@@ -1,0 +1,840 @@
+#!/usr/bin/python
+#
+#
+#
+#
+
+import cookielib
+import getpass
+import json
+import optparse
+import os
+import signal
+import sys
+import urllib
+import urllib2
+import yum
+
+from urlgrabber.progress import TextMeter
+
+class Template(object):
+  def __init__(self, template=''):
+    self._name = ''
+    self._user = 'firnsy'
+
+    self._package_list = PackageList()
+    self._package_list_remove = PackageList()
+    self._repo_list = RepoList()
+    self._repo_list_remove = RepoList()
+
+    self._parse_template( template )
+
+  def _parse_template(self, template):
+    if isinstance( template, str ):
+      parts = template.split(':')
+
+      if len(parts) == 1:
+        self._name = parts[0]
+
+      elif len(parts) == 2:
+        self._user = parts[0]
+        self._name = parts[1]
+
+    if isinstance(template, dict):
+      if 'name' in template:
+        self._name = template['name']
+
+      if 'account' in template:
+        self._user = template['account']
+
+      if 'r' in template:
+        if isinstance(template['r'], list):
+          for r in template['r']:
+            self._repo_list.add( Repo( repo=r ) )
+
+      if 'p' in template:
+        if isinstance(template['p'], list):
+          for p in template['p']:
+            self._package_list.add( Package( package=p ) )
+
+
+  def set(self, template):
+    self._parse_template(template)
+
+  @property
+  def name(self):
+    return self._name
+
+  @property
+  def user(self):
+    return self._user
+
+  def merge(self, template, clean=False):
+    if not isinstance( template, Template ):
+      TypeError('template is not of template Template')
+
+    pl_install = PackageList()
+    pl_remove = PackageList()
+    rl_enable = RepoList()
+
+    # look for packages in our template and not in the template being merged
+    for op in self._package_list.packages():
+
+      found = False
+
+      for tp in template.getPackageList().packages():
+        # match on name only
+        if op.name != tp.name:
+          continue
+
+        # TODO
+        if tp.isPinned():
+          pl_install.add( tp )
+
+        found = True
+
+      # a package exists in ours but not in the template being merged
+      # remove if we're doing a clean merge
+      if not found and clean:
+        pl_remove.add( tp )
+
+
+    # look for package in the merge template and not in our template
+    for tp in self._package_list.packages():
+
+      found = False
+
+      for op in template.getPackageList().packages():
+        # match on name only
+        if op.name != tp.name:
+          continue
+
+        # TODO
+        if tp.isPinned():
+          pl_install.add( tp )
+
+        found = True
+
+      # package is in the merged template but not in our template so let's add
+      if not found:
+        pl_install.add( tp )
+
+
+    # look for repos in our template and not in the template being merged
+    for tr in template.getRepoList().repos():
+
+      found = False
+
+      for r in self._repo_list.repos():
+        # match on name only
+        if r.name != tr.name:
+          continue
+
+        found = True
+
+      # repo is in the merged template but not in our template so let's add
+      if not found:
+        rl_enable.add( tr )
+
+
+    self._package_list = pl_install
+    self._package_list_remove = pl_remove
+    self._repo_list = rl_enable
+
+  def getPackageList(self):
+    return self._package_list
+
+  def getPackageListRemove(self):
+    return self._package_list_remove
+
+  def setPackageList(self, package_list):
+    if not isinstance(package_list, PackageList):
+      TypeError('list is not of type PackageList')
+
+    self._package_list = package_list
+
+  def getRepoList(self):
+    return self._repo_list
+
+  def getRepoListRemove(self):
+    return self._repo_list_remove
+
+  def setRepoList(self, repo_list):
+    if not isinstance(repo_list, RepoList):
+      TypeError('list is not of type RepoList')
+
+    self._repo_list = repo_list
+
+  def asObject(self):
+    return { 'n': self._name,
+             'u': self._user,
+             'r': self._repo_list.asObject(),
+             'p': self._package_list.asObject() }
+
+  def asJSON(self):
+    return json.dumps( self.asObject(), separators=(',',':') )
+
+  def __str__(self):
+    return 'Template: %s (owner: %s)' % (self._name, self._user)
+
+
+class Package(object):
+  def __init__(self, name='', epoch='', version='', release='', arch='', pin=False, package=None):
+    self._name = str(name)
+    self._arch = str(arch)
+    self._version = str(version)
+    self._epoch = str(epoch)
+    self._release = str(release)
+    self._pin = pin
+
+    # parse the name if it contains field separators
+    if isinstance(name, Package):
+      self._parse_package( name )
+
+    elif name.find(':') != -1:
+      self._parse_package( name )
+
+    if package is not None:
+      self._parse_package( package )
+
+  def _parse_package(self, package):
+    if isinstance(package, str):
+      parts = package.split(':')
+
+      if len(parts) == 1:
+        self._name = parts[0]
+
+      elif len(parts) == 2:
+        self._name = parts[0]
+        self._version = parts[1]
+
+      elif len(parts) == 3:
+        self._name = parts[0]
+        self._version = parts[1]
+        self._release = parts[2]
+        self._arch = parts[3]
+
+    if isinstance(package, dict):
+      if 'n' in package:
+        self._name = package['n']
+
+      if 'e' in package:
+        self._epoch = package['e']
+
+      if 'v' in package:
+        self._version = package['v']
+
+      if 'r' in package:
+        self._release = package['r']
+
+      if 'a' in package:
+        self._arch = package['a']
+
+      if 'p' in package:
+        self._pinned = package['p']
+
+
+  def set(self, package):
+    self._parse_package(package)
+
+  @property
+  def name(self):
+    return self._name
+
+  @property
+  def version(self):
+    return self._version
+
+  @property
+  def release(self):
+    return self._release
+
+  def pin(self, state=False):
+    self._pin = state
+
+  def isPinned(self):
+    return self._pin
+
+  def asObject(self):
+    return { 'n': self._name,
+             'e': self._epoch,
+             'v': self._version,
+             'r': self._release,
+             'a': self._arch,
+             'p': self._pin }
+
+  def asJSON(self):
+    return json.dumps( self.asObject(), separators=(',',':') )
+
+  def __str__(self):
+    return 'Package: %s (e:%s, v:%s, r:%s, a:%s)' % (self._name, self._epoch, self._version, self._release, self._arch)
+
+
+class PackageList(object):
+  def __init__(self, packages=[]):
+    self._packages = []
+
+    self._parse_packages( packages )
+
+  def _parse_packages(self, packages ):
+    for p in packages:
+      self._packages.append( Package( p ) )
+
+  def add(self, package):
+    if not isinstance( package, Package ):
+
+      raise TypeError('Not a Package object')
+
+    self._packages.append( package )
+
+  def packages(self):
+    return self._packages
+
+  def asObject(self):
+    return [p.asObject() for p in self._packages]
+
+  def asJSON(self):
+    return json.dumps( self.asObject(), separators=(',',':') )
+
+  def count(self):
+    return len(self._packages)
+
+  def __str__(self):
+    return 'PackageList: %d package.' % ( len(self._packages) )
+
+
+class Repo(object):
+  def __init__(self, id='', name='', baseurl='', mirrorlist='', enabled=False, gpgcheck=False, gpgkey='', meta_expired='', cost=0, exclude=[], repo=None):
+    self._id = id
+    self._name = name
+    self._baseurl = baseurl
+    self._mirrorlist = mirrorlist
+    self._enabled = enabled
+    self._gpgcheck = gpgcheck
+    self._gpgkey = gpgkey
+    self._meta_expired = meta_expired
+    self._cost = cost
+    self._exclude = exclude
+
+    if repo is not None:
+      self._parse_repo( repo )
+
+  def _parse_repo(self, repo):
+    if isinstance(repo, dict):
+      if 'id' in repo:
+        self._id = repo['id']
+
+      if 'n' in repo:
+        self._name = repo['n']
+
+      if 'bu' in repo:
+        self._baseurl = repo['bu']
+
+      if 'ml' in repo:
+        self._mirrorlist = repo['ml']
+
+      if 'e' in repo:
+        self._enabled = repo['e']
+
+      if 'gc' in repo:
+        self._gpgcheck = repo['gc']
+
+      if 'gk' in repo:
+        self._gpgkey = repo['gk']
+
+      if 'me' in repo:
+        self._meta_expired = repo['me']
+
+      if 'c' in repo:
+        self._cost = repo['c']
+
+      if 'x' in repo:
+        self._expired = repo['x']
+
+
+  @property
+  def name(self):
+    return self._name
+
+  def asObject(self):
+    return { 'id': self._id,
+             'n':  self._name,
+             'bu': self._baseurl,
+             'ml': self._mirrorlist,
+             'e':  self._enabled,
+             'gc': self._gpgcheck,
+             'gk': self._gpgkey,
+             'me': self._meta_expired,
+             'c':  self._cost,
+             'x':  self._exclude }
+
+  def __str__(self):
+    return 'Repo: %s (base: %s, mirror: %s)' % (self._name, self._baseurl, self._mirrorlist)
+
+class RepoList(object):
+  def __init__(self, repos=[]):
+    self._repos = []
+
+    self._parse_repos( repos )
+
+  def _parse_repos(self, repos ):
+    for r in repos:
+      if isinstance(r, yum.yumRepo.YumRepository):
+        self._repos.append( Repo( r.id, r.name, r.baseurl, r.mirrorlist, r.enabled, r.gpgcheck, r.gpgkey, r.metadata_expire, r.cost, r.exclude ) )
+
+  def add(self, repo):
+    if not isinstance( repo, Repo ):
+
+      raise TypeError('Not a Repo object')
+
+    self._repos.append( repo )
+
+  def repos(self):
+    return self._repos
+
+  def asObject(self):
+    return [r.asObject() for r in self._repos]
+
+  def asJSON(self):
+    return json.dumps( self.asObject(), separators=(',',':') )
+
+
+class CanvasService(object):
+  def __init__(self, host='https://kororaproject.org:9000'):
+    self._host = host
+    self._urlbase = host
+
+    self._cookiejar = cookielib.CookieJar()
+    self._opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self._cookiejar))
+
+    self._authenticated = False
+
+  def authenticate(self, username='', password='', force=False):
+
+    if self._authenticated and not self._force:
+      return self._authenticated
+
+    auth = json.dumps( { 'u': username, 'p': password }, separators=(',',':') )
+
+    self._authenticated = False
+
+    try:
+      r = urllib2.Request(self._urlbase + '/authenticate', auth)
+      u = self._opener.open(r)
+      self._authenticated = True
+
+    except urllib2.URLError, e:
+      print e
+    except urllib2.HTTPError, e:
+      print e
+
+    return self._authenticated
+
+  def deauthenticate(self, username='', password='', force=False):
+    if not self._authenticated and not self._force:
+      return self._authenticated
+
+    try:
+      r = urllib2.Request(self._urlbase + '/deauthenticate', auth)
+      u = self._opener.open(r)
+
+    except urllib2.URLError, e:
+      print e
+    except urllib2.HTTPError, e:
+      print e
+
+    # 
+    self._authenticated = False
+
+    return self._authenticated
+
+  def template_exists(template):
+    """ Check if the korora template exists
+    """
+    if not isinstance(template, Template):
+      TypeError('template is not of type Template')
+
+  def template_create(self, template):
+
+    if not isinstance(template, Template):
+      TypeError('template is not of type Template')
+
+    try:
+      r = urllib2.Request('http://localhost:9000/api/templates', template.asJSON())
+      u = self._opener.open(r)
+      print u.read()
+
+      return True
+
+    except urllib2.URLError, e:
+      print e
+    except urllib2.HTTPError, e:
+      print e
+
+    return False
+
+
+  def template_add(self, template):
+
+    if not isinstance(template, Template):
+      TypeError('template is not of type Template')
+
+    try:
+      r = urllib2.Request('http://localhost:9000/api/templates', template.asJSON())
+      u = self._opener.open(r)
+      print u.read()
+
+      return True
+
+    except urllib2.URLError, e:
+      print e
+    except urllib2.HTTPError, e:
+      print e
+
+    return False
+
+
+  def template_get(self, template):
+
+    if not isinstance(template, Template):
+      TypeError('template is not of type Template')
+
+    query = { 'account': template.user, 'name': template.name }
+    try:
+      r = urllib2.Request('http://localhost:9000/api/templates?' + urllib.urlencode(query))
+      u = self._opener.open(r)
+
+      template_summary = json.loads( u.read() )
+
+      # we only have one returned since template names are unique per account
+      r = urllib2.Request('http://localhost:9000/api/template/%d' % ( template_summary[0]['id'] ))
+      u = self._opener.open(r)
+
+      return Template( template=json.loads( u.read() ) )
+
+    except urllib2.URLError, e:
+      print e
+    except urllib2.HTTPError, e:
+      print e
+
+    return None
+
+  def template_remove(self, template):
+
+    if not isinstance(template, Template):
+      TypeError('template is not of type Template')
+
+
+
+def main():
+  def signal_handler(signal, frame):
+    print
+    sys.exit(0)
+
+  # trap ctrl+c, it's polish
+  signal.signal(signal.SIGINT, signal_handler)
+
+  '''
+# create a new template "htpc" associated with korora id "firnsy" inheriting from template "minimal" associated with korora id "csmart"
+  canvas template create firnsy:htpc -i csmart:minimal
+
+# remove the explicit packages "package1", "package2" and "packageN" from the template "htpc" associated with korora id "firnsy"
+  canvas template remove -t firnsy:htpc package1 package2 packageN
+
+# pin packages "package1" and "package2" at "version1" and "version2" respectively for the template "htpc" associated with korora id "firnsy"
+  canvas template pin -t firnsy:htpc package1:version1 package2:version2
+
+# unpin packages "package1" and "package2" for the template "htpc" associated with korora id "firnsy"
+  canvas template unpin -t firnsy:htpc package1 package2
+
+# remove all packages defined in the template "htpc" associated with korora id "firnsy"
+  canvas template clear firnsy:htpc
+
+# drop/delete the template "htpc" associated with korora id "firnsy"
+  canvas template drop firnsy:htpc
+
+
+# create a new machine "lounge-htpc" associate with the korora id "firnsy" and using the (public/shared) template "htpc" associated with the korora account "firnsy"
+  canvas machine create firnsy:lounge-htpc -t firnsy:htpc
+
+  canvas machine push firnsy:lounge-htpc /local/path/file1:/remote/path/file1
+
+  canvas machine pull firnsy:lounge-htpc /remote/path/file1:/local/path/file2
+
+  canvas machine sync firnsy:lounge-htpc
+  '''
+
+  usage = "usage: %prog command [options] arg"
+  parser = optparse.OptionParser(usage)
+
+  # general options
+  parser.add_option('-u', '--user', type='string', dest='username')
+  parser.add_option('-p', '--pass', action='store_true', dest='password')
+  parser.add_option('-h', '--host', type='string', dest='host')
+  parser.add_option('-v', '--verbose', action="store_true", dest='verbose')
+
+  # template options
+  parser.add_option('-i', '--inherit', type='string', dest='inherit')
+  parser.add_option('-t', '--template', type='string', dest='template')
+  parser.add_option('-n', '--dry-run', action="store_true", dest='dryrun')
+  parser.add_option('-s', '--system', action='store_true', dest='current_system')
+  parser.add_option('--clean', action='store_true', dest='merge_clean')
+
+
+  (options, args) = parser.parse_args()
+
+  def help(command=None, error=None):
+    if error is not None:
+      print 'Error: %s' % (error)
+
+    if command == 'template':
+      print """
+Usage: canvas template [options] <command> ...
+
+  -n, --dry-run         dry run
+  -v, --verbose         be verbose
+
+  -i, --interactive     interactive picking
+  -f, --force           allow adding otherwise ignored files
+
+  -t, --template        Specify the template to be applied
+
+The most commonly used canvas template commands are:
+  create       Create a new template
+  add          Add packages to a specified template
+  remove       List, create, update or delete packages
+  clear        List, create, update or delete packages
+  delete       List, create, update or delete packages
+  pin          Pin a package to a specific version, release and/or arch.
+  unpin        List, create, update or delete repo
+  apply        Update profile"""
+
+    else:
+      print """
+Usage: canvas [-V|--version] [--help] [-u|--user=<user>] [-p|--password=<pass>]
+       <command> [<args>]
+
+The most commonly used canvas commands are:
+  template     List, create, update or delete templates
+  machine      List, create, update or delete machines
+  package      List, create, update or delete packages
+  repo         List, create, update or delete repo
+  profile      Update profile
+
+See 'canvas help <command>' for more information on a specific command."""
+
+    if error is not None:
+      sys.exit(1);
+
+  # prompt for password if requested
+  password = ''
+  if options.password:
+    password = getpass.getpass()
+
+  if len(args) < 1:
+    help(error='No command specified.')
+
+  if args[0] == 'template':
+
+    if len(args) < 2:
+      help(command='template', error='No template specified.')
+
+    # when creating we support the template being defined as an argument
+    # and not just via the parameter
+    if args[1] == 'create' and len(args) > 2:
+      options.template = args[2]
+
+    # we need a template specified for all template operations
+    if not options.template:
+      help(command='template', error='No template name specified specified.')
+
+    t = Template( options.template )
+
+    if args[1] == 'create':
+      if options.inherit:
+        i = Template( options.inherit )
+        print 'Inheriting from: ' + str(i)
+
+      if options.dryrun:
+        print 'The following template would be created:'
+        print '  - %s' % ( str(t) )
+
+      # perform the real action
+      else:
+        cs = CanvasService()
+
+        if not cs.authenticate(options.username, password):
+          print 'Unable to authenticate with canvas service.'
+          sys.exit(1)
+
+        cs.template_add( t )
+        cs.deauthenticate
+
+
+    elif args[1] == 'add':
+
+      if not options.template:
+        help(command='template', error='No template name specified.')
+
+      if not options.current_system and len(args) < 2:
+        help(command='template', error='No packages specified.')
+
+      pl = PackageList( args[2:] )
+
+      if options.current_system:
+        print "Adding current system packages to template ..."
+
+        yb = yum.YumBase()
+
+        pkgs = yb.rpmdb.returnPackages()
+
+        for p in pkgs:
+          _yd = p.yumdb_info
+          if _yd.get('reason') == 'user':
+            pl.add( Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch) )
+
+
+        rl = RepoList( yb.repos.listEnabled() )
+
+        t.setPackageList( pl )
+        t.setRepoList( rl )
+
+      if options.dryrun:
+        print 'The following would be added to the template %s:' % ( str(t) )
+
+        packages = t.getPackageList().packages()
+        packages.sort( key=lambda x: x.name )
+
+        for p in packages:
+          print "  - " + str(p)
+
+        repos = t.getRepoList().repos()
+        repos.sort( key=lambda x: x.name )
+        for r in repos:
+          print "  - " + str(r)
+
+        print
+        print 'Summary:'
+        print '  - Packages: %d' % ( len(packages) )
+        print '  - Repos: %d' % ( len(repos) )
+        print
+        print 'No action peformed during this dry-run.'
+
+      # perform the real action
+      else:
+        cs = CanvasService()
+
+        if not cs.authenticate(options.username, password):
+          print 'Unable to authenticate with canvas service.'
+          sys.exit(1)
+
+        cs.template_add( t )
+        cs.deauthenticate
+
+    elif args[1] == 'remove':
+      print "Removing from template: " + str(t)
+
+      if not options.current_system and len(args) < 2:
+        parser.error("No packages specified.")
+
+      print "Removing packages from template:"
+
+      l = PackageList( args[2:] )
+      print l
+
+      for p in l.packages():
+        print "  - " + str(p)
+
+    elif args[1] == 'apply':
+      cs = CanvasService()
+
+      if not cs.authenticate(options.username, password):
+        print 'Unable to authenticate with canvas service.'
+        sys.exit(1)
+
+      t_apply = cs.template_get( t )
+      cs.deauthenticate
+
+      # calculate existing system specs
+      t_system = Template()
+
+      yb = yum.YumBase()
+      yb.conf.cache = os.geteuid() != 0
+
+      pkgs = yb.rpmdb.returnPackages()
+      pl = PackageList()
+
+      for p in pkgs:
+        _yd = p.yumdb_info
+        if _yd.get('reason') == 'user':
+          pl.add( Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch) )
+
+      rl = RepoList( yb.repos.listEnabled() )
+
+      t_system.setPackageList( pl )
+      t_system.setRepoList( rl )
+
+      t_apply.merge( template=t_system, clean=options.merge_clean )
+
+      print 'The following actions will be applied to this system:'
+
+      pi = t_apply.getPackageList().packages()
+      pi.sort( key=lambda x: x.name )
+
+      for p in pi:
+        print "  - Install " + str(p)
+
+      pr = t_apply.getPackageListRemove().packages()
+      pr.sort( key=lambda x: x.name )
+
+      for p in pr:
+        print "  - Remove " + str(p)
+
+      repos = t_apply.getRepoList().repos()
+      repos.sort( key=lambda x: x.name )
+      for r in repos:
+        print "  - Install " + str(r)
+
+      print
+      print 'Summary:'
+      print '  - Package(s) installed: %d' % ( len(pi) )
+      print '  - Package(s) removed:   %d' % ( len(pr) )
+      print '  - Repo(s) added:        %d' % ( len(repos) )
+      print
+
+      # show actions on
+      if options.dryrun:
+        print 'No action peformed during this dry-run.'
+
+      # perform the real action
+      else:
+
+        for p in pi:
+          if p.isPinned():
+            yb.install( ( p.name, p.epoch, p.version, p.release, p.arch) )
+          else:
+            yb.install( name=p.name )
+
+        for p in pr:
+          yb.remove( name=p.name )
+
+        # TODO: yum magic here
+        yb.repos.setProgressBar( TextMeter(fo=sys.stdout) )
+
+
+        yb.repos.doSetup()
+        yb.buildTransaction()
+        yb.processTransaction()
+
+    else:
+      help(command='template', error='Unknown template command.')
+
+  elif args[0] == 'machine':
+    print "Machine"
+
+    if len(args) < 2:
+      parser.error("No machinee subcommand specified.")
+
+
+if __name__ == '__main__':
+  main()

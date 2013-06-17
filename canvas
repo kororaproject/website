@@ -1,0 +1,495 @@
+#!/usr/bin/perl
+#
+#
+#
+
+use warnings;
+use strict;
+
+use lib './lib';
+use feature ':5.10';
+
+#
+# PERL INCLUDES
+#
+use Data::Dumper;
+use Mojo::JSON;
+use Mojolicious::Lite;
+
+use Mojolicious::Plugin::Authentication;
+
+#
+# LOCAL INCLUDES
+#
+use Canvas::Package;
+use Canvas::Account;
+use Canvas::AccountMembership;
+use Canvas::Repository;
+use Canvas::Template;
+use Canvas::TemplatePackage;
+use Canvas::TemplateMembership;
+use Canvas::TemplateRepository;
+use Canvas::User;
+
+
+#
+#
+#
+
+plugin 'authentication', {
+  autoload_user => 0,
+  load_user => sub {
+    my ($app, $uid) = @_;
+
+    return {
+      name => 'firnsy',
+      u    => Canvas::User->retrieve( user_login => $uid ),
+      a    => Canvas::Account->search( name => $uid )->first,
+    };
+  },
+  validate_user => sub {
+    my ($app, $user, $pass, $extradata) = @_;
+
+    my $u = Canvas::User->retrieve( user_login => $user );
+    my $a = Canvas::Account->search( name => $user )->first;
+
+    if( defined($a) && defined($u) && $u->validate_password($pass) ) {
+      return $u->user_login;
+    };
+
+    return undef;
+  },
+};
+
+
+#
+# ROUTES
+#
+
+get '/' => sub {
+  my $self = shift;
+
+#  $self->redirect_to('login') if ( ! $self->user_exists() );
+
+  $self->render( text => 'index');
+};
+
+any '/authenticate' => sub {
+  my $self = shift;
+  my $json = Mojo::JSON->new;
+  my $data = $json->decode($self->req->body);
+
+  # collect first out of the parameters and then json decoded body
+  my $u = $self->param('u') // $data->{u} // '';
+  my $p = $self->param('p') // $data->{p} // '';
+
+  if( $self->authenticate($u, $p) ) {
+    return $self->render(
+      status => 200,
+      text => 'woot'
+    );
+  }
+
+  $self->render(
+    status => 403,
+    text => 'denied'
+  );
+};
+
+any '/deauthenticate' => sub {
+  my $self = shift;
+
+  $self->logout;
+
+  $self->render( text => 'woot' );
+};
+
+
+under '/api' => ( authenticated => 1 );
+
+#
+# PACKAGES
+#
+get '/packages' => sub {
+  my $self = shift;
+
+  my $ret = [];
+
+  foreach my $p ( Canvas::Package->retrieve_all ) {
+    push @$ret, {
+      id          => $p->id+0,
+      name        => $p->name,
+    };
+  }
+
+  $self->render( json => $ret );
+};
+
+get '/package/:id' => sub {
+  my $self = shift;
+  my $id = $self->param('id');
+
+  my $p = Canvas::Package->retrieve($id);
+
+  # check we actually received a valid template
+  unless( defined($p) ) {
+    return $self->render(
+      status => 404,
+      json => '{}'
+    );
+  }
+
+  my @template_packages = $p->template_packages;
+
+  $self->render( json => {
+    id          => $p->id+0,
+    name        => $p->name,
+    description => $p->description,
+    referenced  => scalar @template_packages,
+  });
+};
+
+
+#
+# ACCOUNTS
+#
+get '/accounts' => sub {
+  my $self = shift;
+
+  my $cu = $self->current_user;
+
+  my $ret = [];
+
+  foreach my $a ( Canvas::Account->retrieve_all ) {
+    # skip if private and not ( our account or membership to account )
+    next unless( ( $a->id eq $cu->{a}->id ) || ( scalar $a->account_memberships( member_id => $cu->{a}->id ) ) );
+
+    push @$ret, {
+      id          => $a->id+0,
+      name        => $a->name,
+      uuid        => $a->uuid,
+    };
+  }
+
+  $self->render( json => $ret );
+};
+
+get '/account/:id' => sub {
+  my $self = shift;
+  my $id = $self->param('id');
+
+  my $cu = $self->current_user;
+  my $p = Canvas::Account->retrieve($id);
+
+  # skip if private and not ( our account or membership to account )
+  unless( ( $p->id eq $cu->{a}->id ) || ( scalar $p->account_memberships( member_id => $cu->{a}->id ) ) ) {
+    return $self->render(
+      status => 403,
+      json => '{}'
+    );
+  }
+
+  # check we actually received a valid account
+  unless( defined($p) ) {
+   return $self->render(
+      status => 404,
+      json => '{}'
+    );
+  }
+
+  $self->render( json => {
+    id          => $p->id+0,
+    name        => $p->name,
+    uuid        => $p->uuid,
+  });
+};
+
+
+get '/account/:id/memberships' => sub {
+  my $self = shift;
+  my $id = $self->param('id');
+
+  my $cu = $self->current_user;
+  my $p = Canvas::Account->retrieve($id);
+  my @member = $p->account_memberships( member_id => $cu->{a}->id );
+
+  # abort if private and not ( our account or membership to account )
+  unless( ( $p->id eq $cu->{a}->id ) || ( scalar @member && ( $member[0]->is_owner_admin ) ) ) {
+    return $self->render(
+      status => 403,
+      text => 'No access to this account\'s memberships.',
+      json => 'No access to this account\'s memberships.',
+    );
+  }
+
+  my $ret = [];
+
+  foreach my $m ( $p->account_memberships ) {
+    push @$ret, {
+      id          => $m->member_id->id+0,
+      name        => $m->member_id->name,
+      uuid        => $m->member_id->uuid,
+    };
+  }
+
+  $self->render( json => $ret );
+};
+
+#
+# REPOSITORIES
+#
+get '/repositories' => sub {
+  my $self = shift;
+
+  my $ret = [];
+
+  foreach my $r ( Canvas::Repository->retrieve_all ) {
+    push @$ret, {
+      id          => $r->id+0,
+      name        => $r->name,
+    };
+  }
+
+  $self->render( json => $ret );
+};
+
+get '/repository/:id' => sub {
+  my $self = shift;
+  my $id = $self->param('id');
+
+  my $r = Canvas::Repository->retrieve($id);
+
+  # check we actually received a valid profile
+  unless( defined($r) ) {
+    return $self->render(
+      status => 404,
+      json => '{}'
+    );
+  }
+
+  $self->render( json => {
+    id          => $r->id+0,
+    name        => $r->name,
+    base_url    => $r->base_url,
+    gpg_key     => $r->gpg_key,
+  });
+};
+
+
+#
+# TEMPLATES
+#
+get '/templates' => sub {
+  my $self = shift;
+
+  # construct search query as appropriate
+  my $q = {};
+
+  my $q_name = $self->param('name');
+  my $q_account = $self->param('account');
+
+  say Dumper $q_name, $q_account;
+  $q->{name}    = $q_name     if defined($q_name);
+
+  my @templates;
+  if( keys %$q ) {
+    @templates = Canvas::Template->search( $q );
+  }
+  else {
+    @templates = Canvas::Template->retrieve_all();
+  }
+
+  # get auth'd user
+  my $cu = $self->current_user;
+
+  # configure default return
+  my $ret = [];
+
+  foreach my $t ( @templates ) {
+    # skip if private and not ( our account or membership to account )
+    next if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) );
+    next if( defined( $q_account ) && ( $t->account_id->name ne $q_account) );
+
+    # add to available
+    push @$ret, {
+      id          => $t->id+0,
+      name        => $t->name,
+      description => $t->description,
+    };
+  }
+
+  $self->render( json => $ret );
+};
+
+get '/template/:id' => sub {
+  my $self = shift;
+  my $id = $self->param('id');
+  my $cu = $self->current_user;
+  my $t = Canvas::Template->retrieve($id);
+
+  # check we actually received a valid template
+  unless( defined($t) ) {
+    return $self->render(
+      status => 404,
+      json => '{}'
+    );
+  }
+
+  # skip if private and not ( our account or membership to account )
+  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+    return $self->render(
+      status => 403,
+      json => '{}'
+    );
+  }
+
+  my $p = [];
+  foreach my $_p ( $t->template_packages ) {
+    push @$p, {
+      n => $_p->package_id->name,
+      e => $_p->epoch,
+      v => $_p->version,
+      r => $_p->rel,
+      a => $_p->arch_id->name,
+      p => $_p->pinned,
+    }
+  }
+
+  my $r = [];
+  foreach my $_r ( $t->template_repositories ) {
+    push @$r, {
+      n   => $_r->repo_id->name,
+      v   => $_r->version,
+      c   => $_r->cost+0,
+      e   => $_r->enabled eq 1 ? Mojo::JSON->true : Mojo::JSON->false,
+      gc  => $_r->gpg_check,
+    }
+  }
+
+  $self->render( json => {
+    id          => $t->id+0,
+    name        => $t->name,
+    description => $t->description,
+    r           => $r,
+    p           => $p,
+  });
+};
+
+
+post '/templates' => sub {
+  my $self = shift;
+  my $json = Mojo::JSON->new;
+  my $data = $json->decode( $self->req->body );
+
+  # find the account requested
+  my $u = Canvas::Account->search({
+    name => $data->{u},
+  })->first;
+
+  # bail if the account doesn't exist
+  unless( defined($u) ) {
+    return $self->render(
+      status => 500,
+      text => 'No user with that account.',
+      json => 'No user with that account.',
+    );
+  }
+
+  my $cu = $self->current_user;
+  my @membership = $u->account_memberships( member_id => $cu->{a}->id );
+
+  # validate the current user has access to write on this account
+  unless( ( $data->{u} eq $cu->{a}->name ) ||
+          ( scalar @membership && $membership[0]->can_create ) ) {
+
+    return $self->render(
+      status => 500,
+      text => 'Not your account buddy.',
+      json => 'Not your account buddy.',
+    );
+  }
+
+  # find or create new template
+  my $t = Canvas::Template->search({
+    account_id => $u->id+0,
+    name       => $data->{n},
+  })->first;
+
+  if( defined($t) ) {
+    return $self->render(
+      status => 500,
+      json => 'Template already exists with that name for this account.',
+      text => 'Template already exists with that name for this account.',
+    );
+  }
+
+  # create the template
+  $t = Canvas::Template->insert({
+    account_id => $u->id+0,
+    name       => $data->{n},
+  });
+
+  Canvas::DBI->do_transaction( sub {
+
+    # get all archs to cache
+    my $arch_cache = {};
+
+    # store repositories
+    foreach my $r ( @{ $data->{r} } ) {
+      # calculate the base url
+      my $bu = $r->{ml} // '';
+      if( $bu eq '' ) {
+        $bu = $r->{bu}[0] // '';
+      }
+
+      my $pu = $r->{bu}[0] // '';
+
+      my $pr = Canvas::Repository->find_or_create({
+        name      => $r->{n},
+        stub      => $r->{id},
+        base_url  => $bu,
+        gpg_key   => $r->{gk}[0] // '',
+      });
+
+      $t->add_to_template_repositories({
+        repo_id     => $pr->id,
+        pref_url    => $pu,
+        enabled     => $r->{e},
+        cost        => $r->{c}+0,
+        gpg_check   => $r->{gc},
+      });
+    }
+
+    # store pacakges
+    foreach my $p ( @{ $data->{p} } ) {
+      my $pp = Canvas::Package->find_or_create({ name => $p->{n} });
+
+      # cache arch lookups since there are very few
+      unless( defined($arch_cache->{$p->{a}}) ) {
+        $arch_cache->{$p->{a}} = Canvas::Arch->find_or_create({ name => $p->{a} });
+      }
+      my $pa = $arch_cache->{$p->{a}};
+
+      $t->add_to_template_packages({
+        package_id  => $pp->id+0,
+        arch_id     => $pa->id+0,
+        epoch       => $p->{e},
+        version     => $p->{v},
+        rel         => $p->{r},
+        pinned      => $p->{p}
+      });
+    }
+
+  });
+
+  $self->render(
+    text    => 'id: ' . $t->id,
+    json    => { id => $t->id },
+    status  => 200
+  );
+};
+
+say 'starting...';
+
+app->secret('canvas');
+app->start;

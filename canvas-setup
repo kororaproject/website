@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+use strict;
+
+use lib './lib';
+use feature ':5.10';
+
+use Data::Dumper;
+
+use Canvas::User;
+use Canvas::Account;
+
+
+# create firnsy
+my $firnsy = Canvas::Account->find_or_create({
+  name => 'firnsy',
+  uuid => 'woot'
+});
+
+my $test = Canvas::Account->find_or_create({
+  name => 'test_subscriber',
+  uuid => 'woot'
+});
+
+my $woot = Canvas::Account->find_or_create({
+  name => 'Anonymous',
+  uuid => 'woot'
+});
+
+
+$test->add_to_account_memberships({
+  member_id => $firnsy->id,
+  access    => 128,
+});
