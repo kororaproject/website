@@ -1,7 +1,20 @@
 #!/usr/bin/python
 #
+# Copyright (C) 2013    Ian Firns   <firnsy@kororaproject.org>
+#                       Chris Smart <csmart@kororaproject.org>
 #
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 import cookielib
@@ -19,8 +32,10 @@ from urlgrabber.progress import TextMeter
 
 class Template(object):
   def __init__(self, template=''):
-    self._name = ''
-    self._user = 'firnsy'
+    self._name = None
+    self._user = None
+    self._id = None
+    self._description = None
 
     self._package_list = PackageList()
     self._package_list_remove = PackageList()
@@ -41,11 +56,17 @@ class Template(object):
         self._name = parts[1]
 
     if isinstance(template, dict):
+      if 'id' in template:
+        self._id = template['id']
+
       if 'name' in template:
         self._name = template['name']
 
       if 'account' in template:
         self._user = template['account']
+
+      if 'description' in template:
+        self._name = template['description']
 
       if 'r' in template:
         if isinstance(template['r'], list):
@@ -62,16 +83,37 @@ class Template(object):
     self._parse_template(template)
 
   @property
+  def id(self):
+    return self._id
+
+  @property
   def name(self):
     return self._name
+
+  @property
+  def account(self):
+    return self._user
 
   @property
   def user(self):
     return self._user
 
+  @property
+  def description(self):
+    return self._description
+
   def merge(self, template, clean=False):
     if not isinstance( template, Template ):
       TypeError('template is not of template Template')
+
+    if template.name is not None:
+      self._name = template.name
+
+    if template.user is not None:
+      self._user = template.user
+
+    if template.description is not None:
+      self._description = template.description
 
     pl_install = PackageList()
     pl_remove = PackageList()
@@ -384,7 +426,6 @@ class RepoList(object):
 
   def add(self, repo):
     if not isinstance( repo, Repo ):
-
       raise TypeError('Not a Repo object')
 
     self._repos.append( repo )
@@ -419,7 +460,7 @@ class CanvasService(object):
     self._authenticated = False
 
     try:
-      r = urllib2.Request(self._urlbase + '/authenticate', auth)
+      r = urllib2.Request(self._urlbase + '/authenticate.json', auth)
       u = self._opener.open(r)
       self._authenticated = True
 
@@ -435,7 +476,7 @@ class CanvasService(object):
       return self._authenticated
 
     try:
-      r = urllib2.Request(self._urlbase + '/deauthenticate', auth)
+      r = urllib2.Request('%s/deauthenticate.json' % ( self._urlbase ))
       u = self._opener.open(r)
 
     except urllib2.URLError, e:
@@ -443,16 +484,11 @@ class CanvasService(object):
     except urllib2.HTTPError, e:
       print e
 
-    # 
+    #
     self._authenticated = False
 
     return self._authenticated
 
-  def template_exists(self, template):
-    """ Check if the korora template exists
-    """
-    if not isinstance(template, Template):
-      TypeError('template is not of type Template')
 
   def template_create(self, template):
 
@@ -460,9 +496,27 @@ class CanvasService(object):
       TypeError('template is not of type Template')
 
     try:
-      r = urllib2.Request(self._urlbase + '/api/templates.json', template.asJSON())
+      r = urllib2.Request('%s/api/templates.json' % ( self._urlbase ), template.asJSON())
       u = self._opener.open(r)
       print u.read()
+
+      return True
+
+    except urllib2.URLError, e:
+      print e
+    except urllib2.HTTPError, e:
+      print e
+
+    return False
+
+
+  def template_delete(self, template_id):
+
+    try:
+      r = urllib2.Request('%s/api/template/%d.json' % ( self._urlbase, template_id ))
+      r.get_method = lambda: 'DELETE'
+      u = self._opener.open(r)
+      o = json.loads( u.read() )
 
       return True
 
@@ -480,7 +534,8 @@ class CanvasService(object):
       TypeError('template is not of type Template')
 
     try:
-      r = urllib2.Request(self._urlbase + '/api/templates.json', template.asJSON())
+      r = urllib2.Request('%s/api/templates.json' % ( self._urlbase ), template.asJSON())
+      r.get_method = lambda: 'PUT'
       u = self._opener.open(r)
       print u.read()
 
@@ -501,16 +556,17 @@ class CanvasService(object):
 
     query = { 'account': template.user, 'name': template.name }
     try:
-      r = urllib2.Request(self._urlbase + '/api/templates?' + urllib.urlencode(query))
+      r = urllib2.Request('%s/api/templates.json?%s' % ( self._urlbase, urllib.urlencode(query) ))
       u = self._opener.open(r)
 
       template_summary = json.loads( u.read() )
 
-      # we only have one returned since template names are unique per account
-      r = urllib2.Request('%s/api/template/%d' % ( self._urlbase, template_summary[0]['id'] ))
-      u = self._opener.open(r)
+      if len( template_summary ):
+        # we only have one returned since template names are unique per account
+        r = urllib2.Request('%s/api/template/%d.json' % ( self._urlbase, template_summary[0]['id'] ))
+        u = self._opener.open(r)
 
-      return Template( template=json.loads( u.read() ) )
+        return Template( template=json.loads( u.read() ) )
 
     except urllib2.URLError, e:
       print e
@@ -523,7 +579,7 @@ class CanvasService(object):
     """ Check if the korora template exists
     """
     try:
-      r = urllib2.Request('%s/api/templates' % ( self._urlbase ))
+      r = urllib2.Request('%s/api/templates.json' % ( self._urlbase ))
       u = self._opener.open(r)
 
       return json.loads( u.read() )
@@ -592,6 +648,7 @@ def main():
   # template options
   parser.add_option('-i', '--inherit', type='string', dest='inherit')
   parser.add_option('-t', '--template', type='string', dest='template')
+  parser.add_option('--create', action='store_true', dest='create')
   parser.add_option('-n', '--dry-run', action="store_true", dest='dryrun')
   parser.add_option('-s', '--system', action='store_true', dest='current_system')
   parser.add_option('--clean', action='store_true', dest='merge_clean')
@@ -685,7 +742,32 @@ See 'canvas help <command>' for more information on a specific command."""
           sys.exit(1)
 
         cs.template_add( t )
-        cs.deauthenticate
+        cs.deauthenticate()
+
+
+    if args[1] == 'delete':
+      print 'The following template will be deleted:'
+      print '  - %s' % ( str(t) )
+
+      if options.dryrun:
+        print 'No action peformed during this dry-run.'
+
+      # perform the real action
+      else:
+        if not cs.authenticate(options.username, password):
+          print 'Unable to authenticate with canvas service.'
+          sys.exit(1)
+
+        t_delete = cs.template_get( t )
+
+        if t_delete is not None:
+          cs.template_delete( t_delete )
+          print 'Template deleted.'
+
+        else:
+          print 'Template not found.'
+
+        cs.deauthenticate()
 
 
     elif args[1] == 'list':
@@ -699,12 +781,15 @@ See 'canvas help <command>' for more information on a specific command."""
           print 'Templates:'
 
           for t in tl:
-            print '  - ' + t['name']
+            print '  - %s (%s)' % ( t['name'], t['owner'] )
+
+          print
+          print '%d template(s) found.' % ( len(tl) )
 
         else:
           print '0 templates found. \'Tis the dawn of time.'
 
-        cs.deauthenticate
+        cs.deauthenticate()
 
     elif args[1] == 'add':
 
@@ -717,7 +802,7 @@ See 'canvas help <command>' for more information on a specific command."""
       pl = PackageList( args[2:] )
 
       if options.current_system:
-        print "Adding current system packages to template ..."
+        print 'Adding current system packages to template ...'
 
         yb = yum.YumBase()
 
@@ -741,12 +826,12 @@ See 'canvas help <command>' for more information on a specific command."""
         packages.sort( key=lambda x: x.name )
 
         for p in packages:
-          print "  - " + str(p)
+          print '  - ' + str(p)
 
         repos = t.getRepoList().repos()
         repos.sort( key=lambda x: x.name )
         for r in repos:
-          print "  - " + str(r)
+          print '  - ' + str(r)
 
         print
         print 'Summary:'
@@ -762,16 +847,28 @@ See 'canvas help <command>' for more information on a specific command."""
           print 'Unable to authenticate with canvas service.'
           sys.exit(1)
 
-        cs.template_add( t )
-        cs.deauthenticate
+        t_add = cs.template_get( t )
+
+        if t_add is not None:
+          t_add.merge( template=t )
+          cs.template_add( t_add )
+
+        elif options.create:
+          cs.template_create( t )
+
+        else:
+          print 'Template does not exist.'
+          sys.exit(1)
+
+        cs.deauthenticate()
 
     elif args[1] == 'remove':
-      print "Removing from template: " + str(t)
+      print 'Removing from template: ' + str(t)
 
       if not options.current_system and len(args) < 2:
-        parser.error("No packages specified.")
+        parser.error('No packages specified.')
 
-      print "Removing packages from template:"
+      print 'Removing packages from template:'
 
       l = PackageList( args[2:] )
       print l
@@ -785,7 +882,12 @@ See 'canvas help <command>' for more information on a specific command."""
         sys.exit(1)
 
       t_apply = cs.template_get( t )
-      cs.deauthenticate
+      cs.deauthenticate()
+
+      # check the template exists
+      if t_apply is None:
+        print 'Template does not exist.'
+        sys.exit(1)
 
       # calculate existing system specs
       t_system = Template()
@@ -814,18 +916,18 @@ See 'canvas help <command>' for more information on a specific command."""
       pi.sort( key=lambda x: x.name )
 
       for p in pi:
-        print "  - Install " + str(p)
+        print '  - Install ' + str(p)
 
       pr = t_apply.getPackageListRemove().packages()
       pr.sort( key=lambda x: x.name )
 
       for p in pr:
-        print "  - Remove " + str(p)
+        print '  - Remove ' + str(p)
 
       repos = t_apply.getRepoList().repos()
       repos.sort( key=lambda x: x.name )
       for r in repos:
-        print "  - Install " + str(r)
+        print '  - Install ' + str(r)
 
       print
       print 'Summary:'
@@ -852,7 +954,6 @@ See 'canvas help <command>' for more information on a specific command."""
 
         # TODO: yum magic here
         yb.repos.setProgressBar( TextMeter(fo=sys.stdout) )
-
 
         yb.repos.doSetup()
         yb.buildTransaction()
