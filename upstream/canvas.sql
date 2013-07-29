@@ -132,26 +132,28 @@ CREATE TABLE canvas_templatepackage (
     version       varchar(64)   NOT NULL,
     rel           varchar(64)   NOT NULL,
     epoch         varchar(64)   NOT NULL,
-    pinned        bool          NOT NULL DEFAULT FALSE
+
+    /* default action is set to INSTALLED only */
+    action        integer       NOT NULL DEFAULT 1
 )
 ;
 CREATE TABLE canvas_templaterepository (
-    id integer NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-    template_id integer NOT NULL REFERENCES canvas_template(id),
-    repo_id integer NOT NULL REFERENCES canvas_repository(id),
-    pref_url varchar(256) NOT NULL DEFAULT '',
-    version varchar(64) NOT NULL DEFAULT 0,
-    enabled bool NOT NULL DEFAULT TRUE,
-    cost integer NOT NULL DEFAULT 1000,
-    gpg_check bool NOT NULL DEFAULT TRUE
+    id            integer       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+    template_id   integer       NOT NULL REFERENCES canvas_template(id),
+    repo_id       integer       NOT NULL REFERENCES canvas_repository(id),
+    pref_url      varchar(256)  NOT NULL DEFAULT '',
+    version       varchar(64)   NOT NULL DEFAULT 0,
+    enabled       bool          NOT NULL DEFAULT TRUE,
+    cost          integer       NOT NULL DEFAULT 1000,
+    gpg_check     bool          NOT NULL DEFAULT TRUE
 )
 ;
 CREATE TABLE canvas_machine (
-    id integer NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-    account_id integer NOT NULL REFERENCES canvas_account(id),
-    template_id integer NOT NULL REFERENCES canvas_template(id),
-    name varchar(256) NOT NULL,
-    description text
+    id            integer       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+    account_id    integer       NOT NULL REFERENCES canvas_account(id),
+    template_id   integer       NOT NULL REFERENCES canvas_template(id),
+    name          varchar(256)  NOT NULL,
+    description   text
 )
 ;
 COMMIT;

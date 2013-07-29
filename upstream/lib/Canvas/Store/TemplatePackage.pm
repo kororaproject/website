@@ -20,12 +20,63 @@ package Canvas::Store::TemplatePackage;
 use strict;
 use base 'Canvas::Store';
 
-__PACKAGE__->table('canvas_templatepackage');
-__PACKAGE__->columns(All => qw/id template_id package_id arch_id version rel epoch pinned/);
+#
+# CONSTANTS
+#
+use constant {
+  # bit 7: 0 = not pinned, 1 = pinned
+  ACTION_PINNED     => 128,
 
+  # bit 1: 0 = removed, 1 = installed
+  ACTION_INSTALLED  =>   1,
+};
+
+#
+# TABLE DEFINITION
+#
+__PACKAGE__->table('canvas_templatepackage');
+__PACKAGE__->columns(All => qw/id template_id package_id arch_id version rel epoch action/);
+
+#
+# 1:N MAPPINGS
+#
 __PACKAGE__->has_a(template_id  => 'Canvas::Store::Template');
 __PACKAGE__->has_a(package_id   => 'Canvas::Store::Package');
 __PACKAGE__->has_a(arch_id      => 'Canvas::Store::Arch');
+
+
+
+#
+# ATTRIBUTES
+#
+
+sub is_pinned {
+  my $action = shift->action;
+
+  return( $action & ACTION_PINNED )
+}
+
+#
+# is_installed()
+#
+# is the package explicitly installed by the template
+#
+sub is_installed {
+  my $action = shift->action;
+
+  return( $action & ACTION_INSTALLED )
+}
+
+#
+# is_removed()
+#
+# is the package explicitly removed by the template
+#
+sub is_removed {
+  return not shift->is_installed;
+}
+
+
 
 
 
