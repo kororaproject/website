@@ -47,7 +47,7 @@ use Canvas::Store::User;
 
 
 #
-#
+# AUTHENTICATION
 #
 
 plugin 'authentication', {
@@ -100,16 +100,16 @@ any '/authenticate' => sub {
 
   if( $self->authenticate($u, $p) ) {
     return $self->render(
-      status => 200,
-      text => 'ok',
-      json => { message => 'ok' },
+      status  => 200,
+      text    => 'ok',
+      json    => { message => 'ok' },
     );
   }
 
   $self->render(
-    status => 401,
-    text => 'unauthorised',
-    json => { error => 'unauthorised' },
+    status  => 401,
+    text    => 'unauthorised',
+    json    => { error => 'unauthorised' },
   );
 };
 
@@ -119,9 +119,9 @@ any '/deauthenticate' => sub {
   $self->logout;
 
   $self->render(
-    status => 200,
-    text => 'ok',
-    json => { message => 'ok' },
+    status  => 200,
+    text    => 'ok',
+    json    => { message => 'ok' },
   );
 };
 
@@ -155,9 +155,9 @@ get '/package/:id' => sub {
   # check we actually received a valid template
   unless( defined($p) ) {
     return $self->render(
-      status => 404,
-      text => 'not found',
-      json => { error => 'not found' },
+      status  => 404,
+      text    => 'not found',
+      json    => { error => 'not found' },
     );
   }
 
@@ -187,9 +187,9 @@ get '/accounts' => sub {
     next unless( ( $a->id eq $cu->{a}->id ) || ( scalar $a->account_memberships( member_id => $cu->{a}->id ) ) );
 
     push @$ret, {
-      id          => $a->id+0,
-      name        => $a->name,
-      uuid        => $a->uuid,
+      id    => $a->id+0,
+      name  => $a->name,
+      uuid  => $a->uuid,
     };
   }
 
@@ -206,25 +206,25 @@ get '/account/:id' => sub {
   # skip if private and not ( our account or membership to account )
   unless( ( $p->id eq $cu->{a}->id ) || ( scalar $p->account_memberships( member_id => $cu->{a}->id ) ) ) {
     return $self->render(
-      status => 403,
-      text => 'denied',
-      json => { error => 'denied' },
+      status  => 403,
+      text    => 'denied',
+      json    => { error => 'denied' },
     );
   }
 
   # check we actually received a valid account
   unless( defined($p) ) {
    return $self->render(
-      status => 404,
-      text => 'not found',
-      json => { error => 'not found' },
+      status  => 404,
+      text    => 'not found',
+      json    => { error => 'not found' },
     );
   }
 
   $self->render( json => {
-    id          => $p->id+0,
-    name        => $p->name,
-    uuid        => $p->uuid,
+    id    => $p->id+0,
+    name  => $p->name,
+    uuid  => $p->uuid,
   });
 };
 
@@ -240,9 +240,9 @@ get '/account/:id/memberships' => sub {
   # abort if private and not ( our account or membership to account )
   unless( ( $p->id eq $cu->{a}->id ) || ( scalar @member && ( $member[0]->is_owner_admin ) ) ) {
     return $self->render(
-      status => 403,
-      text => 'denied',
-      json => { error => 'denied' },
+      status  => 403,
+      text    => 'denied',
+      json    => { error => 'denied' },
     );
   }
 
@@ -250,9 +250,9 @@ get '/account/:id/memberships' => sub {
 
   foreach my $m ( $p->account_memberships ) {
     push @$ret, {
-      id          => $m->member_id->id+0,
-      name        => $m->member_id->name,
-      uuid        => $m->member_id->uuid,
+      id    => $m->member_id->id+0,
+      name  => $m->member_id->name,
+      uuid  => $m->member_id->uuid,
     };
   }
 
@@ -269,8 +269,8 @@ get '/repositories' => sub {
 
   foreach my $r ( Canvas::Store::Repository->retrieve_all ) {
     push @$ret, {
-      id          => $r->id+0,
-      name        => $r->name,
+      id    => $r->id+0,
+      name  => $r->name,
     };
   }
 
@@ -286,19 +286,19 @@ get '/repository/:id' => sub {
   # check we actually received a valid profile
   unless( defined($r) ) {
     return $self->render(
-      status => 404,
-      text => 'not found',
-      json => { error => 'not found' },
+      status  => 404,
+      text    => 'not found',
+      json    => { error => 'not found' },
     );
   }
 
   $self->render(
     status => 200,
     json => {
-      id          => $r->id+0,
-      name        => $r->name,
-      base_url    => $r->base_url,
-      gpg_key     => $r->gpg_key,
+      id        => $r->id+0,
+      name      => $r->name,
+      base_url  => $r->base_url,
+      gpg_key   => $r->gpg_key,
     }
   );
 };
@@ -353,8 +353,8 @@ get '/templates' => sub {
   }
 
   $self->render(
-    status => 200,
-    json => $ret,
+    status  => 200,
+    json    => $ret,
   );
 };
 
@@ -376,9 +376,9 @@ post '/templates' => sub {
   # bail if the account doesn't exist
   unless( defined($u) ) {
     return $self->render(
-      status => 500,
-      text => 'No user with that account.',
-      json => { error => 'No user with that account.' },
+      status  => 500,
+      text    => 'No user with that account.',
+      json    => { error => 'No user with that account.' },
     );
   }
 
@@ -390,9 +390,9 @@ post '/templates' => sub {
           ( scalar @membership && $membership[0]->can_create ) ) {
 
     return $self->render(
-      status => 500,
-      text => 'Not your account buddy.',
-      json => { error => 'Not your account buddy.' },
+      status  => 500,
+      text    => 'Not your account buddy.',
+      json    => { error => 'Not your account buddy.' },
     );
   }
 
@@ -404,9 +404,9 @@ post '/templates' => sub {
 
   if( defined($t) ) {
     return $self->render(
-      status => 500,
-      json => 'Template already exists with that name for this account.',
-      text => 'Template already exists with that name for this account.',
+      status  => 500,
+      json    => 'Template already exists with that name for this account.',
+      text    => 'Template already exists with that name for this account.',
     );
   }
 
@@ -463,16 +463,16 @@ post '/templates' => sub {
         epoch       => $p->{e},
         version     => $p->{v},
         rel         => $p->{r},
-        pinned      => $p->{p}
+        action      => $p->{p}
       });
     }
 
   });
 
   $self->render(
+    status  => 200,
     text    => 'id: ' . $t->id,
     json    => { id => $t->id },
-    status  => 200
   );
 };
 
@@ -488,20 +488,20 @@ get '/template/:id' => sub {
   my $cu = $self->current_user;
   my $t = Canvas::Template->retrieve($id);
 
-  # check we actually received a valid template
-  unless( defined($t) ) {
-    return $self->render(
-      status => 404,
-      json => '{}'
-    );
-  }
-
   # skip if private and not ( our account or membership to account )
   if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
     return $self->render(
-      status => 403,
-      text => 'denied',
-      json => { error => 'denied' },
+      status  => 403,
+      text    => 'denied',
+      json    => { error => 'denied' },
+    );
+  }
+
+  # check we actually received a valid template
+  unless( defined($t) ) {
+    return $self->render(
+      status  => 404,
+      json    => { error => 'not found' },
     );
   }
 
@@ -513,7 +513,7 @@ get '/template/:id' => sub {
       v => $_p->version,
       r => $_p->rel,
       a => $_p->arch_id->name,
-      p => $_p->pinned,
+      p => $_p->action,
     }
   }
 
@@ -553,20 +553,20 @@ put '/template/:id' => sub {
   my $cu = $self->current_user;
   my $t = Canvas::Template->retrieve($id);
 
-  # check we actually received a valid template
-  unless( defined($t) ) {
-    return $self->render(
-      status => 404,
-      json => '{}'
-    );
-  }
-
   # skip if private and not ( our account or membership to account )
   if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
     return $self->render(
-      status => 403,
-      text => 'denied',
-      json => { error => 'denied' },
+      status  => 403,
+      text    => 'denied',
+      json    => { error => 'denied' },
+    );
+  }
+
+  # check we actually received a valid template
+  unless( defined($t) ) {
+    return $self->render(
+      status  => 404,
+      json    => { error => 'not found' },
     );
   }
 
@@ -670,7 +670,7 @@ put '/template/:id' => sub {
           epoch       => $p->{e},
           version     => $p->{v},
           rel         => $p->{r},
-          pinned      => $p->{p}
+          action      => $p->{p}
         });
 
         $tp[0]->udpate;
@@ -683,7 +683,7 @@ put '/template/:id' => sub {
           epoch       => $p->{e},
           version     => $p->{v},
           rel         => $p->{r},
-          pinned      => $p->{p}
+          action      => $p->{p}
         });
       }
     }
@@ -726,21 +726,21 @@ del '/template/:id' => sub {
   my $cu = $self->current_user;
   my $t = Canvas::Template->retrieve($id);
 
-  # check we actually received a valid template
-  unless( defined($t) ) {
-    return $self->render(
-      status => 404,
-      text => 'not found',
-      json => { error => 'not found' },
-    );
-  }
-
   # skip if private and not ( our account or membership to account )
   if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
     return $self->render(
-      status => 403,
-      text => 'denied',
-      json => { error => 'denied' },
+      status  => 403,
+      text    => 'denied',
+      json    => { error => 'denied' },
+    );
+  }
+
+  # check we actually received a valid template
+  unless( defined($t) ) {
+    return $self->render(
+      status  => 404,
+      text    => 'not found',
+      json    => { error => 'not found' },
     );
   }
 
@@ -754,7 +754,8 @@ del '/template/:id' => sub {
     json    => { message => 'ok' },
   );
 };
-say 'starting...';
+
+say 'Starting ...';
 
 app->secret('canvas');
 app->start;
