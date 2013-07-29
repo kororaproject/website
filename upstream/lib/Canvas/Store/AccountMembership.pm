@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::AccountMembership;
+package Canvas::Store::AccountMembership;
 
 use strict;
-use base 'Canvas::DBI';
+use base 'Canvas::Store';
 
 use constant {
   ACL_OWNER => 128,
@@ -29,8 +29,8 @@ use constant {
 __PACKAGE__->table('canvas_accountmembership');
 __PACKAGE__->columns(All => qw/id account_id member_id name access/);
 
-__PACKAGE__->has_a(account_id => 'Canvas::Account');
-__PACKAGE__->has_a(member_id => 'Canvas::Account');
+__PACKAGE__->has_a(account_id => 'Canvas::Store::Account');
+__PACKAGE__->has_a(member_id  => 'Canvas::Store::Account');
 
 
 

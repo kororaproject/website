@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::User;
+package Canvas::Store::User;
 
 use strict;
-use base 'Canvas::DBI';
+use base 'Canvas::Store';
 
 #
 # PERL INCLUDES

@@ -35,15 +35,15 @@ use Mojolicious::Plugin::Authentication;
 #
 # LOCAL INCLUDES
 #
-use Canvas::Package;
-use Canvas::Account;
-use Canvas::AccountMembership;
-use Canvas::Repository;
-use Canvas::Template;
-use Canvas::TemplatePackage;
-use Canvas::TemplateMembership;
-use Canvas::TemplateRepository;
-use Canvas::User;
+use Canvas::Store::Package;
+use Canvas::Store::Account;
+use Canvas::Store::AccountMembership;
+use Canvas::Store::Repository;
+use Canvas::Store::Template;
+use Canvas::Store::TemplatePackage;
+use Canvas::Store::TemplateMembership;
+use Canvas::Store::TemplateRepository;
+use Canvas::Store::User;
 
 
 #
@@ -57,16 +57,16 @@ plugin 'authentication', {
 
     return {
       name => 'firnsy',
-      u    => Canvas::User->retrieve( user_login => $uid ),
-      a    => Canvas::Account->search( name => $uid )->first,
+      u    => Canvas::Store::User->retrieve( user_login => $uid ),
+      a    => Canvas::Store::Account->search( name => $uid )->first,
     };
   },
   validate_user => sub {
     my ($app, $user, $pass, $extradata) = @_;
 
     print Dumper $user, $pass;
-    my $u = Canvas::User->retrieve( user_login => $user );
-    my $a = Canvas::Account->search( name => $user )->first;
+    my $u = Canvas::Store::User->retrieve( user_login => $user );
+    my $a = Canvas::Store::Account->search( name => $user )->first;
 
     if( defined($a) && defined($u) && $u->validate_password($pass) ) {
       return $u->user_login;
@@ -136,7 +136,7 @@ get '/packages' => sub {
 
   my $ret = [];
 
-  foreach my $p ( Canvas::Package->retrieve_all ) {
+  foreach my $p ( Canvas::Store::Package->retrieve_all ) {
     push @$ret, {
       id          => $p->id+0,
       name        => $p->name,
@@ -150,7 +150,7 @@ get '/package/:id' => sub {
   my $self = shift;
   my $id = $self->param('id');
 
-  my $p = Canvas::Package->retrieve($id);
+  my $p = Canvas::Store::Package->retrieve($id);
 
   # check we actually received a valid template
   unless( defined($p) ) {
@@ -182,7 +182,7 @@ get '/accounts' => sub {
 
   my $ret = [];
 
-  foreach my $a ( Canvas::Account->retrieve_all ) {
+  foreach my $a ( Canvas::Store::Account->retrieve_all ) {
     # skip if private and not ( our account or membership to account )
     next unless( ( $a->id eq $cu->{a}->id ) || ( scalar $a->account_memberships( member_id => $cu->{a}->id ) ) );
 
@@ -201,7 +201,7 @@ get '/account/:id' => sub {
   my $id = $self->param('id');
 
   my $cu = $self->current_user;
-  my $p = Canvas::Account->retrieve($id);
+  my $p = Canvas::Store::Account->retrieve($id);
 
   # skip if private and not ( our account or membership to account )
   unless( ( $p->id eq $cu->{a}->id ) || ( scalar $p->account_memberships( member_id => $cu->{a}->id ) ) ) {
@@ -234,7 +234,7 @@ get '/account/:id/memberships' => sub {
   my $id = $self->param('id');
 
   my $cu = $self->current_user;
-  my $p = Canvas::Account->retrieve($id);
+  my $p = Canvas::Store::Account->retrieve($id);
   my @member = $p->account_memberships( member_id => $cu->{a}->id );
 
   # abort if private and not ( our account or membership to account )
@@ -267,7 +267,7 @@ get '/repositories' => sub {
 
   my $ret = [];
 
-  foreach my $r ( Canvas::Repository->retrieve_all ) {
+  foreach my $r ( Canvas::Store::Repository->retrieve_all ) {
     push @$ret, {
       id          => $r->id+0,
       name        => $r->name,
@@ -281,7 +281,7 @@ get '/repository/:id' => sub {
   my $self = shift;
   my $id = $self->param('id');
 
-  my $r = Canvas::Repository->retrieve($id);
+  my $r = Canvas::Store::Repository->retrieve($id);
 
   # check we actually received a valid profile
   unless( defined($r) ) {
@@ -326,10 +326,10 @@ get '/templates' => sub {
 
   my @templates;
   if( keys %$q ) {
-    @templates = Canvas::Template->search( $q );
+    @templates = Canvas::Store::Template->search( $q );
   }
   else {
-    @templates = Canvas::Template->retrieve_all();
+    @templates = Canvas::Store::Template->retrieve_all();
   }
 
   # get auth'd user
@@ -369,7 +369,7 @@ post '/templates' => sub {
   my $data = $json->decode( $self->req->body );
 
   # find the account requested
-  my $u = Canvas::Account->search({
+  my $u = Canvas::Store::Account->search({
     name => $data->{u},
   })->first;
 
@@ -397,7 +397,7 @@ post '/templates' => sub {
   }
 
   # find or create new template
-  my $t = Canvas::Template->search({
+  my $t = Canvas::Store::Template->search({
     account_id => $u->id+0,
     name       => $data->{n},
   })->first;
@@ -411,12 +411,12 @@ post '/templates' => sub {
   }
 
   # create the template
-  $t = Canvas::Template->insert({
+  $t = Canvas::Store::Template->insert({
     account_id => $u->id+0,
     name       => $data->{n},
   });
 
-  Canvas::DBI->do_transaction( sub {
+  Canvas::Store->do_transaction( sub {
 
     # get all archs to cache
     my $arch_cache = {};
@@ -431,7 +431,7 @@ post '/templates' => sub {
 
       my $pu = $r->{bu}[0] // '';
 
-      my $pr = Canvas::Repository->find_or_create({
+      my $pr = Canvas::Store::Repository->find_or_create({
         name      => $r->{n},
         stub      => $r->{id},
         base_url  => $bu,
@@ -571,7 +571,6 @@ put '/template/:id' => sub {
   }
 
   Canvas::DBI->do_transaction( sub {
-
     # get all archs to cache
     my $arch_cache = {};
 

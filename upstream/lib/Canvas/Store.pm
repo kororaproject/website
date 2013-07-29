@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::DBI;
+package Canvas::Store;
 
 use strict;
 use base 'Class::DBI';
@@ -25,7 +25,7 @@ use base 'Class::DBI';
 
 my ($dsn, $username, $password) = getConfig();
 
-Canvas::DBI->set_db(
+Canvas::Store->set_db(
   'Main',
   $dsn,
   $username,

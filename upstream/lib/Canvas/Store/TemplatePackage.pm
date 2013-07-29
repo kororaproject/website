@@ -15,18 +15,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::Rating;
+package Canvas::Store::TemplatePackage;
 
 use strict;
-use base 'Canvas::DBI';
+use base 'Canvas::Store';
 
-__PACKAGE__->table('canvas_rating');
-__PACKAGE__->columns(All => qw/id account_id description value/);
+__PACKAGE__->table('canvas_templatepackage');
+__PACKAGE__->columns(All => qw/id template_id package_id arch_id version rel epoch pinned/);
 
-__PACKAGE__->has_many(template_rating => 'Canvas::TemplateRating' => 'package_id');
-__PACKAGE__->has_many(package_ratings => 'Canvas::PackageRating' => 'package_id');
+__PACKAGE__->has_a(template_id  => 'Canvas::Store::Template');
+__PACKAGE__->has_a(package_id   => 'Canvas::Store::Package');
+__PACKAGE__->has_a(arch_id      => 'Canvas::Store::Arch');
 
-__PACKAGE__->has_a(account_id => 'Canvas::Account');
+
 
 1;
-

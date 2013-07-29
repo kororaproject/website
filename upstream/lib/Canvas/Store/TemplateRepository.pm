@@ -15,16 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::TemplateRepository;
+package Canvas::Store::TemplateRepository;
 
 use strict;
-use base 'Canvas::DBI';
+use base 'Canvas::Store';
 
 __PACKAGE__->table('canvas_templaterepository');
 __PACKAGE__->columns(All => qw/id template_id repo_id pref_url version enabled cost gpg_check/);
 
-__PACKAGE__->has_a(template_id => 'Canvas::Template');
-__PACKAGE__->has_a(repo_id => 'Canvas::Repository');
+__PACKAGE__->has_a(template_id  => 'Canvas::Store::Template');
+__PACKAGE__->has_a(repo_id      => 'Canvas::Store::Repository');
 
 
 

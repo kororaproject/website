@@ -15,17 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::Profile;
+package Canvas::Store::Account;
 
 use strict;
-use base 'Canvas::DBI';
+use base 'Canvas::Store';
 
-__PACKAGE__->table('canvas_profile');
-__PACKAGE__->columns(All => qw/id name uuid description organisation gpg_private gpg_public created updated/);
+__PACKAGE__->table('canvas_account');
+__PACKAGE__->columns(All => qw/id name uuid description organisation created updated/);
 
-__PACKAGE__->has_many(templates => 'Canvas::Template' => 'profile_id');
-__PACKAGE__->has_many(ratings => 'Canvas::Rating' => 'profile_id');
+__PACKAGE__->has_many(template_memberships  => 'Canvas::Store::TemplateMembership'  => 'account_id');
+__PACKAGE__->has_many(account_memberships   => 'Canvas::Store::AccountMembership'   => 'account_id');
+__PACKAGE__->has_many(ratings               => 'Canvas::Store::Rating'              => 'account_id');
 
+#
+# DIRECT CONNECTIONS (via MAPS)
+#
+__PACKAGE__->has_many(templates             => [ 'Canvas::Store::TemplateMembership'  => 'account_id' ]);
 
 # default value for created
 __PACKAGE__->set_sql(MakeNewObj => qq{

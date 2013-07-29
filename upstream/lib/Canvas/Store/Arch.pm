@@ -15,17 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::TemplateAccount;
+package Canvas::Store::Arch;
 
 use strict;
-use base 'Canvas::DBI';
+use base 'Canvas::Store';
 
-__PACKAGE__->table('canvas_templateaccount');
-__PACKAGE__->columns(All => qw/id template_id account_id name access/);
+__PACKAGE__->table('canvas_arch');
+__PACKAGE__->columns(All => qw/id name description/);
 
-__PACKAGE__->has_a(template_id => 'Canvas::Template');
-__PACKAGE__->has_a(account_id => 'Canvas::Account');
-
-
+__PACKAGE__->has_many(template_packages => 'Canvas::Store::TemplatePackage' => 'arch_id');
 
 1;
+
