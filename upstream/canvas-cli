@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import argparse
 import cookielib
 import getpass
 import json
@@ -452,6 +453,8 @@ class CanvasService(object):
 
   def authenticate(self, username='', password='', force=False):
 
+    print('Authenticating to %s' % ( self._urlbase ))
+
     if self._authenticated and not self._force:
       return self._authenticated
 
@@ -597,6 +600,39 @@ class CanvasService(object):
       TypeError('template is not of type Template')
 
 
+class CanvasFormatter(argparse.HelpFormatter):
+  def _format_action_invocation(self, action):
+    if not action.option_strings:
+      default = self._get_default_metavar_for_positional(action)
+      metavar, = self._metavar_formatter(action, default)(1)
+      return metavar
+
+    parts = []
+
+    # if the Optional doesn't take a value, format is:
+    #    -s, --long
+    if action.nargs == 0:
+      parts.extend(action.option_strings)
+
+    # if the Optional takes a value, format is:
+    #    -s ARGS, --long ARGS
+    else:
+      default = self._get_default_metavar_for_optional(action)
+      args_string = self._format_args(action, default)
+
+      for option_string in action.option_strings:
+        parts.append(option_string)
+
+      return '%s %s' % (', '.join(parts), args_string)
+
+    return ', ' . join(parts)
+
+  def _get_default_metavar_for_optional(self, action):
+    return action.dest.upper()
+
+  def _get_default_metavar_for_positional(self, action):
+    return action.dest.upper()
+
 
 def main():
   def signal_handler(signal, frame):
@@ -606,138 +642,121 @@ def main():
   # trap ctrl+c, it's polish
   signal.signal(signal.SIGINT, signal_handler)
 
-  '''
-# create a new template "htpc" associated with korora id "firnsy" inheriting from template "minimal" associated with korora id "csmart"
-  canvas template create firnsy:htpc -i csmart:minimal
+  parser = argparse.ArgumentParser(prog='canvas-cli', formatter_class=CanvasFormatter)
+  subparsers = parser.add_subparsers(dest='command', title='Commands')
 
-# remove the explicit packages "package1", "package2" and "packageN" from the template "htpc" associated with korora id "firnsy"
-  canvas template remove -t firnsy:htpc package1 package2 packageN
+  #
+  # general arguments
+  parser.add_argument('-u', '--user', type=str, dest='username')
+  parser.add_argument('-p', '--pass', action='store_true', dest='password')
+  parser.add_argument('--host', type=str, dest='host')
+  parser.add_argument('-v', '--verbose', action="store_true", dest='verbose')
+  parser.add_argument('-V', '--version', action='version', version='1.0')
 
-# pin packages "package1" and "package2" at "version1" and "version2" respectively for the template "htpc" associated with korora id "firnsy"
-  canvas template pin -t firnsy:htpc package1:version1 package2:version2
+  #
+  # account general arguments
+  parser_account = subparsers.add_parser('account')
+  subparsers_account = parser_account.add_subparsers(dest='account_command', title='Account Commands')
 
-# unpin packages "package1" and "package2" for the template "htpc" associated with korora id "firnsy"
-  canvas template unpin -t firnsy:htpc package1 package2
+  #
+  # template general arguments
+  parser_template = subparsers.add_parser('template', formatter_class=CanvasFormatter)
+  subparsers_template = parser_template.add_subparsers(dest='template_command', title='Template Commands')
 
-# remove all packages defined in the template "htpc" associated with korora id "firnsy"
-  canvas template clear firnsy:htpc
+  parser_template.add_argument('-n', '--dry-run', action="store_true", dest='dryrun')
 
-# drop/delete the template "htpc" associated with korora id "firnsy"
-  canvas template drop firnsy:htpc
+  # template create arguments
+  parser_template_create = subparsers_template.add_parser('create', formatter_class=CanvasFormatter)
+
+  parser_template_create.add_argument('-i', '--inherit', type=str, dest='inherit')
+  parser_template_create.add_argument('template', type=str, help='name of template to be created (eg. user:test)')
+
+  # template list arguments
+  parser_template_list = subparsers_template.add_parser('list', formatter_class=CanvasFormatter)
+
+  # template add arguments
+  parser_template_add = subparsers_template.add_parser('add', formatter_class=CanvasFormatter)
+  parser_template_add.add_argument('--create', action='store_true', dest='create')
+  parser_template_add.add_argument('-t', '--template', type=str, dest='template', help='Template to add packages to')
+  ptag = parser_template_add.add_mutually_exclusive_group(required=True)
+  ptag.add_argument('-s', '--system', action='store_true', dest='system')
+  ptag.add_argument('-p', '--packages', dest='packages', nargs='+')
+
+  # template pin arguments
+  parser_template_pin = subparsers_template.add_parser('pin', formatter_class=CanvasFormatter)
+  parser_template_pin.add_argument('-t', '--template', type=str, dest='template')
+
+  # template unpin arguments
+  parser_template_unpin = subparsers_template.add_parser('unpin', formatter_class=CanvasFormatter)
+  parser_template_unpin.add_argument('-t', '--template', type=str, dest='template')
+
+  # template remove arguments
+  parser_template_remove = subparsers_template.add_parser('remove', formatter_class=CanvasFormatter)
+  parser_template_remove.add_argument('-t', '--template', type=str, dest='template')
+
+  # template apply arguments
+  parser_template_apply = subparsers_template.add_parser('apply', formatter_class=CanvasFormatter)
+  parser_template_apply.add_argument('--clean', action='store_true', dest='merge_clean')
+  parser_template_apply.add_argument('-t', '--template', type=str, dest='template')
+
+  # template delete arguments
+  parser_template_delete = subparsers_template.add_parser('delete', formatter_class=CanvasFormatter)
+  parser_template_delete.add_argument('-t', '--template', type=str, dest='template')
+
+  #
+  # package general arguments
+  parser_package = subparsers.add_parser('package', formatter_class=CanvasFormatter)
+  subparsers_package = parser_package.add_subparsers(dest='package_command', title='Package Commands')
+
+  #
+  # machine general arguments
+  parser_machine = subparsers.add_parser('machine', formatter_class=CanvasFormatter)
+  subparsers_machine = parser_machine.add_subparsers(dest='machine_command', title='Machine Commands')
+
+  # machine create arguments
+  parser_machine_create = subparsers_machine.add_parser('create', formatter_class=CanvasFormatter)
+
+  # machine push arguments
+  parser_machine_push = subparsers_machine.add_parser('push', formatter_class=CanvasFormatter)
+
+  # machine add arguments
+  parser_machine_pull = subparsers_machine.add_parser('pull', formatter_class=CanvasFormatter)
+
+  # machine sync arguments
+  parser_machine_sync = subparsers_machine.add_parser('sync', formatter_class=CanvasFormatter)
+
+  args = parser.parse_args()
 
 
-# create a new machine "lounge-htpc" associate with the korora id "firnsy" and using the (public/shared) template "htpc" associated with the korora account "firnsy"
-  canvas machine create firnsy:lounge-htpc -t firnsy:htpc
-
-  canvas machine push firnsy:lounge-htpc /local/path/file1:/remote/path/file1
-
-  canvas machine pull firnsy:lounge-htpc /remote/path/file1:/local/path/file2
-
-  canvas machine sync firnsy:lounge-htpc
-  '''
-
-  usage = "usage: %prog command [options] arg"
-  parser = optparse.OptionParser(usage)
-
-  # general options
-  parser.add_option('-u', '--user', type='string', dest='username')
-  parser.add_option('-p', '--pass', action='store_true', dest='password')
-  parser.add_option('--host', type='string', dest='host')
-  parser.add_option('-v', '--verbose', action="store_true", dest='verbose')
-
-  # template options
-  parser.add_option('-i', '--inherit', type='string', dest='inherit')
-  parser.add_option('-t', '--template', type='string', dest='template')
-  parser.add_option('--create', action='store_true', dest='create')
-  parser.add_option('-n', '--dry-run', action="store_true", dest='dryrun')
-  parser.add_option('-s', '--system', action='store_true', dest='current_system')
-  parser.add_option('--clean', action='store_true', dest='merge_clean')
-
-
-  (options, args) = parser.parse_args()
-
-  def help(command=None, error=None):
-    if error is not None:
-      print 'Error: %s' % (error)
-
-    if command == 'template':
-      print """
-Usage: canvas template [options] <command> ...
-
-  -n, --dry-run         dry run
-  -v, --verbose         be verbose
-
-  -i, --interactive     interactive picking
-  -f, --force           allow adding otherwise ignored files
-
-  -t, --template        Specify the template to be applied
-
-The most commonly used canvas template commands are:
-  list         List template
-  create       Create a new template
-  add          Add packages to a specified template
-  remove       List, create, update or delete packages
-  clear        List, create, update or delete packages
-  delete       List, create, update or delete packages
-  pin          Pin a package to a specific version, release and/or arch.
-  unpin        List, create, update or delete repo
-  apply        Update profile"""
-
-    else:
-      print """
-Usage: canvas [-V|--version] [--help] [-u|--user=<user>] [-p|--password=<pass>]
-       <command> [<args>]
-
-The most commonly used canvas commands are:
-  template     List, create, update or delete templates
-  machine      List, create, update or delete machines
-  package      List, create, update or delete packages
-  repo         List, create, update or delete repo
-  profile      Update profile
-
-See 'canvas help <command>' for more information on a specific command."""
-
-    if error is not None:
-      sys.exit(1);
 
   # prompt for password if requested
   password = ''
-  if options.password:
+  if args.password:
     password = getpass.getpass()
 
-  if len(args) < 1:
-    help(error='No command specified.')
-
-  if options.host:
-    cs = CanvasService(host=options.host)
+  if args.host:
+    cs = CanvasService(host=args.host)
   else:
     cs = CanvasService()
 
-  if args[0] == 'template':
 
-    # when creating we support the template being defined as an argument
-    # and not just via the parameter
-    if args[1] == 'create' and len(args) > 2:
-      options.template = args[2]
+  if args.command == 'template':
+    # no template created for list
+    if args.template_command != 'list':
+      t = Template( args.template )
 
-    # we need a template specified for all template operations
-    if ( len(args) < 2 or not options.template ) and args[1] != 'list':
-      help(command='template', error='No template name specified.')
-
-    t = Template( options.template )
-
-    if args[1] == 'create':
-      if options.inherit:
-        i = Template( options.inherit )
+    if args.template_command == 'create':
+      if args.inherit:
+        i = Template( args.inherit )
         print 'Inheriting from: ' + str(i)
 
-      if options.dryrun:
+      if args.dryrun:
         print 'The following template would be created:'
         print '  - %s' % ( str(t) )
 
       # perform the real action
       else:
-        if not cs.authenticate(options.username, password):
+        if not cs.authenticate(args.username, password):
           print 'Unable to authenticate with canvas service.'
           sys.exit(1)
 
@@ -745,16 +764,16 @@ See 'canvas help <command>' for more information on a specific command."""
         cs.deauthenticate()
 
 
-    if args[1] == 'delete':
+    if args.template_command == 'delete':
       print 'The following template will be deleted:'
       print '  - %s' % ( str(t) )
 
-      if options.dryrun:
+      if args.dryrun:
         print 'No action peformed during this dry-run.'
 
       # perform the real action
       else:
-        if not cs.authenticate(options.username, password):
+        if not cs.authenticate(args.username, password):
           print 'Unable to authenticate with canvas service.'
           sys.exit(1)
 
@@ -770,8 +789,8 @@ See 'canvas help <command>' for more information on a specific command."""
         cs.deauthenticate()
 
 
-    elif args[1] == 'list':
-        if not cs.authenticate(options.username, password):
+    elif args.template_command == 'list':
+        if not cs.authenticate(args.username, password):
           print 'Unable to authenticate with canvas service.'
           sys.exit(1)
 
@@ -791,17 +810,10 @@ See 'canvas help <command>' for more information on a specific command."""
 
         cs.deauthenticate()
 
-    elif args[1] == 'add':
+    elif args.template_command == 'add':
+      pl = PackageList( args.packages )
 
-      if not options.template:
-        help(command='template', error='No template name specified.')
-
-      if not options.current_system and len(args) < 2:
-        help(command='template', error='No packages specified.')
-
-      pl = PackageList( args[2:] )
-
-      if options.current_system:
+      if args.system:
         print 'Adding current system packages to template ...'
 
         yb = yum.YumBase()
@@ -819,7 +831,7 @@ See 'canvas help <command>' for more information on a specific command."""
         t.setPackageList( pl )
         t.setRepoList( rl )
 
-      if options.dryrun:
+      if args.dryrun:
         print 'The following would be added to the template %s:' % ( str(t) )
 
         packages = t.getPackageList().packages()
@@ -843,7 +855,7 @@ See 'canvas help <command>' for more information on a specific command."""
       # perform the real action
       else:
 
-        if not cs.authenticate(options.username, password):
+        if not cs.authenticate(args.username, password):
           print 'Unable to authenticate with canvas service.'
           sys.exit(1)
 
@@ -853,7 +865,7 @@ See 'canvas help <command>' for more information on a specific command."""
           t_add.merge( template=t )
           cs.template_add( t_add )
 
-        elif options.create:
+        elif args.create:
           cs.template_create( t )
 
         else:
@@ -862,10 +874,10 @@ See 'canvas help <command>' for more information on a specific command."""
 
         cs.deauthenticate()
 
-    elif args[1] == 'remove':
+    elif args.template_command == 'remove':
       print 'Removing from template: ' + str(t)
 
-      if not options.current_system and len(args) < 2:
+      if not args.system and len(args) < 2:
         parser.error('No packages specified.')
 
       print 'Removing packages from template:'
@@ -876,8 +888,8 @@ See 'canvas help <command>' for more information on a specific command."""
       for p in l.packages():
         print "  - " + str(p)
 
-    elif args[1] == 'apply':
-      if not cs.authenticate(options.username, password):
+    elif args.template_command == 'apply':
+      if not cs.authenticate(args.username, password):
         print 'Unable to authenticate with canvas service.'
         sys.exit(1)
 
@@ -908,7 +920,7 @@ See 'canvas help <command>' for more information on a specific command."""
       t_system.setPackageList( pl )
       t_system.setRepoList( rl )
 
-      t_apply.merge( template=t_system, clean=options.merge_clean )
+      t_apply.merge( template=t_system, clean=args.merge_clean )
 
       print 'The following actions will be applied to this system:'
 
@@ -937,7 +949,7 @@ See 'canvas help <command>' for more information on a specific command."""
       print
 
       # show actions on
-      if options.dryrun:
+      if args.dryrun:
         print 'No action peformed during this dry-run.'
 
       # perform the real action
@@ -959,14 +971,8 @@ See 'canvas help <command>' for more information on a specific command."""
         yb.buildTransaction()
         yb.processTransaction()
 
-    else:
-      help(command='template', error='Unknown template command.')
-
-  elif args[0] == 'machine':
+  elif args.command == 'machine':
     print "Machine"
-
-    if len(args) < 2:
-      parser.error("No machinee subcommand specified.")
 
 
 if __name__ == '__main__':
