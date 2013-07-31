@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::Store::User;
+package Canvas::Store::WPUser;
 
 use strict;
 use base 'Canvas::Store';
