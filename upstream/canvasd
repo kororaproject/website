@@ -43,7 +43,7 @@ use Canvas::Store::Template;
 use Canvas::Store::TemplatePackage;
 use Canvas::Store::TemplateMembership;
 use Canvas::Store::TemplateRepository;
-use Canvas::Store::User;
+use Canvas::Store::WPUser;
 
 
 #
@@ -855,7 +855,6 @@ del '/template/:id' => sub {
   my $json = Mojo::JSON->new;
 
   my $id = $self->param('id');
-  my $data = $json->decode( $self->req->body );
 
   my $cu = $self->authenticated_user;
   my $t = Canvas::Template->retrieve($id);
@@ -889,7 +888,303 @@ del '/template/:id' => sub {
   );
 };
 
-say 'Starting ...';
+#
+# USERS
+#
 
+#
+# GET /api/user/:user/template/:name
+#
+# Get template for user ":user" identified by ":name"
+#
+# Alternative invocation of GET /api/template/:id
+#
+get '/user/:user/template/:name' => sub {
+  my $self = shift;
+  my $user = $self->param('user');
+  my $name = $self->param('name');
+
+  my $cu = $self->authenticated_user;
+  my $t = Canvas::Template->search({
+    name  => $name,
+    owner => $user,
+  });
+
+  # TODO: reuse below from GET /api/template/:id
+
+  # check we actually received a valid template
+  unless( defined($t) ) {
+    return $self->render(
+      status  => 404,
+      json    => { error => 'not found' },
+    );
+  }
+
+  # skip if private and not ( our account or membership to account )
+  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+    return $self->render(
+      status  => 403,
+      text    => 'denied',
+      json    => { error => 'denied' },
+    );
+  }
+
+  # populate repository array
+  my $r = [];
+  foreach my $_r ( $t->template_repositories ) {
+    push @$r, {
+      n   => $_r->repo_id->name,
+      v   => $_r->version,
+      c   => $_r->cost+0,
+      e   => $_r->enabled eq 1 ? Mojo::JSON->true : Mojo::JSON->false,
+      gc  => $_r->gpg_check,
+    }
+  }
+
+  # populate package array
+  my $p = [];
+  foreach my $_p ( $t->template_packages ) {
+    push @$p, {
+      n => $_p->package_id->name,
+      e => $_p->epoch,
+      v => $_p->version,
+      r => $_p->rel,
+      a => $_p->arch_id->name,
+      p => $_p->action,
+    }
+  }
+
+  $self->render( json => {
+    id          => $t->id+0,
+    name        => $t->name,
+    description => $t->description,
+    r           => $r,
+    p           => $p,
+  });
+};
+
+#
+# PUT /api/user/:user/template/:name
+#
+# Update existing template for user ":user" identified by ":name"
+#
+# Alternative invocation of PUT /api/template/:id
+#
+put '/user/:user/template/:name' => sub {
+  my $self = shift;
+  my $json = Mojo::JSON->new;
+
+  my $user = $self->param('user');
+  my $name = $self->param('name');
+  my $data = $json->decode( $self->req->body );
+
+  my $cu = $self->authenticated_user;
+  my $t = Canvas::Template->search({
+    name  => $name,
+    owner => $user,
+  });
+
+  # TODO: reuse below from PUT /api/template/:id
+
+  # check we actually received a valid template
+  unless( defined($t) ) {
+    return $self->render(
+      status  => 404,
+      json    => { error => 'not found' },
+    );
+  }
+
+  # skip if private and not ( our account or membership to account )
+  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+    return $self->render(
+      status  => 403,
+      text    => 'denied',
+      json    => { error => 'denied' },
+    );
+  }
+
+  Canvas::DBI->do_transaction( sub {
+    # get all archs to cache
+    my $arch_cache = {};
+
+    # add/update repositories
+    foreach my $r ( @{ $data->{r} } ) {
+      # calculate the base url
+      my $bu = $r->{ml} // '';
+      if( $bu eq '' ) {
+        $bu = $r->{bu}[0] // '';
+      }
+
+      my $pu = $r->{bu}[0] // '';
+
+      my $rr = Canvas::Repository->find_or_create({
+        name      => $r->{n},
+        stub      => $r->{id},
+        base_url  => $bu,
+        gpg_key   => $r->{gk}[0] // '',
+      });
+
+      my @tr = $t->template_repositories({
+        repo_id => $rr->id,
+        template_id => $t->id,
+      });
+
+      # already exists, so update
+      if( scalar @tr ) {
+        $tr[0]->set({
+          pref_url    => $pu,
+          enabled     => $r->{e},
+          cost        => $r->{c}+0,
+          gpg_check   => $r->{gc},
+        });
+
+        $tr[0]->udpate;
+      }
+      # otherwise we must add
+      else {
+        $t->add_to_template_repositories({
+          repo_id     => $rr->id,
+          pref_url    => $pu,
+          enabled     => $r->{e},
+          cost        => $r->{c}+0,
+          gpg_check   => $r->{gc},
+        });
+      }
+    }
+
+    # remove repositories
+    foreach my $r ( @{ $data->{dr} } ) {
+      my @rr = Canvas::Repository->search({
+        stub => $r->{id},
+      });
+
+      if( scalar @rr ) {
+        my @dr = $t->template_repositories({
+          repo_id => $rr[0]->id,
+          template_id => $t->id,
+        });
+
+        foreach my $drr ( @dr ) {
+          $drr->delete;
+        }
+      }
+    }
+
+    # add/update packages
+    foreach my $p ( @{ $data->{p} } ) {
+      my $pp = Canvas::Package->find_or_create({ name => $p->{n} });
+
+      # cache arch lookups since there are very few
+      unless( defined($arch_cache->{$p->{a}}) ) {
+        $arch_cache->{$p->{a}} = Canvas::Arch->find_or_create({ name => $p->{a} });
+      }
+      my $pa = $arch_cache->{$p->{a}};
+
+      my @tp = $t->template_packages({
+        package_id => $pp->id,
+        template_id => $t->id,
+      });
+
+      # already exists, so update
+      if( scalar @tp ) {
+        $tp[0]->set({
+          arch_id     => $pa->id+0,
+          epoch       => $p->{e},
+          version     => $p->{v},
+          rel         => $p->{r},
+          action      => $p->{p}
+        });
+
+        $tp[0]->udpate;
+      }
+      # otherwise we must add
+      else {
+        $t->add_to_template_packages({
+          package_id  => $pp->id+0,
+          arch_id     => $pa->id+0,
+          epoch       => $p->{e},
+          version     => $p->{v},
+          rel         => $p->{r},
+          action      => $p->{p}
+        });
+      }
+    }
+
+    # remove packages
+    foreach my $p ( @{ $data->{dp} } ) {
+      my @pp = Canvas::Package->search({ name => $p->{n} });
+
+      if( scalar @pp ) {
+        my @dp = $t->template_repositories({
+          package_id => $pp[0]->id,
+          template_id => $t,
+        });
+        foreach my $dpp ( @dp ) {
+          $dpp->delete;
+        }
+      }
+    }
+  });
+
+  $self->render(
+    status  => 200,
+    text    => 'id: ' . $t->id,
+    json    => { id => $t->id },
+  );
+
+};
+
+#
+# DELETE /api/user/:user/template/:name
+#
+# Delete template for user ":user" identified by ":name"
+#
+# Alternative invocation of DELETE /api/template/:id
+#
+del '/user/:user/template/:name' => sub {
+  my $self = shift;
+  my $json = Mojo::JSON->new;
+
+  my $user = $self->param('user');
+  my $name = $self->param('name');
+
+  my $cu = $self->authenticated_user;
+  my $t = Canvas::Template->search({
+    name  => $name,
+    owner => $user,
+  });
+
+  # TODO: reuse below from DEL /api/template/:id
+
+  # check we actually received a valid template
+  unless( defined($t) ) {
+    return $self->render(
+      status  => 404,
+      text    => 'not found',
+      json    => { error => 'not found' },
+    );
+  }
+
+  # skip if private and not ( our account or membership to account )
+  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+    return $self->render(
+      status  => 403,
+      text    => 'denied',
+      json    => { error => 'denied' },
+    );
+  }
+
+  Canvas::DBI->do_transaction( sub {
+    $t->delete;
+  });
+
+  $self->render(
+    status  => 200,
+    text    => 'ok',
+    json    => { message => 'ok' },
+  );
+};
+
+# start the main loop
 app->secret('canvas');
 app->start;
