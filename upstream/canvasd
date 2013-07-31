@@ -52,6 +52,7 @@ use Canvas::Store::User;
 
 plugin 'authentication', {
   autoload_user => 0,
+  current_user_fn => 'authenticated_user',
   load_user => sub {
     my ($app, $uid) = @_;
 
@@ -178,7 +179,7 @@ get '/package/:id' => sub {
 get '/accounts' => sub {
   my $self = shift;
 
-  my $cu = $self->current_user;
+  my $cu = $self->authenticated_user;
 
   my $ret = [];
 
@@ -200,7 +201,7 @@ get '/account/:id' => sub {
   my $self = shift;
   my $id = $self->param('id');
 
-  my $cu = $self->current_user;
+  my $cu = $self->authenticated_user;
   my $p = Canvas::Store::Account->retrieve($id);
 
   # skip if private and not ( our account or membership to account )
@@ -233,7 +234,7 @@ get '/account/:id/memberships' => sub {
   my $self = shift;
   my $id = $self->param('id');
 
-  my $cu = $self->current_user;
+  my $cu = $self->authenticated_user;
   my $p = Canvas::Store::Account->retrieve($id);
   my @member = $p->account_memberships( member_id => $cu->{a}->id );
 
@@ -309,7 +310,7 @@ get '/repository/:id' => sub {
 #
 
 #
-# POST /api/templates
+# GET /api/templates
 #
 #
 #
@@ -333,7 +334,7 @@ get '/templates' => sub {
   }
 
   # get auth'd user
-  my $cu = $self->current_user;
+  my $cu = $self->authenticated_user;
 
   # configure default return
   my $ret = [];
@@ -361,7 +362,48 @@ get '/templates' => sub {
 #
 # POST /api/templates
 #
+# Add a new template
 #
+# Expected body contents is JSON encoded structure defining the template
+# repositories and packages to be added.
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 500 if template owner doesn't exist or is invalid
+#
+# An overview of the JSON structure is shown below:
+#
+# {
+#   u: "user / organisation",
+#   n: "name",
+#   r: [
+#     ... array of repo objects to add ...,
+#     {
+#       n:  "name",
+#       id: "short name",
+#       bu: "base url",
+#       ml: "mirror list url",
+#       c:  "cost",
+#       e:  "enabled",
+#       gc: "gpg check",
+#       gk: "gpg key"
+#     },
+#     ...
+#   ],
+#   p: [
+#     ... array of package objects to add ...,
+#     {
+#       n: "name",
+#       e: "epoch",
+#       v: "version",
+#       r: "release",
+#       a: "arch",
+#       p: "action"
+#     },
+#     ...
+#   ]
+# }
 #
 post '/templates' => sub {
   my $self = shift;
@@ -382,7 +424,7 @@ post '/templates' => sub {
     );
   }
 
-  my $cu = $self->current_user;
+  my $cu = $self->authenticated_user;
   my @membership = $u->account_memberships( member_id => $cu->{a}->id );
 
   # validate the current user has access to write on this account
@@ -390,7 +432,7 @@ post '/templates' => sub {
           ( scalar @membership && $membership[0]->can_create ) ) {
 
     return $self->render(
-      status  => 500,
+      status  => 403,
       text    => 'Not your account buddy.',
       json    => { error => 'Not your account buddy.' },
     );
@@ -402,11 +444,12 @@ post '/templates' => sub {
     name       => $data->{n},
   })->first;
 
+  # template already exists
   if( defined($t) ) {
     return $self->render(
       status  => 500,
-      json    => 'Template already exists with that name for this account.',
       text    => 'Template already exists with that name for this account.',
+      json    => { error => 'Template already exists with that name for this account.' },
     );
   }
 
@@ -417,7 +460,6 @@ post '/templates' => sub {
   });
 
   Canvas::Store->do_transaction( sub {
-
     # get all archs to cache
     my $arch_cache = {};
 
@@ -455,6 +497,7 @@ post '/templates' => sub {
       unless( defined($arch_cache->{$p->{a}}) ) {
         $arch_cache->{$p->{a}} = Canvas::Arch->find_or_create({ name => $p->{a} });
       }
+
       my $pa = $arch_cache->{$p->{a}};
 
       $t->add_to_template_packages({
@@ -480,13 +523,63 @@ post '/templates' => sub {
 #
 # GET /api/template/:id
 #
+# Returns the template identified by :id
 #
+# Returned body contents is an JSON encoded structure defining the template
+# repositories and packages contained within.
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 404 if template doesn't exist
+#  - 500 if template owner doesn't exist or is invalid
+#
+# An overview of the JSON structure is shown below:
+#
+# {
+#   u: "user / organisation",
+#   n: "name",
+#   r: [
+#     ... array of repo objects to add ...,
+#     {
+#       n:  "name",
+#       id: "short name",
+#       bu: "base url",
+#       ml: "mirror list url",
+#       c:  "cost",
+#       e:  "enabled",
+#       gc: "gpg check",
+#       gk: "gpg key"
+#     },
+#     ...
+#   ],
+#   p: [
+#     ... array of package objects to add ...,
+#     {
+#       n: "name",
+#       e: "epoch",
+#       v: "version",
+#       r: "release",
+#       a: "arch",
+#       p: "action"
+#     },
+#     ...
+#   ]
+# }
 #
 get '/template/:id' => sub {
   my $self = shift;
   my $id = $self->param('id');
-  my $cu = $self->current_user;
+  my $cu = $self->authenticated_user;
   my $t = Canvas::Template->retrieve($id);
+
+  # check we actually received a valid template
+  unless( defined($t) ) {
+    return $self->render(
+      status  => 404,
+      json    => { error => 'not found' },
+    );
+  }
 
   # skip if private and not ( our account or membership to account )
   if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
@@ -497,14 +590,19 @@ get '/template/:id' => sub {
     );
   }
 
-  # check we actually received a valid template
-  unless( defined($t) ) {
-    return $self->render(
-      status  => 404,
-      json    => { error => 'not found' },
-    );
+  # populate repository array
+  my $r = [];
+  foreach my $_r ( $t->template_repositories ) {
+    push @$r, {
+      n   => $_r->repo_id->name,
+      v   => $_r->version,
+      c   => $_r->cost+0,
+      e   => $_r->enabled eq 1 ? Mojo::JSON->true : Mojo::JSON->false,
+      gc  => $_r->gpg_check,
+    }
   }
 
+  # populate package array
   my $p = [];
   foreach my $_p ( $t->template_packages ) {
     push @$p, {
@@ -514,17 +612,6 @@ get '/template/:id' => sub {
       r => $_p->rel,
       a => $_p->arch_id->name,
       p => $_p->action,
-    }
-  }
-
-  my $r = [];
-  foreach my $_r ( $t->template_repositories ) {
-    push @$r, {
-      n   => $_r->repo_id->name,
-      v   => $_r->version,
-      c   => $_r->cost+0,
-      e   => $_r->enabled eq 1 ? Mojo::JSON->true : Mojo::JSON->false,
-      gc  => $_r->gpg_check,
     }
   }
 
@@ -541,7 +628,60 @@ get '/template/:id' => sub {
 #
 # PUT /api/template/:id
 #
+# Update existing template
 #
+# Expected body contents is JSON encoded structure defining the template
+# repositories and packages to be added (or removed).
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 500 if template owner doesn't exist or is invalid
+#
+# An overview of the JSON structure is shown below:
+#
+# {
+#   u: "user / organisation",
+#   n: "name",
+#   r: [
+#     ... array of repo objects to add ...,
+#     {
+#       n:  "name",
+#       id: "short name",
+#       bu: "base url",
+#       ml: "mirror list url",
+#       c:  "cost",
+#       e:  "enabled",
+#       gc: "gpg check",
+#       gk: "gpg key"
+#     },
+#     ...
+#   ],
+#   dr: [
+#     ... array of repo ids to remove ...,
+#     "repo_id_1",
+#     "repo_id_2",
+#     ...
+#   ],
+#   p: [
+#     ... array of package objects to add ...,
+#     {
+#       n: "name",
+#       e: "epoch",
+#       v: "version",
+#       r: "release",
+#       a: "arch",
+#       p: "action"
+#     },
+#     ...
+#   ],
+#   dp: [
+#     ... array of package names to remove ...,
+#     "package_name_1",
+#     "package_name_2",
+#     ...
+#   ]
+# }
 #
 put '/template/:id' => sub {
   my $self = shift;
@@ -550,8 +690,16 @@ put '/template/:id' => sub {
   my $id = $self->param('id');
   my $data = $json->decode( $self->req->body );
 
-  my $cu = $self->current_user;
+  my $cu = $self->authenticated_user;
   my $t = Canvas::Template->retrieve($id);
+
+  # check we actually received a valid template
+  unless( defined($t) ) {
+    return $self->render(
+      status  => 404,
+      json    => { error => 'not found' },
+    );
+  }
 
   # skip if private and not ( our account or membership to account )
   if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
@@ -559,14 +707,6 @@ put '/template/:id' => sub {
       status  => 403,
       text    => 'denied',
       json    => { error => 'denied' },
-    );
-  }
-
-  # check we actually received a valid template
-  unless( defined($t) ) {
-    return $self->render(
-      status  => 404,
-      json    => { error => 'not found' },
     );
   }
 
@@ -621,19 +761,8 @@ put '/template/:id' => sub {
 
     # remove repositories
     foreach my $r ( @{ $data->{dr} } ) {
-      # calculate the base url
-      my $bu = $r->{ml} // '';
-      if( $bu eq '' ) {
-        $bu = $r->{bu}[0] // '';
-      }
-
-      my $pu = $r->{bu}[0] // '';
-
       my @rr = Canvas::Repository->search({
-        name      => $r->{n},
-        stub      => $r->{id},
-        base_url  => $bu,
-        gpg_key   => $r->{gk}[0] // '',
+        stub => $r->{id},
       });
 
       if( scalar @rr ) {
@@ -697,7 +826,7 @@ put '/template/:id' => sub {
           package_id => $pp[0]->id,
           template_id => $t,
         });
-        foreach my $dpp ( @dp->id ) {
+        foreach my $dpp ( @dp ) {
           $dpp->delete;
         }
       }
@@ -714,7 +843,12 @@ put '/template/:id' => sub {
 #
 # DELETE /api/template/:id
 #
+# Delete template identified by :id
 #
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 404 if template doesn't exist
 #
 del '/template/:id' => sub {
   my $self = shift;
@@ -723,17 +857,8 @@ del '/template/:id' => sub {
   my $id = $self->param('id');
   my $data = $json->decode( $self->req->body );
 
-  my $cu = $self->current_user;
+  my $cu = $self->authenticated_user;
   my $t = Canvas::Template->retrieve($id);
-
-  # skip if private and not ( our account or membership to account )
-  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
-    return $self->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
 
   # check we actually received a valid template
   unless( defined($t) ) {
@@ -741,6 +866,15 @@ del '/template/:id' => sub {
       status  => 404,
       text    => 'not found',
       json    => { error => 'not found' },
+    );
+  }
+
+  # skip if private and not ( our account or membership to account )
+  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+    return $self->render(
+      status  => 403,
+      text    => 'denied',
+      json    => { error => 'denied' },
     );
   }
 
