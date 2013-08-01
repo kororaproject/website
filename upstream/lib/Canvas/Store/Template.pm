@@ -21,12 +21,12 @@ use strict;
 use base 'Canvas::Store';
 
 __PACKAGE__->table('canvas_template');
-__PACKAGE__->columns(All => qw/id account_id name description private parent_id/);
+__PACKAGE__->columns(All => qw/id user_id name description private parent_id/);
 
 __PACKAGE__->has_many(template_packages     => 'Canvas::Store::TemplatePackage'     => 'template_id');
 __PACKAGE__->has_many(template_repositories => 'Canvas::Store::TemplateRepository'  => 'template_id');
 
-__PACKAGE__->has_a(account_id => 'Canvas::Store::Account');
+__PACKAGE__->has_a(user_id    => 'Canvas::Store::User');
 __PACKAGE__->has_a(parent_id  => 'Canvas::Store::Template');
 
 1;

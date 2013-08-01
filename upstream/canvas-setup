@@ -7,28 +7,39 @@ use feature ':5.10';
 
 use Data::Dumper;
 
-use Canvas::User;
-use Canvas::Account;
+use Canvas::Store::WPUser;
+use Canvas::Store::User;
 
 
 # create firnsy
-my $firnsy = Canvas::Account->find_or_create({
+my $firnsy = Canvas::Store::User->find_or_create({
   name => 'firnsy',
   uuid => 'woot'
 });
 
-my $test = Canvas::Account->find_or_create({
+# create csmart
+my $csmart = Canvas::Store::User->find_or_create({
+  name => 'csmart',
+  uuid => 'woot'
+});
+
+my $test = Canvas::Store::User->find_or_create({
   name => 'test_subscriber',
   uuid => 'woot'
 });
 
-my $woot = Canvas::Account->find_or_create({
+my $woot = Canvas::Store::User->find_or_create({
   name => 'Anonymous',
   uuid => 'woot'
 });
 
 
-$test->add_to_account_memberships({
+$test->add_to_user_memberships({
   member_id => $firnsy->id,
+  access    => 128,
+});
+
+$test->add_to_user_memberships({
+  member_id => $csmart->id,
   access    => 128,
 });

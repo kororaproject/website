@@ -21,9 +21,9 @@ use strict;
 use base 'Canvas::Store';
 
 __PACKAGE__->table('canvas_templatemembership');
-__PACKAGE__->columns(All => qw/id template_id account_id name access/);
+__PACKAGE__->columns(All => qw/id template_id user_id name access/);
 
-__PACKAGE__->has_a(account_id   => 'Canvas::Store::Account');
+__PACKAGE__->has_a(user_id      => 'Canvas::Store::User');
 __PACKAGE__->has_a(template_id  => 'Canvas::Store::Template');
 
 

@@ -1,6 +1,6 @@
 BEGIN;
-DROP TABLE IF EXISTS canvas_account;
-DROP TABLE IF EXISTS canvas_accountmembership;
+DROP TABLE IF EXISTS canvas_user;
+DROP TABLE IF EXISTS canvas_usermembership;
 DROP TABLE IF EXISTS canvas_screenshot;
 DROP TABLE IF EXISTS canvas_rating;
 DROP TABLE IF EXISTS canvas_arch;
@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS canvas_templatepackage;
 DROP TABLE IF EXISTS canvas_templaterepository;
 DROP TABLE IF EXISTS canvas_machine;
 
-CREATE TABLE canvas_account (
+CREATE TABLE canvas_user (
     id            integer       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
     name          varchar(64)   NOT NULL,
     uuid          varchar(64)   NOT NULL,
@@ -29,10 +29,10 @@ CREATE TABLE canvas_account (
     updated       datetime      NOT NULL
 );
 
-CREATE TABLE canvas_accountmembership (
+CREATE TABLE canvas_usermembership (
     id            integer       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-    account_id    integer       NOT NULL  REFERENCES canvas_account (id),
-    member_id     integer       NOT NULL  REFERENCES canvas_account (id),
+    user_id       integer       NOT NULL  REFERENCES canvas_user (id),
+    member_id     integer       NOT NULL  REFERENCES canvas_user (id),
     name          varchar(64)   NOT NULL  DEFAULT 'owner',
     access        integer       NOT NULL  DEFAULT 15
 );
@@ -44,7 +44,7 @@ CREATE TABLE canvas_screenshot (
 
 CREATE TABLE canvas_rating (
     id            integer       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-    account_id    integer       NOT NULL  REFERENCES canvas_account (id),
+    user_id       integer       NOT NULL  REFERENCES canvas_user (id),
     description   text,
     value         float         NOT NULL
 );
@@ -88,7 +88,7 @@ CREATE TABLE canvas_repository (
 
 CREATE TABLE canvas_comment (
     id            integer       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-    account_id    integer       NOT NULL  REFERENCES canvas_account (id),
+    user_id       integer       NOT NULL  REFERENCES canvas_user (id),
     comment       text
 );
 
@@ -108,7 +108,7 @@ CREATE TABLE canvas_template_comments (
 
 CREATE TABLE canvas_template (
     id            integer       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-    account_id    integer       NOT NULL  REFERENCES canvas_account(id),
+    user_id       integer       NOT NULL  REFERENCES canvas_user(id),
     name          varchar(256)  NOT NULL,
     description   text,
     private       bool          NOT NULL  DEFAULT FALSE,
@@ -118,7 +118,7 @@ CREATE TABLE canvas_template (
 CREATE TABLE canvas_templatemembership (
     id            integer       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
     template_id   integer       NOT NULL  REFERENCES canvas_template (id),
-    account_id    integer       NOT NULL  REFERENCES canvas_account (id),
+    user_id       integer       NOT NULL  REFERENCES canvas_user (id),
     name          varchar(64)   NOT NULL  DEFAULT 'owner',
     access        integer       NOT NULL  DEFAULT 15
 );
@@ -149,7 +149,7 @@ CREATE TABLE canvas_templaterepository (
 ;
 CREATE TABLE canvas_machine (
     id            integer       NOT NULL PRIMARY KEY  AUTO_INCREMENT,
-    account_id    integer       NOT NULL REFERENCES canvas_account(id),
+    user_id       integer       NOT NULL REFERENCES canvas_user(id),
     template_id   integer       NOT NULL REFERENCES canvas_template(id),
     name          varchar(256)  NOT NULL,
     description   text

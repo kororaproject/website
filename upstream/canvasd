@@ -36,14 +36,21 @@ use Mojolicious::Plugin::Authentication;
 # LOCAL INCLUDES
 #
 use Canvas::Store::Package;
-use Canvas::Store::Account;
-use Canvas::Store::AccountMembership;
+use Canvas::Store::User;
+use Canvas::Store::UserMembership;
 use Canvas::Store::Repository;
 use Canvas::Store::Template;
 use Canvas::Store::TemplatePackage;
 use Canvas::Store::TemplateMembership;
 use Canvas::Store::TemplateRepository;
 use Canvas::Store::WPUser;
+
+#
+# CONSTANTS
+#
+use constant {
+  DEBUG   => 1
+};
 
 
 #
@@ -57,20 +64,18 @@ plugin 'authentication', {
     my ($app, $uid) = @_;
 
     return {
-      name => 'firnsy',
-      u    => Canvas::Store::User->retrieve( user_login => $uid ),
-      a    => Canvas::Store::Account->search( name => $uid )->first,
+      wpu => Canvas::Store::WPUser->retrieve( user_login => $uid ),
+      a   => Canvas::Store::User->search( name => $uid )->first,
     };
   },
   validate_user => sub {
     my ($app, $user, $pass, $extradata) = @_;
 
-    print Dumper $user, $pass;
-    my $u = Canvas::Store::User->retrieve( user_login => $user );
-    my $a = Canvas::Store::Account->search( name => $user )->first;
+    my $wpu = Canvas::Store::WPUser->retrieve( user_login => $user );
+    my $a = Canvas::Store::User->search( name => $user )->first;
 
-    if( defined($a) && defined($u) && $u->validate_password($pass) ) {
-      return $u->user_login;
+    if( defined($a) && defined($wpu) && $wpu->validate_password($pass) ) {
+      return $wpu->user_login;
     };
 
     return undef;
@@ -176,16 +181,16 @@ get '/package/:id' => sub {
 #
 # ACCOUNTS
 #
-get '/accounts' => sub {
+get '/users' => sub {
   my $self = shift;
 
   my $cu = $self->authenticated_user;
 
   my $ret = [];
 
-  foreach my $a ( Canvas::Store::Account->retrieve_all ) {
-    # skip if private and not ( our account or membership to account )
-    next unless( ( $a->id eq $cu->{a}->id ) || ( scalar $a->account_memberships( member_id => $cu->{a}->id ) ) );
+  foreach my $a ( Canvas::Store::User->retrieve_all ) {
+    # skip if private and not ( our user or membership to user )
+    next unless( ( $a->id eq $cu->{u}->id ) || ( scalar $a->user_memberships( member_id => $cu->{u}->id ) ) );
 
     push @$ret, {
       id    => $a->id+0,
@@ -197,15 +202,15 @@ get '/accounts' => sub {
   $self->render( json => $ret );
 };
 
-get '/account/:id' => sub {
+get '/user/:id' => sub {
   my $self = shift;
   my $id = $self->param('id');
 
   my $cu = $self->authenticated_user;
-  my $p = Canvas::Store::Account->retrieve($id);
+  my $p = Canvas::Store::User->retrieve($id);
 
-  # skip if private and not ( our account or membership to account )
-  unless( ( $p->id eq $cu->{a}->id ) || ( scalar $p->account_memberships( member_id => $cu->{a}->id ) ) ) {
+  # skip if private and not ( our user or membership to user )
+  unless( ( $p->id eq $cu->{u}->id ) || ( scalar $p->user_memberships( member_id => $cu->{u}->id ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',
@@ -213,7 +218,7 @@ get '/account/:id' => sub {
     );
   }
 
-  # check we actually received a valid account
+  # check we actually received a valid user
   unless( defined($p) ) {
    return $self->render(
       status  => 404,
@@ -230,16 +235,16 @@ get '/account/:id' => sub {
 };
 
 
-get '/account/:id/memberships' => sub {
+get '/user/:id/memberships' => sub {
   my $self = shift;
   my $id = $self->param('id');
 
   my $cu = $self->authenticated_user;
-  my $p = Canvas::Store::Account->retrieve($id);
-  my @member = $p->account_memberships( member_id => $cu->{a}->id );
+  my $p = Canvas::Store::User->retrieve($id);
+  my @member = $p->user_memberships( member_id => $cu->{u}->id );
 
-  # abort if private and not ( our account or membership to account )
-  unless( ( $p->id eq $cu->{a}->id ) || ( scalar @member && ( $member[0]->is_owner_admin ) ) ) {
+  # abort if private and not ( our user or membership to user )
+  unless( ( $p->id eq $cu->{u}->id ) || ( scalar @member && ( $member[0]->is_owner_admin ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',
@@ -249,7 +254,7 @@ get '/account/:id/memberships' => sub {
 
   my $ret = [];
 
-  foreach my $m ( $p->account_memberships ) {
+  foreach my $m ( $p->user_memberships ) {
     push @$ret, {
       id    => $m->member_id->id+0,
       name  => $m->member_id->name,
@@ -321,7 +326,7 @@ get '/templates' => sub {
   my $q = {};
 
   my $q_name = $self->param('name');
-  my $q_account = $self->param('account');
+  my $q_user = $self->param('user');
 
   $q->{name}    = $q_name     if defined($q_name);
 
@@ -340,15 +345,15 @@ get '/templates' => sub {
   my $ret = [];
 
   foreach my $t ( @templates ) {
-    # skip if private and not ( our account or membership to account )
-    next if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) );
-    next if( defined( $q_account ) && ( $t->account_id->name ne $q_account) );
+    # skip if private and not ( our user or membership to user )
+    next if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) );
+    next if( defined( $q_user ) && ( $t->user_id->name ne $q_user) );
 
     # add to available
     push @$ret, {
       id          => $t->id+0,
       name        => $t->name,
-      owner       => $t->account_id->name,
+      owner       => $t->user_id->name,
       description => $t->description,
     };
   }
@@ -410,37 +415,37 @@ post '/templates' => sub {
   my $json = Mojo::JSON->new;
   my $data = $json->decode( $self->req->body );
 
-  # find the account requested
-  my $u = Canvas::Store::Account->search({
+  # find the user requested
+  my $u = Canvas::Store::User->search({
     name => $data->{u},
   })->first;
 
-  # bail if the account doesn't exist
+  # bail if the user doesn't exist
   unless( defined($u) ) {
     return $self->render(
       status  => 500,
-      text    => 'No user with that account.',
-      json    => { error => 'No user with that account.' },
+      text    => 'No user with that user.',
+      json    => { error => 'No user with that user.' },
     );
   }
 
   my $cu = $self->authenticated_user;
-  my @membership = $u->account_memberships( member_id => $cu->{a}->id );
+  my @membership = $u->user_memberships( member_id => $cu->{u}->id );
 
-  # validate the current user has access to write on this account
-  unless( ( $data->{u} eq $cu->{a}->name ) ||
+  # validate the current user has access to write on this user
+  unless( ( $data->{u} eq $cu->{u}->name ) ||
           ( scalar @membership && $membership[0]->can_create ) ) {
 
     return $self->render(
       status  => 403,
-      text    => 'Not your account buddy.',
-      json    => { error => 'Not your account buddy.' },
+      text    => 'Not your user buddy.',
+      json    => { error => 'Not your user buddy.' },
     );
   }
 
   # find or create new template
   my $t = Canvas::Store::Template->search({
-    account_id => $u->id+0,
+    user_id => $u->id+0,
     name       => $data->{n},
   })->first;
 
@@ -448,14 +453,14 @@ post '/templates' => sub {
   if( defined($t) ) {
     return $self->render(
       status  => 500,
-      text    => 'Template already exists with that name for this account.',
-      json    => { error => 'Template already exists with that name for this account.' },
+      text    => 'Template already exists with that name for this user.',
+      json    => { error => 'Template already exists with that name for this user.' },
     );
   }
 
   # create the template
   $t = Canvas::Store::Template->insert({
-    account_id => $u->id+0,
+    user_id => $u->id+0,
     name       => $data->{n},
   });
 
@@ -581,8 +586,8 @@ get '/template/:id' => sub {
     );
   }
 
-  # skip if private and not ( our account or membership to account )
-  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+  # skip if private and not ( our user or membership to user )
+  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',
@@ -701,8 +706,8 @@ put '/template/:id' => sub {
     );
   }
 
-  # skip if private and not ( our account or membership to account )
-  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+  # skip if private and not ( our user or membership to user )
+  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',
@@ -868,8 +873,8 @@ del '/template/:id' => sub {
     );
   }
 
-  # skip if private and not ( our account or membership to account )
-  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+  # skip if private and not ( our user or membership to user )
+  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',
@@ -920,8 +925,8 @@ get '/user/:user/template/:name' => sub {
     );
   }
 
-  # skip if private and not ( our account or membership to account )
-  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+  # skip if private and not ( our user or membership to user )
+  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',
@@ -994,8 +999,8 @@ put '/user/:user/template/:name' => sub {
     );
   }
 
-  # skip if private and not ( our account or membership to account )
-  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+  # skip if private and not ( our user or membership to user )
+  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',
@@ -1165,8 +1170,8 @@ del '/user/:user/template/:name' => sub {
     );
   }
 
-  # skip if private and not ( our account or membership to account )
-  if( $t->private && ! ( ( $t->account_id eq $cu->{a}->id ) || ( scalar $t->account_id->account_memberships( member_id => $cu->{a}->id ) ) ) ) {
+  # skip if private and not ( our user or membership to user )
+  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',

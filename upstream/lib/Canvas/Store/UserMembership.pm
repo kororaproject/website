@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::Store::AccountMembership;
+package Canvas::Store::UserMembership;
 
 use strict;
 use base 'Canvas::Store';
@@ -26,11 +26,11 @@ use constant {
   ACL_WRITE =>   1,
 };
 
-__PACKAGE__->table('canvas_accountmembership');
-__PACKAGE__->columns(All => qw/id account_id member_id name access/);
+__PACKAGE__->table('canvas_usermembership');
+__PACKAGE__->columns(All => qw/id user_id member_id name access/);
 
-__PACKAGE__->has_a(account_id => 'Canvas::Store::Account');
-__PACKAGE__->has_a(member_id  => 'Canvas::Store::Account');
+__PACKAGE__->has_a(user_id    => 'Canvas::Store::User');
+__PACKAGE__->has_a(member_id  => 'Canvas::Store::User');
 
 
 
