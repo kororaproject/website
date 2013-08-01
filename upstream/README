@@ -1,0 +1,57 @@
+---------------------------------------------------------------------
+ 0. INTRODUCTION
+---------------------------------------------------------------------
+
+Canvas is an open, lightweight framework providing:
+  - package browser,
+  - package inventory management, and
+  - machine inventory management
+
+
+Canvas was developed for the Korora ecosystem.
+
+---------------------------------------------------------------------
+ 1. INSTALLING
+---------------------------------------------------------------------
+
+Install the pre-requisites.
+
+# yum install perl-Mojolicious perl-Class-DBI
+
+
+Currently we only authenticate against a WP backend. So you'll need to
+configure mysql and import a valid WP schema with accounts.
+
+So create a canvas DB and import the WP dump.
+
+# mysql -u root
+
+$ CREATE DATABASE canvas;
+$ GRANT ALL ON canvas.* TO canvas@localhost IDENTIFIED BY 'c@nva$';
+
+# mysql -u canvas -p -D canvas < wordpress-dump.sql
+
+
+Overlay the canvas schema on top
+
+# mysql -u canvas -p -D canvas < canvas.sql
+
+
+
+Tweak canvas-setup for valid WP accounts
+
+# ./canvas-setup
+
+
+Run canvasd (via morbo for development)
+
+# morbo ./canvasd
+
+
+Test server by listing templates
+
+# ./canvas-cli -u username -p --host="http://localhost:3000" template list
+0 temlates found. 'Tis the dawn of time.
+
+
+Success!
