@@ -320,8 +320,9 @@ class PackageList(object):
     self._parse_packages( packages )
 
   def _parse_packages(self, packages ):
-    for p in packages:
-      self._packages.append( Package( p ) )
+    if isinstance(packages, list):
+      for p in packages:
+        self._packages.append( Package( p ) )
 
   def add(self, package):
     if not isinstance( package, Package ):
