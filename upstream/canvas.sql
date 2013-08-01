@@ -1,4 +1,9 @@
 BEGIN;
+/* renamed (legacy) tables */
+DROP TABLE IF EXISTS canvas_account;
+DROP TABLE IF EXISTS canvas_accountmembership;
+
+/* rebuild all tables from scratch */
 DROP TABLE IF EXISTS canvas_user;
 DROP TABLE IF EXISTS canvas_usermembership;
 DROP TABLE IF EXISTS canvas_screenshot;

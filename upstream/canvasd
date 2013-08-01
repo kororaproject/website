@@ -65,16 +65,16 @@ plugin 'authentication', {
 
     return {
       wpu => Canvas::Store::WPUser->retrieve( user_login => $uid ),
-      a   => Canvas::Store::User->search( name => $uid )->first,
+      u   => Canvas::Store::User->search( name => $uid )->first,
     };
   },
   validate_user => sub {
     my ($app, $user, $pass, $extradata) = @_;
 
     my $wpu = Canvas::Store::WPUser->retrieve( user_login => $user );
-    my $a = Canvas::Store::User->search( name => $user )->first;
+    my $u = Canvas::Store::User->search( name => $user )->first;
 
-    if( defined($a) && defined($wpu) && $wpu->validate_password($pass) ) {
+    if( defined($u) && defined($wpu) && $wpu->validate_password($pass) ) {
       return $wpu->user_login;
     };
 
@@ -496,11 +496,11 @@ post '/templates' => sub {
 
     # store pacakges
     foreach my $p ( @{ $data->{p} } ) {
-      my $pp = Canvas::Package->find_or_create({ name => $p->{n} });
+      my $pp = Canvas::Store::Package->find_or_create({ name => $p->{n} });
 
       # cache arch lookups since there are very few
       unless( defined($arch_cache->{$p->{a}}) ) {
-        $arch_cache->{$p->{a}} = Canvas::Arch->find_or_create({ name => $p->{a} });
+        $arch_cache->{$p->{a}} = Canvas::Store::Arch->find_or_create({ name => $p->{a} });
       }
 
       my $pa = $arch_cache->{$p->{a}};
@@ -576,7 +576,7 @@ get '/template/:id' => sub {
   my $self = shift;
   my $id = $self->param('id');
   my $cu = $self->authenticated_user;
-  my $t = Canvas::Template->retrieve($id);
+  my $t = Canvas::Store::Template->retrieve($id);
 
   # check we actually received a valid template
   unless( defined($t) ) {
@@ -696,7 +696,7 @@ put '/template/:id' => sub {
   my $data = $json->decode( $self->req->body );
 
   my $cu = $self->authenticated_user;
-  my $t = Canvas::Template->retrieve($id);
+  my $t = Canvas::Store::Template->retrieve($id);
 
   # check we actually received a valid template
   unless( defined($t) ) {
@@ -715,7 +715,7 @@ put '/template/:id' => sub {
     );
   }
 
-  Canvas::DBI->do_transaction( sub {
+  Canvas::Store->do_transaction( sub {
     # get all archs to cache
     my $arch_cache = {};
 
@@ -729,7 +729,7 @@ put '/template/:id' => sub {
 
       my $pu = $r->{bu}[0] // '';
 
-      my $rr = Canvas::Repository->find_or_create({
+      my $rr = Canvas::Store::Repository->find_or_create({
         name      => $r->{n},
         stub      => $r->{id},
         base_url  => $bu,
@@ -766,7 +766,7 @@ put '/template/:id' => sub {
 
     # remove repositories
     foreach my $r ( @{ $data->{dr} } ) {
-      my @rr = Canvas::Repository->search({
+      my @rr = Canvas::Store::Repository->search({
         stub => $r->{id},
       });
 
@@ -784,11 +784,11 @@ put '/template/:id' => sub {
 
     # add/update packages
     foreach my $p ( @{ $data->{p} } ) {
-      my $pp = Canvas::Package->find_or_create({ name => $p->{n} });
+      my $pp = Canvas::Store::Package->find_or_create({ name => $p->{n} });
 
       # cache arch lookups since there are very few
       unless( defined($arch_cache->{$p->{a}}) ) {
-        $arch_cache->{$p->{a}} = Canvas::Arch->find_or_create({ name => $p->{a} });
+        $arch_cache->{$p->{a}} = Canvas::Store::Arch->find_or_create({ name => $p->{a} });
       }
       my $pa = $arch_cache->{$p->{a}};
 
@@ -824,7 +824,7 @@ put '/template/:id' => sub {
 
     # remove packages
     foreach my $p ( @{ $data->{dp} } ) {
-      my @pp = Canvas::Package->search({ name => $p->{n} });
+      my @pp = Canvas::Store::Package->search({ name => $p->{n} });
 
       if( scalar @pp ) {
         my @dp = $t->template_repositories({
@@ -862,7 +862,7 @@ del '/template/:id' => sub {
   my $id = $self->param('id');
 
   my $cu = $self->authenticated_user;
-  my $t = Canvas::Template->retrieve($id);
+  my $t = Canvas::Store::Template->retrieve($id);
 
   # check we actually received a valid template
   unless( defined($t) ) {
@@ -882,7 +882,7 @@ del '/template/:id' => sub {
     );
   }
 
-  Canvas::DBI->do_transaction( sub {
+  Canvas::Store->do_transaction( sub {
     $t->delete;
   });
 
@@ -910,7 +910,7 @@ get '/user/:user/template/:name' => sub {
   my $name = $self->param('name');
 
   my $cu = $self->authenticated_user;
-  my $t = Canvas::Template->search({
+  my $t = Canvas::Store::Template->search({
     name  => $name,
     owner => $user,
   });
@@ -984,7 +984,7 @@ put '/user/:user/template/:name' => sub {
   my $data = $json->decode( $self->req->body );
 
   my $cu = $self->authenticated_user;
-  my $t = Canvas::Template->search({
+  my $t = Canvas::Store::Template->search({
     name  => $name,
     owner => $user,
   });
@@ -1008,7 +1008,7 @@ put '/user/:user/template/:name' => sub {
     );
   }
 
-  Canvas::DBI->do_transaction( sub {
+  Canvas::Store->do_transaction( sub {
     # get all archs to cache
     my $arch_cache = {};
 
@@ -1022,7 +1022,7 @@ put '/user/:user/template/:name' => sub {
 
       my $pu = $r->{bu}[0] // '';
 
-      my $rr = Canvas::Repository->find_or_create({
+      my $rr = Canvas::Store::Repository->find_or_create({
         name      => $r->{n},
         stub      => $r->{id},
         base_url  => $bu,
@@ -1059,7 +1059,7 @@ put '/user/:user/template/:name' => sub {
 
     # remove repositories
     foreach my $r ( @{ $data->{dr} } ) {
-      my @rr = Canvas::Repository->search({
+      my @rr = Canvas::Store::Repository->search({
         stub => $r->{id},
       });
 
@@ -1077,11 +1077,11 @@ put '/user/:user/template/:name' => sub {
 
     # add/update packages
     foreach my $p ( @{ $data->{p} } ) {
-      my $pp = Canvas::Package->find_or_create({ name => $p->{n} });
+      my $pp = Canvas::Store::Package->find_or_create({ name => $p->{n} });
 
       # cache arch lookups since there are very few
       unless( defined($arch_cache->{$p->{a}}) ) {
-        $arch_cache->{$p->{a}} = Canvas::Arch->find_or_create({ name => $p->{a} });
+        $arch_cache->{$p->{a}} = Canvas::Store::Arch->find_or_create({ name => $p->{a} });
       }
       my $pa = $arch_cache->{$p->{a}};
 
@@ -1117,7 +1117,7 @@ put '/user/:user/template/:name' => sub {
 
     # remove packages
     foreach my $p ( @{ $data->{dp} } ) {
-      my @pp = Canvas::Package->search({ name => $p->{n} });
+      my @pp = Canvas::Store::Package->search({ name => $p->{n} });
 
       if( scalar @pp ) {
         my @dp = $t->template_repositories({
@@ -1154,7 +1154,7 @@ del '/user/:user/template/:name' => sub {
   my $name = $self->param('name');
 
   my $cu = $self->authenticated_user;
-  my $t = Canvas::Template->search({
+  my $t = Canvas::Store::Template->search({
     name  => $name,
     owner => $user,
   });
@@ -1179,7 +1179,7 @@ del '/user/:user/template/:name' => sub {
     );
   }
 
-  Canvas::DBI->do_transaction( sub {
+  Canvas::Store->do_transaction( sub {
     $t->delete;
   });
 
