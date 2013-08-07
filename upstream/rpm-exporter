@@ -1,0 +1,560 @@
+#!/usr/bin/python
+
+# Export distromatcher input information from a rpm-md repo.
+# See: http://www.enricozini.org/2011/debian/distromatch/
+
+# distromatch - Match binary package names across distributions
+#
+# Copyright (C) 2012 SUSE
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+__author__ = "Vincent Untz <vuntz@opensuse.org>"
+__license__ = """
+    Copyright (C) 2012 Vincent Untz <vuntz@opensuse.org>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+"""
+VERSION = "0.1"
+
+import os
+import sys
+
+import argparse
+import errno
+import getpass
+import gzip
+import hashlib
+import logging
+import operator
+import re
+import shutil
+import tempfile
+import urlparse
+import urllib2
+
+from posixpath import join as posixjoin # Handy for URLs
+
+try:
+    from lxml import etree as ET
+except ImportError:
+    try:
+        from xml.etree import cElementTree as ET
+    except ImportError:
+        import cElementTree as ET
+
+
+from Canvas import CanvasService
+from Canvas import Package
+from Canvas import Repository
+from Canvas import RepositoryDetails
+
+
+RPM_MD_NS='{http://linux.duke.edu/metadata/common}'
+RPM_MD_NS_REPO='{http://linux.duke.edu/metadata/repo}'
+RPM_MD_NS_RPM='{http://linux.duke.edu/metadata/rpm}'
+RPM_MD_NS_FILELISTS='{http://linux.duke.edu/metadata/filelists}'
+
+KNOWN_METADATA_TYPE = ['rpm-md']
+
+log = logging.getLogger(__name__)
+
+
+class HeadRequest(urllib2.Request):
+  def get_method(self):
+    return "HEAD"
+
+
+def get_hash_from_file(algo, path):
+    """ Return the hash of a file, using the specified algorithm. """
+    if not os.path.exists(path):
+        return None
+
+    # hashlib.algorithms is from python 2.7; for earlier versions, just
+    # hardcode the default list of algorithms
+    if hasattr(hashlib, 'algorithms'):
+        algorithms = hashlib.algorithms
+    else:
+        algorithms = ('md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512')
+
+    if algo not in algorithms:
+        print >>sys.stderr, 'Cannot compute hash with hash algorithm: %s' % algo
+        return None
+
+    hash = hashlib.new(algo)
+    file = open(path, 'rb')
+    while True:
+        data = file.read(32768)
+        if not data:
+            break
+        hash.update(data)
+    file.close()
+    return hash.hexdigest()
+
+
+class RpmMdException(Exception):
+  pass
+
+
+class Metadata(object):
+    def __init__(self, resource, cachedir, skip_arches=['src'], skip_suffixes=['-32bit', '-debuginfo', '-debugsource']):
+        self.resource = resource
+
+        parsed = urlparse.urlparse(self.resource)
+        self._is_local = (parsed.scheme == '')
+        if self._is_local:
+            self._tmpdir = None
+            self._cachedir = None
+        else:
+            self._tmpdir = tempfile.mkdtemp()
+            self._cachedir = cachedir
+            try:
+                os.makedirs(os.path.dirname(cachedir))
+            except OSError, e:
+                if e.errno != errno.EEXIST:
+                    raise e
+
+        self.packages = []
+        self._skip_arches = skip_arches
+        self._skip_suffixes = skip_suffixes
+
+    def cleanup(self, keep_cache=False):
+        if self._tmpdir:
+            if keep_cache:
+                shutil.rmtree(self._cachedir, True)
+                try:
+                    shutil.move(self._tmpdir, self._cachedir)
+                except:
+                    shutil.rmtree(self._cachedir, True)
+                    shutil.rmtree(self._tmpdir, True)
+            else:
+                shutil.rmtree(self._tmpdir, True)
+            self._tmpdir = None
+
+    def _fetch(self, subpath, expected_hash_type = None, expected_hash = None):
+        if self._is_local:
+            return
+
+        cache = os.path.join(self._tmpdir, subpath)
+        if os.path.exists(cache):
+            return
+
+        dirname = os.path.join(self._tmpdir, os.path.dirname(subpath))
+        try:
+            os.makedirs(dirname)
+        except OSError, e:
+            if e.errno != errno.EEXIST:
+                raise e
+
+        if expected_hash_type and expected_hash:
+            old_cache = os.path.join(self._cachedir, subpath)
+            old_hash = get_hash_from_file(expected_hash_type, old_cache)
+            if old_hash == expected_hash:
+                shutil.copy(old_cache, cache)
+                return
+
+        fout = open(cache, 'w')
+        try:
+            fin = urllib2.urlopen(posixjoin(self.resource, subpath))
+            while True:
+                bytes = fin.read(500 * 1024)
+                if len(bytes) == 0:
+                    break
+                fout.write(bytes)
+            fout.close()
+        except urllib2.HTTPError, e:
+            fin.close()
+            fout.close()
+            os.unlink(cache)
+            raise e
+        fin.close()
+        fout.close()
+
+    def _get_local_path(self, subpath, fetch = True, expected_hash_type = None, expected_hash = None):
+        if self._is_local:
+            return os.path.join(self.resource, subpath)
+        else:
+            if fetch:
+                self._fetch(subpath, expected_hash_type, expected_hash)
+            return os.path.join(self._tmpdir, subpath)
+
+    def _append_package(self, package):
+        if self._should_skip_package(package):
+            return
+        self.packages.append(package)
+
+    def _should_skip_package(self, package):
+        for suffix in self._skip_suffixes:
+            if package.name.endswith(suffix):
+                return True
+        if package.arch in self._skip_arches:
+            return True
+        return False
+
+
+class RpmMd(Metadata):
+    sourcerpm_re = re.compile(r'(.+)-[^-]+-[^-]+.src.rpm')
+
+    def __init__(self, resource, cachedir):
+        Metadata.__init__(self, resource, cachedir)
+
+        self._parsed_repomd = False
+        self._parsed_primary = False
+        self._parsed_filelists = False
+
+        self._primary_filename = None
+        self._primary_hash = None
+        self._filelists_filename = None
+        self._filelists_hash = None
+
+        self._pkgs_by_id = {}
+
+    def _fetch(self, subpath, expected_hash_type = None, expected_hash = None):
+        try:
+            Metadata._fetch(self, subpath, expected_hash_type, expected_hash)
+        except urllib2.HTTPError, e:
+            raise RpmMdException('Cannot fetch %s from %s: %s' % (subpath, self.resource, e))
+
+    def fetch_and_parse(self):
+        self._parse_repomd()
+
+        (hash_type, expected_hash) = self._primary_hash
+        primary_path = self._get_local_path(self._primary_filename, expected_hash_type=hash_type, expected_hash=expected_hash)
+        real_hash = get_hash_from_file(hash_type, primary_path)
+        if real_hash != expected_hash:
+            raise RpmMdException('Hash of %s from %s is different from the expected value.' % (self._primary_filename, self.resource))
+
+        if self._filelists_filename:
+            (hash_type, expected_hash) = self._filelists_hash
+            filelists_path = self._get_local_path(self._filelists_filename, expected_hash_type=hash_type, expected_hash=expected_hash)
+            real_hash = get_hash_from_file(hash_type, filelists_path)
+            if real_hash != expected_hash:
+                raise RpmMdException('Hash of %s from %s is different from the expected value.' % (self._filelists_filename, self.resource))
+
+        self._parse_primary()
+        #self._parse_filelists()
+
+    def _parse_repomd(self):
+        def get_location(node):
+            location_node = node.find(RPM_MD_NS_REPO + 'location')
+            if location_node is None:
+                return None
+            return location_node.get('href')
+
+        def get_hash(node):
+            checksum_node = node.find(RPM_MD_NS_REPO + 'checksum')
+            if checksum_node is None:
+                return None
+            hash_type = checksum_node.get('type')
+            if not hash_type or not checksum_node.text:
+                return None
+            if hash_type == 'sha':
+                hash_type = 'sha1'
+            return (hash_type, checksum_node.text)
+
+        if self._parsed_repomd:
+            return
+
+        repomd_path = self._get_local_path('repodata/repomd.xml')
+        if not os.path.exists(repomd_path):
+            raise RpmMdException('%s in %s does not exist.' % ('repodata/repomd.xml', self.resource))
+
+        try:
+            root = ET.parse(repomd_path).getroot()
+        except SyntaxError, e:
+            raise RpmMdException('Cannot parse metadata: %s' % (e,))
+
+        for data_node in root.findall(RPM_MD_NS_REPO + 'data'):
+            if data_node.get('type') == 'primary':
+                self._primary_filename = get_location(data_node)
+                self._primary_hash = get_hash(data_node)
+            elif data_node.get('type') == 'filelists':
+                self._filelists_filename = get_location(data_node)
+                self._filelists_hash = get_hash(data_node)
+
+    def _parse_primary(self):
+        log.info("Parsing primary xml.")
+        if self._parsed_primary:
+            return
+
+        if self._primary_filename is None:
+            raise RpmMdException('No primary metadata in %s.' % (self.resource,))
+
+        (hash_type, expected_hash) = self._primary_hash
+        primary_path = self._get_local_path(self._primary_filename, expected_hash_type=hash_type, expected_hash=expected_hash)
+        if not os.path.exists(primary_path):
+            raise RpmMdException('%s in %s does not exist.' % (self._primary_filename, self.resource))
+
+        try:
+            root = ET.parse(primary_path).getroot()
+        except SyntaxError, e:
+            raise RpmMdException('Cannot parse primary metadata: %s' % (e,))
+
+        for package_node in root.findall(RPM_MD_NS + 'package'):
+            (pkgid, package) = self._parse_package_node(package_node)
+            self._pkgs_by_id[pkgid] = package
+            self._append_package(package)
+
+        self._parsed_primary = True
+        log.info("Done parsing primary xml.")
+
+    def _parse_package_node(self, package_node):
+        name = None
+        arch = None
+        version = None
+        release = None
+        epoch = None
+
+        summary = None
+        description = None
+        license = None
+        url = None
+
+        install_size = None
+        package_size = None
+
+        build_time = None
+        file_time = None
+
+        src_package = None
+        provides = []
+        files = []
+
+        name_node = package_node.find(RPM_MD_NS + 'name')
+        if name_node is not None:
+            name = name_node.text
+        if not name:
+            raise RpmMdException('No name found for package.')
+
+        arch_node = package_node.find(RPM_MD_NS + 'arch')
+        if arch_node is not None:
+            arch = arch_node.text
+        if not arch:
+            raise RpmMdException('No arch found for package %s.', name)
+
+        format_node = package_node.find(RPM_MD_NS + 'format')
+        if format_node is None:
+            raise RpmMdException('No <format> tag for %s.' % name)
+
+        version_node = package_node.find(RPM_MD_NS + 'version')
+        if version_node is not None:
+            epoch = version_node.get('epoch')
+            version = version_node.get('ver')
+            release = version_node.get('rel')
+        if not ( epoch and version and release ):
+            raise RpmMdException('No version(s) found for package %s.', name)
+
+        summary_node = package_node.find(RPM_MD_NS + 'summary')
+        if summary_node is not None:
+            summary = summary_node.text
+        if not summary:
+            raise RpmMdException('No summary found for package.')
+
+        description_node = package_node.find(RPM_MD_NS + 'description')
+        if description_node is not None:
+            description = description_node.text
+        if not description:
+            raise RpmMdException('No description found for package.')
+
+        license_node = format_node.find(RPM_MD_NS_RPM + 'license')
+        if license_node is not None:
+            license = license_node.text
+        if not license:
+            raise RpmMdException('No license found for package.')
+
+        url_node = package_node.find(RPM_MD_NS + 'url')
+        if url_node is not None:
+            url = url_node.text
+
+        size_node = package_node.find(RPM_MD_NS + 'size')
+        if size_node is not None:
+            install_size = size_node.get('installed')
+            package_size = size_node.get('package')
+        if not ( package_size and install_size ):
+            raise RpmMdException('No size(s) found for package %s.', name)
+
+        time_node = package_node.find(RPM_MD_NS + 'time')
+        if time_node is not None:
+            file_time = time_node.get('file')
+            build_time = time_node.get('build')
+        if not ( build_time and file_time ):
+            raise RpmMdException('No time(s) found for package %s.', name)
+
+        sourcerpm_node = format_node.find(RPM_MD_NS_RPM + 'sourcerpm')
+        if sourcerpm_node is not None:
+            match = self.sourcerpm_re.match(sourcerpm_node.text)
+            if match:
+                src_package = match.group(1)
+        if not src_package and arch != 'src':
+            raise RpmMdException('No source package for %s.' % name)
+
+        provides_node = format_node.find(RPM_MD_NS_RPM + 'provides')
+        if provides_node is not None:
+            for entry_node in provides_node.findall(RPM_MD_NS_RPM + 'entry'):
+                entry_name = entry_node.get('name')
+                if not entry_name:
+                    continue
+                provides.append(entry_name)
+
+        for file_node in format_node.findall(RPM_MD_NS + 'file'):
+            filename = file_node.text
+            if not filename:
+                continue
+            files.append(filename)
+
+        checksum_node = package_node.find(RPM_MD_NS + 'checksum')
+        if checksum_node is not None and checksum_node.get('pkgid').lower() == 'yes':
+            pkgid = checksum_node.text or None
+        else:
+            pkgid = None
+
+        package = Package(name=name, summary, description, license, url, src_package, provides, files )
+        package.addDetails( PackageDetails( epoch, version, release, arch, install_size, package_size, build_time, file_time ) )
+
+        return (pkgid, package)
+
+    def _parse_filelists(self):
+        log.info("Parsing filelists xml.")
+        if self._parsed_filelists:
+            return
+
+        if self._filelists_filename is None:
+            self._parsed_filelists = True
+            return
+
+        (hash_type, expected_hash) = self._filelists_hash
+        filelists_path = self._get_local_path(self._filelists_filename, expected_hash_type=hash_type, expected_hash=expected_hash)
+        if not os.path.exists(filelists_path):
+            raise RpmMdException('%s in %s does not exist.' % (self._filelists_filename, self.resource))
+
+        try:
+            root = ET.parse(filelists_path).getroot()
+        except SyntaxError, e:
+            raise RpmMdException('Cannot parse filelists: %s' % (e,))
+
+        for package_node in root.findall(RPM_MD_NS_FILELISTS + 'package'):
+            pkgid = package_node.get('pkgid')
+            if not pkgid:
+                continue
+            try:
+                package = self._pkgs_by_id[pkgid]
+            except KeyError:
+                continue
+
+        self._parsed_filelists = True
+        log.info("Done parsing filelists xml.")
+
+
+def main(args):
+  parser = argparse.ArgumentParser(
+      prog="rpm-exporter",
+      description="Export distromatch info from RPM-MD metadata"
+      )
+
+  parser.add_argument('--host', type=str, dest='host')
+  parser.add_argument('-u', '--user', type=str, dest='username')
+  parser.add_argument('-p', '--pass', action='store_true', dest='password')
+
+  parser.add_argument('--cachedir', type=str, dest='cachedir', default='./cache')
+  parser.add_argument('--stub', type=str, dest='stub')
+  parser.add_argument('--name', type=str, dest='name')
+  parser.add_argument('--arch', type=str, dest='arch')
+  parser.add_argument('--version', type=str, dest='version')
+  parser.add_argument('--resource', type=str, dest='resource')
+  parser.add_argument('-v', '--verbose', action='store_true', dest='verbose')
+#  parser.add_argument('-V', '--version', action='version', version=VERSION)
+
+  args = parser.parse_args()
+
+  date_format = "%c"
+  log_format = "[%(levelname)s] %(asctime)s: %(message)s"
+  if args.verbose:
+    logging.basicConfig(level=logging.INFO, stream=sys.stderr, datefmt=date_format, format=log_format)
+  else:
+    logging.basicConfig(level=logging.WARNING, stream=sys.stderr, datefmt=date_format, format=log_format)
+
+  # prompt for password if requested
+  password = ''
+  if args.password:
+    password = getpass.getpass()
+
+  if args.host:
+    cs = CanvasService(host=args.host)
+  else:
+    cs = CanvasService()
+
+
+  if not cs.authenticate(args.username, password):
+    print 'Unable to authenticate with canvas service.'
+    sys.exit(1)
+
+  # get ID for repo
+  repo = cs.repository_find( stub=args.stub, url=args.resource )
+
+  if repo is None or not repo.hasDetails():
+    cr = Repository( args.stub )
+    cr.addDetails( RepositoryDetails( name=args.name, arch=args.arch, version=args.version, url=args.resource ) )
+    repo = cs.repository_create( cr )
+
+  print repo
+
+  parsed = urlparse.urlparse(args.resource)
+
+  if not parsed.scheme:
+    if not os.path.exists(args.resource):
+      print >>sys.stderr, '\'%s\' does not exist.' % args.resource
+      sys.exit(1)
+    if not os.path.isdir(args.resource):
+      print >>sys.stderr, '\'%s\' is not a directory.' % args.resource
+      sys.exit(1)
+
+  metadata = None
+
+  metadata = RpmMd(args.resource, args.cachedir)
+
+  try:
+    metadata.fetch_and_parse()
+  except RpmMdException, e:
+    metadata.cleanup()
+    print >>sys.stderr, '%s' % e
+    sys.exit(2)
+
+  log.info("Exporting data ...")
+  # It's always much more readable to sort the output
+  #self.packages.sort(key=operator.attrgetter('name'))
+  for package in metadata.packages:
+    log.info("  - %s" % package.name)
+    cs.package_create( repo.blessPackage( package ) )
+
+  log.info("Done exporting data.")
+
+
+if __name__ == '__main__':
+  try:
+    ret = main(sys.argv)
+    sys.exit(ret)
+  except KeyboardInterrupt:
+    sys.exit(0)

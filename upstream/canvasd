@@ -36,9 +36,11 @@ use Mojolicious::Plugin::Authentication;
 # LOCAL INCLUDES
 #
 use Canvas::Store::Package;
+use Canvas::Store::PackageDetails;
 use Canvas::Store::User;
 use Canvas::Store::UserMembership;
 use Canvas::Store::Repository;
+use Canvas::Store::RepositoryDetails;
 use Canvas::Store::Template;
 use Canvas::Store::TemplatePackage;
 use Canvas::Store::TemplateMembership;
@@ -131,11 +133,39 @@ any '/deauthenticate' => sub {
   );
 };
 
-
+# expose the /api routes when authenticated only
 under '/api' => ( authenticated => 1 );
 
 #
 # PACKAGES
+#
+
+#
+# GET /packages
+#
+# Returns all packages available
+#
+# Expected body contents is JSON encoded structure defining the template
+# repositories and packages to be added.
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 500 if template owner doesn't exist or is invalid
+#
+# An overview of the JSON structure is shown below:
+#
+# [
+#   {
+#     id: id,
+#     n: "name",
+#     s: "summary",
+#     sx: "description",
+#     l: "license",
+#     u: "url"
+#   },
+#   ...
+# ]
 #
 get '/packages' => sub {
   my $self = shift;
@@ -144,14 +174,175 @@ get '/packages' => sub {
 
   foreach my $p ( Canvas::Store::Package->retrieve_all ) {
     push @$ret, {
-      id          => $p->id+0,
-      name        => $p->name,
+      id  => $p->id+0,
+      n   => $p->name,
+      s   => $p->summary,
+      sx  => $p->description,
+      l   => $p->license,
+      u   => $p->url,
     };
   }
 
   $self->render( json => $ret );
 };
 
+#
+# POST /packages
+#
+# Add a new pacakge
+#
+# Expected body contents is JSON encoded structure defining the package to be
+# added.
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 500 if package already exists
+#
+# An overview of the JSON structure is shown below:
+#
+# {
+#   n:  "name",
+#   s:  "summary",
+#   sx: "description",
+#   l:  "license",
+#   u:  "url",
+#   d: [
+#     {
+#       e: "epoch",
+#       v: "version",
+#       r: "revision",
+#       a: "arch",
+#       is: "install_size",
+#       ps: "package_size",
+#       bt: "build_time",
+#       ft: "file_time",
+#       ri: repo_id,
+#     },
+#     ...
+#   ]
+# }
+#
+post '/packages' => sub {
+  my $self = shift;
+  my $json = Mojo::JSON->new;
+  my $data = $json->decode( $self->req->body );
+
+  # TODO: only super admins and package admins can create packages
+
+  # attempt to find existing package
+  my ($p) = Canvas::Store::Package->search({
+    name       => $data->{n},
+  });
+
+  # general package information exists
+  # check if we're submitting a detailed package structure
+  if( defined($p) ) {
+    unless( defined($data->{d}) ) {
+      return $self->render(
+        status  => 500,
+        text    => 'General package information already exists.',
+        json    => { error => 'General package already exists.' },
+      );
+    }
+  }
+  # otherwise create the package
+  else {
+    $p = Canvas::Store::Package->insert({
+      name        => $data->{n},
+      summary     => $data->{s},
+      description => $data->{sx},
+      license     => $data->{l},
+      url         => $data->{u},
+    });
+  }
+
+  # cache the arch to reduce DB hits
+  my $arch_cache = {};
+
+  for my $d ( @{ $data->{d} } ) {
+    # cache arch lookups since there are very few
+    unless( defined($arch_cache->{$d->{a}}) ) {
+      $arch_cache->{$d->{a}} = Canvas::Store::Arch->find_or_create({ name => $d->{a} });
+    }
+
+    # attempt to find existing package details
+    my( $pd ) = Canvas::Store::PackageDetails->search({
+      package_id    => $p->id,
+      epoch         => $d->{e},
+      version       => $d->{v},
+      rel           => $d->{r},
+      arch_id       => $arch_cache->{ $d->{a} }->id,
+    });
+
+    # details don't exist so add
+    unless( defined( $pd ) ) {
+      # create the package details
+      my $pd = Canvas::Store::PackageDetails->insert({
+        package_id    => $p->id,
+        epoch         => $d->{e},
+        version       => $d->{v},
+        rel           => $d->{r},
+        arch_id       => $arch_cache->{ $d->{a} }->id,
+
+        install_size  => $d->{is},
+        package_size  => $d->{ps},
+        build_time    => Time::Piece->new( $d->{bt} ),
+        file_time     => Time::Piece->new( $d->{ft} ),
+
+        repo_id       => $d->{ri},
+      });
+
+      $d->{id} = $pd->id;
+    }
+  }
+
+  # update general id
+  $data->{id} = $p->id;
+
+  $self->render(
+    status  => 200,
+    json    => $data,
+  );
+};
+
+#
+# GET /api/package/:id
+#
+# Returns the package identified by :id
+#
+# Expected body contents is JSON encoded structure defining the template
+# repositories and packages to be added.
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 500 if template owner doesn't exist or is invalid
+#
+# An overview of the JSON structure is shown below:
+#
+# {
+#   n:  "name",
+#   s:  "summary",
+#   sx: "description",
+#   l:  "license",
+#   u:  "url",
+#   d: [
+#     {
+#       e: "epoch",
+#       v: "version",
+#       r: "release",
+#       a: "arch",
+#       is: "install_size",
+#       ps: "package_size",
+#       bt: "build_time",
+#       ft: "file_time",
+#       ri: repo_id
+#     },
+#     ...
+#   ]
+# }
+#
 get '/package/:id' => sub {
   my $self = shift;
   my $id = $self->param('id');
@@ -169,17 +360,50 @@ get '/package/:id' => sub {
 
   my @template_packages = $p->template_packages;
 
-  $self->render( json => {
-    id          => $p->id+0,
-    name        => $p->name,
-    description => $p->description,
-    referenced  => scalar @template_packages,
-  });
+  my $package = {
+    id  => $p->id+0,
+    n   => $p->name,
+    s   => $p->summary,
+    sx  => $p->description,
+    u   => $p->url,
+    cx  => scalar @template_packages,
+    d   => [],
+  };
+
+  foreach my $d ( $p->package_details ) {
+    push @{ $package->{d} }, {
+      e   => $d->epoch,
+      v   => $d->version,
+      r   => $d->rel,
+      a   => $d->arch_id->name,
+      is  => $d->install_size,
+      ps  => $d->package_size,
+      bt  => $d->build_time,
+      ft  => $d->file_time,
+      ri  => $d->repo_id,
+    }
+  }
+
+  $self->render(
+    status => 200,
+    json => $package,
+  );
 };
 
+put '/package/:id' => sub {
+  my $self = shift;
+  my $json = Mojo::JSON->new;
+  my $data = $json->decode( $self->req->body );
+
+  # TODO: only super admins and package admins can modify packages
+
+};
+
+del '/package/:id' => sub {
+};
 
 #
-# ACCOUNTS
+# USERS
 #
 get '/users' => sub {
   my $self = shift;
@@ -268,21 +492,174 @@ get '/user/:id/memberships' => sub {
 #
 # REPOSITORIES
 #
+
+#
+# GET /repositories
+#
+# Returns all available repositories
+#
+# Returns:
+#  - 200 on success
+#
+# An overview of the JSON structure is shown below:
+#
+# [
+#   {
+#     s: "stub",
+#     n: "name",
+#     gk: "gpg key",
+#   },
+#   ...
+# ]
+#
 get '/repositories' => sub {
   my $self = shift;
 
+  # construct search query as appropriate
+  my $q = {};
+
+  $q->{stub} = $self->param('s') if defined( $self->param( 's' ) );
+
+  my @repos;
+  if( keys %$q ) {
+    @repos = Canvas::Store::Repository->search( $q );
+  }
+  else {
+    @repos = Canvas::Store::Repository->retrieve_all();
+  }
+
   my $ret = [];
 
-  foreach my $r ( Canvas::Store::Repository->retrieve_all ) {
+  foreach my $r ( @repos ) {
     push @$ret, {
-      id    => $r->id+0,
-      name  => $r->name,
+      id  => $r->id+0,
+      s   => $r->stub,
+      gk  => $r->gpg_key,
     };
   }
 
   $self->render( json => $ret );
 };
 
+#
+# POST /repositories
+#
+# Add a new repository
+#
+# Expected body contents is JSON encoded structure defining the package to be
+# added.
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 500 if package already exists
+#
+# An overview of the JSON structure is shown below:
+#
+# {
+#   s: "stub",
+#   n: "name",
+#   gk: "gpg key",
+#   u: "url"
+# }
+#
+post '/repositories' => sub {
+  my $self = shift;
+  my $json = Mojo::JSON->new;
+  my $data = $json->decode( $self->req->body );
+
+  # TODO: only super admins and package admins can create repositories
+
+  # attempt to find existing general package
+  my( $r ) = Canvas::Store::Repository->search({
+    stub       => $data->{s},
+  });
+
+  # general repository information exists
+  # check if we're submitting a detailed repository structure
+  if( defined($r) ) {
+    unless( defined($data->{d}) ) {
+      return $self->render(
+        status  => 500,
+        text    => 'General repository information already exists.',
+        json    => { error => 'General repository already exists.' },
+      );
+    }
+  }
+  # otherwise create the repository
+  else {
+    $r = Canvas::Store::Repository->insert({
+      stub        => $data->{s},
+      gpg_key     => $data->{gk},
+    });
+  }
+
+  my $arch_cache = {};
+
+  for my $d ( @{ $data->{d} } ) {
+    # attempt to find existing general package
+    my( $rd ) = Canvas::Store::RepositoryDetails->search({
+      base_url => $data->{u},
+    });
+
+    # details don't exist so add
+    unless( defined( $rd ) ) {
+      # cache arch lookups since there are very few
+      unless( defined($arch_cache->{$d->{a}}) ) {
+        $arch_cache->{ $d->{a} } = Canvas::Store::Arch->find_or_create({ name => $d->{a} });
+      }
+
+      # create the package details
+      $rd = Canvas::Store::RepositoryDetails->insert({
+        repo_id     => $r->id,
+        name        => $d->{n},
+        arch_id     => $arch_cache->{ $d->{a} }->id,
+        version     => $d->{v},
+        base_url    => $d->{u},
+      });
+
+      # save the repository id for later
+      $d->{id} = $rd->id;
+    }
+  }
+
+  # update general id
+  $data->{id} = $r->id;
+
+  # return an updated version of the posted object
+  $self->render(
+    status  => 200,
+    json    => $data,
+  );
+};
+
+#
+# GET /api/repository/:id
+#
+# Returns the repository identified by :id
+#
+# Returns:
+#  - 200 on success
+#  - 404 if repository does not exist
+#
+# An overview of the JSON structure is shown below:
+#
+# {
+#   id: id,
+#   s: "stub",
+#   gk: "gpg key",
+#   d: [
+#     {
+#       id: id,
+#       n: "name",
+#       a: "arch",
+#       v: version,
+#       u: "url",
+#     },
+#     ...
+#   ]
+# }
+#
 get '/repository/:id' => sub {
   my $self = shift;
   my $id = $self->param('id');
@@ -298,14 +675,49 @@ get '/repository/:id' => sub {
     );
   }
 
+  # build general repository information
+  my $repo = {
+    id  => $r->id+0,
+    s   => $r->stub,
+    gk  => $r->gpg_key,
+    d   => [],
+  };
+
+  # construct search query as appropriate
+  my $q = {};
+
+  if( defined( $self->param( 'a' ) ) ) {
+    my ($arch) = Canvas::Store::Arch->search( { name => $self->param( 'a' ) } );
+    $q->{arch_id} = $arch->id if defined( $arch );
+  }
+  $q->{version} = $self->param('v') if defined( $self->param( 'v' ) );
+  $q->{base_url} = $self->param('u') if defined( $self->param( 'u' ) );
+
+  # search using our constructed query
+  my @repos;
+  if( keys %$q ) {
+    $q->{repo_id} = $r->id;
+
+    @repos = Canvas::Store::RepositoryDetails->search( $q );
+  }
+  else {
+    @repos = Canvas::Store::RepositoryDetails->retrieve_all();
+  }
+
+  # fill out details as required
+  foreach my $d ( @repos ) {
+    push @{ $repo->{d} }, {
+      id  => $d->id+0,
+      n   => $d->name,
+      a   => $d->arch_id->name,
+      v   => $d->version,
+      u   => $d->base_url,
+    };
+  }
+
   $self->render(
     status => 200,
-    json => {
-      id        => $r->id+0,
-      name      => $r->name,
-      base_url  => $r->base_url,
-      gpg_key   => $r->gpg_key,
-    }
+    json => $repo,
   );
 };
 
@@ -416,9 +828,9 @@ post '/templates' => sub {
   my $data = $json->decode( $self->req->body );
 
   # find the user requested
-  my $u = Canvas::Store::User->search({
+  my( $u ) = Canvas::Store::User->search({
     name => $data->{u},
-  })->first;
+  });
 
   # bail if the user doesn't exist
   unless( defined($u) ) {
@@ -444,10 +856,10 @@ post '/templates' => sub {
   }
 
   # find or create new template
-  my $t = Canvas::Store::Template->search({
+  my( $t ) = Canvas::Store::Template->search({
     user_id => $u->id+0,
     name       => $data->{n},
-  })->first;
+  });
 
   # template already exists
   if( defined($t) ) {
@@ -1193,3 +1605,6 @@ del '/user/:user/template/:name' => sub {
 # start the main loop
 app->secret('canvas');
 app->start;
+
+
+

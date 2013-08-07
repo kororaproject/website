@@ -21,12 +21,10 @@ use strict;
 use base 'Canvas::Store';
 
 __PACKAGE__->table('canvas_package_ratings');
-__PACKAGE__->columns(All => qw/id package_id rating_id/);
+__PACKAGE__->columns(All => qw/id package_id rating_id tags/);
 
 __PACKAGE__->has_a(package_id => 'Canvas::Store::Package');
 __PACKAGE__->has_a(rating_id  => 'Canvas::Store::Rating');
-
-
 
 1;
 

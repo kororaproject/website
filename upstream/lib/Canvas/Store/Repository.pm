@@ -21,10 +21,9 @@ use strict;
 use base 'Canvas::Store';
 
 __PACKAGE__->table('canvas_repository');
-__PACKAGE__->columns(All => qw/id stub name base_url gpg_key/);
+__PACKAGE__->columns(All => qw/id stub gpg_key/);
 
-__PACKAGE__->has_many(template_packages => 'Canvas::Store::TemplatePackage' => 'package_id');
-__PACKAGE__->has_many(package_ratings   => 'Canvas::Store::PackageRating'   => 'package_id');
+__PACKAGE__->has_many(repository_details => 'Canvas::Store::RepositoryDetails'   => 'repo_id');
 
 
 1;

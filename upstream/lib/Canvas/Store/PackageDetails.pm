@@ -15,17 +15,33 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::Store::Package;
+package Canvas::Store::PackageDetails;
 
 use strict;
 use base 'Canvas::Store';
 
-__PACKAGE__->table('canvas_package');
-__PACKAGE__->columns(All => qw/id name description summary license url/);
+use Time::Piece;
 
-__PACKAGE__->has_many(template_packages => 'Canvas::Store::TemplatePackage'  => 'package_id');
-__PACKAGE__->has_many(package_ratings   => 'Canvas::Store::PackageRating'    => 'package_id');
-__PACKAGE__->has_many(package_details   => 'Canvas::Store::PackageDetails'   => 'package_id');
+__PACKAGE__->table('canvas_packagedetails');
+__PACKAGE__->columns(All => qw/id package_id arch_id epoch version rel install_size package_size build_time file_time repo_id/);
 
+__PACKAGE__->has_a(package_id => 'Canvas::Store::Package');
+__PACKAGE__->has_a(arch_id    => 'Canvas::Store::Arch');
+__PACKAGE__->has_a(repo_id    => 'Canvas::Store::Repository');
+
+#
+# inflate/deflate epoch stored values
+__PACKAGE__->has_a(
+  build_time  => 'Time::Piece',
+  inflate     => sub { Time::Piece->new( shift ) },
+  deflate     => sub { shift->epoch }
+);
+
+__PACKAGE__->has_a(
+  file_time  => 'Time::Piece',
+  inflate     => sub { Time::Piece->new( shift ) },
+  deflate     => sub { shift->epoch }
+);
 
 1;
+

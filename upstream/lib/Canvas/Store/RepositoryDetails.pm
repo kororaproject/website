@@ -15,17 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::Store::Package;
+package Canvas::Store::RepositoryDetails;
 
 use strict;
 use base 'Canvas::Store';
 
-__PACKAGE__->table('canvas_package');
-__PACKAGE__->columns(All => qw/id name description summary license url/);
+__PACKAGE__->table('canvas_repositorydetails');
+__PACKAGE__->columns(All => qw/id repo_id name version arch_id base_url/);
 
-__PACKAGE__->has_many(template_packages => 'Canvas::Store::TemplatePackage'  => 'package_id');
-__PACKAGE__->has_many(package_ratings   => 'Canvas::Store::PackageRating'    => 'package_id');
-__PACKAGE__->has_many(package_details   => 'Canvas::Store::PackageDetails'   => 'package_id');
-
+__PACKAGE__->has_a(arch_id => 'Canvas::Store::Arch');
+__PACKAGE__->has_a(repo_id => 'Canvas::Store::Repository');
 
 1;
+
