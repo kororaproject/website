@@ -761,7 +761,7 @@ def main():
           print 'Unable to authenticate with canvas service.'
           sys.exit(1)
 
-        cs.template_add( t )
+        cs.template_create( t )
         cs.deauthenticate()
 
 
