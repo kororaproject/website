@@ -21,7 +21,7 @@ use strict;
 use base 'Canvas::Store';
 
 __PACKAGE__->table('canvas_arch');
-__PACKAGE__->columns(All => qw/id name description/);
+__PACKAGE__->columns(All => qw/id name description created updated/);
 
 __PACKAGE__->has_many(template_packages => 'Canvas::Store::TemplatePackage' => 'arch_id');
 

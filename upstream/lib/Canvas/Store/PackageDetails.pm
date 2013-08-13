@@ -23,7 +23,7 @@ use base 'Canvas::Store';
 use Time::Piece;
 
 __PACKAGE__->table('canvas_packagedetails');
-__PACKAGE__->columns(All => qw/id package_id arch_id epoch version rel install_size package_size build_time file_time repo_id/);
+__PACKAGE__->columns(All => qw/id package_id arch_id epoch version rel install_size package_size build_time file_time repo_id created updated/);
 
 __PACKAGE__->has_a(package_id => 'Canvas::Store::Package');
 __PACKAGE__->has_a(arch_id    => 'Canvas::Store::Arch');
@@ -34,13 +34,13 @@ __PACKAGE__->has_a(repo_id    => 'Canvas::Store::Repository');
 __PACKAGE__->has_a(
   build_time  => 'Time::Piece',
   inflate     => sub { Time::Piece->new( shift ) },
-  deflate     => sub { shift->epoch }
+  deflate     => 'epoch'
 );
 
 __PACKAGE__->has_a(
   file_time  => 'Time::Piece',
   inflate     => sub { Time::Piece->new( shift ) },
-  deflate     => sub { shift->epoch }
+  deflate     => 'epoch'
 );
 
 1;

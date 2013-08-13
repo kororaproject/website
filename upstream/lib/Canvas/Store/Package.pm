@@ -21,11 +21,25 @@ use strict;
 use base 'Canvas::Store';
 
 __PACKAGE__->table('canvas_package');
-__PACKAGE__->columns(All => qw/id name description summary license url/);
+__PACKAGE__->columns(All => qw/id name description summary license url category type tags created updated/);
 
 __PACKAGE__->has_many(template_packages => 'Canvas::Store::TemplatePackage'  => 'package_id');
 __PACKAGE__->has_many(package_ratings   => 'Canvas::Store::PackageRating'    => 'package_id');
 __PACKAGE__->has_many(package_details   => 'Canvas::Store::PackageDetails'   => 'package_id');
+
+#
+# inflate/deflate created/updated values
+__PACKAGE__->has_a(
+  created => 'Time::Piece',
+  inflate => sub { Time::Piece->strptime( shift, "%Y-%m-%d %H:%M:%S") },
+  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
+);
+
+__PACKAGE__->has_a(
+  updated => 'Time::Piece',
+  inflate => sub { Time::Piece->strptime( shift, "%Y-%m-%d %H:%M:%S") },
+  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
+);
 
 
 1;

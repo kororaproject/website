@@ -21,7 +21,7 @@ use strict;
 use base 'Canvas::Store';
 
 __PACKAGE__->table('canvas_repository');
-__PACKAGE__->columns(All => qw/id stub gpg_key/);
+__PACKAGE__->columns(All => qw/id stub gpg_key created updated/);
 
 __PACKAGE__->has_many(repository_details => 'Canvas::Store::RepositoryDetails'   => 'repo_id');
 

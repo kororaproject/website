@@ -38,6 +38,9 @@ sub getConfig {
 #  return ('dbi:SQLite:canvas.db', '', '');
 }
 
+#
+#
+#
 sub do_transaction {
   my $class = shift;
   my ( $code ) = @_;
@@ -57,4 +60,20 @@ sub do_transaction {
     die $commit_error;
   }
 }
+
+#
+#
+#
+__PACKAGE__->set_sql(MakeNewObj => <<"");
+ INSERT INTO __TABLE__ (created, updated, %s)
+  VALUES (NOW(), NOW(), %s)
+
+
+__PACKAGE__->set_sql(update => <<"");
+ UPDATE __TABLE__
+  SET    updated = NOW(), %s
+   WHERE  __IDENTIFIER__
+
+
+
 1;
