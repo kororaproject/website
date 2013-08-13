@@ -18,11 +18,12 @@
 #
 
 import cookielib
-import json
 import urllib
 import urllib2
 import yum
 
+from json import dumps as json_encode
+from json import loads as json_decode
 from urlgrabber.progress import TextMeter
 
 #
@@ -222,44 +223,25 @@ class Template(object):
              'p': self._package_list.toObject() }
 
   def toJSON(self):
-    return json.dumps( self.toObject(), separators=(',',':') )
+    return json_encode( self.toObject(), separators=(',',':') )
 
   def __str__(self):
     return 'Template: %s (owner: %s)' % (self._name, self._user)
 
 
 class Package(object):
-  def __init__(self, name=None, epoch=None, version=None, release=None, arch=None, summary=None, description=None, license=None, url=None, install_size=None, package_size=None, build_time=None, file_time=None, src_package=None, provides=None, files=None, files_in_provides=False):
+  def __init__(self, name=None, summary=None, description=None, license=None, url=None, category=None, type=None, tags=None, src_package=None, provides=None, files=None, files_in_provides=False):
     self.name = name
-    self.epoch = epoch
-    self.version = version
-    self.release = release
-    self.arch = arch
 
     self.summary = summary
     self.description = description
     self.license = license
     self.url = url
-
-    self.install_size = install_size
-    self.package_size = package_size
-
-    self.build_time = build_time
-    self.file_time = file_time
-
-    self.repo_id = 1
+    self.category = category
+    self.type = type
+    self.tags = tags
 
     self.details = []
-
-    # parse the name if it contains field separators
-    if isinstance(name, Package):
-      self._parse_package( name )
-
-    elif name.find(':') != -1:
-      self._parse_package( name )
-
-    else:
-      self.name = name
 
   def fromObject(self, package):
     if isinstance(package, str):
@@ -282,40 +264,47 @@ class Package(object):
       if 'n' in package:
         self.name = package['n']
 
-      if 'e' in package:
-        self.epoch = package['e']
+      if 's' in package:
+        self.summary = package['s']
 
-      if 'v' in package:
-        self.version = package['v']
+      if 'sx' in package:
+        self.description = package['sx']
 
-      if 'r' in package:
-        self.release = package['r']
+      if 'l' in package:
+        self.license = package['l']
 
-      if 'a' in package:
-        self._arch = package['a']
+      if 'u' in package:
+        self.url = package['u']
 
+      if 'c' in package:
+        self.category = package['c']
+
+      if 't' in package:
+        self.type = package['t']
+
+      if 'tx' in package:
+        self.tags = package['tx']
 
   def addDetails(self, details):
-    if not isinstance(details, RepositoryDetails):
-      raise TypeError('Not a RepositoryDetails object')
+    if not isinstance(details, PackageDetails):
+      raise TypeError('Not a PackageDetails object')
 
     # TODO: check for duplicates before inserting
 
     self.details.append( details )
 
-
   def hasDetails(self):
     return len( self.details ) > 0
-
-
-  def set(self, package):
-    self._parse_package(package)
 
   def pin(self, state=False):
     self._pin = state
 
   def isPinned(self):
     return self._pin
+
+  def setRepoID(self, id):
+    for d in self.details:
+      d.repo_id = id
 
   def toObject(self):
     details = []
@@ -325,20 +314,107 @@ class Package(object):
       details.append( d.toObject() )
 
     return {
-      "n": self.name,
-      "s": self.summary,
+      "n":  self.name,
+      "s":  self.summary,
       "sx": self.description,
-      "l": self.license,
-      "u": self.url,
+      "l":  self.license,
+      "u":  self.url,
+      "c":  self.category,
+      "t":  self.type,
+      "tx": self.tags,
 
-      "d": details
+      "d":  details
     }
 
   def toJSON(self):
-    return json.dumps( self.toObject(), separators=(',',':') )
+    return json_encode( self.toObject(), separators=(',',':') )
 
   def __str__(self):
-    return 'Package: %s (e:%s, v:%s, r:%s, a:%s)' % (self._name, self._epoch, self._version, self._release, self._arch)
+    return 'Package: %s ' % ( json_encode( self.toObject(), separators=(',',':') ) )
+
+
+class PackageDetails(object):
+  def __init__(self, epoch=None, version=None, release=None, arch=None, install_size=None, package_size=None, build_time=None, file_time=None):
+    self.epoch = epoch
+    self.version = version
+    self.release = release
+    self.arch = arch
+
+    self.install_size = install_size
+    self.package_size = package_size
+
+    self.build_time = build_time
+    self.file_time = file_time
+
+    self.repo_id = None
+
+  def fromObject(self, details):
+    if isinstance(details, str):
+      parts = details.split(':')
+
+      if len(parts) == 1:
+        self.name = parts[0]
+
+      elif len(parts) == 2:
+        self.name = parts[0]
+        self.version = parts[1]
+
+      elif len(parts) == 3:
+        self.name = parts[0]
+        self.version = parts[1]
+        self.release = parts[2]
+        self.arch = parts[3]
+
+    if isinstance(details, dict):
+      if 'e' in details:
+        self.epoch = details['e']
+
+      if 'v' in details:
+        self.version = details['v']
+
+      if 'r' in details:
+        self.release = details['r']
+
+      if 'a' in details:
+        self.arch = details['a']
+
+      if 'is' in details:
+        self.install_size = details['is']
+
+      if 'ps' in details:
+        self.pacakge_size = details['ps']
+
+      if 'bt' in details:
+        self.build_time = details['bt']
+
+      if 'ft' in details:
+        self.file_time = details['ft']
+
+      if 'ri' in details:
+        self.repo_id = details['ri']
+
+  def toObject(self):
+    return {
+      "e": self.epoch,
+      "v": self.version,
+      "r": self.release,
+      "a": self.arch,
+
+      "is": self.install_size,
+      "ps": self.package_size,
+      "bt": self.build_time,
+      "ft": self.file_time,
+
+      "ri": self.repo_id,
+    }
+
+  def toJSON(self):
+    return json_encode( self.toObject(), separators=(',',':') )
+
+  def __str__(self):
+    return 'PackageDetails: %s ' % ( json_encode( self.toObject(), separators=(',',':') ) )
+
+
 
 
 class PackageList(object):
@@ -365,7 +441,7 @@ class PackageList(object):
     return [p.toObject() for p in self._packages]
 
   def toJSON(self):
-    return json.dumps( self.toObject(), separators=(',',':') )
+    return json_encode( self.toObject(), separators=(',',':') )
 
   def count(self):
     return len(self._packages)
@@ -465,7 +541,7 @@ class Repository(object):
         continue
 
       # set the repo identifier
-      package.repo_id = self.id
+      package.setRepoID( d.id )
 
       # only set the id once
       break
@@ -492,7 +568,7 @@ class Repository(object):
     }
 
   def toJSON(self):
-    return json.dumps( self.toObject(), separators=(',',':') )
+    return json_encode( self.toObject(), separators=(',',':') )
 
   def __str__(self):
     return self.toJSON()
@@ -568,7 +644,7 @@ class RepoList(object):
     return [r.toObject() for r in self._repos]
 
   def toJSON(self):
-    return json.dumps( self.toObject(), separators=(',',':') )
+    return json_encode( self.toObject(), separators=(',',':') )
 
 
 class CanvasService(object):
@@ -588,7 +664,7 @@ class CanvasService(object):
     if self._authenticated and not self._force:
       return self._authenticated
 
-    auth = json.dumps( { 'u': username, 'p': password }, separators=(',',':') )
+    auth = json_encode( { 'u': username, 'p': password }, separators=(',',':') )
 
     self._authenticated = False
 
@@ -649,7 +725,7 @@ class CanvasService(object):
       r = urllib2.Request('%s/api/template/%d.json' % ( self._urlbase, template_id ))
       r.get_method = lambda: 'DELETE'
       u = self._opener.open(r)
-      o = json.loads( u.read() )
+      o = json_decode( u.read() )
 
       return True
 
@@ -692,14 +768,14 @@ class CanvasService(object):
       r = urllib2.Request('%s/api/templates.json?%s' % ( self._urlbase, urllib.urlencode(query) ))
       u = self._opener.open(r)
 
-      template_summary = json.loads( u.read() )
+      template_summary = json_decode( u.read() )
 
       if len( template_summary ):
         # we only have one returned since template names are unique per account
         r = urllib2.Request('%s/api/template/%d.json' % ( self._urlbase, template_summary[0]['id'] ))
         u = self._opener.open(r)
 
-        return Template( template=json.loads( u.read() ) )
+        return Template( template=json_decode( u.read() ) )
 
     except urllib2.URLError, e:
       print e
@@ -715,7 +791,7 @@ class CanvasService(object):
       r = urllib2.Request('%s/api/templates.json' % ( self._urlbase ))
       u = self._opener.open(r)
 
-      return json.loads( u.read() )
+      return json_decode( u.read() )
 
     except urllib2.URLError, e:
       print e
@@ -741,7 +817,7 @@ class CanvasService(object):
       r = urllib2.Request('%s/api/repositories.json?%s' % ( self._urlbase, urllib.urlencode(query) ))
       u = self._opener.open(r)
 
-      repo_summary = json.loads( u.read() )
+      repo_summary = json_decode( u.read() )
 
       if len( repo_summary ):
         query = {}
@@ -758,7 +834,7 @@ class CanvasService(object):
         u = self._opener.open(r)
 
         repo = Repository()
-        repo.fromObject( json.loads( u.read() ) )
+        repo.fromObject( json_decode( u.read() ) )
 
         return repo
 
@@ -778,10 +854,9 @@ class CanvasService(object):
     try:
       r = urllib2.Request('%s/api/repositories.json' % ( self._urlbase ), repo.toJSON())
       u = self._opener.open(r)
-      print u.read()
 
       repo = Repository()
-      repo.fromObject( json.loads( u.read() ) )
+      repo.fromObject( json_decode( u.read() ) )
 
       return repo
 

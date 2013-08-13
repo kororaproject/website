@@ -69,6 +69,7 @@ except ImportError:
 
 from Canvas import CanvasService
 from Canvas import Package
+from Canvas import PackageDetails
 from Canvas import Repository
 from Canvas import RepositoryDetails
 
@@ -129,7 +130,8 @@ class Metadata(object):
             self._tmpdir = None
             self._cachedir = None
         else:
-            self._tmpdir = tempfile.mkdtemp()
+#            self._tmpdir = tempfile.mkdtemp()
+            self._tmpdir = os.path.join(cachedir, resource)
             self._cachedir = cachedir
             try:
                 os.makedirs(os.path.dirname(cachedir))
@@ -176,6 +178,8 @@ class Metadata(object):
                 shutil.copy(old_cache, cache)
                 return
 
+        print "Opening: %s" % ( cache )
+
         fout = open(cache, 'w')
         try:
             fin = urllib2.urlopen(posixjoin(self.resource, subpath))
@@ -210,8 +214,8 @@ class Metadata(object):
         for suffix in self._skip_suffixes:
             if package.name.endswith(suffix):
                 return True
-        if package.arch in self._skip_arches:
-            return True
+#        if package.arch in self._skip_arches:
+#            return True
         return False
 
 
@@ -377,7 +381,8 @@ class RpmMd(Metadata):
         if description_node is not None:
             description = description_node.text
         if not description:
-            raise RpmMdException('No description found for package.')
+            description = ""
+            #raise RpmMdException('No description found for package.')
 
         license_node = format_node.find(RPM_MD_NS_RPM + 'license')
         if license_node is not None:
@@ -388,6 +393,12 @@ class RpmMd(Metadata):
         url_node = package_node.find(RPM_MD_NS + 'url')
         if url_node is not None:
             url = url_node.text
+
+        category_node = format_node.find(RPM_MD_NS_RPM + 'group')
+        if category_node is not None:
+            category = category_node.text
+        if not category:
+            raise RpmMdException('No category found for package.')
 
         size_node = package_node.find(RPM_MD_NS + 'size')
         if size_node is not None:
@@ -431,7 +442,7 @@ class RpmMd(Metadata):
         else:
             pkgid = None
 
-        package = Package(name=name, summary, description, license, url, src_package, provides, files )
+        package = Package(name=name, summary=summary, description=description, license=license, url=url, category=category, src_package=src_package, provides=provides, files=files )
         package.addDetails( PackageDetails( epoch, version, release, arch, install_size, package_size, build_time, file_time ) )
 
         return (pkgid, package)
@@ -497,9 +508,9 @@ def main(args):
     logging.basicConfig(level=logging.WARNING, stream=sys.stderr, datefmt=date_format, format=log_format)
 
   # prompt for password if requested
-  password = ''
-  if args.password:
-    password = getpass.getpass()
+  password = 'security conscious innovation'
+#  if args.password:
+#    password = getpass.getpass()
 
   if args.host:
     cs = CanvasService(host=args.host)
