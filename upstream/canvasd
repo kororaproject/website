@@ -158,11 +158,18 @@ under '/api' => ( authenticated => 1 );
 # [
 #   {
 #     id: id,
-#     n: "name",
-#     s: "summary",
+#     n:  "name",
+#     s:  "summary",
 #     sx: "description",
-#     l: "license",
-#     u: "url"
+#     l:  "license",
+#     u:  "url"
+#     c:  "category",
+#     t:  "type",
+#     tx: [
+#       "tag_1",
+#       "tag_2",
+#       ...
+#     ]
 #   },
 #   ...
 # ]
@@ -170,9 +177,26 @@ under '/api' => ( authenticated => 1 );
 get '/packages' => sub {
   my $self = shift;
 
+  # construct search query as appropriate
+  my $q = {};
+
+  my $q_name = $self->param('n');
+  my $q_category = $self->param('c');
+
+  $q->{name}      = $q_name     if defined($q_name);
+  $q->{category}  = $q_category if defined($q_category);
+
+  my @packages;
+  if( keys %$q ) {
+    @packages = Canvas::Store::Package->search( $q );
+  }
+  else {
+    @packages = Canvas::Store::Package->retrieve_all();
+  }
+
   my $ret = [];
 
-  foreach my $p ( Canvas::Store::Package->retrieve_all ) {
+  foreach my $p ( @packages ) {
     push @$ret, {
       id  => $p->id+0,
       n   => $p->name,
@@ -180,6 +204,11 @@ get '/packages' => sub {
       sx  => $p->description,
       l   => $p->license,
       u   => $p->url,
+      c   => $p->category,
+      t   => $p->type,
+      tx  => $p->tags,
+      cd  => $p->updated->epoch,
+      ud  => $p->created->epoch,
     };
   }
 
@@ -207,12 +236,19 @@ get '/packages' => sub {
 #   sx: "description",
 #   l:  "license",
 #   u:  "url",
+#   c:  "category",
+#   t:  "type",
+#   tx: [
+#     "tag_1",
+#     "tag_2",
+#     ...
+#   ],
 #   d: [
 #     {
-#       e: "epoch",
-#       v: "version",
-#       r: "revision",
-#       a: "arch",
+#       e:  "epoch",
+#       v:  "version",
+#       r:  "revision",
+#       a:  "arch",
 #       is: "install_size",
 #       ps: "package_size",
 #       bt: "build_time",
@@ -254,6 +290,9 @@ post '/packages' => sub {
       description => $data->{sx},
       license     => $data->{l},
       url         => $data->{u},
+      category    => $data->{c},
+      type        => $data->{t},
+      tags        => $data->{tx},
     });
   }
 
@@ -273,6 +312,7 @@ post '/packages' => sub {
       version       => $d->{v},
       rel           => $d->{r},
       arch_id       => $arch_cache->{ $d->{a} }->id,
+      repo_id       => $d->{ri},
     });
 
     # details don't exist so add
@@ -327,12 +367,19 @@ post '/packages' => sub {
 #   sx: "description",
 #   l:  "license",
 #   u:  "url",
+#   c:  "category",
+#   t:  "type",
+#   tx: [
+#     "tag_1",
+#     "tag_2",
+#     ...
+#   ],
 #   d: [
 #     {
-#       e: "epoch",
-#       v: "version",
-#       r: "release",
-#       a: "arch",
+#       e:  "epoch",
+#       v:  "version",
+#       r:  "release",
+#       a:  "arch",
 #       is: "install_size",
 #       ps: "package_size",
 #       bt: "build_time",
@@ -366,7 +413,12 @@ get '/package/:id' => sub {
     s   => $p->summary,
     sx  => $p->description,
     u   => $p->url,
+    c   => $p->category,
+    t   => $p->type,
+    tx  => $p->tags,
     cx  => scalar @template_packages,
+    cd  => $p->updated->epoch,
+    ud  => $p->created->epoch,
     d   => [],
   };
 
@@ -378,9 +430,11 @@ get '/package/:id' => sub {
       a   => $d->arch_id->name,
       is  => $d->install_size,
       ps  => $d->package_size,
-      bt  => $d->build_time,
-      ft  => $d->file_time,
+      bt  => $d->build_time->epoch,
+      ft  => $d->file_time->epoch,
       ri  => $d->repo_id,
+      cd  => $p->updated->epoch,
+      ud  => $p->created->epoch,
     }
   }
 
