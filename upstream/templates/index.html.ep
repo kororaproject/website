@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  <title>Canvas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="css/canvas.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <!-- navigation -->
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="NavigationController">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-primary-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <div class="navbar-brand canvas-logo-48"></div>
+    </div>
+
+    <!-- navigation content for toggling -->
+    <div class="collapse navbar-collapse navbar-primary-collapse">
+      <ul class="nav navbar-nav">
+        <li ng-class="pageActive('home')"><a href="#/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+        <li ng-class="pageActive('templates')"><a href="#/templates"><span class="glyphicon glyphicon-download"></span> Templates</a></li>
+        <li ng-class="pageActive('packages')"><a href="#/packages"><span class="glyphicon glyphicon-th"></span> Packages</a></li>
+        <li ng-class="pageActive('repositories')"><a href="#/repositories"><span class="glyphicon glyphicon-th-list"></span> Repositories</a></li>
+        <li ng-class="pageActive('updates')"><a href="#/updates"><span class="glyphicon glyphicon-download"></span> Updates</a></li>
+        <li ng-class="pageActive('downloads')"><a href="#/downloads"><span class="glyphicon glyphicon-download"></span> Downloads</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <%= authenticated_user->{u}->name %> <b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#">Settings</a></li>
+            <li><a href="/deauthenticate">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <ng-view></ng-view>
+
+  <script src="js/jquery.js"></script>
+  <script src="js/bootstrap.js"></script>
+  <script src="js/angular.js"></script>
+  <script src="js/angular-route.js"></script>
+  <script src="js/canvas.js"></script>
+</body>
+</html>

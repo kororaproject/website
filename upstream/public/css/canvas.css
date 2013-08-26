@@ -1,0 +1,122 @@
+/*
+** IMPORTS
+*/
+
+/* fonts */
+@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700);
+
+/* bootstrap - glyphicons */
+@import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc2/css/bootstrap-glyphicons.css");
+
+html {
+  overflow-y: scroll;
+}
+
+/*
+** SCROLLBARS
+*/
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 2px 0 0 2px;
+  -webkit-border-radius: 2px 0 0 2px;
+
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 2px 0 0 2px;
+  -webkit-border-radius: 2px 0 0 2px;
+
+  background: rgba(128, 128, 128, 0.4);
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+  background: rgba(128, 128, 128, 0.4);
+}
+
+
+/*
+** FONTS
+*/
+body {
+  font-family:'Open Sans Condensed';
+
+  padding-top: 64px;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family:'Open Sans Condensed';
+}
+
+/*
+** LOGO
+*/
+.canvas-logo {
+  margin-top: 64px;
+}
+
+.canvas-logo-48 {
+  height: 48px;
+  width: 48px;
+
+  background-image: url('../img/logo.png');
+  background-size: 36px 36px;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.canvas-logo h1 {
+  display: inline-block;
+
+  height: 48px;
+
+  background-image: url('../img/logo.png');
+  background-size: 48px 48px;
+  background-repeat: no-repeat;
+  background-position: left center;
+
+  color: #808080;
+
+  font-size: 42px;
+  line-height: 48px;
+
+  text-align: left;
+
+  padding-left: 48px;
+  margin-bottom: 32px;
+}
+
+.tab-content {
+  padding: 8px 20px;
+  border: 1px solid #ddd;
+  border-top: 0px;
+
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.canvas-logo h1 span {
+  margin-left: 4px;
+
+  color: #404040;
+}
+
+/*
+** PAGINATION
+*/
+.pagination-sm > li > a {
+  width: 32px;
+
+  padding: 4px;
+  text-align: center;
+
+  cursor: hand;
+  cursor: pointer;
+}

@@ -74,7 +74,7 @@ plugin 'authentication', {
     my ($app, $user, $pass, $extradata) = @_;
 
     my $wpu = Canvas::Store::WPUser->retrieve( user_login => $user );
-    my $u = Canvas::Store::User->search( name => $user )->first;
+    my( $u ) = Canvas::Store::User->search( name => $user );
 
     if( defined($u) && defined($wpu) && $wpu->validate_password($pass) ) {
       return $wpu->user_login;
@@ -82,6 +82,27 @@ plugin 'authentication', {
 
     return undef;
   },
+};
+
+#
+# HELPERS
+#
+
+helper build_query => sub {
+  my $self = shift;
+  my $map = shift;
+
+  return {} unless( ref( $map ) eq 'HASH' );
+
+  my $q = {};
+
+  while( my ( $k, $v ) = each %{ $map } ) {
+    foreach my $r ( @{ $v } ) {
+      $q->{ $k } = $self->param( $r ) if defined( $self->param( $r ) );
+    }
+  }
+
+  return $q;
 };
 
 
@@ -92,9 +113,15 @@ plugin 'authentication', {
 get '/' => sub {
   my $self = shift;
 
-#  $self->redirect_to('login') if ( ! $self->user_exists() );
+  return $self->redirect_to('login') unless( $self->is_user_authenticated );
 
-  $self->render( text => 'index');
+  $self->render('index');
+};
+
+get '/login' => sub {
+  my $self = shift;
+
+  $self->render('login');
 };
 
 any '/authenticate' => sub {
@@ -107,18 +134,20 @@ any '/authenticate' => sub {
   my $p = $self->param('p') // $data->{p} // '';
 
   if( $self->authenticate($u, $p) ) {
-    return $self->render(
-      status  => 200,
-      text    => 'ok',
-      json    => { message => 'ok' },
-    );
+    return $self->redirect_to('/');
+#    return $self->render(
+#      status  => 200,
+#      text    => 'ok',
+#      json    => { message => 'ok' },
+#    );
   }
 
-  $self->render(
-    status  => 401,
-    text    => 'unauthorised',
-    json    => { error => 'unauthorised' },
-  );
+  $self->redirect_to('/login');
+#  $self->render(
+#    status  => 401,
+#    text    => 'unauthorised',
+#    json    => { error => 'unauthorised' },
+#  );
 };
 
 any '/deauthenticate' => sub {
@@ -126,11 +155,7 @@ any '/deauthenticate' => sub {
 
   $self->logout;
 
-  $self->render(
-    status  => 200,
-    text    => 'ok',
-    json    => { message => 'ok' },
-  );
+  $self->redirect_to('/login');
 };
 
 # expose the /api routes when authenticated only
@@ -178,21 +203,19 @@ get '/packages' => sub {
   my $self = shift;
 
   # construct search query as appropriate
-  my $q = {};
+  my $q = $self->build_query({
+    name      => [ 'n', 'name' ],
+    category  => [ 'c', 'category' ],
+  });
 
-  my $q_name = $self->param('n');
-  my $q_category = $self->param('c');
+  # build pager for packages
+  my $pager = Canvas::Store::Package->pager(
+    entries_per_page  => $self->param('_ep')  // 100,
+    current_page      => $self->param('_cp')  // 0,
+    order_by          => $self->param('_ob')  // 'name',
+  );
 
-  $q->{name}      = $q_name     if defined($q_name);
-  $q->{category}  = $q_category if defined($q_category);
-
-  my @packages;
-  if( keys %$q ) {
-    @packages = Canvas::Store::Package->search( $q );
-  }
-  else {
-    @packages = Canvas::Store::Package->retrieve_all();
-  }
+  my @packages = $pager->search_where( $q );
 
   my $ret = [];
 
@@ -206,13 +229,19 @@ get '/packages' => sub {
       u   => $p->url,
       c   => $p->category,
       t   => $p->type,
-      tx  => $p->tags,
+      tx  => [ split /,/, $p->tags // '' ],
       cd  => $p->updated->epoch,
       ud  => $p->created->epoch,
     };
   }
 
-  $self->render( json => $ret );
+  $self->render( json => {
+    page        => $pager->current_page+0,
+    page_size   => $pager->entries_per_page+0,
+    last_page   => $pager->last_page+0,
+    total_items => $pager->total_entries+0,
+    items       => $ret,
+  });
 };
 
 #
@@ -415,7 +444,7 @@ get '/package/:id' => sub {
     u   => $p->url,
     c   => $p->category,
     t   => $p->type,
-    tx  => $p->tags,
+    tx  => [ split /,/, $p->tags ],
     cx  => scalar @template_packages,
     cd  => $p->updated->epoch,
     ud  => $p->created->epoch,
@@ -570,17 +599,17 @@ get '/repositories' => sub {
   my $self = shift;
 
   # construct search query as appropriate
-  my $q = {};
+  my $q = $self->build_query({
+    stub      => [ 's', 'n', 'name' ],
+  });
 
-  $q->{stub} = $self->param('s') if defined( $self->param( 's' ) );
+  # build pager for packages
+  my $pager = Canvas::Store::Repository->pager(
+    entries_per_page  => $self->param('epp')  // 100,
+    current_page      => $self->param('cp')   // 0,
+  );
 
-  my @repos;
-  if( keys %$q ) {
-    @repos = Canvas::Store::Repository->search( $q );
-  }
-  else {
-    @repos = Canvas::Store::Repository->retrieve_all();
-  }
+  my @repos = $pager->search_where( $q );
 
   my $ret = [];
 
@@ -738,7 +767,9 @@ get '/repository/:id' => sub {
   };
 
   # construct search query as appropriate
-  my $q = {};
+  my $q = {
+    repo_id => $r->id,
+  };
 
   if( defined( $self->param( 'a' ) ) ) {
     my ($arch) = Canvas::Store::Arch->search( { name => $self->param( 'a' ) } );
@@ -748,15 +779,7 @@ get '/repository/:id' => sub {
   $q->{base_url} = $self->param('u') if defined( $self->param( 'u' ) );
 
   # search using our constructed query
-  my @repos;
-  if( keys %$q ) {
-    $q->{repo_id} = $r->id;
-
-    @repos = Canvas::Store::RepositoryDetails->search( $q );
-  }
-  else {
-    @repos = Canvas::Store::RepositoryDetails->retrieve_all();
-  }
+  my @repos = Canvas::Store::RepositoryDetails->search( $q );
 
   # fill out details as required
   foreach my $d ( @repos ) {

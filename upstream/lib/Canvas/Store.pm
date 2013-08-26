@@ -20,6 +20,9 @@ package Canvas::Store;
 use strict;
 use base 'Class::DBI';
 
+use Canvas::Store::Pager;
+
+### TODO: CONFIGURATION FILE
 #Canvas::DBI->connection('dbi:SQLite:dbname=canvas.db', '', '');
 #Canvas::DBI->connection('dbi:mysql:dbname=canvas', 'canvas', 'c@nvas');
 
@@ -37,6 +40,7 @@ sub getConfig {
   return ('dbi:mysql:dbname=canvas', 'canvas', 'c@nva$');
 #  return ('dbi:SQLite:canvas.db', '', '');
 }
+### TODO: END CONFIGURATION FILE
 
 #
 #
@@ -62,18 +66,21 @@ sub do_transaction {
 }
 
 #
+# DB CLASS HELPERS
 #
-#
-__PACKAGE__->set_sql(MakeNewObj => <<"");
- INSERT INTO __TABLE__ (created, updated, %s)
-  VALUES (NOW(), NOW(), %s)
 
+# generic count
+__PACKAGE__->set_sql( count_search_where => qq{
+ SELECT COUNT(*)
+  FROM __TABLE__
+   %s
+});
 
-__PACKAGE__->set_sql(update => <<"");
+# auto update the update attribute
+__PACKAGE__->set_sql(update => qq{
  UPDATE __TABLE__
-  SET    updated = NOW(), %s
+  SET updated=CURRENT_TIMESTAMP, %s
    WHERE  __IDENTIFIER__
-
-
+});
 
 1;

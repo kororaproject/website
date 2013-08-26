@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <ul class="pagination pagination-sm pull-right">
+        <li ng-class="{disabled: isFirstPage()}"><a ng-click="firstPage()"><span class="icon-double-angle-left"></span></a></li>
+        <li ng-class="{disabled: isFirstPage()}"><a ng-click="previousPage()"><span class="icon-angle-left"></span></a></li>
+        <li ng-repeat="page in pageList()" ng-class="{active: isPage(page)}"><a ng-click="setPage(page)">{{page+1}}</a></li>
+        <li ng-class="{disabled: isLastPage()}"><a ng-click="nextPage()"><span class="icon-angle-right"></span></a></li>
+        <li ng-class="{disabled: isLastPage()}"><a ng-click="lastPage()"><span class="icon-double-angle-right"></span></a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <table class="table table-striped table-hover table-responsive table-condensed">
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th>Summary</th>
+        </tr>
+        <tr ng-repeat-start="item in data.items" ng-click="togglePackageDetails(item.id)" id="package_{{item.id}}">
+          <td ng-click="togglePackageDetailsSelected(item.id)"><span ng-class="{'icon-check-empty': !isPackageDetailsSelected(item.id), 'icon-check': isPackageDetailsSelected(item.id)}"></td>
+          <td>{{item.n}}</td>
+          <td>{{item.s}}</td>
+        </tr>
+        <tr ng-show="isPackageDetailsVisible(item.id)" ng-repeat-end id="details_{{item.id}}">
+          <td colspan="3">
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-12">
+                  <p>{{data_details[item.id].sx}}</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <p><span class="label label-default">{{data_details[item.id].c}}</span></p>
+                </div>
+                <div class="col-sm-6">
+                  <div class="pull-right">
+                    <p><span class="icon-link"> </span><a href="{{data_details[item.id].u}}">{{data_details[item.id].u}}</a></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
