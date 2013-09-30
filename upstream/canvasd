@@ -27,6 +27,7 @@ use feature ':5.10';
 # PERL INCLUDES
 #
 use Data::Dumper;
+use Mojo::ByteStream;
 use Mojo::JSON;
 use Mojolicious::Lite;
 
@@ -46,6 +47,7 @@ use Canvas::Store::TemplatePackage;
 use Canvas::Store::TemplateMembership;
 use Canvas::Store::TemplateRepository;
 use Canvas::Store::WPUser;
+use Canvas::Store::WPPost;
 
 #
 # CONSTANTS
@@ -105,6 +107,44 @@ helper build_query => sub {
   return $q;
 };
 
+helper post_content => sub {
+  my( $self, $content ) = @_;
+
+  my $result = '<pre>' . $content . '</pre>';
+  #
+
+  # process no attribute tags
+  $result =~ s/\[(i|code|b)\]/<$1>/mg;
+  $result =~ s/\[\/(i|code|b)\]/<\/$1>/mg;
+
+  # process quotes
+  $result =~ s/\[quote(:[a-zA-Z0-9]+)?\]/<blockquote>/mg;
+  $result =~ s/\[quote="([^"]+)"\]/<cite>$1 wrote:<\/cite><blockquote>/mg;
+  $result =~ s/\[\/quote(:[a-zA-Z0-9]+)?\]/<\/blockquote>/mg;
+
+  # process urls
+  $result =~ s/\[url\]([^\[]+)\[\/url\]/<a href="$1">$1<\/a>/ig;
+  $result =~ s/\[url="([^"]+)"\]([^\[]+)\[\/url\]/<a href="$1">$2<\/a>/mig;
+
+  # process images
+  $result =~ s/\[img\]([^\[]+)\[\/img\]/<img class="img-responsive" src="$1"><\/img>/mig;
+
+
+  # turn newlines into breaks
+  #$result =~ s/(\r?\n>)+/[n]/g;
+#  $result =~ s/(\r?\n|<br\s?\/?>)+/\n\n/mg;
+  $result =~ s/^(\r?\n|<br\s?\/?>)+/\n/mg;
+  #$result =~ s/(\r?\n|<br\s?\/?>)+/<br\/>/g;
+  #$result =~ s/(<br\s?\/?>)+/<br\/>/g;
+  #$result = '<p>' . join( '</p><p>', split( /(\r?\n|<br\s?\/?>)+/, $content ) ) . '</p>';
+
+  # compress multiple breaks into one
+  #$result =~ s/(<br\/>)+/<br\/>/g;
+
+  say Dumper $result;
+
+  return Mojo::ByteStream->new( $result );
+};
 
 #
 # ROUTES
@@ -116,6 +156,12 @@ get '/' => sub {
   return $self->redirect_to('login') unless( $self->is_user_authenticated );
 
   $self->render('index');
+};
+
+get '/home' => sub {
+  my $self = shift;
+
+  $self->render('home');
 };
 
 get '/login' => sub {
@@ -157,6 +203,183 @@ any '/deauthenticate' => sub {
 
   $self->redirect_to('/login');
 };
+
+#
+# FORUMS
+#
+
+get '/forums' => sub {
+  my $self = shift;
+
+  my $cache = [];
+
+  foreach my $f ( Canvas::Store::WPPost->forums( 0 ) ) {
+    my $forum = {
+      id            => $f->ID,
+      created       => $f->post_date_gmt,
+      updated       => $f->post_modified_gmt,
+      title         => $f->post_title,
+      content       => $f->post_content,
+      name          => $f->post_name,
+      author        => $f->post_author->user_nicename,
+      subforums     => [],
+      topics        => [],
+      replies       => [],
+      total_topics  => undef,
+      total_posts   => undef,
+    };
+
+    foreach my $sf ( Canvas::Store::WPPost->forums( $f->ID ) ) {
+      push @{ $forum->{subforums} }, {
+        id            => $sf->ID,
+        created       => $sf->post_date_gmt,
+        updated       => $sf->post_modified_gmt,
+        title         => $sf->post_title,
+        content       => $sf->post_content,
+        name          => $sf->post_name,
+        author        => $sf->post_author->user_nicename,
+      };
+    }
+
+    foreach my $t ( Canvas::Store::WPPost->topics( $f->ID ) ) {
+      push @{ $forum->{topics} }, {
+        id            => $t->ID,
+        created       => $t->post_date_gmt,
+        updated       => $t->post_modified_gmt,
+        title         => $t->post_title,
+        content       => $t->post_content,
+        name          => $t->post_name,
+        author        => $t->post_author->user_nicename,
+      };
+    }
+
+    say Dumper $forum;
+    push $cache, $forum;
+  }
+
+  $self->stash( forums => $cache );
+  $self->render('forums');
+};
+
+
+get '/forum/:name' => sub {
+  my $self = shift;
+  my $name = $self->param('name');
+
+  my $cache = [];
+
+  my( $f ) = Canvas::Store::WPPost->forum_name( $name );
+
+  my $forum = {
+    id            => $f->ID,
+    created       => $f->post_date_gmt,
+    updated       => $f->post_modified_gmt,
+    title         => $f->post_title,
+    content       => $f->post_content,
+    name          => $f->post_name,
+    author        => $f->post_author->user_nicename,
+    subforums     => [],
+    topics        => [],
+    posts         => [],
+    total_topics  => undef,
+    total_posts   => undef,
+  };
+
+  foreach my $sf ( Canvas::Store::WPPost->forums( $f->ID ) ) {
+    push @{ $forum->{subforums} }, {
+      id            => $sf->ID,
+      created       => $sf->post_date_gmt,
+      updated       => $sf->post_modified_gmt,
+      title         => $sf->post_title,
+      content       => $sf->post_content,
+      name          => $sf->post_name,
+      author        => $sf->post_author->user_nicename,
+    };
+  }
+
+  foreach my $t ( Canvas::Store::WPPost->topics_newest( $f->ID ) ) {
+
+    # collect all replies
+    my @replies = Canvas::Store::WPPost->replies( $t->ID );
+
+    # determine unique voices
+    my %voices;
+    my @unique_voices = grep { ! $voices{$_->post_author->user_nicename}++ } ( $t, @replies );
+
+    # determine freshness
+    my $freshness = $t->post_modified_gmt;
+    my $freshness_author = $t->post_author->user_nicename;
+
+    if( @replies ) {
+      $freshness = $replies[0]->post_modified_gmt;
+      $freshness_author = $replies[0]->post_author->user_nicename;
+    }
+
+    push @{ $forum->{topics} }, {
+      id                => $t->ID,
+      created           => $t->post_date_gmt,
+      updated           => $t->post_modified_gmt,
+      title             => $t->post_title,
+      content           => $t->post_content,
+      name              => $t->post_name,
+      author            => $t->post_author->user_nicename,
+      total_posts       => scalar @replies + 1,
+      unique_voices     => scalar @unique_voices,
+      freshness         => $freshness,
+      freshness_author  => $freshness_author
+    };
+  }
+
+  push $cache, $forum;
+
+  $self->stash( forum => $forum );
+  $self->render('forum');
+};
+
+get '/forum' => sub {
+  my $self = shift;
+
+  $self->redirect_to('/forums');
+};
+
+get '/topic/:name' => sub {
+  my $self = shift;
+  my $name = $self->param('name');
+
+  my $cache = [];
+
+  my( $t ) = Canvas::Store::WPPost->topic_name( $name );
+
+  my $topic = {
+    id            => $t->ID,
+    created       => $t->post_date_gmt->strftime('%d %m %Y at %H:%M'),
+    updated       => $t->post_modified_gmt->strftime('%d %m %Y at %H:%M'),
+    title         => $t->post_title,
+    content       => $t->post_content,
+    name          => $t->post_name,
+    author        => $t->post_author->user_nicename,
+    replies       => [],
+  };
+
+  foreach my $r ( Canvas::Store::WPPost->replies( $t->ID ) ) {
+    push @{ $topic->{replies} }, {
+      id            => $r->ID,
+      created       => $r->post_date_gmt->strftime('%d %m %Y at %H:%M'),
+      updated       => $r->post_modified_gmt->strftime('%d %m %Y at %H:%M'),
+      title         => $r->post_title,
+      content       => $r->post_content,
+      name          => $r->post_name,
+      author        => $r->post_author->user_nicename,
+    };
+  }
+
+  push $cache, $topic;
+
+  $self->stash( topic => $topic );
+  $self->render('topic');
+};
+
+
 
 # expose the /api routes when authenticated only
 under '/api' => ( authenticated => 1 );
@@ -376,6 +599,70 @@ post '/packages' => sub {
 };
 
 #
+# GET /packages/latest
+#
+# Returns all packages based on latest updated time
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 500 if template owner doesn't exist or is invalid
+#
+# An overview of the JSON structure is shown below:
+#
+# [
+#   {
+#     id: id,
+#     n:  "name",
+#     s:  "summary",
+#     sx: "description",
+#     l:  "license",
+#     u:  "url"
+#     c:  "category",
+#     t:  "type",
+#     tx: [
+#       "tag_1",
+#       "tag_2",
+#       ...
+#     ]
+#   },
+#   ...
+# ]
+#
+get '/packages/latest' => sub {
+  my $self = shift;
+
+  # construct search query as appropriate
+  my $q = $self->build_query({
+    name      => [ 'n', 'name' ],
+    category  => [ 'c', 'category' ],
+  });
+
+  # build pager for packages
+  my @packages = Canvas::Store::Package->search_latest();
+
+  my $ret = [];
+
+  foreach my $p ( @packages ) {
+    push @$ret, {
+      id  => $p->id+0,
+      n   => $p->name,
+      s   => $p->summary,
+      sx  => $p->description,
+      l   => $p->license,
+      u   => $p->url,
+      c   => $p->category,
+      t   => $p->type,
+      tx  => [ split /,/, $p->tags // '' ],
+      cd  => $p->updated->epoch,
+      ud  => $p->created->epoch,
+    };
+  }
+
+  $self->render( json => $ret );
+};
+
+#
 # GET /api/package/:id
 #
 # Returns the package identified by :id
@@ -444,7 +731,7 @@ get '/package/:id' => sub {
     u   => $p->url,
     c   => $p->category,
     t   => $p->type,
-    tx  => [ split /,/, $p->tags ],
+    tx  => [ split /,/, $p->tags // '' ],
     cx  => scalar @template_packages,
     cd  => $p->updated->epoch,
     ud  => $p->created->epoch,
@@ -1677,6 +1964,14 @@ del '/user/:user/template/:name' => sub {
     text    => 'ok',
     json    => { message => 'ok' },
   );
+};
+
+#
+# CATCH ALL
+get '*' => sub {
+  my $self = shift;
+
+  $self->render('home');
 };
 
 # start the main loop

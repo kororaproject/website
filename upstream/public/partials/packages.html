@@ -1,6 +1,12 @@
 <div class="container">
   <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-6">
+      <div class="btn-group pagination-toolbar">
+        <button class="btn btn-sm"><span class="icon-plus"></span></button>
+        <button class="btn btn-sm">Install Template</button>
+      </div>
+    </div>
+    <div class="col-sm-6">
       <ul class="pagination pagination-sm pull-right">
         <li ng-class="{disabled: isFirstPage()}"><a ng-click="firstPage()"><span class="icon-double-angle-left"></span></a></li>
         <li ng-class="{disabled: isFirstPage()}"><a ng-click="previousPage()"><span class="icon-angle-left"></span></a></li>

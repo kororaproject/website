@@ -4,51 +4,268 @@
   <title>Canvas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap -->
-  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-  <link href="css/font-awesome.min.css" rel="stylesheet" media="screen">
-  <link href="css/canvas.css" rel="stylesheet" media="screen">
+  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="/css/canvas.css" rel="stylesheet" media="screen">
+  <link rel="stylesheet" href="/css/layerslider.css" type="text/css">
 </head>
 <body>
-  <!-- navigation -->
-  <nav class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="NavigationController">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-primary-collapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <div class="navbar-brand canvas-logo-48"></div>
+  <noscript style="">
+    <div>
+      <h1 class="kp-logo">KORORA<span>PROJECT</span></h1>
+      <h3>Oops! JavaScript is not enabled!</h3>
+      <div class="hr"></div>
+      <div class="">
+        <p>In order to get the intended Korora Project experience you must enable JavaScript.</p>
+        <p>We have carefully crafted an innovative experience for Korora community and we hope you find us trustworthy enough to enable try it out in it's full glory.</p>
+        <p>Thankyou for your consideration.</p>
+      </div>
     </div>
+  </noscript>
+  <div class="page-container">
+    <div ng-controller="NavigationController">
+      <div ng-show="pageActive('home')" class="banner">
+        <style type="text/css" media="screen">
+          .ls-layer,
+          .ls-layer * {
+            font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: normal;
+            white-space: nowrap;
+          }
+          .l3s1, .l3s2, .l3s3 {
+            text-shadow: 0px 0px 10px white;
+            color: white;
+          }
+          .l3s1 {
+            font-size: 30px;
+          }
+          .l3s2 {
+            font-size: 60px;
+          }
+          .l3s3 {
+            font-size: 20px;
+            font-style: italic;
+          }
+          .l4s1, .l4s2, .l4s3, .l4s4 {
+            box-shadow: 0px 3px 10px -3px #002c4b;
+            background: #02cef7;
+            background: -moz-linear-gradient(top, #02cef7 0%, #009bba 100%);
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#02cef7), color-stop(100%,#009bba));
+            background: -webkit-linear-gradient(top, #02cef7 0%,#009bba 100%);
+            background: -o-linear-gradient(top, #02cef7 0%,#009bba 100%);
+            background: -ms-linear-gradient(top, #02cef7 0%,#009bba 100%);
+            background: linear-gradient(to bottom, #02cef7 0%,#009bba 100%);
+            text-shadow: 0px -1px 1px #00819c;
+            padding: 10px 15px 10px 15px;
+            border-top: 4px solid white;
+            font-size: 20px;
+            color: white;
+            border-radius: 7px;
+          }
+        </style>
 
-    <!-- navigation content for toggling -->
-    <div class="collapse navbar-collapse navbar-primary-collapse">
-      <ul class="nav navbar-nav">
-        <li ng-class="pageActive('home')"><a href="#/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-        <li ng-class="pageActive('templates')"><a href="#/templates"><span class="glyphicon glyphicon-download"></span> Templates</a></li>
-        <li ng-class="pageActive('packages')"><a href="#/packages"><span class="glyphicon glyphicon-th"></span> Packages</a></li>
-        <li ng-class="pageActive('repositories')"><a href="#/repositories"><span class="glyphicon glyphicon-th-list"></span> Repositories</a></li>
-        <li ng-class="pageActive('updates')"><a href="#/updates"><span class="glyphicon glyphicon-download"></span> Updates</a></li>
-        <li ng-class="pageActive('downloads')"><a href="#/downloads"><span class="glyphicon glyphicon-download"></span> Downloads</a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <%= authenticated_user->{u}->name %> <b class="caret"></b></a>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="#">Settings</a></li>
-            <li><a href="/deauthenticate">Logout</a></li>
+        <div id="layerslider-container">
+          <div id="layerslider" style="width: 100%; height: 256px; margin: 0px auto;">
+            <div class="ls-layer" style="slidedelay: 7200; transition2d: all; transition3d: 15;">
+
+              <img src="/gallery/abyss-bg.jpg" class="ls-bg">
+              <img class="ls-s3" src="/gallery/bg-fishes-far.png" style="position: absolute; top: 186px; left: 701px; slidedirection : right; slideoutdirection : left;  durationin : 50; durationout : 11000; easingin : linear; easingout : linear; delayin : 0; delayout : 0; showuntil : 1; ">
+              <img class="ls-s3" src="/gallery/bg-fishes-far.png" style="position: absolute; top: 251px; left: 857px; slidedirection : right; slideoutdirection : left;  durationin : 50; durationout : 9000; easingin : linear; easingout : linear; delayin : 0; delayout : 0; showuntil : 1; ">
+              <img class="ls-s2" src="/gallery/bg-fishes-mid.png" style="position: absolute; top: 131px; left: 358px; slidedirection : right; slideoutdirection : left;  durationin : 3000; durationout : 3000; easingin : linear; easingout : linear; delayin : 1000; delayout : 0; showuntil : 1; ">
+              <img class="ls-s2" src="/gallery/bg-fishes-mid.png" style="position: absolute; top: 196px; left: 255px; slidedirection : right; slideoutdirection : left;  durationin : 4000; durationout : 3000; easingin : linear; easingout : linear; delayin : 1000; delayout : 0; showuntil : 1; ">
+              <img class="ls-s3" src="/gallery/abyss-bg-mask.png" style="position: absolute; top: 0px; left: 0px; slidedirection : fade; slideoutdirection : fade;  durationin : 0; durationout : 0; easingin : linear; easingout : linear; delayin : 0; delayout : 0; showuntil : 0; ">
+              <h1 class="ls-s3" style="position: absolute; top:30%; left: 50%; slidedirection : fade; slideoutdirection : fade; durationin : 2500; durationout : 2500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 0; delayout : 0; showuntil : 1; text-shadow: 0px 0px 20px white; font-weight: normal; font-size: 50px; color: white;">LayerSlider </h1>
+              <h1 class="ls-s3" style="position: absolute; top:50%; left: 50%; slidedirection : fade; slideoutdirection : fade; durationin : 2500; durationout : 2500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 500; delayout : 0; showuntil : 1; text-shadow: 0px 0px 20px white; font-weight: normal; font-size: 120px; color: white;">3D</h1>
+              <h1 class="ls-s3" style="position: absolute; top:70%; left: 50%; slidedirection : fade; slideoutdirection : fade; durationin : 2500; durationout : 2500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1200; delayout : 0; showuntil : 1; text-shadow: 0px 0px 20px white; font-weight: normal; font-size: 50px; color: white;">demo slider</h1>
+              <img class="ls-s3" src="/gallery/shark.png" style="position: absolute; top: 20px; left: 1000px; slidedirection : left; slideoutdirection : right;  durationin : 6500; durationout : 0; easingin : linear; easingout : linear; delayin : 0; delayout : 0; showuntil : 1; ">
+              <img class="ls-s2" src="/gallery/small-fish-far.png" style="position: absolute; top: 218px; left: 481px; slidedirection : right; slideoutdirection : left;  durationin : 4000; durationout : 4000; easingin : easeOutQuad; easingout : easeInExpo; delayin : 2000; delayout : 0; showuntil : 0; ">
+              <img class="ls-s2" src="/gallery/small-fish-far.png" style="position: absolute; top: 286px; left: 646px; slidedirection : right; slideoutdirection : left;  durationin : 4000; durationout : 3000; easingin : easeOutQuad; easingout : easeInExpo; delayin : 3000; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/small-fish-mid.png" style="position: absolute; top: 315px; left: 325px; slidedirection : right; slideoutdirection : left;  durationin : 4000; durationout : 4000; easingin : easeOutQuad; easingout : easeInExpo; delayin : 2500; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/small-fish-close.png" style="position: absolute; top: 143px; left: 695px; slidedirection : right; slideoutdirection : left;  durationin : 4000; durationout : 2500; easingin : easeOutQuad; easingout : easeInExpo; delayin : 3500; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/small-fish-mid.png" style="position: absolute; top: 84px; left: 458px; slidedirection : right; slideoutdirection : left;  durationin : 3000; durationout : 3000; easingin : linear; easingout : linear; delayin : 2800; delayout : 0; showuntil : 1; ">
+              <img class="ls-s5" src="/gallery/med-fish-mid.png" style="position: absolute; top: 272px; left: 685px; slidedirection : right; slideoutdirection : left;  durationin : 2000; durationout : 3000; easingin : easeOutExpo; easingout : easeInOutQuint; delayin : 3000; delayout : 0; showuntil : 1; ">
+              <img class="ls-s5" src="/gallery/med-fish-mid.png" style="position: absolute; top: 70px; left: 244px; slidedirection : right; slideoutdirection : left;  durationin : 2000; durationout : 2000; easingin : easeOutExpo; easingout : easeInExpo; delayin : 5300; delayout : 0; showuntil : 0; ">
+              <img class="ls-s6" src="/gallery/med-fish-mid.png" style="position: absolute; top: 200px; left: 196px; slidedirection : right; slideoutdirection : left;  durationin : 2000; durationout : 3000; easingin : easeOutExpo; easingout : easeInOutQuint; delayin : 4000; delayout : 0; showuntil : 1; ">
+              <img class="ls-s6" src="/gallery/med-fish-close.png" style="position: absolute; top: 246px; left: 339px; slidedirection : right; slideoutdirection : left;  durationin : 2400; durationout : 2000; easingin : easeOutExpo; easingout : easeInExpo; delayin : 5500; delayout : 0; showuntil : 0; ">
+              <img class="ls-s7" src="/gallery/big-fish-close.png" style="position: absolute; top: 12px; left: 344px; slidedirection : right; slideoutdirection : left;  durationin : 2000; durationout : 3000; easingin : easeOutCirc; easingout : easeInOutExpo; delayin : 3300; delayout : 0; showuntil : 1; ">
+              <img class="ls-s7" src="/gallery/big-fish-close.png" style="position: absolute; top: 194px; left: 454px; slidedirection : right; slideoutdirection : left;  durationin : 2000; durationout : 1700; easingin : easeOutExpo; easingout : easeInExpo; delayin : 6000; delayout : 0; showuntil : 0; ">
+
+            </div>
+
+            <div class="ls-layer" style="slidedelay: 4500; timeshift: -1000; transition2d: all; transition3d: 36;">
+
+              <img src="/gallery/3d-bg.jpg" class="ls-bg">
+              <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 20px; left: 106px; slidedirection : top; slideoutdirection : right;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 0; delayout : 0; showuntil : 1; ">
+              <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 153px; left: 342px; slidedirection : top; slideoutdirection : right;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 50; delayout : 0; showuntil : 700; ">
+              <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 276px; left: 252px; slidedirection : top; slideoutdirection : left;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 100; delayout : 0; showuntil : 400; ">
+              <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 199px; left: 585px; slidedirection : top; slideoutdirection : left;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 50; delayout : 0; showuntil : 950; ">
+              <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 37px; left: 525px; slidedirection : top; slideoutdirection : left;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 0; delayout : 0; showuntil : 250; ">
+              <img class="ls-s2" src="/gallery/sayhello.png" style="position: absolute; top: 116px; left: 86px; slidedirection : fade; slideoutdirection : fade;  durationin : 1500; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1500; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/mid-cube-blur.png" style="position: absolute; top: 190px; left: 135px; slidedirection : top; slideoutdirection : right;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 50; delayout : 0; showuntil : 100; ">
+              <img class="ls-s3" src="/gallery/mid-cube-blur.png" style="position: absolute; top: 340px; left: 322px; slidedirection : top; slideoutdirection : right;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 150; delayout : 0; showuntil : 500; ">
+              <img class="ls-s3" src="/gallery/mid-cube-blur.png" style="position: absolute; top: 398px; left: 587px; slidedirection : top; slideoutdirection : left;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 100; delayout : 0; showuntil : 300; ">
+              <img class="ls-s5" src="/gallery/big-cube.png" style="position: absolute; top: 211px; left: 16px; slidedirection : top; slideoutdirection : right;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 100; delayout : 0; showuntil : 300; ">
+              <img class="ls-s5" src="/gallery/big-cube.png" style="position: absolute; top: 251px; left: 746px; slidedirection : top; slideoutdirection : left;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 200; delayout : 0; showuntil : 50; ">
+
+            </div>
+
+            <div class="ls-layer" style="slidedelay: 5600; transition2d: all; transition3d: 58, 74; ">
+
+              <img src="/gallery/autumn-bg.jpg" class="ls-bg">
+              <img class="ls-s3" src="/gallery/summer-bg.jpg" style="position: absolute; top: 0px; left: 0px; slidedirection : fade; slideoutdirection : fade;  durationin : 2500; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2500; delayout : 0; showuntil : 0; ">
+              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-1.png" alt="Autumn Leaf" style="position: absolute; top: 9px; left: 101px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; rotatein : 360; showuntil : 1000; ">
+              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-2.png" alt="Autumn Leaf" style="position: absolute; top: 210px; left: 240px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 200;  rotatein : -360; showuntil : 1000; ">
+              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-3.png" alt="Autumn Leaf" style="position: absolute; top: 193px; left: 480px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 400;  rotatein : 360; showuntil : 1000; ">
+              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-4.png" alt="Autumn Leaf" style="position: absolute; top: 311px; left: 623px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 600;  rotatein : -360; showuntil : 1000; ">
+              <img class="ls-s2" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-5.png" alt="Autumn Leaf" style="position: absolute; top: 407px; left: 371px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 800;  rotatein : 360; showuntil : 1000; ">
+              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-6.png" alt="Autumn Leaf" style="position: absolute; top: 232px; left: 392px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 1000;  rotatein : -360; showuntil : 1000; ">
+              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-7.png" alt="Autumn Leaf" style="position: absolute; top: 190px; left: 67px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 1200;  rotatein : 360; showuntil : 1000; ">
+              <img class="ls-s3" src="/gallery/s-l-1.png" style="position: absolute; top: 9px; left: 101px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2500; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/s-l-2.png" style="position: absolute; top: 210px; left: 240px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2700; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/s-l-3.png" style="position: absolute; top: 193px; left: 480px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2900; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/s-l-4.png" style="position: absolute; top: 311px; left: 623px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 3100; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/s-l-5.png" style="position: absolute; top: 407px; left: 371px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 3300; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/s-l-6.png" style="position: absolute; top: 232px; left: 392px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 3500; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/s-l-7.png" style="position: absolute; top: 190px; left: 67px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 3700; delayout : 0; showuntil : 0; ">
+              <p class="ls-s-1 l3s1" style="position: absolute; top:83px; left: 277px; slidedirection : left; slideoutdirection : left; durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1000; delayout : 0; showuntil : 2000;">To improve</p>
+              <p class="ls-s-1 l3s2" style="position: absolute; top:62px; left: 451px; slidedirection : top; slideoutdirection : top; durationin : 2000; durationout : 1500; easingin : easeOutElastic; easingout : easeInOutQuint; delayin : 1500; delayout : 0; showuntil : 500;">is</p>
+              <p class="ls-s-1 l3s1" style="position: absolute; top:83px; left: 503px; slidedirection : right; slideoutdirection : right; durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1000; delayout : 0; showuntil : 2000;">to change.</p>
+              <p class="ls-s-1 l3s1" style="position: absolute; top:137px; left: 367px; slidedirection : left; slideoutdirection : left; durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1750; delayout : 0; showuntil : 1500;">To be perfect</p>
+              <p class="ls-s-1 l3s2" style="position: absolute; top:116px; left: 555px; slidedirection : top; slideoutdirection : bottom; durationin : 1500; durationout : 1500; easingin : easeOutElastic; easingout : easeInOutQuint; delayin : 2250; delayout : 0; showuntil : 500;">is</p>
+              <p class="ls-s-1 l3s1" style="position: absolute; top:137px; left: 608px; slidedirection : right; slideoutdirection : right; durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1750; delayout : 0; showuntil : 1500;">to change often.</p>
+              <p class="ls-s-1 l3s3" style="position: absolute; top:198px; left: 722px; slidedirection : fade; slideoutdirection : fade; durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2500; delayout : 0; showuntil : 1000;">- Winston Churchill</p>
+
+            </div>
+
+            <div class="ls-layer" style="slidedelay: 10050; transition2d: all; transition3d: 68,69,77,78;">
+              <img src="/gallery/cubes-bg.jpg" class="ls-bg">
+              <img class="ls-s3" src="/gallery/cubes-blur.jpg" style="position: absolute; top: 0px; left: 0px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1000; easingin : easeInOutQuad; easingout : easeInOutQuad; delayin : 0; delayout : 0; showuntil : 0; ">
+              <img class="ls-s3" src="/gallery/tile-1.png" style="position: absolute; top: 0px; left: 0px; slidedirection : top; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 500; delayout : 0; showuntil : 5700; ">
+              <img class="ls-s3" src="/gallery/tile-2.png" style="position: absolute; top: 0px; left: 0px; slidedirection : right; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 600; delayout : 0; showuntil : 5100; ">
+              <img class="ls-s3" src="/gallery/tile-3.png" style="position: absolute; top: 0px; left: 0px; slidedirection : bottom; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 700; delayout : 0; showuntil : 5200; ">
+              <img class="ls-s3" src="/gallery/tile-4.png" style="position: absolute; top: 0px; left: 0px; slidedirection : left; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 800; delayout : 0; showuntil : 5500; ">
+              <img class="ls-s3" src="/gallery/tile-5.png" style="position: absolute; top: 0px; left: 0px; slidedirection : top; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 900; delayout : 0; showuntil : 5500; ">
+              <img class="ls-s3" src="/gallery/tile-6.png" style="position: absolute; top: 0px; left: 0px; slidedirection : right; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 1000; delayout : 0; showuntil : 4600; ">
+              <img class="ls-s3" src="/gallery/tile-7.png" style="position: absolute; top: 0px; left: 0px; slidedirection : bottom; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 1100; delayout : 0; showuntil : 5100; ">
+              <img class="ls-s3" src="/gallery/tile-8.png" style="position: absolute; top: 0px; left: 0px; slidedirection : left; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 1200; delayout : 0; showuntil : 4800; ">
+              <img class="ls-s3" src="/gallery/tile-9.png" style="position: absolute; top: 0px; left: 0px; slidedirection : top; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 1300; delayout : 0; showuntil : 4500; ">
+              <p class="ls-s3 l4s1" style="position: absolute; top:45px; left: 30px; slidedirection : top; slideoutdirection : fade; durationin : 1000; durationout : 1000; easingin : easeOutExpo; easingout : easeInQuart; delayin : 1500; delayout : 0; showuntil : 2000; rotatein : -120; scaleout : .5;">200+ 2D &amp; 2D transitions or create your custom!</p>
+              <p class="ls-s3 l4s2" style="position: absolute; top:360px; left: 450px; slidedirection : bottom; slideoutdirection : fade; durationin : 1000; durationout : 1000; easingin : easeOutExpo; easingout : easeInQuart; delayin : 3000; delayout : 0; showuntil : 2000; rotatein : -120; scaleout : .5;">Use with any HTML content including embedded videos!</p>
+              <p class="ls-s3 l4s3" style="position: absolute; top:100px; left: 505px; slidedirection : right; slideoutdirection : fade; durationin : 1000; durationout : 1000; easingin : easeOutExpo; easingout : easeInQuart; delayin : 4500; delayout : 0; showuntil : 2000;rotatein : 120; scaleout : .5;">Responsive with Smart Resize &amp; Touch-enabled!</p>
+              <p class="ls-s3 l4s4" style="position: absolute; top:400px; left: 10px; slidedirection : left; slideoutdirection : fade; durationin : 1000; durationout : 1000; easingin : easeOutExpo; easingout : easeInQuart; delayin : 6000; delayout : 0; showuntil : 2000;rotatein : 120; scaleout : .5;">Unlimited possibilities of usage!</p>
+
+            </div>
+
+            <div class="ls-layer" style="slidedelay: 6000; transition2d: all; transition3d: 45,46,47,48,49,50;">
+
+              <img src="/gallery/bbb-bg.jpg" class="ls-bg">
+              <img class="ls-s3" src="/gallery/bbb-clouds-far.png" style="position: absolute; top: -90px; left: 500px; slidedirection : fade; slideoutdirection : left;  durationin : 2000; durationout : 50000; easingin : easeInOutQuad; easingout : easeInQuad; delayin : 1000; delayout : 0; showuntil : 1; ">
+              <img class="ls-s5" src="/gallery/bbb-clouds-close.png" style="position: absolute; top: -60px; left: 1000px; slidedirection : right; slideoutdirection : left;  durationin : 0; durationout : 40000; easingin : linear; easingout : linear; delayin : 10000; delayout : 0; showuntil : 1; ">
+              <img class="ls-s1" src="/gallery/bbb-bg-mask.png" style="position: absolute; top: 0px; left: 0px; slidedirection : top; slideoutdirection : fade;  durationin : 0; durationout : 1500; easingin : linear; easingout : linear; delayin : 100; delayout : 0; showuntil : 0; ">
+              <div class="ls-s2" style="position: absolute; top:154px; left: 465px; slidedirection : right; slideoutdirection : bottom; durationin : 1500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 0; delayout : 0; showuntil : 0; box-shadow: 0px 5px 35px -2px black; width: 510px; height: 291px; background: white; border-radius: 2px;"></div>
+              <div class="ls-s2" style="position: absolute; top:159px; left: 470px; slidedirection : right; slideoutdirection : bottom; durationin : 1500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 0; delayout : 0; showuntil : 0; ">
+                <iframe src="http://player.vimeo.com/video/47438073?title=0&byline=0&portrait=0&color=e4f000" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+              </div>
+              <img class="ls-s2" src="/gallery/easy.png" style="position: absolute; top: 35px; left: 715px; slidedirection : top; slideoutdirection : top;  durationin : 1500; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1500; delayout : 0; showuntil : 0; ">
+              <img class="ls-s2" src="/gallery/vfeatures.png" style="position: absolute; top: 37px; left: 188px; slidedirection : fade; slideoutdirection : fade;  durationin : 1500; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 5000; delayout : 0; showuntil : 0; ">
+              <img class="ls-s2" src="/gallery/bi-colored-butterfly-source_ijc.gif" style="position: absolute; top: 304px; left: 159px; slidedirection : bottom; slideoutdirection : top;  durationin : 2000; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 3000; delayout : 0; showuntil : 0; ">
+              <img class="ls-s-1" src="/gallery/acorn.png" style="position: absolute; top: 119px; left: 234px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1000; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 16000; delayout : 0; showuntil : 2000; ">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- navigation -->
+      <nav id="korobar" class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-primary-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="navbar-brand kp-logo-48"></div>
+        </div>
+
+        <!-- navigation content for toggling -->
+        <div class="collapse navbar-collapse navbar-primary-collapse" ng-switch on="modeActive()">
+          <ul class="nav navbar-nav" ng-switch-when="default">
+            <li class="nav-home" ng-class="pageActive('home')"><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+            <li ng-class="pageActive('about')"><a href="/about"><span class="glyphicon icon-cog"></span> About</a></li>
+            <li ng-class="pageActive('discover')"><a href="/discover"><span class="glyphicon icon-compass"></span> Discover</a></li>
+            <li ng-class="pageActive('support')"><a href="/support"><span class="glyphicon icon-group"></span> Support</a></li>
+            <li ng-class="pageActive('news')"><a href="/news"><span class="glyphicon icon-bullhorn"></span> News</a></li>
+            <li ng-class="pageActive('canvas')"><a href="/canvas"><span class="glyphicon glyphicon-download"></span> Canvas</a></li>
           </ul>
-        </li>
-      </ul>
+          <ul class="nav navbar-nav" ng-switch-when="canvas">
+            <li class="nav-home" ng-class="pageActive('home')"><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+            <li ng-class="pageActive('canvas-templates')"><a href="/canvas/templates"><span class="glyphicon glyphicon-download"></span> Templates</a></li>
+            <li ng-class="pageActive('canvas-packages')"><a href="/canvas/packages"><span class="glyphicon glyphicon-th"></span> Packages</a></li>
+            <li ng-class="pageActive('canvas-repositories')"><a href="/canvas/repositories"><span class="glyphicon glyphicon-th-list"></span> Repositories</a></li>
+            <li ng-class="pageActive('updates')"><a href="/canvas/updates"><span class="glyphicon glyphicon-download"></span> Updates</a></li>
+            <li ng-class="pageActive('downloads')"><a href="/canvas/downloads"><span class="glyphicon glyphicon-download"></span> Downloads</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <%= authenticated_user->{u}->name %> <b class="caret"></b></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="/">Settings</a></li>
+                <li><a href="/deauthenticate">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </nav>
     </div>
-  </nav>
 
-  <ng-view></ng-view>
+    <div class="page-content">
+      <div class="hr"></div>
+      <ng-view></ng-view>
+    </div>
+  </div>
 
-  <script src="js/jquery.js"></script>
-  <script src="js/bootstrap.js"></script>
-  <script src="js/angular.js"></script>
-  <script src="js/angular-route.js"></script>
-  <script src="js/canvas.js"></script>
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 col-md-8 col-lg-8">
+          <p class="copyright">Derived from  <a href="http://www.fedoraproject.org">Fedora</a> | Powered by  <a href="http://en.wiktionary.org/wiki/freedom">Freedom</a>, <a href="http://en.wiktionary.org/wiki/dedication">Dedication</a> and the pursuit of <a href="http://en.wiktionary.org/wiki/perfection">Perfection</a></p>
+        </div>
+        <div class="col-sm-4 col-md-4 col-lg-4">
+          <div id="social" class="pull-right">
+            <a href="https://plus.google.com/u/0/113276359756252515026"><img src="../img/social-google.png"></a>
+            <a href="http://facebook.com/kororaproject"><img src="../img/social-facebook.png"></a>
+            <a href="http://identi.ca/kororaproject"><img src="../img/social-identica.png"></a>
+            <a href="http://twitter.com/#!/kororaproject"><img src="../img/social-twitter.png"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap.js"></script>
+  <script src="/js/angular.js"></script>
+  <script src="/js/angular-route.js"></script>
+  <script src="/js/canvas.js"></script>
+
+
+  <script src="/js/jquery-easing-1.3.js" type="text/javascript"></script>
+  <script src="/js/jquery-transit-modified.js" type="text/javascript"></script>
+  <script src="/js/layerslider.transitions.js" type="text/javascript"></script>
+  <script src="/js/layerslider.kreaturamedia.jquery.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $('#layerslider').layerSlider({
+        skinsPath: '/skins/',
+        //skin: 'borderlessdark3d',
+        skin: 'fullwidth',
+        thumbnailNavigation: 'hover',
+        showCircleTimer: false,
+        showBarTimer: true
+      });
+    });
+  </script>
 </body>
 </html>

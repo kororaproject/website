@@ -42,4 +42,15 @@ __PACKAGE__->has_a(
 );
 
 
+#
+# latest updated packages
+__PACKAGE__->set_sql(latest => qq {
+  SELECT canvas_package.id
+  FROM canvas_package
+  JOIN canvas_packagedetails
+    ON canvas_packagedetails.package_id=canvas_package.id
+  ORDER BY canvas_packagedetails.build_time DESC
+  LIMIT 100
+});
+
 1;

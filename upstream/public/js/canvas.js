@@ -1,18 +1,33 @@
 var canvas = angular.module('canvas', ['ngRoute'])
-  .config(function($routeProvider) {
+  .config(function($routeProvider, $locationProvider) {
     $routeProvider
-      .when('/', {templateUrl: 'partials/home.html', controller: 'HomeController'})
-      .when('/packages', {templateUrl: 'partials/packages.html', controller: 'PackageController'})
-      .when('/repositories', {templateUrl: 'partials/repositories.html', controller: 'RepositoryController'})
+      .when('/',                     { templateUrl: '/partials/home.html', controller: 'HomeController' })
+      .when('/about',                { templateUrl: '/partials/about.html', controller: 'AboutController' })
+      .when('/canvas',               { templateUrl: '/partials/canvas.html', controller: 'CanvasController' })
+      .when('/canvas/packages',      { templateUrl: '/partials/packages.html', controller: 'PackageController' })
+      .when('/canvas/repositories',  { templateUrl: '/partials/repositories.html', controller: 'RepositoryController' })
       .otherwise({redirectTo: '/'});
+
+    $locationProvider
+      .html5Mode(true)
+      .hashPrefix('!');
   });
+
 
 canvas.service('CanvasNavigation', function($rootScope) {
   var _page = '';
+  var _mode = '';
 
   return {
     setPage: function( page ) {
-      $rootScope.$broadcast('routeLoaded', { slug: page });
+      if( page.indexOf('canvas-') == 0 ) {
+        _mode = 'canvas';
+      }
+      else {
+        _mode = 'default';
+      }
+
+      $rootScope.$broadcast('routeLoaded', { slug: page, mode: _mode });
     }
   };
 });
@@ -24,12 +39,59 @@ canvas.service('Database', function($resource) {
 });
 
 function NavigationController($scope, CanvasNavigation) {
+  // configure korobar
+  var korobar = $('#korobar');
+  var fixed = true;
+
+  var footer  = $('footer');
+
+    // frob page-container minimum height to at least the footer top
+  $('.page-container').css('min-height', ($(window).height()-footer.outerHeight()) + 'px');
+
   $scope.$on('routeLoaded', function (event, args) {
+    $scope.mode = args.mode;
     $scope.slug = args.slug;
+
+    // TODO: correct korobar start position
+    var start = ( args.slug == 'home' ) ? 256 : 0;
+
+    if( start - $(window).scrollTop() <= 0 ) {
+      korobar.css('top', 0);
+      korobar.css('position', 'fixed');
+      fixed = true;
+    }
+    else {
+      korobar.css('position', 'absolute');
+      korobar.css('top', start + 'px');
+      fixed = false;
+    }
+
+    // pin korobar to top when it passes
+    $(window).off('scroll');
+    $(window).on('scroll', function () {
+      if( !fixed && (korobar.offset().top - $(window).scrollTop() <= 0) ) {
+        korobar.css('top', 0);
+        korobar.css('position', 'fixed');
+        fixed = true;
+      }
+      else if( fixed && $(window).scrollTop() <= start ) {
+        korobar.css('position', 'absolute');
+        korobar.css('top', start + 'px');
+        fixed = false;
+      }
+    });
   });
 
   $scope.pageActive = function(page) {
     return $scope.slug === page ? 'active' : '';
+  };
+
+  $scope.modeActive = function() {
+    return $scope.mode;
+  };
+
+  $scope.isMode = function(mode) {
+    return mode === $scope.mode;
   };
 };
 
@@ -42,12 +104,28 @@ function HomeController($scope, CanvasNavigation) {
   CanvasNavigation.setPage('home');
 };
 
+function AboutController($scope, CanvasNavigation) {
+  $scope.data = {};
+
+  //
+  // INIT
+  CanvasNavigation.setPage('about');
+};
+
+function CanvasController($scope, CanvasNavigation) {
+  $scope.data = {};
+
+  //
+  // INIT
+  CanvasNavigation.setPage('canvas-home');
+};
+
 function RepositoryController($scope, CanvasNavigation) {
   $scope.data = [];
 
   //
   // INIT
-  CanvasNavigation.setPage('repositories');
+  CanvasNavigation.setPage('canvas-repositories');
 };
 
 function PackageController($scope, CanvasNavigation, $http) {
@@ -81,7 +159,7 @@ function PackageController($scope, CanvasNavigation, $http) {
   };
 
   $scope.pageList = function(elements) {
-    var _m = elements || 9;
+    var _m = elements || 5;
     var _list = [];
 
     if( $scope.havePages() ) {
@@ -162,7 +240,7 @@ function PackageController($scope, CanvasNavigation, $http) {
   }
 
   $scope.nextPage = function(elements) {
-    var _m = elements || 9;
+    var _m = elements || 5;
 
     if( ( ! $scope.havePages() ) ||
         ( $scope.isLastPage() ) ) {
@@ -175,7 +253,7 @@ function PackageController($scope, CanvasNavigation, $http) {
   }
 
   $scope.previousPage = function(elements) {
-    var _m = elements || 9;
+    var _m = elements || 5;
 
     if( ( ! $scope.havePages() ) ||
         ( $scope.isFirstPage() ) ) {
@@ -298,7 +376,7 @@ function PackageController($scope, CanvasNavigation, $http) {
 
   //
   // INIT
-  CanvasNavigation.setPage('packages');
+  CanvasNavigation.setPage('canvas-packages');
 
   $scope.loadPage();
 };

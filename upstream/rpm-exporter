@@ -554,8 +554,7 @@ def main(args):
     sys.exit(2)
 
   log.info("Exporting data ...")
-  # It's always much more readable to sort the output
-  #self.packages.sort(key=operator.attrgetter('name'))
+
   for package in metadata.packages:
     log.info("  - %s" % package.name)
     cs.package_create( repo.blessPackage( package ) )

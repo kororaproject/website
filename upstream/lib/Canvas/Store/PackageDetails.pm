@@ -43,5 +43,14 @@ __PACKAGE__->has_a(
   deflate     => 'epoch'
 );
 
+
+__PACKAGE__->set_sql(latest => qq {
+  SELECT canvas_packagedetails.id
+  FROM canvas_packagedetails
+  ORDER BY build_time DESC
+  LIMIT 20
+});
+
+
 1;
 
