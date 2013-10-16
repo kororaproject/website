@@ -1,8 +1,9 @@
-var canvas = angular.module('canvas', ['ngRoute'])
+var canvas = angular.module('canvas', ['ngRoute', 'ngAnimate'])
   .config(function($routeProvider, $locationProvider) {
     $routeProvider
       .when('/',                     { templateUrl: '/partials/home.html', controller: 'HomeController' })
       .when('/about',                { templateUrl: '/partials/about.html', controller: 'AboutController' })
+      .when('/discover',             { templateUrl: '/partials/discover.html', controller: 'DiscoverController' })
       .when('/canvas',               { templateUrl: '/partials/canvas.html', controller: 'CanvasController' })
       .when('/canvas/packages',      { templateUrl: '/partials/packages.html', controller: 'PackageController' })
       .when('/canvas/repositories',  { templateUrl: '/partials/repositories.html', controller: 'RepositoryController' })
@@ -13,6 +14,14 @@ var canvas = angular.module('canvas', ['ngRoute'])
       .hashPrefix('!');
   });
 
+
+/*
+** DIRECTIVES
+*/
+
+/*
+** SERVICES
+*/
 
 canvas.service('CanvasNavigation', function($rootScope) {
   var _page = '';
@@ -38,7 +47,14 @@ canvas.service('Database', function($resource) {
   };
 });
 
+/*
+** CONTROLLERS
+*/
+
 function NavigationController($scope, CanvasNavigation) {
+
+  $scope.sliderPaused = false;
+
   // configure korobar
   var korobar = $('#korobar');
   var fixed = true;
@@ -53,7 +69,18 @@ function NavigationController($scope, CanvasNavigation) {
     $scope.slug = args.slug;
 
     // TODO: correct korobar start position
-    var start = ( args.slug == 'home' ) ? 256 : 0;
+    // HOME PAGE correction
+    var start = 0;
+    var ls = $('#layerslider');
+    var ls_data = ls.layerSlider('data');
+
+    if( args.slug == 'home' ) {
+      start = 256;
+      ls.layerSlider('start');
+    }
+    else {
+      ls.layerSlider('stop');
+    }
 
     if( start - $(window).scrollTop() <= 0 ) {
       korobar.css('top', 0);
@@ -110,6 +137,19 @@ function AboutController($scope, CanvasNavigation) {
   //
   // INIT
   CanvasNavigation.setPage('about');
+
+  $('#aboutdetails a').click(function (e) {
+    e.preventDefault()
+    $(this).tab('show')
+  });
+};
+
+function DiscoverController($scope, CanvasNavigation) {
+  $scope.data = {};
+
+  //
+  // INIT
+  CanvasNavigation.setPage('discover');
 };
 
 function CanvasController($scope, CanvasNavigation) {

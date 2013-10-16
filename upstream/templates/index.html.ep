@@ -155,22 +155,6 @@
               <p class="ls-s3 l4s4" style="position: absolute; top:400px; left: 10px; slidedirection : left; slideoutdirection : fade; durationin : 1000; durationout : 1000; easingin : easeOutExpo; easingout : easeInQuart; delayin : 6000; delayout : 0; showuntil : 2000;rotatein : 120; scaleout : .5;">Unlimited possibilities of usage!</p>
 
             </div>
-
-            <div class="ls-layer" style="slidedelay: 6000; transition2d: all; transition3d: 45,46,47,48,49,50;">
-
-              <img src="/gallery/bbb-bg.jpg" class="ls-bg">
-              <img class="ls-s3" src="/gallery/bbb-clouds-far.png" style="position: absolute; top: -90px; left: 500px; slidedirection : fade; slideoutdirection : left;  durationin : 2000; durationout : 50000; easingin : easeInOutQuad; easingout : easeInQuad; delayin : 1000; delayout : 0; showuntil : 1; ">
-              <img class="ls-s5" src="/gallery/bbb-clouds-close.png" style="position: absolute; top: -60px; left: 1000px; slidedirection : right; slideoutdirection : left;  durationin : 0; durationout : 40000; easingin : linear; easingout : linear; delayin : 10000; delayout : 0; showuntil : 1; ">
-              <img class="ls-s1" src="/gallery/bbb-bg-mask.png" style="position: absolute; top: 0px; left: 0px; slidedirection : top; slideoutdirection : fade;  durationin : 0; durationout : 1500; easingin : linear; easingout : linear; delayin : 100; delayout : 0; showuntil : 0; ">
-              <div class="ls-s2" style="position: absolute; top:154px; left: 465px; slidedirection : right; slideoutdirection : bottom; durationin : 1500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 0; delayout : 0; showuntil : 0; box-shadow: 0px 5px 35px -2px black; width: 510px; height: 291px; background: white; border-radius: 2px;"></div>
-              <div class="ls-s2" style="position: absolute; top:159px; left: 470px; slidedirection : right; slideoutdirection : bottom; durationin : 1500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 0; delayout : 0; showuntil : 0; ">
-                <iframe src="http://player.vimeo.com/video/47438073?title=0&byline=0&portrait=0&color=e4f000" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-              </div>
-              <img class="ls-s2" src="/gallery/easy.png" style="position: absolute; top: 35px; left: 715px; slidedirection : top; slideoutdirection : top;  durationin : 1500; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1500; delayout : 0; showuntil : 0; ">
-              <img class="ls-s2" src="/gallery/vfeatures.png" style="position: absolute; top: 37px; left: 188px; slidedirection : fade; slideoutdirection : fade;  durationin : 1500; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 5000; delayout : 0; showuntil : 0; ">
-              <img class="ls-s2" src="/gallery/bi-colored-butterfly-source_ijc.gif" style="position: absolute; top: 304px; left: 159px; slidedirection : bottom; slideoutdirection : top;  durationin : 2000; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 3000; delayout : 0; showuntil : 0; ">
-              <img class="ls-s-1" src="/gallery/acorn.png" style="position: absolute; top: 119px; left: 234px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1000; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 16000; delayout : 0; showuntil : 2000; ">
-            </div>
           </div>
         </div>
       </div>
@@ -194,8 +178,9 @@
             <li ng-class="pageActive('about')"><a href="/about"><span class="glyphicon icon-cog"></span> About</a></li>
             <li ng-class="pageActive('discover')"><a href="/discover"><span class="glyphicon icon-compass"></span> Discover</a></li>
             <li ng-class="pageActive('support')"><a href="/support"><span class="glyphicon icon-group"></span> Support</a></li>
+            <li ng-class="pageActive('support')"><a href="/download"><span class="glyphicon icon-download"></span> Download</a></li>
             <li ng-class="pageActive('news')"><a href="/news"><span class="glyphicon icon-bullhorn"></span> News</a></li>
-            <li ng-class="pageActive('canvas')"><a href="/canvas"><span class="glyphicon glyphicon-download"></span> Canvas</a></li>
+            <li ng-class="pageActive('canvas')"><a href="/canvas"><span class="glyphicon glyphicon-cloud"></span> Canvas</a></li>
           </ul>
           <ul class="nav navbar-nav" ng-switch-when="canvas">
             <li class="nav-home" ng-class="pageActive('home')"><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
@@ -207,7 +192,7 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-              <a href="" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <%= authenticated_user->{u}->name %> <b class="caret"></b></a>
+              <a href="" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> user <b class="caret"></b></a>
               <ul class="dropdown-menu" role="menu">
                 <li><a href="/">Settings</a></li>
                 <li><a href="/deauthenticate">Logout</a></li>
@@ -220,7 +205,7 @@
 
     <div class="page-content">
       <div class="hr"></div>
-      <ng-view></ng-view>
+      <div ng-view></div>
     </div>
   </div>
 
@@ -247,6 +232,7 @@
   <script src="/js/jquery.js"></script>
   <script src="/js/bootstrap.js"></script>
   <script src="/js/angular.js"></script>
+  <script src="/js/angular-animate.js"></script>
   <script src="/js/angular-route.js"></script>
   <script src="/js/canvas.js"></script>
 
@@ -261,9 +247,12 @@
         skinsPath: '/skins/',
         //skin: 'borderlessdark3d',
         skin: 'fullwidth',
-        thumbnailNavigation: 'hover',
+        thumbnailNavigation: 'bullet',
+        hoverBottomNav: true,
+        pauseOnHover: false,
         showCircleTimer: false,
-        showBarTimer: true
+        showBarTimer: true,
+        responsive: true
       });
     });
   </script>

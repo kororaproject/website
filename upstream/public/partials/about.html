@@ -1,70 +1,385 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-12">
-      <p>Korora was born out of a desire to make Linux easier for new users, while still being useful for experts.</p>
-      <p>Originally based on Gentoo Linux in 2005, Korora was re-born in 2010 as a Fedora Remix<span style="font-size: 11px;"><a href="#footnote">[1]</a></span> with tweaks and extras to make the system “just work” out of the box.<br>
-      <span id="more-2"></span><br>
-      Why Fedora? <a href="../why-fedora">Lots of reasons!</a></p>
-      <h2>Comparison to Fedora</h2>
-      <p>Korora is a Fedora Remix, meaning it ships packages from the default Fedora repositories but also a number of other packages (often ones that Fedora cannot ship directly). We also make changes to the default system, whereas Fedora generally sticks to upstream. For new users, Fedora can be tricky because it doesn’t include many of the extras that users often need, things like media codecs and some proprietary software. This is
-      one area where Korora can help.</p>
-      <p>Ultimately, we want people just like you to become useful members of the Fedora community and we hope that trying Korora will be a catalyst for this.</p>
-      <p>For a detailed look at how Korora differs to Fedora, see <a href="/whats-inside"><em>what’s inside</em></a>.</p>
-      <h2>Desktops</h2>
-      <p>Korora comes in <a href="/discover">a few installable versions</a> which include both the <a href="http://kde.org/workspaces/plasmadesktop/">KDE</a> and <a href="http://www.gnome.org/start/stable/" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://www.gnome.org']);">GNOME</a> desktops.</p>
+      <h1 class="text-center">About</h1>
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-6">
-      <h3>GNOME</h3>
-      <div class="text-center">
-        <a href="/discover/gnome-desktop/">
-          <img src="http://kororaproject.org/images/web/screenshots/korora-desktop-gnome-extra-small.jpg" alt="Korora GNOME desktop" class="img-responsive">
-        </a>
-      </div>
-    </div>
-    <div class="col-sm-6">
-      <h3>KDE</h3>
-      <div class="text-center">
-        <a href="/discover/kde-desktop/">
-          <img src="http://kororaproject.org/images/web/screenshots/korora-desktop-kde-extra-small.jpg" alt="Korora KDE desktop" class="img-responsive">
-        </a>
+    <div class="col-sm-12">
+      <div class="hr"></div>
+      <div class="tabbable">
+        <ul id="aboutdetails" class="nav nav-tabs nav-justified">
+          <li class="active"><a href="#overview" data-toggle="tab">Overview</a></li>
+          <li><a href="#why-fedora" data-toggle="tab">Why Fedora?</a></li>
+          <li><a href="#whats-inside" data-toggle="tab">What's Inside</a></li>
+          <li><a href="#the-team" data-toggle="tab">The Team</a></li>
+          <li><a href="#the-roadmap" data-toggle="tab">Roadmap</a></li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade in active" id="overview">
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-12">
+                  <p>Korora was born out of a desire to make Linux easier for new users, while still being useful for experts.</p>
+                  <p>Originally based on Gentoo Linux in 2005, Korora was re-born in 2010 as a Fedora Remix<a href="#footnote"><sup>1</sup></a> with tweaks and extras to make the system “just work” out of the box.<br>
+                  <span id="more-2"></span><br>
+                  Why Fedora? <a href="#why-fedora">Lots of reasons!</a></p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h2>Comparison to Fedora</h2>
+                  <p>Korora is a Fedora Remix, meaning it ships packages from the default Fedora repositories but also a number of other packages (often ones that Fedora cannot ship directly). We also make changes to the default system, whereas Fedora generally sticks to upstream. For new users, Fedora can be tricky because it doesn’t include many of the extras that users often need, things like media codecs and some proprietary software. This is
+                  one area where Korora can help.</p>
+                  <p>Ultimately, we want people just like you to become useful members of the Fedora community and we hope that trying Korora will be a catalyst for this.</p>
+                  <p>For a detailed look at how Korora differs to Fedora, see <a href="/whats-inside"><em>what’s inside</em></a>.</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h2>Desktops</h2>
+                  <p>Korora comes in <a href="/discover">a few installable versions</a> which include both the <a href="http://kde.org/workspaces/plasmadesktop/">KDE</a> and <a href="http://www.gnome.org/start/stable/">GNOME</a> desktops.</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <h3>GNOME</h3>
+                  <div class="text-center">
+                    <a href="/discover/gnome-desktop/">
+                      <img src="http://kororaproject.org/images/web/screenshots/korora-desktop-gnome-extra-small.jpg" alt="Korora GNOME desktop" class="img-responsive">
+                    </a>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <h3>KDE</h3>
+                  <div class="text-center">
+                    <a href="/discover/kde-desktop/">
+                      <img src="http://kororaproject.org/images/web/screenshots/korora-desktop-kde-extra-small.jpg" alt="Korora KDE desktop" class="img-responsive">
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h2>Default applications</h2>
+                  <p>Korora sets the default applications to those that we believe end users typically want. For example, <a href="http://www.mozilla.org/firefox">Firefox</a> is the default web browser (instead of Konqueror in KDE and Epiphany in GNOME) and <a href="http://www.videolan.org/vlc/">VLC</a> is the default media player (instead of Dragon Player in KDE and Totem in GNOME). There is generally one popular program installed for each task, although alternatives (such as the <a href="http://www.google.com/chrome/"
+                   >Google Chrome</a> web browser) are available via the package manager for a quick install.</p>
+                  <p>We have a licence to distribute Adobe Flash so this is now included by default.</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h2>Package repositories</h2>
+                  <p>Korora also pre-configures a number of third party repositories, making it easier to install the additional software that most people uses. These include packages like:</p>
+                  <ul>
+                    <li>Adobe Flash</li>
+                    <li>Google Chrome and Google Earth</li>
+                    <li>RPMFusion</li>
+                    <li>VirtualBox</li>
+                  </ul>
+                  <p>This means packages are available to install out-of-the-box, that would not normally be on Fedora.</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h2>Third party driver support</h2>
+                  <p>Korora makes use of the <a href="https://launchpad.net/jockey">Jockey Device Driver Manager</a>, for simple installation of third party drivers such as those for NVIDIA graphics cards and certain wireless devices.</p>
+                  <p>Korora also comes with all the development tools and kernel headers you need to easily install out of tree kernel modules, such as those required by VirtualBox. These modules are automatically built when you get a new kernel update thanks to Dynamic Kernel Module Support.</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h2>Goals</h2>
+                  <p>Korora hopes to provide a <em>complete, easy to use system for general computing</em> which is assisted by the following:</p>
+                  <ul>
+                    <li>Support for as much hardware as possible</li>
+                    <li>End user desired applications as defaults (e.g. Firefox over Konqueror)</li>
+                    <li>Ability to play all media out of the box using free software, wherever possible</li>
+                    <li>Make it easy for users to get Adobe Flash, if they want it</li>
+                    <li>Target specific applications for tasks with as little bloat as possible</li>
+                    <li>Provide simple means to getting support</li>
+                    <li>Provide howtos, guides, on how to use the system</li>
+                    <li>Build a little community of happy Linux users</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="why-fedora">
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-12">
+                  <p>You might be wondering, "<em>why is Korora derived from Fedora?</em>"</p>
+                  <p>Perhaps you have used Fedora in the past yourself and been burnt, or perhaps you can’t stand Yum, Fedora’s package manager. Perhaps you even hate RPMs? Well, <em>we understand!</em></p>
+                  <p>Let us also say, that we think you should give Fedora another chance (like we did), or at least continue reading this page.<br>
+                  <span id="more-8"></span><br>
+                  All distros are different and they have different goals. However, we’re drawn to Fedora for several reasons including the fact that <a href="http://fedoraproject.org/wiki/Objectives">at its heart</a>, Fedora is about building a <em>community of contributors</em>, not just consumers.</p>
+                  <h2><a name="menu" href=""></a>Contents:</h2>
+                  <ul>
+                    <li><a href="#redhat">Relationship with Red Hat</a></li>
+                    <li><a href="#values">Values</a></li>
+                    <li><a href="#package">Package Management</a></li>
+                    <li><a href="#updates">Updates</a></li>
+                    <li><a href="#innovation">Innovation</a></li>
+                    <li><a href="#upstream">Upstream</a></li>
+                    <li><a href="#security">Security</a></li>
+                    <li><a href="#tools">Tools</a></li>
+                    <li><a href="#reliability">Reliability</a></li>
+                    <li><a href="#summary">Summary</a></li>
+                  </ul>
+                  <p><a name="redhat" href=""></a></p>
+                  <h2>Relationship with Red Hat</h2>
+                  <p>Fedora is a community operating system, whose major commercial sponsor is Red Hat. Many Red Hat engineers work on free software projects (see <a href="#upstream">Upstream</a> below) and Fedora provides a platform to push those changes to a large audience. While there is a small team of Red Hat engineers dedicated to working on Fedora, it remains primarily a community driven project.<br>
+                  <a href="#menu"><em>Top</em></a></p>
+                  <p><a name="values" href=""></a></p>
+                  <h2>Values</h2>
+                  <p>Fedora has a <a href="http://fedoraproject.org/wiki/Foundations">great set of values</a>, which embody the very heart of the community; <em>Freedom, Friends, Features, First</em>. A central goal for Fedora is advancing free software and content freedom, which benefits the whole World.</p>
+                  <p>In particular, we admire Fedora’s <strong>strong support of freedom</strong>. This means that they do not ship (nor support) proprietary software, but naturally prefer (and create where necessary) free software alternatives. For example, instead of building tools to help install NVIDIA drivers, Fedora invested in Nouveau, the free 3D driver for NVIDIA cards. This not only keeps Fedora free to re-distribute,
+                  but it benefits the whole Linux community. That’s extremely admirable, in our opinion.</p>
+                  <p>That’s not to say that you can’t get the NVIDIA drivers, or other proprietary software for your system. Various third party repositories, such as <a href="http://rpmfusion.org/">RPMFusion</a>, exist for this very purpose (and of course, Korora configures all this for you out of the box!).<br>
+                  <a href="#menu"><em>Top</em></a></p>
+                  <p><a name="package" href=""></a></p>
+                  <h2>Package Management</h2>
+                  <p>Yum (and RPM) have made leaps and bounds over the last few years and you might actually enjoy using it now (and it’s quite fast!). Having said that, most package commands are run through PackageKit these days thanks to graphical package managers. As for RPMs themselves, they’re just a binary package format like Debs – it’s the package manager that makes the difference.</p>
+                  <p>Download an RPM from the net and you can install it with Yum (or via the GUI using PackageKit), which will automatically pull in any dependencies for you. You rarely use the <em>rpm</em>command, just like in Debian and Ubuntu you rarely use <em>dpkg</em>. The days of <em>RPM hell</em> are long gone.</p>
+                  <p>Fedora also has a wonderful addition, called groups. After some educational software, office programs, or support for your language? It’s easy, just install the group you need, like so:</p>
+                  <pre><code>yum groupinstall "Educational Software"</code></pre>
+                  <p>If you’re a developer, getting started with Fedora is easy. Just install the development group you need, such as GNOME, KDE, Java, Kernel, Perl, or even the Web.</p>
+                  <pre><code>yum groupinstall "Development Tools"</code></pre>
+                  <p>There are almost 200 groups, ready to make your life easier!</p>
+                  <p>Fedora also has several <a href="http://repos.fedorapeople.org/">contributor repositories available</a> for end users, which is sort-of similar to Ubuntu’s PPA (Personal Package Archive). However, Fedora often provides updates for major packages anyway, so you don’t actually need to add a separate
+                  repository to get the latest version of things like KDE.</p>
+                  <p><em>If that’s still not enough</em>, you can also <a href="http://fedoraproject.org/wiki/Tools/Apt">install Debian’s Apt package manager</a> and other graphical front-ends like Synaptic in Fedora!<br>
+                  <a href="#menu"><em>Top</em></a></p>
+                  <p><a name="updates" href=""></a></p>
+                  <h3>Updates</h3>
+                  <p>Similar to other non-rolling release distros, Fedora <a href="http://fedoraproject.org/wiki/Updates_Policy#Stable_Releases">generally only applies bug fixes</a> to a stable release, rather than introducing new features with later versions.</p>
+                  <p>Having said that though, Fedora does often provide major updates to some specific programs, including KDE. In general, often packages like Firefox, LibreOffice and the Linux kernel itself get major updates. So, with Fedora you are not left behind quite as much, nor having to add repositories for unofficial builds. We like that.<br>
+                  <a href="#menu"><em>Top</em></a></p>
+                  <p><a name="innovation" href=""></a></p>
+                  <h3>Innovation</h3>
+                  <p>With every new release, Fedora is often leading the charge to implement new free software technologies. In fact, Fedora’s primary sponsor Red Hat is responsible for <a href="http://fedoraproject.org/wiki/RedHatContributions#Desktop_Software">some of the greatest desktop enhancements ever</a>, including
+                  AIGLX (Accelerated Indirect GLX), D-Bus, DeviceKit, HAL, NetworkManager, Ogg Theora, and PolicyKit. Even the <a href="http://wayland.freedesktop.org/">Wayland display server</a> (which Ubuntu has announced they are moving to) was started by Kristian Høgsberg when he was working for Red Hat (he’s now at Intel).</p>
+                  <p>Not to mention that out of all the vendors, Red Hat <a href="http://www.press.redhat.com/2008/04/08/red-hat-leads-open-source-contributions-to-kernel/">contributes the most to the Linux kernel</a> and to<a href="http://www.phoronix.com/scan.php?page=article&amp;item=x_server_contributors&amp;num=1">X.Org</a>. Red Hat is also the <a href="http://blogs.gnome.org/bolsh/2010/07/28/gnome-census/">biggest contributor to GNOME</a> (including GNOME Shell) and they also provide infrastructure, hosting and bandwidth for
+                  the project.</p>
+                  <p>Kudos.<br>
+                  <a href="#menu"><em>Top</em></a></p>
+                  <p><a name="upstream" href=""></a></p>
+                  <h3>Upstream</h3>
+                  <p>Fedora works as <a href="http://fedoraproject.org/wiki/Staying_close_to_upstream_projects">closely to upstream as possible</a>. They don’t often go off on their own tangent with disregard for upstream projects. If they want to have something changed, they work with upstream to create fixes and
+                  introduce new features.</p>
+                  <p>Take the Chromium web browser for example. It’s not included in Fedora <a href="http://spot.livejournal.com/312320.html">for several reasons</a>, but Fedora people are <a href="http://code.google.com/p/chromium/issues/detail?id=28287"
+                   >working with Google</a> to fix these issues, so that it <em>can</em> be included nicely. By doing this, other distros will benefit!</p>
+                  <p>Having said that, there are Chromium builds available too. Just add <a href="http://repos.fedorapeople.org/repos/spot/chromium/">the repository</a> and away you go!<br>
+                  <a href="#menu"><em>Top</em></a></p>
+                  <p><a name="security" href=""></a></p>
+                  <h3>Security</h3>
+                  <p>Many used to wonder at the usefulness of SELinux (Security Enhanced Linux). Afterall, this is Linux right? It’s secure enough.</p>
+                  <p>That might be true, but SELinux is still extremely useful (and even Debian is now <a href="http://wiki.debian.org/SELinux">busy implementing SELinux</a>).</p>
+                  <p>SELinux works by protecting your system, even if there is an exploit available in an application which gives users root access. Take Apache for example. In a non-SELinux enabled system, if a user gains root through an exploit in Apache they will have full access to your machine. Not so with SELinux. Even if someone gains root access, there are rules around what Apache can and can’t do. For example, these might be restricting
+                  it to only read the directory which holds websites. Your system is compromised, but the damage is limited.</p>
+                  <p>SELinux is not just useful for servers. It’s also valuable to your desktop system, especially if you use Adobe’s proprietary flash player (which is known to have lots of security holes). When Fedora first implemented SELinux, there were lots of issues because it would block the system from doing what were considered normal tasks. These growing pains are now over, and SELinux rarely gets in the way. Even if it does,
+                  the graphical tool which pops up will tell you how to change that particular behaviour (if you really want to).</p>
+                  <p>Of course, at the end of the day you can still turn SELinux off (or just to warning mode). Korora leaves it enabled as it’s a great way to add extra security to your system, especially as a major part of our lives are now lived on the Internet.<br>
+                  <a href="#menu"><em>Top</em></a></p>
+                  <p><a name="tools" href=""></a></p>
+                  <h3>Tools</h3>
+                  <p>Fedora comes with lots of handy graphical tools to help you manage your system, including:</p>
+                  <ul class="icons">
+                    <li><i class="icon-lock"></i> authentication</li>
+                    <li><i class="icon-fire"></i> firewall</li>
+                    <li><i class="icon-check"></i> language settings</li>
+                    <li><i class="icon-sitemap"></i> network shares</li>
+                    <li><i class="icon-cogs"></i> services</li>
+                    <li><i class="icon-group"></i> users</li>
+                    <li><i class="icon-globe"></i> web server</li>
+                  </ul>
+                  <p>And many more..<br>
+                  <a href="#menu"><em>Top</em></a></p>
+                  <p><a name="reliability" href=""></a></p>
+                  <h3>Reliability</h3>
+                  <p>In the last few years we’ve been solely using Fedora and have been super impressed with its reliability. Things just work, as you would expect them to. No weirdness. Even though Fedora provides major updates to many packages, it’s still more reliable than other popular distributions we’ve used. Perhaps this is due to sticking close to upstream.<br>
+                  <a href="#menu"><em>Top</em></a></p>
+                  <p><a name="summary" href=""></a></p>
+                  <h3>Summary</h3>
+                  <p>Fedora is truly a great, free operating system. Its core principles are ones that we fully support, but which we recognise might restrict or turn away some users. This is why we chose to re-launch Korora as it is, so that users don’t give up on Fedora before they have a chance to love it. We see great potential in Fedora, and great benefit to those who are using it.</p>
+                  <p>Thanks to their wonderful <a href="http://fedoraproject.org/wiki/How_to_create_and_use_a_Live_CD#How_the_livecd-creator_Works">build tools like livecd-creator</a>, we are able to build a powerful operating system that includes all those tweaks and extras that users want.</p>
+                  <p>Now, why not give Korora a shot?</p>
+                  <p><a href="/download" class="btn btn-large btn-success"><i class="icon-download"></i> Download Korora</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="whats-inside">
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-12">
+                  <p>Korora is a Fedora Remix<a href="#footnote"><sup>1</sup></a>, which means it ships with regular Fedora packages along with others that Fedora cannot ship. We also make changes to the system, so exactly how does Korora differ from Fedora?</p>
+                  <p><a href="#opensource"></a></p>
+                  <h2>We’re open source</h2>
+                  <p>Firstly, <em>all our code is open source and freely available</em> to anyone via <a href="http://github.com/kororaproject">our GitHub account</a>. We also provide a tool called <a href="https://github.com/kororaproject/kp">kp</a> which will let anyone rebuild all of our packages and an entire Korora image, or modify these to build their own variation. That’s the tool we use to build all of the Korora packages and images.</p>
+                  <p>We do however ship some software that is proprietary, such as Adobe Flash, and others are installable, such as Google Chrome. We don’t have source code for these as they are not open source; however, anything <em>we</em> create, or modify <em>is</em>.</p>
+                  <p><a href="#kickstarts"></a></p>
+                  <h2>Kickstart templates</h2>
+                  <p>Kickstarts are files that define how to build a system and include things like:</p>
+                  <ul>
+                    <li>General settings, partitioning, timezones, services to enable or disable</li>
+                    <li>Repositories to install packages from</li>
+                    <li>List of packages to install</li>
+                    <li>Changes to make to the system</li>
+                  </ul>
+                  <p>Fedora uses kickstarts to build their images and <a href="https://github.com/kororaproject/kp-config/tree/master/kickstart.d">we use kickstarts</a> to build ours too. We have a base kickstart (from Fedora’s fedora-live-base.ks) which includes some common elements for all images, such as system settings, repositories, packages and system
+                  changes.</p>
+                  <p>The base kickstart includes the following <strong>settings</strong>, which we think are most useful for an end user:</p>
+                  <ul>
+                    <li>US English as the default language</li>
+                    <li>Australia/Sydney as the default timezone</li>
+                    <li>SELinux to enforcing mode</li>
+                    <li>Opens the firewall for Samba (Windows file sharing), SSH, Multicast DNS and printing</li>
+                    <li>Enables a number of services, including time, network management and yum daemon to keep repositories information fresh</li>
+                    <li>Disables a large number of services, like bug reporting tools, enterprise services like iscsi and multipath, as well as sendmail and ssh</li>
+                  </ul>
+                  <p>The base kickstart also spells out the <strong>repositories</strong> to pull packages from. Many of these, and in particular RPMFusion, are added by most Fedora users and we can do this out of the box because we aren’t restricted by Fedora’s own project rules. They include:</p>
+                  <ul>
+                    <li>Adobe</li>
+                    <li>Fedora</li>
+                    <li>Fedora Updates</li>
+                    <li>Korora</li>
+                    <li>RPMFusion Free</li>
+                    <li>RPMFusion Non-Free</li>
+                    <li>RPMFusion Free Updates</li>
+                    <li>RPMFusion Non-Free Updates</li>
+                  </ul>
+                  <p>The base kickstart then includes some common <strong>packages</strong> (full list available in the kickstart) including the re-branding of the system (a requirement from Fedora) that changes the name and logos, etc. We also include the following types of packages:</p>
+                  <ul>
+                    <li>Repository files so you can install Chrome and other packages out-of-the-box</li>
+                    <li>Base groups, like core</li>
+                    <li>Administration and system tools</li>
+                    <li>Hardware support</li>
+                  </ul>
+                  <p>The base kickstart implements the same <strong>changes</strong> as the Fedora base kickstart, changes that enable all that magic for when the live image is booted. We don’t change anything here except for:</p>
+                  <ul>
+                    <li>Import keys for the repositories we include</li>
+                    <li>Add a README to the image</li>
+                  </ul>
+                  <p><a href="#desktops"></a><br>
+                  For the specific <strong>desktops</strong> we have GNOME and KDE kickstarts that build on the base and include our choice of desktop specific applications. This is where we include things like Firefox for KDE and the multimedia codecs, etc.</p>
+                  <p>We do change some additional things on the system in these kickstarts when compared to Fedora, such as running prelink and updatedb, as well as stopping jockey from starting on a live session. Mostly however these are the same as upstream counterparts.</p>
+                  <p><a href="#breakdown"></a></p>
+                  <h2>Package breakdown</h2>
+                  <p>As you can see from the kickstart information above, we include a number of extra repositories which means a number of packages on the system will be from those repositories.</p>
+                  <p>Here’s a breakdown of the packages on a regular Korora live DVD and where they come from.</p>
+                  <div class="container">
+                    <div class="row">
+                      <div class="col-sm-3">
+                        <p class="text-right">Adobe</p>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="progress">
+                          <div class="progress-bar progress-bar-info" style="width: 0.053%"></div>
+                          </div>
+                        </div>
+                      <div class="col-sm-3">
+                        <p>1 package</p>
+                    </div></div>
+                    <div class="row">
+                      <div class="col-sm-3">
+                        <p class="text-right">Korora</p>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="progress">
+                          <div class="progress-bar progress-bar-success" style="width: 1.95%"></div>
+                        </div>
+                      </div>
+                      <div class="col-sm-3">
+                        <p>36 packages</p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-3">
+                        <p class="text-right">RPMFusion</p>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="progress">
+                          <div class="progress-bar progress-bar-warning" style="width: 2.76%"></div>
+                        </div>
+                      </div>
+                      <div class="col-sm-3">
+                        <p>51 packages</p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-3">
+                        <p class="text-right">Fedora</p>
+                      </div>
+                      <div class="col-sm-6">
+                        <div class="progress">
+                          <div class="progress-bar progress-bar-danger" style="width: 95.2%"></div>
+                        </div>
+                      </div>
+                      <div class="col-sm-3">
+                        <p>1760 packages</p>
+                      </div>
+                    </div>
+                  </div>
+                  <p>Korora is 95% upstream Fedora packages and under 2% of our own. The packages that come from RPMFusion are the regular packages any Fedora user might install and the one package from Adobe is flash-plugin.</p>
+                  <p><a href="#ourpackages"></a></p>
+                  <h2>Our packages</h2>
+                  <p>So if we hardly change anything on the system in the kickstarts, where do we make the changes to the system? Regular old RPM packages. The reason we make changes in RPMs is because we want them to be persistent. If we change things in the kickstarts (like editing a configuration file) then when you get an upstream package update our settings can be lost.</p>
+                  <p>So what exactly are you installing from our repositories? The best way to see what we make is to take a look at our <a href="http://dl.kororaproject.org/pub/korora/releases/19/source/">source repository</a>.</p>
+                  <p>Many of the RPMs are replacements for Fedora packages such as anaconda, fedora-release and fedora-logos, because Remixes are not allowed to ship Fedora branded packages. We also have our own backgrounds and plymouth theme.</p>
+                  <p>We ship several other “release” RPMs which provide the repositories and GPG keys for things like Adobe Flash, Google Chrome and VirtualBox. These are what allow users to install those packages out-of-the-box via the regular package manager without having to trawl the Internet.</p>
+                  <p>We also replace some Fedora packages so that we can make desktop specific changes, such as kde-settings (for KDE configuration) and shared-mime-info (that handles default applications). We have korora-settings-gnome and korora-settings-kde packages which deliver more custom settings including default Firefox profile settings and <a
+                    href="https://github.com/kororaproject/kp-korora-settings-gnome/blob/master/upstream/org.korora.gschema.override">GNOME settings</a>.</p>
+                  <p>Next, there are several Mozilla plugins that we package up as they aren’t included in Fedora but we enable them in the default Firefox profile.</p>
+                  <p>Finally, we package a number of RPMs that are not available in Fedora or RPMFusion, such as Steam client (which comes from <a href="http://spot.fedorapeople.org/steam/">Spot’s repository</a>), libdvdcss, scripts like unburden-home-dir and undistract-me, as well as Jockey the proprietary driver manager and our own
+                  welcome screen.</p>
+                  <p>As mentioned on the Download page, you can easily download the source for any of our packages using the <a href="http://linux.die.net/man/1/yumdownloader">yumdownloader</a> command.</p>
+                  <p><a href="#conclusion"></a></p>
+                  <h2>Conclusion</h2>
+                  <p>Korora is an open source project and we support open source software, even though some of the software we ship is proprietary. What we have done is to put all the pieces together and try to make a Fedora Remix that is useful for anyone out there, but there’s nothing that we do that you couldn’t do yourself. You’re welcome to install Fedora and then grab any of our packages you want, rather than using Korora if you
+                  prefer.</p>
+                  <p>At the end of the day we hope Korora is a useful system which gets people interested in Fedora, and hopefully they will one day become useful members of the community.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="the-team">
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-12">
+                  <p>The Korora Project is small, but we have a dedicated team and community.</p>
+                  <p>We would like to recognise the following developers:</p>
+                  <ul>
+                    <li>Chris Smart (csmart) – founder and lead developer</li>
+                    <li>Ian Firns (firnsy) – co-lead developer and general all-round good guy</li>
+                  </ul>
+                  <p>We would like to recognise the following community members for their continued contributions to the Korora Project:</p>
+                  <ul>
+                    <li>Jim Dean (ozjd) – tester and forum executive extraordinaire</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="the-roadmap">
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-12">
+                  <p>Goals for future releases... Coming soon!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
   <div class="row">
     <div class="col-sm-12">
-      <h2>Default applications</h2>
-      <p>Korora sets the default applications to those that we believe end users typically want. For example, <a href="http://www.mozilla.org/firefox" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://www.mozilla.org']);">Firefox</a> is the default web browser (instead of Konqueror in KDE and Epiphany in GNOME) and <a
-        href="http://www.videolan.org/vlc/" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://www.videolan.org']);">VLC</a> is the default media player (instead of Dragon Player in KDE and Totem in GNOME). There is generally one popular program installed for each task, although alternatives (such as the <a href="http://www.google.com/chrome/"
-        onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://www.google.com']);">Google Chrome</a> web browser) are available via the package manager for a quick install.</p>
-      <p>We have a licence to distribute Adobe Flash so this is now included by default.</p>
-      <h2>Package repositories</h2>
-      <p>Korora also pre-configures a number of third party repositories, making it easier to install the additional software that most people uses. These include packages like:</p>
-      <ul>
-        <li>Adobe Flash</li>
-        <li>Google Chrome and Google Earth</li>
-        <li>RPMFusion</li>
-        <li>VirtualBox</li>
-      </ul>
-      <p>This means packages are available to install out-of-the-box, that would not normally be on Fedora.</p>
-      <h2>Third party driver support</h2>
-      <p>Korora makes use of the <a href="https://launchpad.net/jockey" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://launchpad.net']);">Jockey Device Driver Manager</a>, for simple installation of third party drivers such as those for NVIDIA graphics cards and certain wireless devices.</p>
-      <p>Korora also comes with all the development tools and kernel headers you need to easily install out of tree kernel modules, such as those required by VirtualBox. These modules are automatically built when you get a new kernel update thanks to Dynamic Kernel Module Support.</p>
-      <h2>Goals</h2>
-      <p>Korora hopes to provide a <em>complete, easy to use system for general computing</em> which is assisted by the following:</p>
-      <ul>
-        <li>Support for as much hardware as possible</li>
-        <li>End user desired applications as defaults (e.g. Firefox over Konqueror)</li>
-        <li>Ability to play all media out of the box using free software, wherever possible</li>
-        <li>Make it easy for users to get Adobe Flash, if they want it</li>
-        <li>Target specific applications for tasks with as little bloat as possible</li>
-        <li>Provide simple means to getting support</li>
-        <li>Provide howtos, guides, on how to use the system</li>
-        <li>Build a little community of happy Linux users</li>
-      </ul>
-      <div class="alert alert-footnote">
-        <p><a name="footnote" href=""></a>Korora is not provided or supported by the <a href="http://fedoraproject.org/" onclick="javascript:_gaq.push(['_trackEvent','outbound-article','http://fedoraproject.org']);">Fedora Project</a>. Official, unmodified Fedora software is available through the Fedora Project website.</p>
+      <div class="hr"></div>
+      <div class="alert alert-warning">
+        <p><a name="footnote" href=""></a><sup>1</sup> Korora is not provided or supported by the <a href="http://fedoraproject.org/" class="alert-link">Fedora Project</a>. Official, unmodified Fedora software is available through the Fedora Project website.</p>
       </div>
     </div>
   </div>
