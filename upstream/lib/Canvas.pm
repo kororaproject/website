@@ -139,7 +139,6 @@ sub startup {
   my $r = $self->routes;
 
   $r->get('/')->to('site#index');
-  $r->get('/login')->to('site#login');
   $r->any('/authenticate')->to('site#authenticate');
   $r->any('/deauthenticate')->to('site#deauthenticate');
 
