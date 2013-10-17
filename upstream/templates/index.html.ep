@@ -113,13 +113,6 @@
 
               <img src="/gallery/autumn-bg.jpg" class="ls-bg">
               <img class="ls-s3" src="/gallery/summer-bg.jpg" style="position: absolute; top: 0px; left: 0px; slidedirection : fade; slideoutdirection : fade;  durationin : 2500; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2500; delayout : 0; showuntil : 0; ">
-              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-1.png" alt="Autumn Leaf" style="position: absolute; top: 9px; left: 101px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; rotatein : 360; showuntil : 1000; ">
-              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-2.png" alt="Autumn Leaf" style="position: absolute; top: 210px; left: 240px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 200;  rotatein : -360; showuntil : 1000; ">
-              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-3.png" alt="Autumn Leaf" style="position: absolute; top: 193px; left: 480px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 400;  rotatein : 360; showuntil : 1000; ">
-              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-4.png" alt="Autumn Leaf" style="position: absolute; top: 311px; left: 623px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 600;  rotatein : -360; showuntil : 1000; ">
-              <img class="ls-s2" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-5.png" alt="Autumn Leaf" style="position: absolute; top: 407px; left: 371px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 800;  rotatein : 360; showuntil : 1000; ">
-              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-6.png" alt="Autumn Leaf" style="position: absolute; top: 232px; left: 392px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 1000;  rotatein : -360; showuntil : 1000; ">
-              <img class="ls-s-1" src="http://kreaturamedia.com/wp-content/plugins/LayerSlider/sampleslider/a-l-7.png" alt="Autumn Leaf" style="position: absolute; top: 190px; left: 67px; slidedirection : bottom; slideoutdirection : fade; durationin : 2000; durationout : 1000; easingin : easeOutQuint; easingout : easeInOutQuint; delayin : 1200;  rotatein : 360; showuntil : 1000; ">
               <img class="ls-s3" src="/gallery/s-l-1.png" style="position: absolute; top: 9px; left: 101px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2500; delayout : 0; showuntil : 0; ">
               <img class="ls-s3" src="/gallery/s-l-2.png" style="position: absolute; top: 210px; left: 240px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2700; delayout : 0; showuntil : 0; ">
               <img class="ls-s3" src="/gallery/s-l-3.png" style="position: absolute; top: 193px; left: 480px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2900; delayout : 0; showuntil : 0; ">
@@ -174,25 +167,25 @@
         <!-- navigation content for toggling -->
         <div class="collapse navbar-collapse navbar-primary-collapse" ng-switch on="modeActive()">
           <ul class="nav navbar-nav" ng-switch-when="default">
-            <li class="nav-home" ng-class="pageActive('home')"><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-            <li ng-class="pageActive('about')"><a href="/about"><span class="glyphicon icon-cog"></span> About</a></li>
-            <li ng-class="pageActive('discover')"><a href="/discover"><span class="glyphicon icon-compass"></span> Discover</a></li>
-            <li ng-class="pageActive('support')"><a href="/support"><span class="glyphicon icon-group"></span> Support</a></li>
-            <li ng-class="pageActive('support')"><a href="/download"><span class="glyphicon icon-download"></span> Download</a></li>
-            <li ng-class="pageActive('news')"><a href="/news"><span class="glyphicon icon-bullhorn"></span> News</a></li>
-            <li ng-class="pageActive('canvas')"><a href="/canvas"><span class="glyphicon glyphicon-cloud"></span> Canvas</a></li>
+            <li class="nav-home" ng-class="pageActive('home')"><a href="/">Home</a></li>
+            <li ng-class="pageActive('about')"><a href="/about">About</a></li>
+            <li ng-class="pageActive('discover')"><a href="/discover">Discover</a></li>
+            <li ng-class="pageActive('support')"><a href="/support">Support</a></li>
+            <li ng-class="pageActive('support')"><a href="/download">Download</a></li>
+            <li ng-class="pageActive('news')"><a href="/news">News</a></li>
+            <li ng-class="pageActive('canvas')"><a href="/canvas">Canvas</a></li>
           </ul>
           <ul class="nav navbar-nav" ng-switch-when="canvas">
-            <li class="nav-home" ng-class="pageActive('home')"><a href="/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-            <li ng-class="pageActive('canvas-templates')"><a href="/canvas/templates"><span class="glyphicon glyphicon-download"></span> Templates</a></li>
-            <li ng-class="pageActive('canvas-packages')"><a href="/canvas/packages"><span class="glyphicon glyphicon-th"></span> Packages</a></li>
-            <li ng-class="pageActive('canvas-repositories')"><a href="/canvas/repositories"><span class="glyphicon glyphicon-th-list"></span> Repositories</a></li>
-            <li ng-class="pageActive('updates')"><a href="/canvas/updates"><span class="glyphicon glyphicon-download"></span> Updates</a></li>
-            <li ng-class="pageActive('downloads')"><a href="/canvas/downloads"><span class="glyphicon glyphicon-download"></span> Downloads</a></li>
+            <li class="nav-home" ng-class="pageActive('home')"><a href="/">Home</a></li>
+            <li ng-class="pageActive('canvas-templates')"><a href="/canvas/templates">Templates</a></li>
+            <li ng-class="pageActive('canvas-packages')"><a href="/canvas/packages">Packages</a></li>
+            <li ng-class="pageActive('canvas-repositories')"><a href="/canvas/repositories">Repositories</a></li>
+            <li ng-class="pageActive('updates')"><a href="/canvas/updates">Updates</a></li>
+            <li ng-class="pageActive('downloads')"><a href="/canvas/downloads">Downloads</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-              <a href="" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> user <b class="caret"></b></a>
+              <a href="" class="dropdown-toggle" data-toggle="dropdown">user <b class="caret"></b></a>
               <ul class="dropdown-menu" role="menu">
                 <li><a href="/">Settings</a></li>
                 <li><a href="/deauthenticate">Logout</a></li>
@@ -218,10 +211,10 @@
         </div>
         <div class="col-sm-4 col-md-4 col-lg-4">
           <div id="social" class="pull-right">
-            <a href="https://plus.google.com/u/0/113276359756252515026"><img src="../img/social-google.png"></a>
-            <a href="http://facebook.com/kororaproject"><img src="../img/social-facebook.png"></a>
-            <a href="http://identi.ca/kororaproject"><img src="../img/social-identica.png"></a>
-            <a href="http://twitter.com/#!/kororaproject"><img src="../img/social-twitter.png"></a>
+            <a href="https://plus.google.com/u/0/113276359756252515026"><img class="img-bumper" src="../img/social-google.png"></a>
+            <a href="http://facebook.com/kororaproject"><img class="img-bumper" src="../img/social-facebook.png"></a>
+            <a href="http://identi.ca/kororaproject"><img class="img-bumper" src="../img/social-identica.png"></a>
+            <a href="http://twitter.com/#!/kororaproject"><img class="img-bumper" src="../img/social-twitter.png"></a>
           </div>
         </div>
       </div>

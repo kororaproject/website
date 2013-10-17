@@ -3,11 +3,7 @@
 */
 
 /* fonts */
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,300italic,600,700);
-//@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700);
-
-/* bootstrap - glyphicons */
-@import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc2/css/bootstrap-glyphicons.css");
+@import url("//fonts.googleapis.com/css?family=Open+Sans:300,300italic,600,700");
 
 html {
   overflow-y: scroll;
@@ -82,7 +78,7 @@ p {
 */
 
 /*
-** LOGO
+** LOGOS / IMAGES
 */
 .banner {
   height: 256px;
@@ -98,9 +94,9 @@ p {
   height: 48px;
   padding-left: 48px;
   background-image: url('../img/kp-logo.png');
-  background-size: 48px 48px;
+  background-size: 32px 32px;
   background-repeat: no-repeat;
-  background-position: center left;
+  background-position: center 8px;
   line-height: 48px;
   font-size: 36px;
   font-weight: 300;
@@ -119,7 +115,7 @@ p {
   width: 48px;
 
   background-image: url('../img/kp-logo.png');
-  background-size: 48px 48px;
+  background-size: 40px 40px;
   background-repeat: no-repeat;
   background-position: center center;
 }
@@ -211,6 +207,27 @@ p {
   -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
+
+.img-desktop-logo {
+  height: 64px;
+  width: 64px;
+}
+
+
+.img-bumper {
+  position: relative;
+  top: 0;
+
+  -webkit-transition: all .2s ease-in-out;
+  -moz-transition: all .2s ease-in-out;
+  -o-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+}
+
+.img-bumper:hover {
+  top: -4px;
+}
+
 
 /*
 ** PAGINATION BUTTON SIZE
@@ -326,21 +343,6 @@ p {
 /*  margin: 12px 8px 0 0; */
 }
 
-#social img {
-  position: relative;
-  top: 0;
-
-  -webkit-transition: all .2s ease-in-out;
-  -moz-transition: all .2s ease-in-out;
-  -o-transition: all .2s ease-in-out;
-  transition: all .2s ease-in-out;
-}
-
-#social img:hover {
-  top: -4px;
-}
-
-
 #register {
   margin: 10px 0 0 0;
 }
@@ -371,7 +373,7 @@ p {
 .hr {
   display: block;
   content: "&nbsp;";
-  height: 16px;
+  height: 8px;
 }
 
 .icons-ul {
@@ -509,7 +511,11 @@ footer a:visited {
   }
 
   .hr {
-    height: 32px;
+    height: 16px;
+  }
+
+  .hr-sm {
+    height: 16px!important;
   }
 
   .forum-child {
@@ -537,8 +543,12 @@ footer a:visited {
     background-position: 16px center;
   }
 
-  .hr, .hr-md {
+  .hr {
     height: 24px;
+  }
+
+  .hr-md {
+    height: 24px!important;
   }
 
   .forum-child {
@@ -548,8 +558,12 @@ footer a:visited {
 }
 /* lg */
 @media all and (min-width: 1200px) {
-  .hr, .hr-lg {
+  .hr {
     height: 32px;
+  }
+
+  .hr-lg {
+    height: 32px!important;
   }
 
   .forum-child {
@@ -558,12 +572,10 @@ footer a:visited {
 }
 
 
-
-
-
 .page-transition {
   position:relative;
 }
+
 .page-transition.ng-enter, .page-transition.ng-leave {
   -webkit-transition:0.5s linear all;
   -moz-transition:0.5s linear all;
@@ -596,8 +608,6 @@ footer a:visited {
   top:-600px;
   opacity:0;
 }
-
-
 
 
 .ng-hide {
