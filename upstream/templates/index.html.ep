@@ -161,7 +161,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <div class="navbar-brand kp-logo-48"></div>
+          <div class="navbar-brand" ng-class="{'kp-logo-48': isMode('default'), 'canvas-logo-48': isMode('canvas')}"></div>
         </div>
 
         <!-- navigation content for toggling -->
@@ -171,12 +171,13 @@
             <li ng-class="pageActive('about')"><a href="/about">About</a></li>
             <li ng-class="pageActive('discover')"><a href="/discover">Discover</a></li>
             <li ng-class="pageActive('support')"><a href="/support">Support</a></li>
-            <li ng-class="pageActive('support')"><a href="/download">Download</a></li>
+            <li ng-class="pageActive('download')"><a href="/download">Download</a></li>
             <li ng-class="pageActive('news')"><a href="/news">News</a></li>
             <li ng-class="pageActive('canvas')"><a href="/canvas">Canvas</a></li>
           </ul>
           <ul class="nav navbar-nav" ng-switch-when="canvas">
             <li class="nav-home" ng-class="pageActive('home')"><a href="/">Home</a></li>
+            <li ng-class="pageActive('canvas-dashboard')"><a href="/canvas">Dashboard</a></li>
             <li ng-class="pageActive('canvas-templates')"><a href="/canvas/templates">Templates</a></li>
             <li ng-class="pageActive('canvas-packages')"><a href="/canvas/packages">Packages</a></li>
             <li ng-class="pageActive('canvas-repositories')"><a href="/canvas/repositories">Repositories</a></li>
@@ -197,7 +198,6 @@
     </div>
 
     <div class="page-content">
-      <div class="hr"></div>
       <div ng-view></div>
     </div>
   </div>

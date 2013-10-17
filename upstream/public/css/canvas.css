@@ -137,7 +137,7 @@ p {
   width: 48px;
 
   background-image: url('../img/canvas-logo.png');
-  background-size: 36px 36px;
+  background-size: 40px 40px;
   background-repeat: no-repeat;
   background-position: center center;
 }
@@ -375,7 +375,7 @@ p {
 }
 
 .page-content {
-  padding-top: 112px;
+  padding-top: 96px;
 }
 
 .hr {
@@ -535,10 +535,6 @@ footer a:visited {
 
   .page-container {
     margin-bottom: 56px;
-  }
-
-  .page-content {
-    padding-top: 56px;
   }
 
   footer {

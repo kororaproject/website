@@ -44,7 +44,7 @@ canvas.service('CanvasNavigation', function($rootScope) {
 
 canvas.service('Database', function($resource) {
   return {
-    packages: $resource('http://localhost:3000/api/packages')
+    packages: $resource('/api/packages')
   };
 });
 
@@ -61,9 +61,6 @@ function NavigationController($scope, CanvasNavigation) {
   var fixed = true;
 
   var footer  = $('footer');
-
-    // frob page-container minimum height to at least the footer top
-  $('.page-container').css('min-height', ($(window).height()-footer.outerHeight()) + 'px');
 
   $scope.$on('routeLoaded', function (event, args) {
     $scope.mode = args.mode;
@@ -108,6 +105,9 @@ function NavigationController($scope, CanvasNavigation) {
         fixed = false;
       }
     });
+
+    // frob page-container minimum height to at least the footer top
+    $('.page-container').css('min-height', ($(window).height()-footer.outerHeight()) + 'px');
   });
 
   $scope.pageActive = function(page) {
@@ -639,7 +639,7 @@ function CanvasController($scope, CanvasNavigation) {
 
   //
   // INIT
-  CanvasNavigation.setPage('canvas-home');
+  CanvasNavigation.setPage('canvas-dashboard');
 };
 
 function RepositoryController($scope, CanvasNavigation) {
@@ -808,7 +808,7 @@ function PackageController($scope, CanvasNavigation, $http) {
 
     $http({
       method: 'GET',
-      url: 'http://localhost:3000/api/packages',
+      url: '/api/packages',
       params: _param
     })
       .success( function(data, status, headers, config) {
@@ -884,7 +884,7 @@ function PackageController($scope, CanvasNavigation, $http) {
 
     $http({
       method: 'GET',
-      url: 'http://localhost:3000/api/package/' + id
+      url: '/api/package/' + id
     })
       .success( function(data, status, headers, config) {
         angular.extend($scope.data_details[id], data);
