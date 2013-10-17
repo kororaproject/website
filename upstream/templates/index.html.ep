@@ -183,7 +183,7 @@
             <li ng-class="pageActive('updates')"><a href="/canvas/updates">Updates</a></li>
             <li ng-class="pageActive('downloads')"><a href="/canvas/downloads">Downloads</a></li>
           </ul>
-          <ul class="nav navbar-nav navbar-right">
+          <ul class="nav navbar-nav navbar-right hide">
             <li class="dropdown">
               <a href="" class="dropdown-toggle" data-toggle="dropdown">user <b class="caret"></b></a>
               <ul class="dropdown-menu" role="menu">

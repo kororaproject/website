@@ -78,6 +78,14 @@ p {
 */
 
 /*
+** INPUT
+*/
+.form-control-generic {
+  height: inherit;
+}
+
+
+/*
 ** LOGOS / IMAGES
 */
 .banner {
@@ -373,7 +381,10 @@ p {
 .hr {
   display: block;
   content: "&nbsp;";
-  height: 8px;
+  height: 4px;
+}
+.hr-xs {
+  height: 4px!important;
 }
 
 .icons-ul {

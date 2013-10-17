@@ -1,11 +1,11 @@
 <div id="page-download" class="container">
   <div class="row">
     <div class="col-sm-12">
-      <h1 class="text-center">Discover</h1>
+      <h1 class="text-center">Download</h1>
     </div>
   </div>
   <div class="hr"></div>
-  <div class="row">
+  <div class="row alert" ng-class="{'alert-info': isVersionStable(), 'alert-warning': !isVersionStable()}">
     <div class="col-sm-12">
       <h2>{{version.name}} ({{version.codename}})</h2>
     </div>
@@ -40,8 +40,8 @@
           <div class="col-sm-3">
             <h4 class="step">Step 3</h4>
           </div>
-          <div class="col-sm-9 well">
-            <div class="text-center">
+          <div class="col-sm-9">
+            <div class="text-center form-control form-control-generic">
               <img class="img-desktop-logo img-bumper" ng-repeat="d in version.desktops" src="/img/ico-logo-{{d.name}}.png" ng-class="{'selected': isSelected(d.name)}" ng-click="selectDesktop(d)"></img>
             </div>
           </div>
@@ -54,12 +54,13 @@
           <div class="col-sm-9">
             <div ng-repeat="ls in version.links | filter:arch.name | filter:desktop.name">
               <div ng-repeat="l in ls.link" class="btn-download">
-                <a href="{{l.url}}" class="btn btn-primary btn-large btn-block" ng-class="{'btn-success': version.isStable, 'btn-warning': !version.isStable}"><i class="icon-download-alt icon-white"></i> Get <span>{{version.name}} ({{desktop.label}}) via {{l.type}}</span></a>
+                <a href="{{l.url}}" class="btn btn-primary btn-large btn-block" ng-class="{'btn-success': version.isStable, 'btn-warning': !version.isStable}"><i class="icon-cloud-download icon-white"></i> {{l.type}}</a>
+                <div class="hr hr-xs"></div>
               </div>
             </div>
             <div class="pull-right checksums">
               <div ng-repeat="cs in version.checksums | filter:arch.name | filter:desktop.name">
-                <span ng-repeat="c in cs.checksum" class="label label-inverse" title="{{c.hash}}">{{c.type}}</span>
+                <span ng-repeat="c in cs.checksum" class="label label-default" title="{{c.hash}}">{{c.type}}</span>
               </div>
             </div>
           </div>
