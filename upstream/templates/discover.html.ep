@@ -10,7 +10,7 @@
 <body>
   <div class="page-container">
 
-    %= include 'navigation.inc'
+    %= include 'navigation.inc', active => 'discover'
 
     <div class="page-content">
       <!-- CONTENT -->

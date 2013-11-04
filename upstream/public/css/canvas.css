@@ -28,10 +28,11 @@ noscript {
   text-align: center;
 }
 
+.alert,
 .btn,
 .label,
-pre,
-.form-control {
+.form-control,
+pre{
   border-radius: 2px !important;
   -webkit-border-radius: 2px !important;
   -moz-border-radius: 2px !important;
@@ -115,7 +116,7 @@ p {
 
   height: 48px;
   padding-left: 48px;
-  background-image: url('../img/kp-logo.png');
+  background-image: url('/img/kp-logo.png');
   background-size: 32px 32px;
   background-repeat: no-repeat;
   background-position: center 8px;
@@ -136,7 +137,7 @@ p {
   height: 48px;
   width: 48px;
 
-  background-image: url('../img/kp-logo.png');
+  background-image: url('/img/kp-logo.png');
   background-size: 40px 40px;
   background-repeat: no-repeat;
   background-position: center center;
@@ -150,7 +151,7 @@ p {
   height: 48px;
   width: 48px;
 
-  background-image: url('../img/canvas-logo.png');
+  background-image: url('/img/canvas-logo.png');
   background-size: 40px 40px;
   background-repeat: no-repeat;
   background-position: center center;
@@ -161,7 +162,7 @@ p {
 
   height: 48px;
 
-  background-image: url('../img/canvas-logo.png');
+  background-image: url('/img/canvas-logo.png');
   background-size: 48px 48px;
   background-repeat: no-repeat;
   background-position: left center;
@@ -199,23 +200,23 @@ p {
 }
 
 .col-img-leader-innovation {
-  background-image: url('../img/ico-innovation.png');
+  background-image: url('/img/ico-innovation.png');
 }
 
 .col-img-leader-community {
-  background-image: url('../img/ico-community.png');
+  background-image: url('/img/ico-community.png');
 }
 
 .col-img-leader-security {
-  background-image: url('../img/ico-security.png');
+  background-image: url('/img/ico-security.png');
 }
 
 .col-img-leader-choice {
-  background-image: url('../img/ico-choice.png');
+  background-image: url('/img/ico-choice.png');
 }
 
 .col-img-leader-open-source {
-  background-image: url('../img/ico-open-source.png');
+  background-image: url('/img/ico-open-source.png');
 }
 
 .img-showcase {
@@ -283,6 +284,9 @@ p {
   margin: 20px 0;
   padding: 20px;
   border-left: 3px solid #eeeeee;
+  border-radius: 0 2px 2px 0;
+  -moz-border-radius: 0 2px 2px 0;
+  -webkit-border-radius: 0 2px 2px 0;
 }
 .callout .code,
 .callout .highlight {
@@ -428,8 +432,8 @@ p {
 
 .page-container {
   min-height: 100%;
-  padding-bottom: 32px;
-  margin-bottom: 256px; /* footer height */
+  padding-bottom: 96px; /* match top padding of page-content */
+  margin-bottom: 256px; /* auto-calculated */
 
   background-color: #fff;
   box-shadow: 0px 4px 16px #111;

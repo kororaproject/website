@@ -42,10 +42,10 @@
       </div>
       <div class="col-sm-4">
         <div id="social" class="pull-right">
-          <a href="https://plus.google.com/u/0/113276359756252515026"><img class="img-bumper" src="../img/social-google.png"></a>
-          <a href="http://facebook.com/kororaproject"><img class="img-bumper" src="../img/social-facebook.png"></a>
-          <a href="http://identi.ca/kororaproject"><img class="img-bumper" src="../img/social-identica.png"></a>
-          <a href="http://twitter.com/#!/kororaproject"><img class="img-bumper" src="../img/social-twitter.png"></a>
+          <a href="https://plus.google.com/u/0/113276359756252515026"><img class="img-bumper" src="/img/social-google.png"></a>
+          <a href="http://facebook.com/kororaproject"><img class="img-bumper" src="/img/social-facebook.png"></a>
+          <a href="http://identi.ca/kororaproject"><img class="img-bumper" src="/img/social-identica.png"></a>
+          <a href="http://twitter.com/#!/kororaproject"><img class="img-bumper" src="/img/social-twitter.png"></a>
         </div>
       </div>
     </div>

@@ -3,9 +3,9 @@
 <head>
   <title>Canvas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-  <link href="css/font-awesome.min.css" rel="stylesheet" media="screen">
-  <link href="css/canvas.css" rel="stylesheet" media="screen">
+  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="/css/canvas.css" rel="stylesheet" media="screen">
 </head>
 <body>
   <div class="page-container">
@@ -22,7 +22,7 @@
           </div>
         </div>
         <div class="hr"></div>
-        <div class="row alert" ng-class="{'alert-info': isVersionStable(), 'alert-warning': !isVersionStable()}">
+        <div class="row alert ng-cloak" ng-class="{'alert-info': isVersionStable(), 'alert-warning': !isVersionStable()}">
           <div class="col-sm-12">
             <h2>{{version.name}} ({{version.codename}})</h2>
           </div>
