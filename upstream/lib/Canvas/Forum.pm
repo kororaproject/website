@@ -80,8 +80,7 @@ sub forums {
       };
     }
 
-    say Dumper $forum;
-    push $cache, $forum;
+    push @$cache, $forum;
   }
 
   $self->stash( forums => $cache );
@@ -158,7 +157,7 @@ sub forum_name {
     };
   }
 
-  push $cache, $forum;
+  push @$cache, $forum;
 
   $self->stash( forum => $forum );
   $self->render('support-forum');
@@ -196,7 +195,7 @@ sub topic_name {
     };
   }
 
-  push $cache, $topic;
+  push @$cache, $topic;
 
   $self->stash( topic => $topic );
   $self->render('support-forum-topic');
