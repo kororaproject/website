@@ -39,6 +39,18 @@ sub index {
   $self->render('index');
 }
 
+sub discover {
+  my $self = shift;
+
+  $self->render('discover');
+}
+
+sub download {
+  my $self = shift;
+
+  $self->render('download');
+}
+
 sub login {
   my $self = shift;
 

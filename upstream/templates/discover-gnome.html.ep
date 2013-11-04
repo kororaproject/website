@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  <title>Canvas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="/css/canvas.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'discover'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="text-center">Discover: Gnome</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="text-center">
+              <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/gnome-desktop-nautilus.jpg" alt="GNOME Desktop">
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 class="center">Simply Beautiful</h2>
+            <p>GNOME’s new desktop takes elegance to a new level. We’ve swept away the clutter and made a simple and easy-to-use desktop that’s the most beautiful version ever that includes a new visual theme, a refined new font and carefully crafted animations.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/gnome-thumb-menu.jpg" alt="GNOME Desktop">
+          </div>
+          <div class="col-sm-3">
+            <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/gnome-thumb-notification-bar.jpg" alt="GNOME Desktop">
+          </div>
+          <div class="col-sm-3">
+            <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/gnome-thumb-notification.jpg" alt="GNOME Desktop">
+          </div>
+          <div class="col-sm-3">
+            <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/gnome-thumb-dock.jpg" alt="GNOME Desktop">
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/gnome-fingertips.jpg" alt="GNOME Overview">
+          </div>
+          <div class="col-sm-6">
+            <h2>Overview at a glance</h2>
+            <p>The Activities Overview is the portal to all your computing activities. Quickly accessible using the top-left hot corner or windows key, it provides a single place to access windows, applications and even messages. The dash allows you to see which applications are currently running and the workspace switcher can be
+            used to group windows.</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h2>Everything at your fingertips</h2>
+            <p>Search is central to the GNOME desktop. Applications, windows, documents and even settings can all be quickly and easily searched for from one place. Accessing GNOME’s desktop search is as simple as pressing the super key and starting to type. This is a great feature for people who like things to happen <em>fast</em>.</p>
+          </div>
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/gnome-applications.jpg" alt="Gnome Overview">
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- SCRIPTS -->
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap.js"></script>
+  <script src="/js/bootstrap-dropdown-hover.js"></script>
+  <script src="/js/angular.js"></script>
+  <script src="/js/angular-route.js"></script>
+  <script src="/js/angular-animate.js"></script>
+  <script src="/js/canvas.js"></script>
+
+  <script>
+    $(document).ready( function() {
+      // configure korobar
+      var fixed = true;
+      var korobar = $('#korobar');
+      var page = $('.page-container');
+      var footer  = $('footer');
+
+      // banner height correction
+      var start = $('#banner').length ? 256 : 0;
+
+      if( start - $(window).scrollTop() <= 0 ) {
+        korobar.css('top', 0);
+        korobar.css('position', 'fixed');
+        fixed = true;
+      }
+      else {
+        korobar.css('position', 'absolute');
+        korobar.css('top', start + 'px');
+        fixed = false;
+      }
+
+      // pin korobar to top when it passes
+      $(window).on('scroll', function () {
+        if( !fixed && (korobar.offset().top - $(window).scrollTop() <= 0) ) {
+          korobar.css({ position: 'fixed', top: 0, });
+          fixed = true;
+        }
+        else if( fixed && $(window).scrollTop() <= start ) {
+          korobar.css({ position: 'absolute', top: start + 'px' });
+          fixed = false;
+        }
+      });
+
+      // frob page-container minimum height to at least the footer top
+      page.css({
+        'min-height': ($(window).height()-footer.outerHeight()) + 'px',
+        'margin-bottom': footer.outerHeight() + 'px'
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  <title>Canvas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="/css/canvas.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'about'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="text-center">About</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <p>Korora was born out of a desire to make Linux easier for new users, while still being useful for experts.</p>
+            <p>Originally based on Gentoo Linux in 2005, Korora was re-born in 2010 as a Fedora Remix<a href="#footnote"><sup>1</sup></a> with tweaks and extras to make the system “just work” out of the box. Why Fedora? <a href="#why-fedora">Lots of reasons!</a></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Comparison to Fedora</h2>
+            <p>Korora is a Fedora Remix, meaning it ships packages from the default Fedora repositories but also a number of other packages (often ones that Fedora cannot ship directly). We also make changes to the default system, whereas Fedora generally sticks to upstream. For new users, Fedora can be tricky because it doesn’t include many of the extras that users often need, things like media codecs and some proprietary software. This is
+            one area where Korora can help.</p>
+            <p>Ultimately, we want people just like you to become useful members of the Fedora community and we hope that trying Korora will be a catalyst for this.</p>
+            <p>For a detailed look at how Korora differs to Fedora, see <a href="#whats-inside" data-toggle="tab">What's Inside</a>.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Desktops</h2>
+            <p>Korora comes in <a href="/discover">a few installable versions</a> which include both the <a href="http://kde.org/workspaces/plasmadesktop/">KDE</a> and <a href="http://www.gnome.org/start/stable/">GNOME</a> desktops.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h3>GNOME</h3>
+            <div class="text-center">
+              <a href="/discover/gnome-desktop/">
+                <img src="http://kororaproject.org/images/web/screenshots/korora-desktop-gnome-extra-small.jpg" alt="Korora GNOME desktop" class="img-responsive">
+              </a>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <h3>KDE</h3>
+            <div class="text-center">
+              <a href="/discover/kde-desktop/">
+                <img src="http://kororaproject.org/images/web/screenshots/korora-desktop-kde-extra-small.jpg" alt="Korora KDE desktop" class="img-responsive">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Default applications</h2>
+            <p>Korora sets the default applications to those that we believe end users typically want. For example, <a href="http://www.mozilla.org/firefox">Firefox</a> is the default web browser (instead of Konqueror in KDE and Epiphany in GNOME) and <a href="http://www.videolan.org/vlc/">VLC</a> is the default media player (instead of Dragon Player in KDE and Totem in GNOME). There is generally one popular program installed for each task, although alternatives (such as the <a href="http://www.google.com/chrome/"
+             >Google Chrome</a> web browser) are available via the package manager for a quick install.</p>
+            <p>We have a licence to distribute Adobe Flash so this is now included by default.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Package repositories</h2>
+            <p>Korora also pre-configures a number of third party repositories, making it easier to install the additional software that most people uses. These include packages like:</p>
+            <ul>
+              <li>Adobe Flash</li>
+              <li>Google Chrome and Google Earth</li>
+              <li>RPMFusion</li>
+              <li>VirtualBox</li>
+            </ul>
+            <p>This means packages are available to install out-of-the-box, that would not normally be on Fedora.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Third party driver support</h2>
+            <p>Korora makes use of the <a href="https://launchpad.net/jockey">Jockey Device Driver Manager</a>, for simple installation of third party drivers such as those for NVIDIA graphics cards and certain wireless devices.</p>
+            <p>Korora also comes with all the development tools and kernel headers you need to easily install out of tree kernel modules, such as those required by VirtualBox. These modules are automatically built when you get a new kernel update thanks to Dynamic Kernel Module Support.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Goals</h2>
+            <p>Korora hopes to provide a <em>complete, easy to use system for general computing</em> which is assisted by the following:</p>
+            <ul>
+              <li>Support for as much hardware as possible</li>
+              <li>End user desired applications as defaults (e.g. Firefox over Konqueror)</li>
+              <li>Ability to play all media out of the box using free software, wherever possible</li>
+              <li>Make it easy for users to get Adobe Flash, if they want it</li>
+              <li>Target specific applications for tasks with as little bloat as possible</li>
+              <li>Provide simple means to getting support</li>
+              <li>Provide howtos, guides, on how to use the system</li>
+              <li>Build a little community of happy Linux users</li>
+            </ul>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="alert alert-warning">
+              <p><a name="footnote" href=""></a><sup>1</sup> Korora is not provided or supported by the <a href="http://fedoraproject.org/" class="alert-link">Fedora Project</a>. Official, unmodified Fedora software is available through the Fedora Project website.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+  %= include 'scripts.inc'
+
+</body>
+</html>

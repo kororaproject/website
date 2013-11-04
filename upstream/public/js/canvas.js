@@ -814,7 +814,7 @@ function PackageController($scope, CanvasNavigation, $http) {
       .success( function(data, status, headers, config) {
         $scope.data = data;
 
-//        console.log(data);
+        console.log(data);
         $scope._pageLoading = false;
       })
       .error( function(data, status, headers, config) {

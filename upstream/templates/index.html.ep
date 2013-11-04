@@ -3,11 +3,11 @@
 <head>
   <title>Canvas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap -->
-  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
-  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
-  <link href="/css/canvas.css" rel="stylesheet" media="screen">
-  <link rel="stylesheet" href="/css/layerslider.css" type="text/css">
+
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="css/canvas.css" rel="stylesheet" media="screen">
+  <link href="/css/layerslider.css" rel="stylesheet" media="screen">
 </head>
 <body>
   <noscript style="">
@@ -22,212 +22,160 @@
       </div>
     </div>
   </noscript>
+
   <div class="page-container">
-    <div ng-controller="NavigationController">
-      <div ng-show="pageActive('home')" class="banner">
-        <style type="text/css" media="screen">
-          .ls-layer,
-          .ls-layer * {
-            font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-weight: normal;
-            white-space: nowrap;
-          }
-          .l3s1, .l3s2, .l3s3 {
-            text-shadow: 0px 0px 10px white;
-            color: white;
-          }
-          .l3s1 {
-            font-size: 30px;
-          }
-          .l3s2 {
-            font-size: 60px;
-          }
-          .l3s3 {
-            font-size: 20px;
-            font-style: italic;
-          }
-          .l4s1, .l4s2, .l4s3, .l4s4 {
-            box-shadow: 0px 3px 10px -3px #002c4b;
-            background: #02cef7;
-            background: -moz-linear-gradient(top, #02cef7 0%, #009bba 100%);
-            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#02cef7), color-stop(100%,#009bba));
-            background: -webkit-linear-gradient(top, #02cef7 0%,#009bba 100%);
-            background: -o-linear-gradient(top, #02cef7 0%,#009bba 100%);
-            background: -ms-linear-gradient(top, #02cef7 0%,#009bba 100%);
-            background: linear-gradient(to bottom, #02cef7 0%,#009bba 100%);
-            text-shadow: 0px -1px 1px #00819c;
-            padding: 10px 15px 10px 15px;
-            border-top: 4px solid white;
-            font-size: 20px;
-            color: white;
-            border-radius: 7px;
-          }
-        </style>
 
-        <div id="layerslider-container">
-          <div id="layerslider" style="width: 100%; height: 256px; margin: 0px auto;">
-            <div class="ls-layer" style="slidedelay: 7200; transition2d: all; transition3d: 15;">
+    %= include 'banner.inc'
+    %= include 'navigation.inc', active => 'home'
 
-              <img src="/gallery/abyss-bg.jpg" class="ls-bg">
-              <img class="ls-s3" src="/gallery/bg-fishes-far.png" style="position: absolute; top: 186px; left: 701px; slidedirection : right; slideoutdirection : left;  durationin : 50; durationout : 11000; easingin : linear; easingout : linear; delayin : 0; delayout : 0; showuntil : 1; ">
-              <img class="ls-s3" src="/gallery/bg-fishes-far.png" style="position: absolute; top: 251px; left: 857px; slidedirection : right; slideoutdirection : left;  durationin : 50; durationout : 9000; easingin : linear; easingout : linear; delayin : 0; delayout : 0; showuntil : 1; ">
-              <img class="ls-s2" src="/gallery/bg-fishes-mid.png" style="position: absolute; top: 131px; left: 358px; slidedirection : right; slideoutdirection : left;  durationin : 3000; durationout : 3000; easingin : linear; easingout : linear; delayin : 1000; delayout : 0; showuntil : 1; ">
-              <img class="ls-s2" src="/gallery/bg-fishes-mid.png" style="position: absolute; top: 196px; left: 255px; slidedirection : right; slideoutdirection : left;  durationin : 4000; durationout : 3000; easingin : linear; easingout : linear; delayin : 1000; delayout : 0; showuntil : 1; ">
-              <img class="ls-s3" src="/gallery/abyss-bg-mask.png" style="position: absolute; top: 0px; left: 0px; slidedirection : fade; slideoutdirection : fade;  durationin : 0; durationout : 0; easingin : linear; easingout : linear; delayin : 0; delayout : 0; showuntil : 0; ">
-              <h1 class="ls-s3" style="position: absolute; top:30%; left: 50%; slidedirection : fade; slideoutdirection : fade; durationin : 2500; durationout : 2500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 0; delayout : 0; showuntil : 1; text-shadow: 0px 0px 20px white; font-weight: normal; font-size: 50px; color: white;">LayerSlider </h1>
-              <h1 class="ls-s3" style="position: absolute; top:50%; left: 50%; slidedirection : fade; slideoutdirection : fade; durationin : 2500; durationout : 2500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 500; delayout : 0; showuntil : 1; text-shadow: 0px 0px 20px white; font-weight: normal; font-size: 120px; color: white;">3D</h1>
-              <h1 class="ls-s3" style="position: absolute; top:70%; left: 50%; slidedirection : fade; slideoutdirection : fade; durationin : 2500; durationout : 2500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1200; delayout : 0; showuntil : 1; text-shadow: 0px 0px 20px white; font-weight: normal; font-size: 50px; color: white;">demo slider</h1>
-              <img class="ls-s3" src="/gallery/shark.png" style="position: absolute; top: 20px; left: 1000px; slidedirection : left; slideoutdirection : right;  durationin : 6500; durationout : 0; easingin : linear; easingout : linear; delayin : 0; delayout : 0; showuntil : 1; ">
-              <img class="ls-s2" src="/gallery/small-fish-far.png" style="position: absolute; top: 218px; left: 481px; slidedirection : right; slideoutdirection : left;  durationin : 4000; durationout : 4000; easingin : easeOutQuad; easingout : easeInExpo; delayin : 2000; delayout : 0; showuntil : 0; ">
-              <img class="ls-s2" src="/gallery/small-fish-far.png" style="position: absolute; top: 286px; left: 646px; slidedirection : right; slideoutdirection : left;  durationin : 4000; durationout : 3000; easingin : easeOutQuad; easingout : easeInExpo; delayin : 3000; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/small-fish-mid.png" style="position: absolute; top: 315px; left: 325px; slidedirection : right; slideoutdirection : left;  durationin : 4000; durationout : 4000; easingin : easeOutQuad; easingout : easeInExpo; delayin : 2500; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/small-fish-close.png" style="position: absolute; top: 143px; left: 695px; slidedirection : right; slideoutdirection : left;  durationin : 4000; durationout : 2500; easingin : easeOutQuad; easingout : easeInExpo; delayin : 3500; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/small-fish-mid.png" style="position: absolute; top: 84px; left: 458px; slidedirection : right; slideoutdirection : left;  durationin : 3000; durationout : 3000; easingin : linear; easingout : linear; delayin : 2800; delayout : 0; showuntil : 1; ">
-              <img class="ls-s5" src="/gallery/med-fish-mid.png" style="position: absolute; top: 272px; left: 685px; slidedirection : right; slideoutdirection : left;  durationin : 2000; durationout : 3000; easingin : easeOutExpo; easingout : easeInOutQuint; delayin : 3000; delayout : 0; showuntil : 1; ">
-              <img class="ls-s5" src="/gallery/med-fish-mid.png" style="position: absolute; top: 70px; left: 244px; slidedirection : right; slideoutdirection : left;  durationin : 2000; durationout : 2000; easingin : easeOutExpo; easingout : easeInExpo; delayin : 5300; delayout : 0; showuntil : 0; ">
-              <img class="ls-s6" src="/gallery/med-fish-mid.png" style="position: absolute; top: 200px; left: 196px; slidedirection : right; slideoutdirection : left;  durationin : 2000; durationout : 3000; easingin : easeOutExpo; easingout : easeInOutQuint; delayin : 4000; delayout : 0; showuntil : 1; ">
-              <img class="ls-s6" src="/gallery/med-fish-close.png" style="position: absolute; top: 246px; left: 339px; slidedirection : right; slideoutdirection : left;  durationin : 2400; durationout : 2000; easingin : easeOutExpo; easingout : easeInExpo; delayin : 5500; delayout : 0; showuntil : 0; ">
-              <img class="ls-s7" src="/gallery/big-fish-close.png" style="position: absolute; top: 12px; left: 344px; slidedirection : right; slideoutdirection : left;  durationin : 2000; durationout : 3000; easingin : easeOutCirc; easingout : easeInOutExpo; delayin : 3300; delayout : 0; showuntil : 1; ">
-              <img class="ls-s7" src="/gallery/big-fish-close.png" style="position: absolute; top: 194px; left: 454px; slidedirection : right; slideoutdirection : left;  durationin : 2000; durationout : 1700; easingin : easeOutExpo; easingout : easeInExpo; delayin : 6000; delayout : 0; showuntil : 0; ">
-
+    <div class="page-content">
+      <!-- CONTENT -->
+      <div class="container">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-12 col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-8">
+              <p>Korora aims to make Linux easier and accessible for new users, while still being useful for experts. We provide a complete, easy to use computing system that "just works" out of the box.</p>
             </div>
-
-            <div class="ls-layer" style="slidedelay: 4500; timeshift: -1000; transition2d: all; transition3d: 36;">
-
-              <img src="/gallery/3d-bg.jpg" class="ls-bg">
-              <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 20px; left: 106px; slidedirection : top; slideoutdirection : right;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 0; delayout : 0; showuntil : 1; ">
-              <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 153px; left: 342px; slidedirection : top; slideoutdirection : right;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 50; delayout : 0; showuntil : 700; ">
-              <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 276px; left: 252px; slidedirection : top; slideoutdirection : left;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 100; delayout : 0; showuntil : 400; ">
-              <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 199px; left: 585px; slidedirection : top; slideoutdirection : left;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 50; delayout : 0; showuntil : 950; ">
-              <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 37px; left: 525px; slidedirection : top; slideoutdirection : left;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 0; delayout : 0; showuntil : 250; ">
-              <img class="ls-s2" src="/gallery/sayhello.png" style="position: absolute; top: 116px; left: 86px; slidedirection : fade; slideoutdirection : fade;  durationin : 1500; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1500; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/mid-cube-blur.png" style="position: absolute; top: 190px; left: 135px; slidedirection : top; slideoutdirection : right;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 50; delayout : 0; showuntil : 100; ">
-              <img class="ls-s3" src="/gallery/mid-cube-blur.png" style="position: absolute; top: 340px; left: 322px; slidedirection : top; slideoutdirection : right;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 150; delayout : 0; showuntil : 500; ">
-              <img class="ls-s3" src="/gallery/mid-cube-blur.png" style="position: absolute; top: 398px; left: 587px; slidedirection : top; slideoutdirection : left;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 100; delayout : 0; showuntil : 300; ">
-              <img class="ls-s5" src="/gallery/big-cube.png" style="position: absolute; top: 211px; left: 16px; slidedirection : top; slideoutdirection : right;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 100; delayout : 0; showuntil : 300; ">
-              <img class="ls-s5" src="/gallery/big-cube.png" style="position: absolute; top: 251px; left: 746px; slidedirection : top; slideoutdirection : left;  durationin : 3000; durationout : 1500; easingin : easeOutElastic; easingout : easeInBack; delayin : 200; delayout : 0; showuntil : 50; ">
-
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-md-offset-2 col-md-4 col-lg-offset-2 col-lg-4">
+              <p>Want to try Korora for yourself?</p>
+              <p><a href="/download" class="btn btn-large btn-success btn-block"><i class="icon-cloud-download icon-white"></i> Download</a></p>
             </div>
-
-            <div class="ls-layer" style="slidedelay: 5600; transition2d: all; transition3d: 58, 74; ">
-
-              <img src="/gallery/autumn-bg.jpg" class="ls-bg">
-              <img class="ls-s3" src="/gallery/summer-bg.jpg" style="position: absolute; top: 0px; left: 0px; slidedirection : fade; slideoutdirection : fade;  durationin : 2500; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2500; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/s-l-1.png" style="position: absolute; top: 9px; left: 101px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2500; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/s-l-2.png" style="position: absolute; top: 210px; left: 240px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2700; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/s-l-3.png" style="position: absolute; top: 193px; left: 480px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2900; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/s-l-4.png" style="position: absolute; top: 311px; left: 623px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 3100; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/s-l-5.png" style="position: absolute; top: 407px; left: 371px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 3300; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/s-l-6.png" style="position: absolute; top: 232px; left: 392px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 3500; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/s-l-7.png" style="position: absolute; top: 190px; left: 67px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 3700; delayout : 0; showuntil : 0; ">
-              <p class="ls-s-1 l3s1" style="position: absolute; top:83px; left: 277px; slidedirection : left; slideoutdirection : left; durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1000; delayout : 0; showuntil : 2000;">To improve</p>
-              <p class="ls-s-1 l3s2" style="position: absolute; top:62px; left: 451px; slidedirection : top; slideoutdirection : top; durationin : 2000; durationout : 1500; easingin : easeOutElastic; easingout : easeInOutQuint; delayin : 1500; delayout : 0; showuntil : 500;">is</p>
-              <p class="ls-s-1 l3s1" style="position: absolute; top:83px; left: 503px; slidedirection : right; slideoutdirection : right; durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1000; delayout : 0; showuntil : 2000;">to change.</p>
-              <p class="ls-s-1 l3s1" style="position: absolute; top:137px; left: 367px; slidedirection : left; slideoutdirection : left; durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1750; delayout : 0; showuntil : 1500;">To be perfect</p>
-              <p class="ls-s-1 l3s2" style="position: absolute; top:116px; left: 555px; slidedirection : top; slideoutdirection : bottom; durationin : 1500; durationout : 1500; easingin : easeOutElastic; easingout : easeInOutQuint; delayin : 2250; delayout : 0; showuntil : 500;">is</p>
-              <p class="ls-s-1 l3s1" style="position: absolute; top:137px; left: 608px; slidedirection : right; slideoutdirection : right; durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 1750; delayout : 0; showuntil : 1500;">to change often.</p>
-              <p class="ls-s-1 l3s3" style="position: absolute; top:198px; left: 722px; slidedirection : fade; slideoutdirection : fade; durationin : 1000; durationout : 1500; easingin : easeInOutQuint; easingout : easeInOutQuint; delayin : 2500; delayout : 0; showuntil : 1000;">- Winston Churchill</p>
-
+            <div class="col-sm-6 col-md-4 col-lg-4">
+              <p>Minimum installation requirements:</p>
+              <ul class="icons-ul">
+                <li><i class="icon-li icon-check"></i>32-bit Intel-compatible PC</li>
+                <li><i class="icon-li icon-check"></i>1GB memory (RAM)</li>
+                <li><i class="icon-li icon-check"></i>10GB disk space / storage</li>
+              </ul>
             </div>
-
-            <div class="ls-layer" style="slidedelay: 10050; transition2d: all; transition3d: 68,69,77,78;">
-              <img src="/gallery/cubes-bg.jpg" class="ls-bg">
-              <img class="ls-s3" src="/gallery/cubes-blur.jpg" style="position: absolute; top: 0px; left: 0px; slidedirection : fade; slideoutdirection : fade;  durationin : 1000; durationout : 1000; easingin : easeInOutQuad; easingout : easeInOutQuad; delayin : 0; delayout : 0; showuntil : 0; ">
-              <img class="ls-s3" src="/gallery/tile-1.png" style="position: absolute; top: 0px; left: 0px; slidedirection : top; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 500; delayout : 0; showuntil : 5700; ">
-              <img class="ls-s3" src="/gallery/tile-2.png" style="position: absolute; top: 0px; left: 0px; slidedirection : right; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 600; delayout : 0; showuntil : 5100; ">
-              <img class="ls-s3" src="/gallery/tile-3.png" style="position: absolute; top: 0px; left: 0px; slidedirection : bottom; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 700; delayout : 0; showuntil : 5200; ">
-              <img class="ls-s3" src="/gallery/tile-4.png" style="position: absolute; top: 0px; left: 0px; slidedirection : left; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 800; delayout : 0; showuntil : 5500; ">
-              <img class="ls-s3" src="/gallery/tile-5.png" style="position: absolute; top: 0px; left: 0px; slidedirection : top; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 900; delayout : 0; showuntil : 5500; ">
-              <img class="ls-s3" src="/gallery/tile-6.png" style="position: absolute; top: 0px; left: 0px; slidedirection : right; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 1000; delayout : 0; showuntil : 4600; ">
-              <img class="ls-s3" src="/gallery/tile-7.png" style="position: absolute; top: 0px; left: 0px; slidedirection : bottom; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 1100; delayout : 0; showuntil : 5100; ">
-              <img class="ls-s3" src="/gallery/tile-8.png" style="position: absolute; top: 0px; left: 0px; slidedirection : left; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 1200; delayout : 0; showuntil : 4800; ">
-              <img class="ls-s3" src="/gallery/tile-9.png" style="position: absolute; top: 0px; left: 0px; slidedirection : top; slideoutdirection : left;  durationin : 2500; durationout : 1500; easingin : easeOutBack; easingout : easeInOutQuint; delayin : 1300; delayout : 0; showuntil : 4500; ">
-              <p class="ls-s3 l4s1" style="position: absolute; top:45px; left: 30px; slidedirection : top; slideoutdirection : fade; durationin : 1000; durationout : 1000; easingin : easeOutExpo; easingout : easeInQuart; delayin : 1500; delayout : 0; showuntil : 2000; rotatein : -120; scaleout : .5;">200+ 2D &amp; 2D transitions or create your custom!</p>
-              <p class="ls-s3 l4s2" style="position: absolute; top:360px; left: 450px; slidedirection : bottom; slideoutdirection : fade; durationin : 1000; durationout : 1000; easingin : easeOutExpo; easingout : easeInQuart; delayin : 3000; delayout : 0; showuntil : 2000; rotatein : -120; scaleout : .5;">Use with any HTML content including embedded videos!</p>
-              <p class="ls-s3 l4s3" style="position: absolute; top:100px; left: 505px; slidedirection : right; slideoutdirection : fade; durationin : 1000; durationout : 1000; easingin : easeOutExpo; easingout : easeInQuart; delayin : 4500; delayout : 0; showuntil : 2000;rotatein : 120; scaleout : .5;">Responsive with Smart Resize &amp; Touch-enabled!</p>
-              <p class="ls-s3 l4s4" style="position: absolute; top:400px; left: 10px; slidedirection : left; slideoutdirection : fade; durationin : 1000; durationout : 1000; easingin : easeOutExpo; easingout : easeInQuart; delayin : 6000; delayout : 0; showuntil : 2000;rotatein : 120; scaleout : .5;">Unlimited possibilities of usage!</p>
-
+          </div>
+          <div class="row">
+            <div class="col-img-leader col-img-leader-innovation col-sm-12 col-md-8 col-md-offset-2">
+              <h1>Innovation</h1>
+              <p>Built on a strong foundation, Korora is a Fedora Remix that aims to make Linux easier for new users, while still being useful for experts. We provide a complete, easy to use computing system that “just works” out of the box.</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-img-leader col-img-leader-community col-sm-12 col-md-8 col-md-offset-2">
+              <h1>Community</h1>
+              <p>The Korora community drives the Korora is developed to meet the community's expectations.</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-img-leader col-img-leader-security col-sm-12 col-md-8 col-md-offset-2">
+              <h1>Security</h1>
+              <p>Linux is already well-known for being strong on security. We have security as a top priority in everything we do, starting with the inclusion of Security-Enhanced Linux (SELinux). SELinux implements security policies including mandatory access controls.</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-img-leader col-img-leader-choice col-sm-12 col-md-8 col-md-offset-2">
+              <h1>Choice</h1>
+              <p>Korora is a Fedora Remix that aims to make Linux easier for new users, while still being useful for experts. We provide a complete, easy to use computing system that “just works” out of the box.</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-img-leader col-img-leader-open-source col-sm-12 col-md-8 col-md-offset-2">
+              <h1>Free</h1>
+              <p>Korora is 100% free. Copy and distribute as you see fit. In fact, we encourage it. The full source to all of our packages are available on <a href="https://github.com/kororaproject">GitHub</a>.</p>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- navigation -->
-      <nav id="korobar" class="navbar navbar-default" role="navigation">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-primary-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <div class="navbar-brand" ng-class="{'kp-logo-48': isMode('default'), 'canvas-logo-48': isMode('canvas')}"></div>
-        </div>
-
-        <!-- navigation content for toggling -->
-        <div class="collapse navbar-collapse navbar-primary-collapse" ng-switch on="modeActive()">
-          <ul class="nav navbar-nav" ng-switch-when="default">
-            <li class="nav-home" ng-class="pageActive('home')"><a href="/">Home</a></li>
-            <li ng-class="pageActive('about')"><a href="/about">About</a></li>
-            <li ng-class="pageActive('discover')"><a href="/discover">Discover</a></li>
-            <li ng-class="pageActive('support')"><a href="/support">Support</a></li>
-            <li ng-class="pageActive('download')"><a href="/download">Download</a></li>
-            <li ng-class="pageActive('news')"><a href="/news">News</a></li>
-            <li ng-class="pageActive('canvas')"><a href="/canvas">Canvas</a></li>
-          </ul>
-          <ul class="nav navbar-nav" ng-switch-when="canvas">
-            <li class="nav-home" ng-class="pageActive('home')"><a href="/">Home</a></li>
-            <li ng-class="pageActive('canvas-dashboard')"><a href="/canvas">Dashboard</a></li>
-            <li ng-class="pageActive('canvas-templates')"><a href="/canvas/templates">Templates</a></li>
-            <li ng-class="pageActive('canvas-packages')"><a href="/canvas/packages">Packages</a></li>
-            <li ng-class="pageActive('canvas-repositories')"><a href="/canvas/repositories">Repositories</a></li>
-            <li ng-class="pageActive('updates')"><a href="/canvas/updates">Updates</a></li>
-            <li ng-class="pageActive('downloads')"><a href="/canvas/downloads">Downloads</a></li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right hide">
-            <li class="dropdown">
-              <a href="" class="dropdown-toggle" data-toggle="dropdown">user <b class="caret"></b></a>
-              <ul class="dropdown-menu" role="menu">
-                <li><a href="/">Settings</a></li>
-                <li><a href="/deauthenticate">Logout</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </nav>
-    </div>
-
-    <div class="page-content">
-      <div ng-view></div>
+      <!-- END CONTENT -->
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-8 col-md-8 col-lg-8">
-          <p class="copyright">Derived from  <a href="http://www.fedoraproject.org">Fedora</a> | Powered by  <a href="http://en.wiktionary.org/wiki/freedom">Freedom</a>, <a href="http://en.wiktionary.org/wiki/dedication">Dedication</a> and the pursuit of <a href="http://en.wiktionary.org/wiki/perfection">Perfection</a></p>
-        </div>
-        <div class="col-sm-4 col-md-4 col-lg-4">
-          <div id="social" class="pull-right">
-            <a href="https://plus.google.com/u/0/113276359756252515026"><img class="img-bumper" src="../img/social-google.png"></a>
-            <a href="http://facebook.com/kororaproject"><img class="img-bumper" src="../img/social-facebook.png"></a>
-            <a href="http://identi.ca/kororaproject"><img class="img-bumper" src="../img/social-identica.png"></a>
-            <a href="http://twitter.com/#!/kororaproject"><img class="img-bumper" src="../img/social-twitter.png"></a>
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="/authenticate" method="post" class="form-signin" role="form">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Log In</h4>
           </div>
-        </div>
-      </div>
-    </div>
-  </footer>
+          <div class="modal-body">
+            <div class="form-group">
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                <input name="u" type="text" class="form-control" placeholder="username">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                <input name="p" type="password" class="form-control" placeholder="password">
+              </div>
+            </div>
+            <div class="form-group">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button class="btn btn-large btn-primary" type="submit">Sign In</button>
+          </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 
 
+  <!-- SCRIPTS -->
   <script src="/js/jquery.js"></script>
   <script src="/js/bootstrap.js"></script>
+  <script src="/js/bootstrap-dropdown-hover.js"></script>
   <script src="/js/angular.js"></script>
-  <script src="/js/angular-animate.js"></script>
   <script src="/js/angular-route.js"></script>
+  <script src="/js/angular-animate.js"></script>
   <script src="/js/canvas.js"></script>
+
+  <script>
+    $(document).ready( function() {
+      // configure korobar
+      var fixed = true;
+      var korobar = $('#korobar');
+      var page = $('.page-container');
+      var footer  = $('footer');
+
+      // banner height correction
+      var start = $('#banner').length ? 256 : 0;
+
+      if( start - $(window).scrollTop() <= 0 ) {
+        korobar.css('top', 0);
+        korobar.css('position', 'fixed');
+        fixed = true;
+      }
+      else {
+        korobar.css('position', 'absolute');
+        korobar.css('top', start + 'px');
+        fixed = false;
+      }
+
+      // pin korobar to top when it passes
+      $(window).on('scroll', function () {
+        if( !fixed && (korobar.offset().top - $(window).scrollTop() <= 0) ) {
+          korobar.css({ position: 'fixed', top: 0, });
+          fixed = true;
+        }
+        else if( fixed && $(window).scrollTop() <= start ) {
+          korobar.css({ position: 'absolute', top: start + 'px' });
+          fixed = false;
+        }
+      });
+
+      // frob page-container minimum height to at least the footer top
+      page.css({
+        'min-height': ($(window).height()-footer.outerHeight()) + 'px',
+        'margin-bottom': footer.outerHeight() + 'px'
+      });
+    });
+  </script>
 
 
   <!-- layerslider -->

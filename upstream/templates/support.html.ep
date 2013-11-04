@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  <title>Canvas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="/css/canvas.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'support'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="text-center">Support</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <p>We do hope that you won't run into any problems with Korora, however no system is perfect!</p>
+
+            <h2>Forums</h2>
+            <p>There are lots of ways to get help. Perhaps the best method, and certainly the one we recommend you try first, is via our <a href="/support/forums">forums</a>.</p>
+
+            <h2>Social</h2>
+            <p>We are also ready and waiting on IRC, identi.ca, Twitter, Facebook and Google+.</p>
+            <p>You can also find us on the following networks:
+
+            <ul>
+              <li>IRC: Join us on the #korora IRC channel on irc.freenode.net server.</li>
+              <li>Identi.ca: Follow us on kororaproject@identi.ca, or join the korora@identi.ca group.</li>
+              <li>Twitter: @kororaproject</li>
+              <li>Facebook: kororaproject</li>
+              <li>Google+: kororaproject</li>
+            </ul>
+            <div class="callout callout-info">
+              <p>If you're specifically after Fedora assistance, perhaps try their <a href="https://fedoraforumorg">community forums</a>, <a href="https://admin.fedoraproject.org/mailman/listinfo/users">official user mailing list</a>, or their #fedora IRC channel on irc.freenode.net.</p>
+              <p>Fedora Remixes are a valid component of the Fedora ecosystem. As always, remember to be nice.</p>
+            </div>
+
+            <h2>Bugs and suggestions</h2>
+            <p>If you've found a bug or have a suggestion, please post it on our <a href="https://github.com/kororaproject/kp/issues/">GitHub issues page</a> or let us know in our <a href="/support/forums">forums</a>.
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+  %= include 'scripts.inc'
+
+</body>
+</html>

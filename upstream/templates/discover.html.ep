@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  <title>Canvas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="css/canvas.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="text-center">Discover</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <p>Korora currently comes with the choice of two desktops, both available in 64-bit (x86_64) and 32-bit (i686):</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4 col-sm-offset-1 col-md-4 col-md-offset-1">
+            <h3>GNOME</h3>
+            <div class="text-center">
+              <a href="/discover/gnome-desktop/">
+                <img class="img-responsive" alt="Korora GNOME desktop" src="https://kororaproject.org/images/web/screenshots/korora-desktop-gnome-extra-small.jpg">
+              </a>
+            </div>
+          </div>
+          <div class="col-sm-4 col-sm-offset-1">
+            <h3>KDE</h3>
+            <div class="text-center">
+              <a href="/discover/kde-desktop/">
+                <img class="img-responsive" alt="Korora KDE desktop" src="https://kororaproject.org/images/web/screenshots/korora-desktop-kde-extra-small.jpg">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <p>Both versions are similarly focused, being aimed at making Linux easier to use and pre-configuring the system for end users. As such, they both include:</p>
+            <ul class="icons-ul">
+              <li><i class="icon-li icon-check"></i>Tweaked desktops (enabled GNOME extensions and desktop, cleaned KDE menus, desktop cache files under ramfs, alerts when commands complete and much more..)</li>
+              <li><i class="icon-li icon-check"></i>Third party repositories such as Adobe, Chrome, RPMFusion<a href="#footnote"><sup>1</sup></a> and VirtualBox</li>
+              <li><i class="icon-li icon-check"></i>Firefox as the default web browser (with integration theme for KDE)</li>
+              <li><i class="icon-li icon-check"></i>Firefox extensions included (Adblock Plus, DownThemAll, Flashblock, Xclear)</li>
+              <li><i class="icon-li icon-check"></i>Microblogging client (Choqok for KDE, Gwibber for GNOME)</li>
+              <li><i class="icon-li icon-check"></i>Full multimedia support, including Adobe Flash plugin</li>
+              <li><i class="icon-li icon-check"></i>Jockey device manager to handle drivers such as NVIDIA and wireless</li>
+              <li><i class="icon-li icon-check"></i>Video editor (Kdenlive for KDE, OpenShot for GNOME)</li>
+              <li><i class="icon-li icon-check"></i>VLC as the default media player</li>
+              <li><i class="icon-li icon-check"></i>SELinux enabled (particularly worthwhile for Flash)</li>
+              <li><i class="icon-li icon-check"></i>and more..</li>
+            </ul>
+            <p>The Korora system includes applications for many common desktop computing tasks. As such is much larger than a regular live CD and should be booted using DVD disks or USB drives for installation.</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="alert alert-warning">
+              <p><a name="footnote" href=""></a><sup>1</sup> RPMFusion provides software that the Fedora Project doesn’t want to ship, such as support for MP3s and proprietary video drivers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- SCRIPTS -->
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap.js"></script>
+  <script src="/js/bootstrap-dropdown-hover.js"></script>
+  <script src="/js/angular.js"></script>
+  <script src="/js/angular-route.js"></script>
+  <script src="/js/angular-animate.js"></script>
+  <script src="/js/canvas.js"></script>
+
+  <script>
+    $(document).ready( function() {
+      // configure korobar
+      var fixed = true;
+      var korobar = $('#korobar');
+      var page = $('.page-container');
+      var footer  = $('footer');
+
+      // banner height correction
+      var start = $('#banner').length ? 256 : 0;
+
+      if( start - $(window).scrollTop() <= 0 ) {
+        korobar.css('top', 0);
+        korobar.css('position', 'fixed');
+        fixed = true;
+      }
+      else {
+        korobar.css('position', 'absolute');
+        korobar.css('top', start + 'px');
+        fixed = false;
+      }
+
+      // pin korobar to top when it passes
+      $(window).on('scroll', function () {
+        if( !fixed && (korobar.offset().top - $(window).scrollTop() <= 0) ) {
+          korobar.css({ position: 'fixed', top: 0, });
+          fixed = true;
+        }
+        else if( fixed && $(window).scrollTop() <= start ) {
+          korobar.css({ position: 'absolute', top: start + 'px' });
+          fixed = false;
+        }
+      });
+
+      // frob page-container minimum height to at least the footer top
+      page.css({
+        'min-height': ($(window).height()-footer.outerHeight()) + 'px',
+        'margin-bottom': footer.outerHeight() + 'px'
+      });
+    });
+  </script>
+</body>
+</html>

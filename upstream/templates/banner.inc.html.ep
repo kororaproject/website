@@ -1,0 +1,138 @@
+<!-- BANNER -->
+<div id="banner">
+  <style type="text/css" media="screen">
+    .ls-layer,
+    .ls-layer * {
+      font-weight: normal;
+      white-space: nowrap;
+    }
+    .l3s1, .l3s2, .l3s3 {
+      text-shadow: 0px 0px 10px white;
+      color: white;
+    }
+    .l1s1 {
+      font-size: 64px;
+    }
+
+    .l3s1 {
+      font-size: 30px;
+    }
+    .l3s2 {
+      font-size: 60px;
+    }
+    .l3s3 {
+      font-size: 20px;
+      font-style: italic;
+    }
+    .l4s1, .l4s2, .l4s3, .l4s4 {
+      box-shadow: 0px 3px 10px -3px #002c4b;
+      background: #02cef7;
+      background: -moz-linear-gradient(top, #02cef7 0%, #009bba 100%);
+      background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#02cef7), color-stop(100%,#009bba));
+      background: -webkit-linear-gradient(top, #02cef7 0%,#009bba 100%);
+      background: -o-linear-gradient(top, #02cef7 0%,#009bba 100%);
+      background: -ms-linear-gradient(top, #02cef7 0%,#009bba 100%);
+      background: linear-gradient(to bottom, #02cef7 0%,#009bba 100%);
+      text-shadow: 0px -1px 1px #00819c;
+      padding: 10px 15px 10px 15px;
+      border-top: 4px solid white;
+      font-size: 20px;
+      color: white;
+      border-radius: 7px;
+    }
+  </style>
+
+  <div id="layerslider-container">
+    <div id="layerslider" style="width: 100%; height: 256px; margin: 0px auto;">
+      <div class="ls-layer" style="slidedelay: 8000; transition2d: all; transition3d: 15;">
+        <img src="/img/bg-banner.jpg" class="ls-bg">
+        <img class="ls-s3" src="/gallery/bg-fishes-far.png" style="position: absolute; top: 186px; left: 701px; slidedirection: right; slideoutdirection: left;  durationin: 50; durationout: 11000; easingin: linear; easingout: linear; delayin: 0; delayout: 0; showuntil: 1; ">
+        <img class="ls-s7" src="/gallery/big-fish-close.png" style="position: absolute; top: 194px; left: 454px; slidedirection: right; slideoutdirection: left;  durationin: 2000; durationout: 1700; easingin: easeOutExpo; easingout: easeInExpo; delayin: 6000; delayout: 0; showuntil: 0; ">
+
+        <h1 class="ls-s-1 l1s1" style="position: absolute; top: 50%; left: 50%; slidedirection: fade; slideoutdirection: fade; durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 1000; delayout: 0; showuntil: 8000;">KORORA<span>PROJECT</span></h1>
+      </div>
+
+      <div class="ls-layer" style="slidedelay: 7200; transition2d: all; transition3d: 15;">
+        <img src="/img/bg-banner2.jpg" class="ls-bg">
+        <img class="ls-s3" src="/gallery/bg-fishes-far.png" style="position: absolute; top: 186px; left: 701px; slidedirection: right; slideoutdirection: left;  durationin: 50; durationout: 11000; easingin: linear; easingout: linear; delayin: 0; delayout: 0; showuntil: 1; ">
+        <img class="ls-s3" src="/gallery/bg-fishes-far.png" style="position: absolute; top: 251px; left: 857px; slidedirection: right; slideoutdirection: left;  durationin: 50; durationout: 9000; easingin: linear; easingout: linear; delayin: 0; delayout: 0; showuntil: 1; ">
+        <img class="ls-s2" src="/gallery/bg-fishes-mid.png" style="position: absolute; top: 131px; left: 358px; slidedirection: right; slideoutdirection: left;  durationin: 3000; durationout: 3000; easingin: linear; easingout: linear; delayin: 1000; delayout: 0; showuntil: 1; ">
+        <img class="ls-s2" src="/gallery/bg-fishes-mid.png" style="position: absolute; top: 196px; left: 255px; slidedirection: right; slideoutdirection: left;  durationin: 4000; durationout: 3000; easingin: linear; easingout: linear; delayin: 1000; delayout: 0; showuntil: 1; ">
+        <img class="ls-s3" src="/gallery/abyss-bg-mask.png" style="position: absolute; top: 0px; left: 0px; slidedirection: fade; slideoutdirection: fade;  durationin: 0; durationout: 0; easingin: linear; easingout: linear; delayin: 0; delayout: 0; showuntil: 0; ">
+        <h1 class="ls-s3" style="position: absolute; top:30%; left: 50%; slidedirection: fade; slideoutdirection: fade; durationin: 2500; durationout: 2500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 0; delayout: 0; showuntil: 1; text-shadow: 0px 0px 20px white; font-weight: normal; font-size: 50px; color: white;">LayerSlider </h1>
+        <h1 class="ls-s3" style="position: absolute; top:50%; left: 50%; slidedirection: fade; slideoutdirection: fade; durationin: 2500; durationout: 2500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 500; delayout: 0; showuntil: 1; text-shadow: 0px 0px 20px white; font-weight: normal; font-size: 120px; color: white;">3D</h1>
+        <h1 class="ls-s3" style="position: absolute; top:70%; left: 50%; slidedirection: fade; slideoutdirection: fade; durationin: 2500; durationout: 2500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 1200; delayout: 0; showuntil: 1; text-shadow: 0px 0px 20px white; font-weight: normal; font-size: 50px; color: white;">demo slider</h1>
+        <img class="ls-s3" src="/gallery/shark.png" style="position: absolute; top: 20px; left: 1000px; slidedirection: left; slideoutdirection: right;  durationin: 6500; durationout: 0; easingin: linear; easingout: linear; delayin: 0; delayout: 0; showuntil: 1; ">
+        <img class="ls-s2" src="/gallery/small-fish-far.png" style="position: absolute; top: 218px; left: 481px; slidedirection: right; slideoutdirection: left;  durationin: 4000; durationout: 4000; easingin: easeOutQuad; easingout: easeInExpo; delayin: 2000; delayout: 0; showuntil: 0; ">
+        <img class="ls-s2" src="/gallery/small-fish-far.png" style="position: absolute; top: 286px; left: 646px; slidedirection: right; slideoutdirection: left;  durationin: 4000; durationout: 3000; easingin: easeOutQuad; easingout: easeInExpo; delayin: 3000; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/small-fish-mid.png" style="position: absolute; top: 315px; left: 325px; slidedirection: right; slideoutdirection: left;  durationin: 4000; durationout: 4000; easingin: easeOutQuad; easingout: easeInExpo; delayin: 2500; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/small-fish-close.png" style="position: absolute; top: 143px; left: 695px; slidedirection: right; slideoutdirection: left;  durationin: 4000; durationout: 2500; easingin: easeOutQuad; easingout: easeInExpo; delayin: 3500; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/small-fish-mid.png" style="position: absolute; top: 84px; left: 458px; slidedirection: right; slideoutdirection: left;  durationin: 3000; durationout: 3000; easingin: linear; easingout: linear; delayin: 2800; delayout: 0; showuntil: 1; ">
+        <img class="ls-s5" src="/gallery/med-fish-mid.png" style="position: absolute; top: 272px; left: 685px; slidedirection: right; slideoutdirection: left;  durationin: 2000; durationout: 3000; easingin: easeOutExpo; easingout: easeInOutQuint; delayin: 3000; delayout: 0; showuntil: 1; ">
+        <img class="ls-s5" src="/gallery/med-fish-mid.png" style="position: absolute; top: 70px; left: 244px; slidedirection: right; slideoutdirection: left;  durationin: 2000; durationout: 2000; easingin: easeOutExpo; easingout: easeInExpo; delayin: 5300; delayout: 0; showuntil: 0; ">
+        <img class="ls-s6" src="/gallery/med-fish-mid.png" style="position: absolute; top: 200px; left: 196px; slidedirection: right; slideoutdirection: left;  durationin: 2000; durationout: 3000; easingin: easeOutExpo; easingout: easeInOutQuint; delayin: 4000; delayout: 0; showuntil: 1; ">
+        <img class="ls-s6" src="/gallery/med-fish-close.png" style="position: absolute; top: 246px; left: 339px; slidedirection: right; slideoutdirection: left;  durationin: 2400; durationout: 2000; easingin: easeOutExpo; easingout: easeInExpo; delayin: 5500; delayout: 0; showuntil: 0; ">
+        <img class="ls-s7" src="/gallery/big-fish-close.png" style="position: absolute; top: 12px; left: 344px; slidedirection: right; slideoutdirection: left;  durationin: 2000; durationout: 3000; easingin: easeOutCirc; easingout: easeInOutExpo; delayin: 3300; delayout: 0; showuntil: 1; ">
+        <img class="ls-s7" src="/gallery/big-fish-close.png" style="position: absolute; top: 194px; left: 454px; slidedirection: right; slideoutdirection: left;  durationin: 2000; durationout: 1700; easingin: easeOutExpo; easingout: easeInExpo; delayin: 6000; delayout: 0; showuntil: 0; ">
+
+      </div>
+
+      <div class="ls-layer" style="slidedelay: 4500; timeshift: -1000; transition2d: all; transition3d: 36;">
+        <img src="/img/bg-banner3.jpg" class="ls-bg">
+        <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 20px; left: 106px; slidedirection: top; slideoutdirection: right;  durationin: 3000; durationout: 1500; easingin: easeOutElastic; easingout: easeInBack; delayin: 0; delayout: 0; showuntil: 1; ">
+        <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 153px; left: 342px; slidedirection: top; slideoutdirection: right;  durationin: 3000; durationout: 1500; easingin: easeOutElastic; easingout: easeInBack; delayin: 50; delayout: 0; showuntil: 700; ">
+        <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 276px; left: 252px; slidedirection: top; slideoutdirection: left;  durationin: 3000; durationout: 1500; easingin: easeOutElastic; easingout: easeInBack; delayin: 100; delayout: 0; showuntil: 400; ">
+        <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 199px; left: 585px; slidedirection: top; slideoutdirection: left;  durationin: 3000; durationout: 1500; easingin: easeOutElastic; easingout: easeInBack; delayin: 50; delayout: 0; showuntil: 950; ">
+        <img class="ls-s2" src="/gallery/small-cube-blur.png" style="position: absolute; top: 37px; left: 525px; slidedirection: top; slideoutdirection: left;  durationin: 3000; durationout: 1500; easingin: easeOutElastic; easingout: easeInBack; delayin: 0; delayout: 0; showuntil: 250; ">
+        <img class="ls-s2" src="/gallery/sayhello.png" style="position: absolute; top: 116px; left: 86px; slidedirection: fade; slideoutdirection: fade;  durationin: 1500; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 1500; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/mid-cube-blur.png" style="position: absolute; top: 190px; left: 135px; slidedirection: top; slideoutdirection: right;  durationin: 3000; durationout: 1500; easingin: easeOutElastic; easingout: easeInBack; delayin: 50; delayout: 0; showuntil: 100; ">
+        <img class="ls-s3" src="/gallery/mid-cube-blur.png" style="position: absolute; top: 340px; left: 322px; slidedirection: top; slideoutdirection: right;  durationin: 3000; durationout: 1500; easingin: easeOutElastic; easingout: easeInBack; delayin: 150; delayout: 0; showuntil: 500; ">
+        <img class="ls-s3" src="/gallery/mid-cube-blur.png" style="position: absolute; top: 398px; left: 587px; slidedirection: top; slideoutdirection: left;  durationin: 3000; durationout: 1500; easingin: easeOutElastic; easingout: easeInBack; delayin: 100; delayout: 0; showuntil: 300; ">
+        <img class="ls-s5" src="/gallery/big-cube.png" style="position: absolute; top: 211px; left: 16px; slidedirection: top; slideoutdirection: right;  durationin: 3000; durationout: 1500; easingin: easeOutElastic; easingout: easeInBack; delayin: 100; delayout: 0; showuntil: 300; ">
+        <img class="ls-s5" src="/gallery/big-cube.png" style="position: absolute; top: 251px; left: 746px; slidedirection: top; slideoutdirection: left;  durationin: 3000; durationout: 1500; easingin: easeOutElastic; easingout: easeInBack; delayin: 200; delayout: 0; showuntil: 50; ">
+
+      </div>
+
+      <div class="ls-layer" style="slidedelay: 5600; transition2d: all; transition3d: 58, 74; ">
+
+        <img src="/img/bg-banner4.jpg" class="ls-bg">
+        <img class="ls-s3" src="/gallery/summer-bg.jpg" style="position: absolute; top: 0px; left: 0px; slidedirection: fade; slideoutdirection: fade;  durationin: 2500; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 2500; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/s-l-1.png" style="position: absolute; top: 9px; left: 101px; slidedirection: fade; slideoutdirection: fade;  durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 2500; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/s-l-2.png" style="position: absolute; top: 210px; left: 240px; slidedirection: fade; slideoutdirection: fade;  durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 2700; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/s-l-3.png" style="position: absolute; top: 193px; left: 480px; slidedirection: fade; slideoutdirection: fade;  durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 2900; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/s-l-4.png" style="position: absolute; top: 311px; left: 623px; slidedirection: fade; slideoutdirection: fade;  durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 3100; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/s-l-5.png" style="position: absolute; top: 407px; left: 371px; slidedirection: fade; slideoutdirection: fade;  durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 3300; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/s-l-6.png" style="position: absolute; top: 232px; left: 392px; slidedirection: fade; slideoutdirection: fade;  durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 3500; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/s-l-7.png" style="position: absolute; top: 190px; left: 67px; slidedirection: fade; slideoutdirection: fade;  durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 3700; delayout: 0; showuntil: 0; ">
+        <p class="ls-s-1 l3s1" style="position: absolute; top:83px; left: 277px; slidedirection: left; slideoutdirection: left; durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 1000; delayout: 0; showuntil: 2000;">To improve</p>
+        <p class="ls-s-1 l3s2" style="position: absolute; top:62px; left: 451px; slidedirection: top; slideoutdirection: top; durationin: 2000; durationout: 1500; easingin: easeOutElastic; easingout: easeInOutQuint; delayin: 1500; delayout: 0; showuntil: 500;">is</p>
+        <p class="ls-s-1 l3s1" style="position: absolute; top:83px; left: 503px; slidedirection: right; slideoutdirection: right; durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 1000; delayout: 0; showuntil: 2000;">to change.</p>
+        <p class="ls-s-1 l3s1" style="position: absolute; top:137px; left: 367px; slidedirection: left; slideoutdirection: left; durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 1750; delayout: 0; showuntil: 1500;">To be perfect</p>
+        <p class="ls-s-1 l3s2" style="position: absolute; top:116px; left: 555px; slidedirection: top; slideoutdirection: bottom; durationin: 1500; durationout: 1500; easingin: easeOutElastic; easingout: easeInOutQuint; delayin: 2250; delayout: 0; showuntil: 500;">is</p>
+        <p class="ls-s-1 l3s1" style="position: absolute; top:137px; left: 608px; slidedirection: right; slideoutdirection: right; durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 1750; delayout: 0; showuntil: 1500;">to change often.</p>
+        <p class="ls-s-1 l3s3" style="position: absolute; top:198px; left: 722px; slidedirection: fade; slideoutdirection: fade; durationin: 1000; durationout: 1500; easingin: easeInOutQuint; easingout: easeInOutQuint; delayin: 2500; delayout: 0; showuntil: 1000;">- Winston Churchill</p>
+
+      </div>
+
+      <div class="ls-layer" style="slidedelay: 10050; transition2d: all; transition3d: 68,69,77,78;">
+        <img src="/gallery/cubes-bg.jpg" class="ls-bg">
+        <img class="ls-s3" src="/gallery/cubes-blur.jpg" style="position: absolute; top: 0px; left: 0px; slidedirection: fade; slideoutdirection: fade;  durationin: 1000; durationout: 1000; easingin: easeInOutQuad; easingout: easeInOutQuad; delayin: 0; delayout: 0; showuntil: 0; ">
+        <img class="ls-s3" src="/gallery/tile-1.png" style="position: absolute; top: 0px; left: 0px; slidedirection: top; slideoutdirection: left;  durationin: 2500; durationout: 1500; easingin: easeOutBack; easingout: easeInOutQuint; delayin: 500; delayout: 0; showuntil: 5700; ">
+        <img class="ls-s3" src="/gallery/tile-2.png" style="position: absolute; top: 0px; left: 0px; slidedirection: right; slideoutdirection: left;  durationin: 2500; durationout: 1500; easingin: easeOutBack; easingout: easeInOutQuint; delayin: 600; delayout: 0; showuntil: 5100; ">
+        <img class="ls-s3" src="/gallery/tile-3.png" style="position: absolute; top: 0px; left: 0px; slidedirection: bottom; slideoutdirection: left;  durationin: 2500; durationout: 1500; easingin: easeOutBack; easingout: easeInOutQuint; delayin: 700; delayout: 0; showuntil: 5200; ">
+        <img class="ls-s3" src="/gallery/tile-4.png" style="position: absolute; top: 0px; left: 0px; slidedirection: left; slideoutdirection: left;  durationin: 2500; durationout: 1500; easingin: easeOutBack; easingout: easeInOutQuint; delayin: 800; delayout: 0; showuntil: 5500; ">
+        <img class="ls-s3" src="/gallery/tile-5.png" style="position: absolute; top: 0px; left: 0px; slidedirection: top; slideoutdirection: left;  durationin: 2500; durationout: 1500; easingin: easeOutBack; easingout: easeInOutQuint; delayin: 900; delayout: 0; showuntil: 5500; ">
+        <img class="ls-s3" src="/gallery/tile-6.png" style="position: absolute; top: 0px; left: 0px; slidedirection: right; slideoutdirection: left;  durationin: 2500; durationout: 1500; easingin: easeOutBack; easingout: easeInOutQuint; delayin: 1000; delayout: 0; showuntil: 4600; ">
+        <img class="ls-s3" src="/gallery/tile-7.png" style="position: absolute; top: 0px; left: 0px; slidedirection: bottom; slideoutdirection: left;  durationin: 2500; durationout: 1500; easingin: easeOutBack; easingout: easeInOutQuint; delayin: 1100; delayout: 0; showuntil: 5100; ">
+        <img class="ls-s3" src="/gallery/tile-8.png" style="position: absolute; top: 0px; left: 0px; slidedirection: left; slideoutdirection: left;  durationin: 2500; durationout: 1500; easingin: easeOutBack; easingout: easeInOutQuint; delayin: 1200; delayout: 0; showuntil: 4800; ">
+        <img class="ls-s3" src="/gallery/tile-9.png" style="position: absolute; top: 0px; left: 0px; slidedirection: top; slideoutdirection: left;  durationin: 2500; durationout: 1500; easingin: easeOutBack; easingout: easeInOutQuint; delayin: 1300; delayout: 0; showuntil: 4500; ">
+        <p class="ls-s3 l4s1" style="position: absolute; top:45px; left: 30px; slidedirection: top; slideoutdirection: fade; durationin: 1000; durationout: 1000; easingin: easeOutExpo; easingout: easeInQuart; delayin: 1500; delayout: 0; showuntil: 2000; rotatein: -120; scaleout: .5;">200+ 2D &amp; 2D transitions or create your custom!</p>
+        <p class="ls-s3 l4s2" style="position: absolute; top:360px; left: 450px; slidedirection: bottom; slideoutdirection: fade; durationin: 1000; durationout: 1000; easingin: easeOutExpo; easingout: easeInQuart; delayin: 3000; delayout: 0; showuntil: 2000; rotatein: -120; scaleout: .5;">Use with any HTML content including embedded videos!</p>
+        <p class="ls-s3 l4s3" style="position: absolute; top:100px; left: 505px; slidedirection: right; slideoutdirection: fade; durationin: 1000; durationout: 1000; easingin: easeOutExpo; easingout: easeInQuart; delayin: 4500; delayout: 0; showuntil: 2000;rotatein: 120; scaleout: .5;">Responsive with Smart Resize &amp; Touch-enabled!</p>
+        <p class="ls-s3 l4s4" style="position: absolute; top:400px; left: 10px; slidedirection: left; slideoutdirection: fade; durationin: 1000; durationout: 1000; easingin: easeOutExpo; easingout: easeInQuart; delayin: 6000; delayout: 0; showuntil: 2000;rotatein: 120; scaleout: .5;">Unlimited possibilities of usage!</p>
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END BANNER -->

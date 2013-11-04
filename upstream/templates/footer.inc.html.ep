@@ -1,0 +1,54 @@
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div id="site-map" class="row">
+      <div class="col-sm-2">
+        <a href="/about"><h4>About</h4></a>
+        <ul>
+          <li><a href="/about/why-fedora">Why Fedora?</a></li>
+          <li><a href="/about/whats-inside">What's Inside</a></li>
+          <li><a href="/about/team">Team</a></li>
+          <li><a href="/about/roadmap">Roadmap</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-2">
+        <h4><a href="/discover">Discover</a></h4>
+        <ul>
+          <li><a href="/discover/gnome">Gnome</a></li>
+          <li><a href="/discover/kde">KDE</a></li>
+          <li><a href="/discover/cinnamon">Cinnamon</a></li>
+          <li><a href="/discover/mate">MATE</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-2">
+        <h4><a href="/support">Support</a></h4>
+        <ul>
+          <li><a href="/support/forums">Forum</a></li>
+          <li><a href="/support/irc">IRC</a></li>
+          <li><a href="/support/howto">HowTo</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-2">
+        <h4><a href="/news">News</a></h4>
+        <ul>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">The Shiznit!</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-8">
+        <p class="copyright">Derived from  <a href="http://www.fedoraproject.org">Fedora</a> | Powered by  <a href="http://en.wiktionary.org/wiki/freedom">Freedom</a>, <a href="http://en.wiktionary.org/wiki/dedication">Dedication</a> and the pursuit of <a href="http://en.wiktionary.org/wiki/perfection">Perfection</a></p>
+      </div>
+      <div class="col-sm-4">
+        <div id="social" class="pull-right">
+          <a href="https://plus.google.com/u/0/113276359756252515026"><img class="img-bumper" src="../img/social-google.png"></a>
+          <a href="http://facebook.com/kororaproject"><img class="img-bumper" src="../img/social-facebook.png"></a>
+          <a href="http://identi.ca/kororaproject"><img class="img-bumper" src="../img/social-identica.png"></a>
+          <a href="http://twitter.com/#!/kororaproject"><img class="img-bumper" src="../img/social-twitter.png"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- END FOOTER -->

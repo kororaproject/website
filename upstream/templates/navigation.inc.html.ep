@@ -1,0 +1,55 @@
+<!-- NAVIGATION -->
+<nav id="korobar" class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-primary-collapse">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <div class="navbar-brand kp-logo-48"></div>
+  </div>
+
+  <!-- navigation content for toggling -->
+  <div class="collapse navbar-collapse navbar-primary-collapse">
+    <ul class="nav navbar-nav">
+      <li class="<%= 'active' if ( $active eq 'home' ) %>"><a href="/">Home</a></li>
+      <li class="dropdown <%= 'active' if ( $active eq 'about' ) %>">
+        <a href="/about" class="dropdown-toggle" data-hover="dropdown">About <b class="caret"></b></a>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="/about/why-fedora">Why Fedora?</a></li>
+          <li><a href="/about/whats-inside">What's Inside</a></li>
+          <li><a href="/about/team">Team</a></li>
+          <li><a href="/about/roadmap">Roadmap</a></li>
+        </ul>
+      </li>
+      <li class="dropdown <%= 'active' if ( $active eq 'discover' ) %>">
+        <a href="/discover" class="dropdown-toggle" data-hover="dropdown">Discover <b class="caret"></b></a>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="/discover/gnome">Gnome Desktop</a></li>
+          <li><a href="/discover/kde">KDE Desktop</a></li>
+          <li><a href="/discover/cinnamon">Cinnamon Desktop</a></li>
+          <li><a href="/discover/mate">MATE Desktop</a></li>
+        </ul>
+      </li>
+      <li class="<%= 'active' if ( $active eq 'download' ) %>"><a href="/download">Download</a></li>
+      <li class="dropdown <%= 'active' if ( $active eq 'support' ) %>">
+        <a href="/support" class="dropdown-toggle" data-hover="dropdown">Support <b class="caret"></b></a>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="/support/forums">Forums</a></li>
+          <li><a href="/support/irc">IRC</a></li>
+          <li><a href="/support/howto">HOWTOs / Tutorials</a></li>
+        </ul>
+      </li>
+      <li class="<%= 'active' if ( $active eq 'news' ) %>"><a href="/news">News</a></li>
+    </ul>
+    <div class="nav navbar-right">
+      <div id="register" class="navbar-btn btn-group btn-group-sm">
+        <button type="button" class="btn btn-default">Register</button>
+        <a data-toggle="modal" href="#loginModal" class="btn btn-success">Log In</a>
+      </div>
+    </div>
+    <div class="nav navbar-right">
+    </div>
+  </div>
+</nav>

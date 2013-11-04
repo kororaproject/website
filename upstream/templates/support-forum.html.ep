@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>KororaProject :: Forum :: <%= $forum->{title} %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="/css/canvas.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'support'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <h1 class="text-center">Forums</h1>
+            <h3><span class="label label-primary">Forum</span> <%= $forum->{title} %></h3>
+            <p><%= $forum->{content} %></p>
+          </div>
+        </div>
+        <div class="hr"></div>
+% foreach my $subforum ( @{ $forum->{subforums} } ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <a href="<%= url_for('/forum/' . $subforum->{name}) %>"><h4><%= $subforum->{title} %></h4></a>
+            <p><%= $subforum->{content} %></p>
+          </div>
+        </div>
+        <div class="hr"></div>
+% }
+% if( @{ $forum->{topics} } ) {
+        <div class="row-table">
+          <div class="row row-header">
+            <div class="col-sm-7">
+              <h4>Topic</h4>
+            </div>
+            <div class="col-sm-1">
+              <h4 class="text-center">Posts</h4>
+            </div>
+            <div class="col-sm-1">
+              <h4 class="text-center">Voices</h4>
+            </div>
+            <div class="col-sm-3">
+              <h4 class="text-center">Freshness</h4>
+            </div>
+          </div>
+%   foreach my $topic ( @{ $forum->{topics} } ) {
+          <div class="row row-entry">
+            <div class="col-sm-7">
+              <a href="/topic/<%= $topic->{name} %>"><h5><%= $topic->{title} %></h5></a>
+            </div>
+            <div class="col-sm-1">
+              <h5 class="text-center"><%= $topic->{total_posts} %></h5>
+            </div>
+            <div class="col-sm-1">
+              <h5 class="text-center"><%= $topic->{unique_voices} %></h5>
+            </div>
+            <div class="col-sm-3">
+              <h5 class="text-center"><%= $topic->{freshness} %></h5>
+              <h5 class="text-center"><%= $topic->{freshness_author} %></h5>
+            </div>
+          </div>
+%   }
+        </div>
+% }
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+  %= include 'scripts.inc'
+
+</body>
+</html>

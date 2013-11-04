@@ -35,6 +35,8 @@ use Mojolicious::Plugin::Authentication;
 #
 # LOCAL INCLUDES
 #
+use Canvas::About;
+use Canvas::Site;
 
 #
 # CONSTANTS
@@ -139,9 +141,36 @@ sub startup {
   my $r = $self->routes;
 
   $r->get('/')->to('site#index');
+
+  # about pages
+  $r->get('/about')->to('about#index');
+  $r->get('/about/why-fedora')->to('about#why_fedora');
+  $r->get('/about/whats-inside')->to('about#whats_inside');
+  $r->get('/about/team')->to('about#team');
+  $r->get('/about/roadmap')->to('about#roadmap');
+
+  # discover pages
+  $r->get('/discover')->to('discover#index');
+  $r->get('/discover/gnome')->to('discover#gnome');
+  $r->get('/discover/kde')->to('discover#kde');
+  $r->get('/discover/cinnamon')->to('discover#cinnamon');
+  $r->get('/discover/mate')->to('discover#mate');
+
+  # support pages
+  $r->get('/support')->to('support#index');
+  $r->get('/support/irc')->to('support#irc');
+  $r->get('/support/howto')->to('support#howto');
+
+  $r->get('/support/forums')->to('forum#forums');
+  $r->get('/forum/:name')->to('forum#forum_name');
+  $r->get('/topic/:name')->to('forum#topic_name');
+
+  # download pages
+  $r->get('/download')->to('site#download');
+
+
   $r->any('/authenticate')->to('site#authenticate');
   $r->any('/deauthenticate')->to('site#deauthenticate');
-
 
   my $r_api = $r->under('/api');
 
@@ -150,7 +179,6 @@ sub startup {
   $r_api->get('/package/:id')->to('core#package_id_get');
   $r_api->put('/package/:id')->to('core#package_id_put');
   $r_api->delete('/package/:id')->to('core#package_id_del');
-
 
   $r_api->get('/users')->to('core#users_get');
   $r_api->get('/user/:id')->to('core#user_id_get');
@@ -172,7 +200,7 @@ sub startup {
 
 
   # catch all
-  $r->get('/(*trap)')->to('site#trap');
+  $r->get('/(*trap)')->to('site#index');
 }
 
 1;
