@@ -46,5 +46,7 @@
       'min-height': ($(window).height()-footer.outerHeight()) + 'px',
       'margin-bottom': footer.outerHeight() + 'px'
     });
+    // TODO: test
+    $('.page-content').css('min-height', $(window).height()-(footer.outerHeight()-48) + 'px');
   });
 </script>

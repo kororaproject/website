@@ -31,17 +31,21 @@
       <div class="col-sm-2">
         <h4><a href="/news">News</a></h4>
         <ul>
-          <li><a href="#">Blog</a></li>
-          <li><a href="#">The Shiznit!</a></li>
         </ul>
+      </div>
+      <div class="col-sm-3 col-sm-offset-1">
+        <div class="pull-right">
+          <a href="http://creativecommons.org/licenses/by-sa/3.0/au/" class="cc-by-sa"></a>
+          <p class="text-right">All content is licensed under the CC-BY-SA 3.0 license.</p>
+        </div>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-8">
         <p class="copyright">Derived from  <a href="http://www.fedoraproject.org">Fedora</a> | Powered by  <a href="http://en.wiktionary.org/wiki/freedom">Freedom</a>, <a href="http://en.wiktionary.org/wiki/dedication">Dedication</a> and the pursuit of <a href="http://en.wiktionary.org/wiki/perfection">Perfection</a></p>
       </div>
-      <div class="col-sm-4">
-        <div id="social" class="pull-right">
+      <div class="col-sm-3 col-sm-offset-1">
+        <div id="social">
           <a href="https://plus.google.com/u/0/113276359756252515026"><img class="img-bumper" src="/img/social-google.png"></a>
           <a href="http://facebook.com/kororaproject"><img class="img-bumper" src="/img/social-facebook.png"></a>
           <a href="http://identi.ca/kororaproject"><img class="img-bumper" src="/img/social-identica.png"></a>

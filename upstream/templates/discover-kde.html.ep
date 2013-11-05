@@ -21,6 +21,81 @@
             <h1 class="text-center">Discover: KDE</h1>
           </div>
         </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="text-center">
+              <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/kde-desktop-file-manager.jpg" alt="KDE Desktop">
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 class="center">Experience Freedom</h2>
+            <p>If you are looking for a familiar working environment, KDE's Plasma Desktop offers all the tools required for a modern desktop computing experience so you can be productive right from the start.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <div class="center">
+              <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/kde-thumb-menu.jpg" alt="KDE Desktop">
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="center">
+              <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/kde-thumb-notification.jpg" alt="KDE Desktop">
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="center">
+              <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/kde-thumb-activities.jpg" alt="KDE Desktop">
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="center">
+              <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/kde-thumb-search.jpg" alt="KDE Desktop">
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="center">
+              <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/kde-desktop-overview.jpg" alt="KDE Overview">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <h2>Beautiful looks</h2>
+            <p>KDE's Plasma Desktop offers a beautiful looking desktop that takes complete advantage of modern computing technology. Through the use of visual effects and scalable graphics, the desktop experience is not only smooth but also pleasant to the eye. The looks of KDE Plasma Desktop not only provide beauty, they are also used to support and
+            improve your computer activities effectively, without being distracting.</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h2>Shape the desktop the way you want it</h2>
+            <p>Should you want the power to adjust your desktop to your needs, KDE Plasma Desktop allows you to do so with a few clicks of the mouse: you can add and arrange any number of widgets on your desktop and on your panels, depending on your needs. And if what you are looking for is not available, you can search among the thousands of
+            available widgets online. Likewise, the visual appearance of the desktop can be changed rapidly and easily using visual themes, installed locally or fetched from the Internet.</p>
+          </div>
+          <div class="col-sm-6">
+            <div class="center">
+              <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/kde-applications.jpg" alt="KDE Overview">
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="center">
+              <img class="img-responsive img-showcase" src="https://kororaproject.org/wp-content/uploads/2013/02/kde-desktop-netbook.jpg" alt="KDE Overview">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <h2>Plasma Netbook</h2>
+            <p>If you use a small, portable device such as a netbook, then Plasma Netbook is the KDE Workspace for you as it was built specifically for those kinds of devices. Its user interface has been custom tailored to the usage patterns associated with such portable devices and can therefore help you get the most out
+            of your portable devices.</p>
+          </div>
+        </div>
       </div>
 
       <!-- END CONTENT -->

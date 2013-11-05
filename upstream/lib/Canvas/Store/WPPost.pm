@@ -65,5 +65,10 @@ __PACKAGE__->add_constructor( topics => qq{ post_type='topic' AND post_parent=? 
 # REPLIES
 __PACKAGE__->add_constructor( replies => qq{ post_type='reply' AND post_parent=? ORDER BY post_date_gmt } );
 
+sub freshness {
+  my $self = shift;
+
+  # post_parent=? ORDER BY post_modified_gmt DESC LIMIT 1
+}
 1;
 

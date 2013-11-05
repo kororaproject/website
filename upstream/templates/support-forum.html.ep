@@ -20,22 +20,40 @@
         <div class="row">
           <div class="col-sm-12 col-md-12 col-lg-12">
             <h1 class="text-center">Forums</h1>
-            <h3><span class="label label-primary">Forum</span> <%= $forum->{title} %></h3>
-            <p><%= $forum->{content} %></p>
           </div>
         </div>
         <div class="hr"></div>
-% foreach my $subforum ( @{ $forum->{subforums} } ) {
-        <div class="row">
-          <div class="col-sm-12">
-            <a href="<%= url_for('/forum/' . $subforum->{name}) %>"><h4><%= $subforum->{title} %></h4></a>
-            <p><%= $subforum->{content} %></p>
+        <div class="row-table">
+          <div class="row row-header">
+            <div class="col-sm-12">
+              <h2 class="forum-title"><%= $forum->{title} %></h2>
+              <a class="label label-success" href="/support/forums">Forums</a>
+% foreach my $b ( @$breadcrumbs ) {
+<a class="label label-success" href="<%= url_for('/forum/' . $b->{url} ) %>"><%= $b->{title} %></a>
+% }
+            </div>
           </div>
-        </div>
-        <div class="hr"></div>
+          <div class="hr"></div>
+
+% if( @{ $forum->{subforums} } ) {
+          <div class="row row-header">
+            <div class="col-sm-12">
+              <h4>Subforum</h4>
+            </div>
+          </div>
+
+%   foreach my $subforum ( @{ $forum->{subforums} } ) {
+          <div class="row row-entry">
+            <div class="col-sm-12">
+              <a href="<%= url_for('/forum/' . $subforum->{name}) %>"><h4><%= $subforum->{title} %></h4></a>
+              <p><%= $subforum->{content} %></p>
+            </div>
+          </div>
+%   }
+          <div class="hr"></div>
+
 % }
 % if( @{ $forum->{topics} } ) {
-        <div class="row-table">
           <div class="row row-header">
             <div class="col-sm-7">
               <h4>Topic</h4>

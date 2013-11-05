@@ -25,6 +25,7 @@ use strict;
 #
 use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
+use Time::Piece;
 
 #
 # LOCAL INCLUDES
@@ -94,8 +95,19 @@ sub forum_name {
   my $name = $self->param('name');
 
   my $cache = [];
+  my $breadcrumbs = [];
 
   my( $f ) = Canvas::Store::WPPost->forum_name( $name );
+
+  # calculate breadcrumbs
+  my $b = $f;
+  while( $b->post_parent->ID ne 0 ) {
+    unshift @$breadcrumbs, {
+      url => $b->post_parent->post_name,
+      title => $b->post_parent->post_title,
+    };
+    $b = $b->post_parent;
+  }
 
   my $forum = {
     id            => $f->ID,
@@ -134,12 +146,12 @@ sub forum_name {
     my @unique_voices = grep { ! $voices{$_->post_author->user_nicename}++ } ( $t, @replies );
 
     # determine freshness
+    my $now = gmtime;
     my $freshness = $t->post_modified_gmt;
     my $freshness_author = $t->post_author->user_nicename;
 
     if( @replies ) {
-      $freshness = $replies[0]->post_modified_gmt;
-      $freshness_author = $replies[0]->post_author->user_nicename;
+      $freshness_author = $replies[-1]->post_author->user_nicename;
     }
 
     push @{ $forum->{topics} }, {
@@ -159,7 +171,7 @@ sub forum_name {
 
   push @$cache, $forum;
 
-  $self->stash( forum => $forum );
+  $self->stash( forum => $forum, breadcrumbs => $breadcrumbs );
   $self->render('support-forum');
 }
 
@@ -169,8 +181,19 @@ sub topic_name {
   my $name = $self->param('name');
 
   my $cache = [];
+  my $breadcrumbs = [];
 
   my( $t ) = Canvas::Store::WPPost->topic_name( $name );
+
+  # calculate breadcrumbs
+  my $b = $t;
+  while( $b->post_parent->ID ne 0 ) {
+    unshift @$breadcrumbs, {
+      url => $b->post_parent->post_name,
+      title => $b->post_parent->post_title,
+    };
+    $b = $b->post_parent;
+  }
 
   my $topic = {
     id            => $t->ID,
@@ -197,7 +220,7 @@ sub topic_name {
 
   push @$cache, $topic;
 
-  $self->stash( topic => $topic );
+  $self->stash( topic => $topic, breadcrumbs => $breadcrumbs );
   $self->render('support-forum-topic');
 }
 

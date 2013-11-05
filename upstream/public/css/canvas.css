@@ -99,6 +99,16 @@ p {
   height: inherit;
 }
 
+/*
+** MODALS
+*/
+.modal-header {
+  background-color: #428bca;
+  color: #fff;
+}
+
+.modal-footer {
+}
 
 /*
 ** LOGOS / IMAGES
@@ -131,6 +141,34 @@ p {
 .kp-logo span {
   color: #777;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, .3);
+}
+
+.kp-logo-cc-by-sa {
+  display: inline-block;
+  margin-top: 8px;
+
+  height: 108px;
+  width: 108px;
+
+  background-image: url('/img/kp-logo-cc-by-sa.png');
+
+  background-size: 96px 96px;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.cc-by-sa {
+  display: block;
+  margin-top: 4px;
+
+  height: 36px;
+  width: 100%;
+
+  background-image: url('/img/cc-by-sa-logo.png');
+
+  background-size: 96px 36px;
+  background-repeat: no-repeat;
+  background-position: center right;
 }
 
 .kp-logo-48 {
@@ -409,6 +447,10 @@ p {
 
 #social {
 /*  margin: 12px 8px 0 0; */
+  display: block;
+  width: 100%;
+
+  text-align: right;
 }
 
 #register {
@@ -600,6 +642,10 @@ footer a:visited {
   padding-left: 8px;
 
   border-left: 1px solid #428bca;
+}
+
+.forum-title {
+  margin: 4px 0;
 }
 
 /* sm */
