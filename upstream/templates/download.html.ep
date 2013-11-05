@@ -59,7 +59,7 @@
                 </div>
                 <div class="col-sm-9">
                   <div class="text-center form-control form-control-generic">
-                    <img class="img-desktop-logo img-bumper" ng-repeat="d in version.desktops" src="/img/ico-logo-{{d.name}}.png" ng-class="{'selected': isSelected(d.name)}" ng-click="selectDesktop(d)"></img>
+                    <img class="img-desktop-logo img-bumper" ng-repeat="d in version.desktops" ng-src="/img/ico-logo-{{d.name}}.png" ng-class="{'selected': isSelected(d.name)}" ng-click="selectDesktop(d)"></img>
                   </div>
                 </div>
               </div>
