@@ -294,6 +294,10 @@ blockquote.title p {
   transition: all .2s ease-in-out;
 }
 
+.img-well-selected .img-bumper:hover {
+  top:0;
+}
+
 .img-bumper:hover {
   top: -4px;
 }
