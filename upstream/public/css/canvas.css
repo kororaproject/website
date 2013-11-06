@@ -5,6 +5,10 @@
 /* fonts */
 @import url("//fonts.googleapis.com/css?family=Open+Sans:300,300italic,600,700");
 
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
 html {
   overflow-y: scroll;
 }
