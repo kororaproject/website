@@ -25,64 +25,64 @@
 
   <div class="page-container">
 
-    %= include 'banner.inc'
     %= include 'navigation.inc', active => 'home'
 
     <div class="page-content">
       <!-- CONTENT -->
+
       <div class="container">
-        <div class="container">
-          <div class="row">
-            <div class="col-sm-12 col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-8">
-              <p>Korora aims to make Linux easier and accessible for new users, while still being useful for experts. We provide a complete, easy to use computing system that "just works" out of the box.</p>
-            </div>
+        <div class="row">
+          <div class="col-sm-offset-6 col-sm-4">
+            <blockquote class="title">
+              <p>With a special blend of aesthetic and functionality, Korora aims to make Linux easier for new users, while still being useful for experts.</p>
+              <p>We provide a complete, easy to use computing system that "just works" out of the box.</p>
+              <p><a class="btn btn-success" href="/download">Download</a> Korora and give it a spin.</p>
+            </blockquote>
           </div>
-          <div class="row">
-            <div class="col-sm-6 col-md-offset-2 col-md-4 col-lg-offset-2 col-lg-4">
-              <p>Want to try Korora for yourself?</p>
-              <p><a href="/download" class="btn btn-large btn-success btn-block"><i class="icon-cloud-download icon-white"></i> Download</a></p>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="text-center">
+              <img class="img-title" src="/img/ico-innovation.png"></img>
             </div>
-            <div class="col-sm-6 col-md-4 col-lg-4">
-              <p>Minimum installation requirements:</p>
-              <ul class="icons-ul">
-                <li><i class="icon-li icon-check"></i>32-bit Intel-compatible PC</li>
-                <li><i class="icon-li icon-check"></i>1GB memory (RAM)</li>
-                <li><i class="icon-li icon-check"></i>10GB disk space / storage</li>
-              </ul>
-            </div>
+            <h2 class="text-center">Innovation</h2>
+            <p class="feature-block">Innovation and invention are key precepts of Korora. Efficiency, elegance and empowerment drive our development processes.</p>
           </div>
-          <div class="row">
-            <div class="col-img-leader col-img-leader-innovation col-sm-12 col-md-8 col-md-offset-2">
-              <h1>Innovation</h1>
-              <p>Built on a strong foundation, Korora is a Fedora Remix that aims to make Linux easier for new users, while still being useful for experts. We provide a complete, easy to use computing system that “just works” out of the box.</p>
+          <div class="col-sm-4">
+            <div class="text-center">
+              <img class="img-title" src="/img/ico-community.png"></img>
             </div>
+            <h2 class="text-center">Community</h2>
+            <p class="feature-block">The Korora community is a tight-knit group of users and contributors providing testing, development, support, and feedback. All our welcome.</p>
           </div>
-          <div class="row">
-            <div class="col-img-leader col-img-leader-community col-sm-12 col-md-8 col-md-offset-2">
-              <h1>Community</h1>
-              <p>The Korora community drives the Korora is developed to meet the community's expectations.</p>
+          <div class="col-sm-4">
+            <div class="text-center">
+              <img class="img-title" src="/img/ico-security.png"></img>
             </div>
+            <h2 class="text-center">Security</h2>
+            <p class="feature-block">Security is essential. Korora is hardened with Mandatory Access Control, Stack Smash Protection, Buffer Overflow Detection, Variable Reordering and much, much more.</p>
           </div>
-          <div class="row">
-            <div class="col-img-leader col-img-leader-security col-sm-12 col-md-8 col-md-offset-2">
-              <h1>Security</h1>
-              <p>Linux is already well-known for being strong on security. We have security as a top priority in everything we do, starting with the inclusion of Security-Enhanced Linux (SELinux). SELinux implements security policies including mandatory access controls.</p>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-offset-2 col-sm-4">
+            <div class="text-center">
+              <img class="img-title" src="/img/ico-choice.png"></img>
             </div>
+            <h2 class="text-center">Choice</h2>
+            <p class="feature-block">With a robust collection of software repositories, there are well over 30,000 unique packages for you to choose from.</p>
           </div>
-          <div class="row">
-            <div class="col-img-leader col-img-leader-choice col-sm-12 col-md-8 col-md-offset-2">
-              <h1>Choice</h1>
-              <p>Korora is a Fedora Remix that aims to make Linux easier for new users, while still being useful for experts. We provide a complete, easy to use computing system that “just works” out of the box.</p>
+          <div class="col-sm-4">
+            <div class="text-center">
+              <img class="img-title" src="/img/ico-open-source.png"></img>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-img-leader col-img-leader-open-source col-sm-12 col-md-8 col-md-offset-2">
-              <h1>Free</h1>
-              <p>Korora is 100% free. Copy and distribute as you see fit. In fact, we encourage it. The full source to all of our packages are available on <a href="https://github.com/kororaproject">GitHub</a>.</p>
-            </div>
+            <h2 class="text-center">Free</h2>
+            <p class="feature-block">Korora is 100% free. Copy and distribute as you see fit. In fact, we encourage it. The full source to all of our packages are available on <a href="https://github.com/kororaproject">GitHub</a>.</p>
           </div>
         </div>
       </div>
+
       <!-- END CONTENT -->
     </div>
   </div>

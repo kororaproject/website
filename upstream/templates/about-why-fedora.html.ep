@@ -28,34 +28,19 @@
             <p>Let us also say, that we think you should give Fedora another chance (like we did), or at least continue reading this page.<br>
             <span id="more-8"></span><br>
             All distros are different and they have different goals. However, we're drawn to Fedora for several reasons including the fact that <a href="http://fedoraproject.org/wiki/Objectives">at its heart</a>, Fedora is about building a <em>community of contributors</em>, not just consumers.</p>
-            <h2><a name="menu" href=""></a>Contents:</h2>
-            <ul>
-              <li><a href="#redhat">Relationship with Red Hat</a></li>
-              <li><a href="#values">Values</a></li>
-              <li><a href="#package">Package Management</a></li>
-              <li><a href="#updates">Updates</a></li>
-              <li><a href="#innovation">Innovation</a></li>
-              <li><a href="#upstream">Upstream</a></li>
-              <li><a href="#security">Security</a></li>
-              <li><a href="#tools">Tools</a></li>
-              <li><a href="#reliability">Reliability</a></li>
-              <li><a href="#summary">Summary</a></li>
-            </ul>
             <p><a name="redhat" href=""></a></p>
             <h2>Relationship with Red Hat</h2>
             <p>Fedora is a community operating system, whose major commercial sponsor is Red Hat. Many Red Hat engineers work on free software projects (see <a href="#upstream">Upstream</a> below) and Fedora provides a platform to push those changes to a large audience. While there is a small team of Red Hat engineers dedicated to working on Fedora, it remains primarily a community driven project.<br>
-            <a href="#menu"><em>Top</em></a></p>
             <p><a name="values" href=""></a></p>
             <h2>Values</h2>
             <p>Fedora has a <a href="http://fedoraproject.org/wiki/Foundations">great set of values</a>, which embody the very heart of the community; <em>Freedom, Friends, Features, First</em>. A central goal for Fedora is advancing free software and content freedom, which benefits the whole World.</p>
-            <p>In particular, we admire Fedora's <strong>strong support of freedom</strong>. This means that they do not ship (nor support) proprietary software, but naturally prefer (and create where necessary) free software alternatives. For example, instead of building tools to help install NVIDIA drivers, Fedora invested in Nouveau, the free 3D driver for NVIDIA cards. This not only keeps Fedora free to re-distribute,
+            <p>In particular, we admire Fedora's <em>strong support of freedom</em>. This means that they do not ship (nor support) proprietary software, but naturally prefer (and create where necessary) free software alternatives. For example, instead of building tools to help install NVIDIA drivers, Fedora invested in Nouveau, the free 3D driver for NVIDIA cards. This not only keeps Fedora free to re-distribute,
             but it benefits the whole Linux community. That's extremely admirable, in our opinion.</p>
             <p>That's not to say that you can't get the NVIDIA drivers, or other proprietary software for your system. Various third party repositories, such as <a href="http://rpmfusion.org/">RPMFusion</a>, exist for this very purpose (and of course, Korora configures all this for you out of the box!).<br>
-            <a href="#menu"><em>Top</em></a></p>
             <p><a name="package" href=""></a></p>
             <h2>Package Management</h2>
             <p>Yum (and RPM) have made leaps and bounds over the last few years and you might actually enjoy using it now (and it's quite fast!). Having said that, most package commands are run through PackageKit these days thanks to graphical package managers. As for RPMs themselves, they're just a binary package format like Debs – it's the package manager that makes the difference.</p>
-            <p>Download an RPM from the net and you can install it with Yum (or via the GUI using PackageKit), which will automatically pull in any dependencies for you. You rarely use the <em>rpm</em>command, just like in Debian and Ubuntu you rarely use <em>dpkg</em>. The days of <em>RPM hell</em> are long gone.</p>
+            <p>Download an RPM from the net and you can install it with Yum (or via the GUI using PackageKit), which will automatically pull in any dependencies for you. You rarely use the <em>rpm</em>command, just like in Debian and Ubuntu you rarely use <em>dpkg</em>. The days of <em>"RPM hell"</em> are long gone.</p>
             <p>Fedora also has a wonderful addition, called groups. After some educational software, office programs, or support for your language? It's easy, just install the group you need, like so:</p>
             <pre><code>yum groupinstall "Educational Software"</code></pre>
             <p>If you're a developer, getting started with Fedora is easy. Just install the development group you need, such as GNOME, KDE, Java, Kernel, Perl, or even the Web.</p>
@@ -64,12 +49,10 @@
             <p>Fedora also has several <a href="http://repos.fedorapeople.org/">contributor repositories available</a> for end users, which is sort-of similar to Ubuntu's PPA (Personal Package Archive). However, Fedora often provides updates for major packages anyway, so you don't actually need to add a separate
             repository to get the latest version of things like KDE.</p>
             <p><em>If that's still not enough</em>, you can also <a href="http://fedoraproject.org/wiki/Tools/Apt">install Debian's Apt package manager</a> and other graphical front-ends like Synaptic in Fedora!<br>
-            <a href="#menu"><em>Top</em></a></p>
             <p><a name="updates" href=""></a></p>
             <h3>Updates</h3>
             <p>Similar to other non-rolling release distros, Fedora <a href="http://fedoraproject.org/wiki/Updates_Policy#Stable_Releases">generally only applies bug fixes</a> to a stable release, rather than introducing new features with later versions.</p>
             <p>Having said that though, Fedora does often provide major updates to some specific programs, including KDE. In general, often packages like Firefox, LibreOffice and the Linux kernel itself get major updates. So, with Fedora you are not left behind quite as much, nor having to add repositories for unofficial builds. We like that.<br>
-            <a href="#menu"><em>Top</em></a></p>
             <p><a name="innovation" href=""></a></p>
             <h3>Innovation</h3>
             <p>With every new release, Fedora is often leading the charge to implement new free software technologies. In fact, Fedora's primary sponsor Red Hat is responsible for <a href="http://fedoraproject.org/wiki/RedHatContributions#Desktop_Software">some of the greatest desktop enhancements ever</a>, including
@@ -77,7 +60,6 @@
             <p>Not to mention that out of all the vendors, Red Hat <a href="http://www.press.redhat.com/2008/04/08/red-hat-leads-open-source-contributions-to-kernel/">contributes the most to the Linux kernel</a> and to <a href="http://www.phoronix.com/scan.php?page=article&amp;item=x_server_contributors&amp;num=1">X.Org</a>. Red Hat is also the <a href="http://blogs.gnome.org/bolsh/2010/07/28/gnome-census/">biggest contributor to GNOME</a> (including GNOME Shell) and they also provide infrastructure, hosting and bandwidth for
             the project.</p>
             <p>Kudos.<br>
-            <a href="#menu"><em>Top</em></a></p>
             <p><a name="upstream" href=""></a></p>
             <h3>Upstream</h3>
             <p>Fedora works as <a href="http://fedoraproject.org/wiki/Staying_close_to_upstream_projects">closely to upstream as possible</a>. They don't often go off on their own tangent with disregard for upstream projects. If they want to have something changed, they work with upstream to create fixes and
@@ -85,7 +67,6 @@
             <p>Take the Chromium web browser for example. It's not included in Fedora <a href="http://spot.livejournal.com/312320.html">for several reasons</a>, but Fedora people are <a href="http://code.google.com/p/chromium/issues/detail?id=28287"
              >working with Google</a> to fix these issues, so that it <em>can</em> be included nicely. By doing this, other distros will benefit!</p>
             <p>Having said that, there are Chromium builds available too. Just add <a href="http://repos.fedorapeople.org/repos/spot/chromium/">the repository</a> and away you go!<br>
-            <a href="#menu"><em>Top</em></a></p>
             <p><a name="security" href=""></a></p>
             <h3>Security</h3>
             <p>Many used to wonder at the usefulness of SELinux (Security Enhanced Linux). Afterall, this is Linux right? It's secure enough.</p>
@@ -95,7 +76,6 @@
             <p>SELinux is not just useful for servers. It's also valuable to your desktop system, especially if you use Adobe's proprietary flash player (which is known to have lots of security holes). When Fedora first implemented SELinux, there were lots of issues because it would block the system from doing what were considered normal tasks. These growing pains are now over, and SELinux rarely gets in the way. Even if it does,
             the graphical tool which pops up will tell you how to change that particular behaviour (if you really want to).</p>
             <p>Of course, at the end of the day you can still turn SELinux off (or just to warning mode). Korora leaves it enabled as it's a great way to add extra security to your system, especially as a major part of our lives are now lived on the Internet.<br>
-            <a href="#menu"><em>Top</em></a></p>
             <p><a name="tools" href=""></a></p>
             <h3>Tools</h3>
             <p>Fedora comes with lots of handy graphical tools to help you manage your system, including:</p>
@@ -109,17 +89,13 @@
               <li><i class="icon-globe"></i> web server</li>
             </ul>
             <p>And many more..<br>
-            <a href="#menu"><em>Top</em></a></p>
             <p><a name="reliability" href=""></a></p>
             <h3>Reliability</h3>
             <p>In the last few years we've been solely using Fedora and have been super impressed with its reliability. Things just work, as you would expect them to. No weirdness. Even though Fedora provides major updates to many packages, it's still more reliable than other popular distributions we've used. Perhaps this is due to sticking close to upstream.<br>
-            <a href="#menu"><em>Top</em></a></p>
             <p><a name="summary" href=""></a></p>
             <h3>Summary</h3>
             <p>Fedora is truly a great, free operating system. Its core principles are ones that we fully support, but which we recognise might restrict or turn away some users. This is why we chose to re-launch Korora as it is, so that users don't give up on Fedora before they have a chance to love it. We see great potential in Fedora, and great benefit to those who are using it.</p>
             <p>Thanks to their wonderful <a href="http://fedoraproject.org/wiki/How_to_create_and_use_a_Live_CD#How_the_livecd-creator_Works">build tools like livecd-creator</a>, we are able to build a powerful operating system that includes all those tweaks and extras that users want.</p>
-            <p>Now, why not give Korora a shot?</p>
-            <p><a href="/download" class="btn btn-large btn-success"><i class="icon-download"></i> Download Korora</a></p>
           </div>
         </div>
       </div>
@@ -129,56 +105,7 @@
   </div>
 
   %= include 'footer.inc'
+  %= include 'scripts.inc'
 
-  <!-- SCRIPTS -->
-  <script src="/js/jquery.js"></script>
-  <script src="/js/bootstrap.js"></script>
-  <script src="/js/bootstrap-dropdown-hover.js"></script>
-  <script src="/js/angular.js"></script>
-  <script src="/js/angular-route.js"></script>
-  <script src="/js/angular-animate.js"></script>
-  <script src="/js/canvas.js"></script>
-
-  <script>
-    $(document).ready( function() {
-      // configure korobar
-      var fixed = true;
-      var korobar = $('#korobar');
-      var page = $('.page-container');
-      var footer  = $('footer');
-
-      // banner height correction
-      var start = $('#banner').length ? 256 : 0;
-
-      if( start - $(window).scrollTop() <= 0 ) {
-        korobar.css('top', 0);
-        korobar.css('position', 'fixed');
-        fixed = true;
-      }
-      else {
-        korobar.css('position', 'absolute');
-        korobar.css('top', start + 'px');
-        fixed = false;
-      }
-
-      // pin korobar to top when it passes
-      $(window).on('scroll', function () {
-        if( !fixed && (korobar.offset().top - $(window).scrollTop() <= 0) ) {
-          korobar.css({ position: 'fixed', top: 0, });
-          fixed = true;
-        }
-        else if( fixed && $(window).scrollTop() <= start ) {
-          korobar.css({ position: 'absolute', top: start + 'px' });
-          fixed = false;
-        }
-      });
-
-      // frob page-container minimum height to at least the footer top
-      page.css({
-        'min-height': ($(window).height()-footer.outerHeight()) + 'px',
-        'margin-bottom': footer.outerHeight() + 'px'
-      });
-    });
-  </script>
 </body>
 </html>

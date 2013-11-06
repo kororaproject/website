@@ -31,6 +31,12 @@
             <p>This is {{getStabilityString()}} of the Korora Linux operating system.</p>
             <p>It's everything you need to try out Korora &mdash; you don't have to erase anything on your current system and it won't put your files at risk.</p>
             <p>Simply take Korora for a test drive on a DVD or USB stick and if you like what you see, you can install Korora directly to your hard drive straight from the Live Media desktop.</p>
+            <p>The minimum installation requirements for Korora are:</p>
+            <ul class="icons-ul">
+              <li><i class="icon-li icon-check"></i>32-bit Intel-compatible PC</li>
+              <li><i class="icon-li icon-check"></i>1GB memory (RAM)</li>
+              <li><i class="icon-li icon-check"></i>10GB disk space / storage</li>
+            </ul>
             <p>Follow the steps to download ...</p>
           </div>
           <div class="col-sm-6">

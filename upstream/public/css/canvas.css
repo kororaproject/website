@@ -85,6 +85,16 @@ p {
   text-align: justify;
 }
 
+p.feature-block {
+  font-size: 16px;
+  text-align: center;
+}
+
+blockquote.title p {
+  font: 18px;
+  text-align: left;
+}
+
 .alert .alert-link {
   font-weight: 600;
 }
@@ -116,6 +126,7 @@ p {
 #banner {
   height: 256px;
 
+  padding: 16px;
   background-color: #428bca;
 
   color: #fff;
@@ -237,24 +248,9 @@ p {
   background-position: 8px center;
 }
 
-.col-img-leader-innovation {
-  background-image: url('/img/ico-innovation.png');
-}
-
-.col-img-leader-community {
-  background-image: url('/img/ico-community.png');
-}
-
-.col-img-leader-security {
-  background-image: url('/img/ico-security.png');
-}
-
-.col-img-leader-choice {
-  background-image: url('/img/ico-choice.png');
-}
-
-.col-img-leader-open-source {
-  background-image: url('/img/ico-open-source.png');
+.img-title {
+  width: 96px;
+  height: 96px;
 }
 
 .img-showcase {
