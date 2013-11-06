@@ -625,12 +625,12 @@ function DownloadController($scope, CanvasNavigation) {
 
   $scope.version = $scope.downloadsAvailable()[0];
  
-  $scope.desktop = null;
   $scope.setArchDefault();
 
+  // select random desktop
+  $scope.desktop = $scope.version.desktops[Math.floor(Math.random()* $scope.version.desktops.length)]
 
-  //
-  // INIT
+
   CanvasNavigation.setPage('download');
 };
 
