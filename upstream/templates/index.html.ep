@@ -32,7 +32,11 @@
 
       <div class="container">
         <div class="row">
-          <div class="col-sm-offset-6 col-sm-4">
+          <div class="col-sm-offset-2 col-sm-4">
+            <img src="/img/laptop-korora.png"></img>
+            <div class="hr hr-lg"></div>
+          </div>
+          <div class="col-sm-4">
             <blockquote class="title">
               <p>With a special blend of aesthetic and functionality, Korora aims to make Linux easier for new users, while still being useful for experts.</p>
               <p>We provide a complete, easy to use computing system that "just works" out of the box.</p>

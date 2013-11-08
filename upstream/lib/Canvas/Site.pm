@@ -57,7 +57,7 @@ sub login {
   $self->render('login');
 }
 
-sub authenticate {
+sub auth {
   my $self = shift;
   my $json = Mojo::JSON->new;
   my $data = $json->decode($self->req->body);
@@ -66,14 +66,14 @@ sub authenticate {
   my $u = $self->param('u') // $data->{u} // '';
   my $p = $self->param('p') // $data->{p} // '';
 
-  if( $self->authenticate($u, $p) ) {
+#  if( $self->authenticate($u, $p) ) {
 #    return $self->redirect_to('/');
     return $self->render(
       status  => 200,
       text    => 'ok',
       json    => { message => 'ok' },
     );
-  }
+#  }
 
 #  $self->redirect_to('/login');
   $self->render(
@@ -83,7 +83,7 @@ sub authenticate {
   );
 };
 
-sub deauthenticate {
+sub deauth {
   my $self = shift;
 
   $self->logout;

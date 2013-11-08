@@ -168,9 +168,13 @@ sub startup {
   # download pages
   $r->get('/download')->to('site#download');
 
+  # news pages
+  $r->get('/news')->to('news#index');
+  $r->get('/news/:id')->to('news#post');
 
-  $r->any('/authenticate')->to('site#authenticate');
-  $r->any('/deauthenticate')->to('site#deauthenticate');
+
+  $r->any('/authenticate')->to('site#auth');
+  $r->any('/deauthenticate')->to('site#deauth');
 
   my $r_api = $r->under('/api');
 

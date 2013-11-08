@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  <title>Canvas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="/css/canvas.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'news'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="text-center">News</h1>
+          </div>
+        </div>
+        % foreach my $n ( @{ $news->{items} } ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <a href="/news/<%= $n->post_name %>"><h2><%= $n->post_title %></h2></a>
+            <h3>by <%= $n->post_author->display_name %> on <%= $n->post_modified_gmt->strftime('%e %B, %Y') %></h3>
+
+
+          </div>
+        </div>
+        <div class="hr"></div>
+% }
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+  %= include 'scripts.inc'
+
+</body>
+</html>

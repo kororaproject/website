@@ -39,12 +39,12 @@ __PACKAGE__->has_a( post_author => 'Canvas::Store::WPUser' );
 
 __PACKAGE__->has_a(
   post_date_gmt => 'Time::Piece',
-  inflate => sub { Time::Piece->strptime( shift, "%Y-%m-%d %H:%M:%S") },
+  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
   deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
 );
 __PACKAGE__->has_a(
   post_modified_gmt => 'Time::Piece',
-  inflate => sub { Time::Piece->strptime( shift, "%Y-%m-%d %H:%M:%S") },
+  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
   deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
 );
 

@@ -418,7 +418,8 @@ blockquote.title p {
   text-shadow: 1px 1px 2px rgba(0, 0, 0, .6);
 }
 
-.navbar-default .navbar-nav>.dropdown>a .caret {
+.navbar-default .navbar-nav>.dropdown>a .caret,
+.navbar-default .navbar-nav>.dropdown>a:hover .caret {
   border-top-color: #fff;
   border-bottom-color: #fff;
 }
@@ -455,6 +456,26 @@ blockquote.title p {
 .navbar-default .navbar-nav>.active>a:focus {
   background-color:#3276b1;
   color: #fff;
+}
+
+.navbar-nav>li>.dropdown-menu {
+  background-color: #428bca;
+  border-color: #357ebd;
+}
+
+.dropdown-menu {
+  border-radius: 2px;
+}
+
+.navbar-default .navbar-nav .open .dropdown-menu>li>a {
+  color: #fff;
+}
+
+.navbar-default .navbar-nav .open .dropdown-menu>li>a:hover {
+  background-color: #3276b1;
+  color: #fff;
+
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, .6);
 }
 
 .navbar-default .nav-home {
@@ -510,6 +531,17 @@ blockquote.title p {
 .hr-xs {
   height: 4px!important;
 }
+.hr-sm {
+  height: 16px!important;
+}
+.hr-md {
+  height: 24px!important;
+}
+.hr-lg {
+  height: 32px!important;
+}
+
+
 
 .icons-ul {
   padding-left: 0;
@@ -686,10 +718,6 @@ footer a:visited {
     height: 16px;
   }
 
-  .hr-sm {
-    height: 16px!important;
-  }
-
   .forum-child {
     padding-left: 16px;
   }
@@ -707,10 +735,6 @@ footer a:visited {
     height: 24px;
   }
 
-  .hr-md {
-    height: 24px!important;
-  }
-
   .forum-child {
     padding-left: 24px;
     border-left: 2px solid #428bca;
@@ -722,11 +746,7 @@ footer a:visited {
     height: 32px;
   }
 
-  .hr-lg {
-    height: 32px!important;
-  }
-
-  .forum-child {
+  .h  .forum-child {
     padding-left: 32px;
   }
 }
