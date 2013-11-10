@@ -101,37 +101,53 @@ sub startup {
   $self->helper(post_content => sub {
     my( $self, $content ) = @_;
 
-    my $result = '<pre>' . $content . '</pre>';
+    my $result = $content; # '<pre>' . $content . '</pre>';
     #
+
+    # remove newlines immediately proceeding tags
+#    say Dumper $result;
+    $result =~ s/(?:\r?\n)?(<\/?(?:p|li|ol|ul)>)\s*(?:\r?\n)?/$1/img;
+#    say Dumper $result;
+#    $result =~ s/(<\/?(?:p|li|ol|ul)>)\s*\r?\n/$1/ig;
+
+
+
+
 
     # process no attribute tags
     $result =~ s/\[(i|code|b)\]/<$1>/mg;
     $result =~ s/\[\/(i|code|b)\]/<\/$1>/mg;
+
+    # process urls
+    $result =~ s/\[url\]([^\[]+)\[\/url\]/<a href="$1">$1<\/a>/ig;
+    $result =~ s/\[url="([^"]+)"\]([^\[]+)\[\/url\]/<a href="$1">$2<\/a>/mig;
+    $result =~ s/((?:ht|f)tps?:\/\/[^\s]+)/<a href="$1">$1<\/a>/ig;
+
+    # process images
+    $result =~ s/\[img\]([^\[]+)\[\/img\]/<img class="img-responsive" src="$1"><\/img>/mig;
+
+    # compress multiple breaks into one
+    #$result =~ s/(<br\/>)+/<br\/>/g;
 
     # process quotes
     $result =~ s/\[quote(:[a-zA-Z0-9]+)?\]/<blockquote>/mg;
     $result =~ s/\[quote="([^"]+)"\]/<cite>$1 wrote:<\/cite><blockquote>/mg;
     $result =~ s/\[\/quote(:[a-zA-Z0-9]+)?\]/<\/blockquote>/mg;
 
-    # process urls
-    $result =~ s/\[url\]([^\[]+)\[\/url\]/<a href="$1">$1<\/a>/ig;
-    $result =~ s/\[url="([^"]+)"\]([^\[]+)\[\/url\]/<a href="$1">$2<\/a>/mig;
-
-    # process images
-    $result =~ s/\[img\]([^\[]+)\[\/img\]/<img class="img-responsive" src="$1"><\/img>/mig;
 
     # turn newlines into breaks
     #$result =~ s/(\r?\n>)+/[n]/g;
 #  $result =~ s/(\r?\n|<br\s?\/?>)+/\n\n/mg;
-    $result =~ s/^(\r?\n|<br\s?\/?>)+/\n/mg;
-    #$result =~ s/(\r?\n|<br\s?\/?>)+/<br\/>/g;
+#    $result =~ s/^(\r?\n|<br\s?\/?>)+/\n/mg;
+#    $result =~ s/(\r?\n|<br\s?\/?>)+/<br\/>/g;
     #$result =~ s/(<br\s?\/?>)+/<br\/>/g;
-    #$result = '<p>' . join( '</p><p>', split( /(\r?\n|<br\s?\/?>)+/, $content ) ) . '</p>';
+    my @lines = split /(\r?\n)+/, $result;
+    #my @lines = split /(\r?\n|<br\s?\/?>)+/, $result;
+    say Dumper map { "<p>$_</p>" } grep { ! /\n/ } @lines;
 
-    # compress multiple breaks into one
-    #$result =~ s/(<br\/>)+/<br\/>/g;
+    # strip empty paragraphs
+    $result =~ s/<p>\s*<\/p>//ig;
 
-    say Dumper $result;
 
     return Mojo::ByteStream->new( $result );
   });

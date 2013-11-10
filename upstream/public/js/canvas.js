@@ -1,3 +1,17 @@
+// prototypes
+Array.prototype.indexOfObject = function(prop, val) {
+  for(var i = 0, l = this.length; i < l; i++) {
+    if( this[i].hasOwnProperty(prop) &&
+        this[i][prop] === val ) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
+
+
 var canvas = angular.module('canvas', ['ngRoute', 'ngAnimate'])
   .config(function($routeProvider, $locationProvider) {
     $routeProvider
@@ -153,7 +167,7 @@ function DiscoverController($scope, CanvasNavigation) {
   CanvasNavigation.setPage('discover');
 };
 
-function DownloadController($scope, CanvasNavigation) {
+function DownloadController($scope, $location) {
   //
   // GLOBALS
   //
@@ -552,18 +566,62 @@ function DownloadController($scope, CanvasNavigation) {
     return item.available;
   };
 
-  $scope.setArchDefault = function() {
-    var _system_arch = ( window.navigator.userAgent.indexOf('WOW64')>-1 ||
-                         window.navigator.platform == 'Win64' ||
-                         window.navigator.userAgent.indexOf('x86_64')>-1 ) ? 'x86_64' : 'i686';
-
-    var i = $scope.version.archs.indexOf(_system_arch);
+  $scope.getPreferredVersion = function( args ) {
+    // check for specified arch
+    var i = -1;
+    if( args.hasOwnProperty('v') ) {
+      for(var n=0, l=$scope.downloads.length; n<l; n++ ) {
+        if( $scope.downloads[n].version === args.v ) {
+          i = n;
+          continue;
+        }
+      }
+    }
 
     if( i < 0 ) {
       i = 0;
     }
 
-    $scope.arch = $scope.version.archs[i];
+    return $scope.downloads[i];
+  };
+
+  $scope.getPreferredArch = function( args ) {
+    // check for specified arch
+    var i = -1;
+    if( args.hasOwnProperty('a') ) {
+      i = $scope.version.archs.indexOfObject('name', args.a);
+    }
+
+    // check for browser arch as a fallback
+    if( i < 0 ) {
+      var _system_arch = ( window.navigator.userAgent.indexOf('WOW64')>-1 ||
+                           window.navigator.platform == 'Win64' ||
+                           window.navigator.userAgent.indexOf('x86_64')>-1 ) ? 'x86_64' : 'i686';
+
+      i = $scope.version.archs.indexOfObject('name', _system_arch);
+    }
+
+    // otherwise the first item will do
+    if( i < 0 ) {
+      i = 0;
+    }
+
+    return $scope.version.archs[i];
+  };
+
+  $scope.getPreferredDesktop = function( args ) {
+    // check for specified arch
+    var i = -1;
+    if( args.hasOwnProperty('d') ) {
+      i = $scope.version.desktops.indexOfObject('name', args.d);
+    }
+
+    // check randomise as a fallback
+    if( i < 0 ) {
+      i = Math.floor(Math.random()* $scope.version.desktops.length);
+    }
+
+    return $scope.version.desktops[i];
   };
 
   $scope.hasArchs = function() {
@@ -579,30 +637,17 @@ function DownloadController($scope, CanvasNavigation) {
   };
 
   $scope.selectedDesktop = function() {
-    return $scope.desktop; 
+    return $scope.desktop;
   };
 
   $scope.validDesktop = function() {
-    return ($scope.desktop !== null); 
+    return ($scope.desktop !== null);
   };
 
   $scope.getStabilityString = function() {
-    if( $scope.version.isStable ) {
-      if( $scope.version.isCurrent ) {
-        return "the latest stable version";
-      }
-      else {
-        return "an older stable version";
-      }
-    }
-    else {
-      if( $scope.version.isCurrent ) {
-        return "the latest beta version";
-      }
-      else {
-        return "an older beta version";
-      }
-    }
+
+    return ( $scope.version.isCurrent ? "the latest " : "an older " ) +
+           ( $scope.version.isStable  ? "stable " : "beta " ) + "version";
   };
 
   $scope.isVersionStable = function() {
@@ -613,41 +658,24 @@ function DownloadController($scope, CanvasNavigation) {
     return ( ( $scope.desktop !== null ) && ( $scope.desktop.name === d ) );
   };
 
-  $scope.debug = function() {
-    console.log($scope.version);
-    console.log($scope.arch);
-    console.log($scope.desktop);
-  };
-
   //
   // INIT
   //
+
+  args = $location.search();
 
   $scope.version = $scope.downloadsAvailable()[0];
- 
-  $scope.setArchDefault();
-
-  // select random desktop
-  $scope.desktop = $scope.version.desktops[Math.floor(Math.random()* $scope.version.desktops.length)]
-
-
-  CanvasNavigation.setPage('download');
+  $scope.version = $scope.getPreferredVersion( args );
+  $scope.arch = $scope.getPreferredArch( args );
+  $scope.desktop = $scope.getPreferredDesktop( args );
 };
 
-function CanvasController($scope, CanvasNavigation) {
+function CanvasController($scope) {
   $scope.data = {};
-
-  //
-  // INIT
-  CanvasNavigation.setPage('canvas-dashboard');
 };
 
-function RepositoryController($scope, CanvasNavigation) {
+function RepositoryController($scope) {
   $scope.data = [];
-
-  //
-  // INIT
-  CanvasNavigation.setPage('canvas-repositories');
 };
 
 function PackageController($scope, CanvasNavigation, $http) {

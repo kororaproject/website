@@ -53,6 +53,7 @@ sub index {
   $cache->{item_count} = $pager->total_entries;
   $cache->{page_size} = $pager->entries_per_page;
   $cache->{page} = $pager->current_page;
+  $cache->{page_last} = ($pager->total_entries / $pager->entries_per_page) - 1;
 
 #  my foreach my $p ( @posts ) {
 #    push @$cache, {

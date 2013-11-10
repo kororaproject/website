@@ -24,7 +24,8 @@
         <div class="row">
           <div class="col-sm-12">
             <p>Korora was born out of a desire to make Linux easier for new users, while still being useful for experts.</p>
-            <p>Originally based on Gentoo Linux in 2005, Korora was re-born in 2010 as a Fedora Remix<a href="#footnote"><sup>1</sup></a> with tweaks and extras to make the system “just work” out of the box. Why Fedora? <a href="#why-fedora">Lots of reasons!</a></p>
+            <p>Originally based on Gentoo Linux in 2005, Korora was re-born in 2010 as a Fedora Remix<a href="#footnote"><sup>1</sup></a> with tweaks and extras to make the system “just work” out of the box.</p>
+            <p>Why Fedora? <a href="#why-fedora">Lots of reasons!</a></p>
           </div>
         </div>
         <div class="row">
@@ -46,7 +47,7 @@
           <div class="col-sm-6">
             <h3>GNOME</h3>
             <div class="text-center">
-              <a href="/discover/gnome-desktop/">
+              <a href="/discover/gnome">
                 <img src="http://kororaproject.org/images/web/screenshots/korora-desktop-gnome-extra-small.jpg" alt="Korora GNOME desktop" class="img-responsive">
               </a>
             </div>
@@ -54,7 +55,7 @@
           <div class="col-sm-6">
             <h3>KDE</h3>
             <div class="text-center">
-              <a href="/discover/kde-desktop/">
+              <a href="/discover/kde">
                 <img src="http://kororaproject.org/images/web/screenshots/korora-desktop-kde-extra-small.jpg" alt="Korora KDE desktop" class="img-responsive">
               </a>
             </div>
