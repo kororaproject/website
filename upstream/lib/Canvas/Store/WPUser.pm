@@ -32,6 +32,8 @@ use Data::Dumper;
 __PACKAGE__->table('kwp_users');
 __PACKAGE__->columns(All => qw/ID user_login user_pass user_nicename user_email user_url user_registered user_activation_key user_status display_name/);
 
+__PACKAGE__->has_many(meta => 'Canvas::Store::WPUserMeta' => 'user_id');
+
 my $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
 sub validate_password($$) {
@@ -42,7 +44,7 @@ sub validate_password($$) {
   my $id = substr($setting, 0, 3);
 
   # wordpress uses "$P$"
-  return 0 if ($id != '$P$' && $id != '$H$');
+  return 0 if( $id != '$P$' && $id != '$H$' );
 
   my $count_log2 = index($itoa64, substr $setting, 3, 1);
   return 0 if( $count_log2 < 7 || $count_log2 > 30 );
@@ -64,15 +66,15 @@ sub validate_password($$) {
 }
 
 sub _encode64 {
-  my ($input, $count) = @_;
+  my( $input, $count ) = @_;
   my $output = '';
   my $i = 0;
 
-  while ($i < $count) {
+  while( $i < $count ) {
     my $value = ord( substr $input, $i++, 1);
     $output .= substr $itoa64, ($value & 0x3f), 1;
 
-    if ($i < $count) {
+    if( $i < $count ) {
       $value |= ord( substr $input, $i, 1 ) << 8;
     }
 
@@ -80,20 +82,35 @@ sub _encode64 {
 
     last if ($i++ >= $count);
 
-    if ($i < $count) {
+    if( $i < $count ) {
       $value |= ord( substr $input, $i, 1 ) << 16;
     }
 
     $output .= substr $itoa64, (($value >> 12) & 0x3f), 1;
 
-    last if ($i++ >= $count);
+    last if( $i++ >= $count );
 
     $output .= substr $itoa64, (($value >> 18) & 0x3f), 1;
   }
 
-
   return $output;
 }
 
-1;
 
+sub metadata($$) {
+  my( $self, $key ) = @_;
+
+  my @meta = grep { $key eq $_->meta_key } $self->meta;
+
+  return ( @meta ) ? $meta[0]->meta_value : undef;
+}
+
+sub is_admin($) {
+  my $self = shift;
+
+  my $level = $self->metadata('kwp_user_level') // 0;
+
+  return ( $level == 10 );
+}
+
+1;

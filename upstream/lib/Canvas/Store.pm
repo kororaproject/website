@@ -77,10 +77,10 @@ __PACKAGE__->set_sql( count_search_where => qq{
 });
 
 # auto update the update attribute
-__PACKAGE__->set_sql(update => qq{
- UPDATE __TABLE__
-  SET updated=CURRENT_TIMESTAMP, %s
-   WHERE  __IDENTIFIER__
-});
+#__PACKAGE__->set_sql(update => qq{
+# UPDATE __TABLE__
+#  SET updated=CURRENT_TIMESTAMP, %s
+#   WHERE  __IDENTIFIER__
+#});
 
 1;
