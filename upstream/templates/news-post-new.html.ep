@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  <title>Canvas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="/css/canvas.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'news'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <form action="/news" method="post">
+          <input type="hidden" name="post_id" value="<%= $post->{stub} %>">
+          <div class="row">
+            <div class="col-sm-12">
+              <h1 class="text-center"><%= ($mode eq 'edit') ? 'Edit' : 'Create' %> News Post</h1>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <h2>Title</h2>
+              <input type="text" name="post_title" class="form-control" value="<%= $post->{title} %>">
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div class="col-sm-12">
+              <h2>Introduction</h2>
+              <textarea name="post_excerpt" class="form-control" rows="3"><%= $post->{excerpt} %></textarea>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div class="col-sm-12">
+              <h2>Body</h2>
+              <textarea name="post_content" class="form-control" rows="20"><%= $post->{content} %></textarea>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div class="col-sm-4">
+              <h2>Tags</h2>
+              <input type="text" name="post_tags" class="form-control">
+            </div>
+            <div class="col-sm-4">
+              <h2>Category</h2>
+              <input type="text" name="post_category" class="form-control">
+            </div>
+            <div class="col-sm-4">
+              <h2>Date</h2>
+              <input type="text" name="post_modified_gmt" class="form-control">
+            </div>
+          </div>
+          <div class="hr hr-sm"></div>
+          <div class="row">
+            <div class="col-sm-12">
+              <a class="btn btn-danger" href="<%= substr url_for('current'), 0, -5 %>">Cancel</a>
+              <input type="submit" class="btn btn-success" value="Save"></button>
+            </div>
+          </div>
+          <div class="hr"></div>
+        </form>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+</body>
+</html>

@@ -1,4 +1,5 @@
-<!-- SCRIPTS -->
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&skin=desert"></script>
+
 <script src="/js/jquery.js"></script>
 <script src="/js/bootstrap.js"></script>
 <script src="/js/bootstrap-dropdown-hover.js"></script>
@@ -46,7 +47,10 @@
       'min-height': ($(window).height()-footer.outerHeight()) + 'px',
       'margin-bottom': footer.outerHeight() + 'px'
     });
+
     // TODO: test
     $('.page-content').css('min-height', $(window).height()-(footer.outerHeight()-48) + 'px');
+
+    // conduct any pretty printing
   });
 </script>

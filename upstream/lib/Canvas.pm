@@ -37,6 +37,8 @@ use Mojolicious::Plugin::Authentication;
 #
 use Canvas::About;
 use Canvas::Site;
+use Canvas::Store::WPUser;
+use Canvas::Store::User;
 
 #
 # CONSTANTS
@@ -56,7 +58,7 @@ sub startup {
   # AUTHENTICATION
   $self->plugin('authentication' => {
     autoload_user => 0,
-    current_user_fn => 'authenticated_user',
+    current_user_fn => 'auth_user',
     load_user => sub {
       my ($app, $uid) = @_;
 
@@ -186,11 +188,19 @@ sub startup {
 
   # news pages
   $r->get('/news')->to('news#index');
+  $r->get('/news/create')->to('news#post_create');
+  $r->post('/news')->to('news#post_update');
   $r->get('/news/:id')->to('news#post');
+  $r->get('/news/:id/')->to('news#post');
+  $r->get('/news/:id/edit')->to('news#post_edit');
 
-
+  # authentication
   $r->any('/authenticate')->to('site#auth');
   $r->any('/deauthenticate')->to('site#deauth');
+
+
+
+
 
   my $r_api = $r->under('/api');
 

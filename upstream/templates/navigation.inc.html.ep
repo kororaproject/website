@@ -46,13 +46,23 @@
       </li>
       <li class="<%= 'active' if ( $active eq 'news' ) %>"><a href="/news">News</a></li>
     </ul>
+% if( is_user_authenticated ) {
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="" class="dropdown-toggle" data-toggle="dropdown"><%= auth_user->{wpu}->display_name %> <b class="caret"></b></a>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="/deauthenticate?redirect_to=<%= url_for('current') %>">Log Out</a></li>
+        </ul>
+      </li>
+    </ul>
+% }
+% else {
     <div class="nav navbar-right">
       <div id="register" class="navbar-btn btn-group btn-group-sm">
         <button type="button" class="btn btn-default">Register</button>
         <a data-toggle="modal" href="#loginModal" class="btn btn-success">Log In</a>
       </div>
     </div>
-    <div class="nav navbar-right">
-    </div>
+% }
   </div>
 </nav>

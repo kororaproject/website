@@ -25,8 +25,11 @@
         <div class="row">
           <div class="col-sm-12">
             <a href="/news/<%= $n->post_name %>"><h2><%= $n->post_title %></h2></a>
-            <h3>by <%= $n->post_author->display_name %> on <%= $n->post_modified_gmt->strftime('%e %B, %Y') %></h3>
+            <h3 class="subtitle"><%= $n->post_author->display_name %> | <%= $n->post_modified_gmt->strftime('%e %B, %Y') %></h3>
 
+%== $n->post_excerpt;
+
+            <a class="btn btn-default" href="/news/<%= $n->post_name %>">Read more ... </a>
 
           </div>
         </div>
@@ -47,6 +50,14 @@
           </div>
         </div>
 % }
+% if( is_user_authenticated && auth_user->{wpu}->is_admin  ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <a class="btn btn-danger" href="/news/create">Create</a>
+          </div>
+        </div>
+        <div class="hr"></div>
+% }
       </div>
 
       <!-- END CONTENT -->
@@ -54,6 +65,11 @@
   </div>
 
   %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
   %= include 'scripts.inc'
 
 </body>

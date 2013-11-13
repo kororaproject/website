@@ -66,21 +66,13 @@ sub auth {
   my $u = $self->param('u') // $data->{u} // '';
   my $p = $self->param('p') // $data->{p} // '';
 
-#  if( $self->authenticate($u, $p) ) {
-#    return $self->redirect_to('/');
-    return $self->render(
-      status  => 200,
-      text    => 'ok',
-      json    => { message => 'ok' },
-    );
-#  }
+  if( $self->authenticate($u, $p) ) {
+  }
 
-#  $self->redirect_to('/login');
-  $self->render(
-    status  => 401,
-    text    => 'unauthorised',
-    json    => { error => 'unauthorised' },
-  );
+  # extract the redirect url and fall back to the index
+  my $url = $self->param('redirect_to') // $data->{redirect_to} // '/';
+
+  return $self->redirect_to( $url );
 };
 
 sub deauth {
@@ -88,7 +80,10 @@ sub deauth {
 
   $self->logout;
 
-#  $self->redirect_to('/');
+  # extract the redirect url and fall back to the index
+  my $url = $self->param('redirect_to') // '/';
+
+  return $self->redirect_to( $url );
 };
 
 #

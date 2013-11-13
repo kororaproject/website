@@ -83,8 +83,8 @@ sub post {
 
   my $cache = {
     id            => $p->ID,
-    created       => $p->post_date_gmt,
-    updated       => $p->post_modified_gmt,
+    created       => $p->post_date_gmt->strftime('%e %B, %Y'),
+    updated       => $p->post_modified_gmt->strftime('%e %B, %Y'),
     title         => $p->post_title,
     content       => $p->post_content,
     excerpt       => $p->post_excerpt,
@@ -92,9 +92,100 @@ sub post {
     author        => $p->post_author->user_nicename,
   };
 
-
   $self->stash( post => $cache );
   $self->render('news-post');
+}
+
+sub post_create {
+  my $self = shift;
+
+  # only allow authenticated and authorised users
+  $self->redirect_to('/') unless (
+    $self->is_user_authenticated() &&
+    $self->auth_user->{wpu}->is_admin
+  );
+
+  my $cache = {
+    id            => undef,
+    created       => '',
+    updated       => '',
+    title         => '',
+    content       => '',
+    excerpt       => '',
+    name          => '',
+    author        => '',
+  };
+
+  $self->stash( mode => 'create', post => $cache );
+  $self->render('news-post-new');
+}
+
+sub post_edit {
+  my $self = shift;
+
+  # only allow authenticated and authorised users
+  $self->redirect_to('/') unless (
+    $self->is_user_authenticated() &&
+    $self->auth_user->{wpu}->is_admin
+  );
+
+  my $stub = $self->param('id');
+
+  my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
+
+  # check we found the post
+  $self->redirect_to('/') unless defined $p;
+
+  my $cache = {
+    id            => $p->ID,
+    created       => $p->post_date_gmt->strftime('%e %B, %Y at %H:%M'),
+    updated       => $p->post_modified_gmt->strftime('%e %B, %Y at %H:%M'),
+    title         => $p->post_title,
+    content       => $p->post_content,
+    excerpt       => $p->post_excerpt,
+    stub          => $p->post_name,
+    author        => $p->post_author->user_nicename,
+  };
+
+  # build the cancel path
+
+  $self->stash( mode => 'edit', post => $cache );
+  $self->render('news-post-new');
+}
+
+sub post_update {
+  my $self = shift;
+
+  # only allow authenticated and authorised users
+  $self->redirect_to('/') unless (
+    $self->is_user_authenticated() &&
+    $self->auth_user->{wpu}->is_admin
+  );
+
+  my $stub = $self->param('post_id');
+  my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
+
+  # update if we found the object
+  if( $p ) {
+    $p->post_title( $self->param('post_title') // '' );
+    $p->post_content( $self->param('post_content') // '' );
+    $p->post_excerpt( $self->param('post_excerpt') // '' );
+
+    $p->update;
+  }
+  # otherwise create a new entry
+  else {
+    my $stub = '';
+
+    $p = Canvas::Store::WPPost->create(
+      post_name    => $stub,
+      post_title   => $self->param('post_title'),
+      post_content => $self->param('post_content'),
+      post_excerpt => $self->param('post_excerpt'),
+    )
+  }
+
+  $self->redirect_to( 'newsid', id => $stub );
 }
 
 1;

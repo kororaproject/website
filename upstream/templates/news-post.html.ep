@@ -18,17 +18,32 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="text-center"><%= $post->{title}%></h1>
+            <h1><%= $post->{title}%></h1>
+            <h2 class="subtitle"><%= $post->{author} %> | <%= $post->{created} %></h2>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
 
+%== $post->{excerpt};
 %== $post->{content};
 
           </div>
         </div>
+        <div class="row">
+          <div class="col-sm-12">
+          </div>
+        </div>
         <div class="hr"></div>
+% if( is_user_authenticated && auth_user->{wpu}->is_admin  ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <a class="btn btn-danger" href="<%= url_for('current') . '/edit' %>">Edit</a>
+            <a class="btn btn-danger" href="<%= url_for('current') . '/delete' %>">Delete</a>
+          </div>
+        </div>
+        <div class="hr"></div>
+% }
       </div>
 
       <!-- END CONTENT -->
@@ -36,6 +51,11 @@
   </div>
 
   %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
   %= include 'scripts.inc'
 
 </body>

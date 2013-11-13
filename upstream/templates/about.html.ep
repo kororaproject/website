@@ -120,6 +120,11 @@
   </div>
 
   %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
   %= include 'scripts.inc'
 
 </body>
