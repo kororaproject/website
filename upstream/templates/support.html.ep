@@ -1,11 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="canvas">
 <head>
-  <title>Canvas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
-  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
-  <link href="/css/canvas.css" rel="stylesheet" media="screen">
+  %= include 'header.inc', title => 'KororaProject'
 </head>
 <body>
   <div class="page-container">
@@ -55,6 +51,11 @@
   </div>
 
   %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
   %= include 'scripts.inc'
 
 </body>

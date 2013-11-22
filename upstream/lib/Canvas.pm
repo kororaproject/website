@@ -32,6 +32,9 @@ use Mojo::JSON;
 
 use Mojolicious::Plugin::Authentication;
 
+use POSIX qw(floor);
+use Time::Piece;
+
 #
 # LOCAL INCLUDES
 #
@@ -53,6 +56,8 @@ use constant {
 #
 sub startup {
   my $self = shift;
+
+  $self->secret('canvas');
 
   #
   # AUTHENTICATION
@@ -81,9 +86,14 @@ sub startup {
     },
   });
 
+  $self->plugin('mail' => {
+    from => 'firnsy@gmail.com',
+    type => 'text/plain',
+  });
+
   #
   # HELPERS
-  $self->helper(build_query  => sub {
+  $self->helper(build_query => sub {
     my $self = shift;
     my $map = shift;
 
@@ -100,6 +110,78 @@ sub startup {
     return $q;
   });
 
+  $self->helper(pluralise => sub {
+    my( $self, $amount, $unit ) = @_;
+
+    if( $amount ne '1' ) {
+      $unit .= 's';
+      $unit =~ s/os$/oes/;
+      $unit =~ s/ys$/ies/;
+    }
+
+    return $amount . ' ' . $unit;
+  });
+
+  # time prettifier
+  $self->helper(time_ago => sub {
+    my( $self, $time ) = @_;
+
+    my $now = gmtime;
+    $time = Time::Piece->new( $time ) unless ref $time eq 'Time::Piece';
+
+    my $d = $now - $time;
+    my $t = 'One';
+    my $u = 'moment';
+
+    if( $d > 604800 ) {
+      $t = floor( $d / 604800 );
+      $u = 'week';
+    }
+    elsif( $d > 84600 ) {
+      $t = floor( $d / 86400 );
+      $u = 'day';
+    }
+    elsif( $d > 3600 ) {
+      $t = floor( $d / 3600 );
+      $u = 'hour';
+    }
+    elsif( $d > 60 ) {
+      $t = floor( $d / 60 );
+      $u = 'minute';
+    }
+
+    return $self->pluralise( $t, $u ) . ' ago';
+  });
+
+  $self->helper(response_icon => sub {
+    my( $self, $type, $classes ) = @_;
+
+    $classes //= '';
+
+    my $map = {
+      idea      => 'fa-lightbulb-o',
+      problem   => 'fa-bug',
+      question  => 'fa-question',
+      thank     => 'fa-heart',
+    };
+
+    return '<i class="fa ' . ( $map->{ $type } // 'fa-ban' ) . ' ' . $classes . '"></i>';
+  });
+
+  $self->helper(post_can_edit => sub {
+    my( $self, $post ) = @_;
+
+    return 0 unless ref $post eq 'Canvas::Store::Post';
+
+    return 0 unless defined $self->auth_user;
+
+    return 1 if $self->auth_user->{wpu}->is_admin;
+
+    return 1 if $self->auth_user->{u}->id == $post->author->id;
+
+    return 0;
+  });
+
   $self->helper(post_content => sub {
     my( $self, $content ) = @_;
 
@@ -111,10 +193,6 @@ sub startup {
     $result =~ s/(?:\r?\n)?(<\/?(?:p|li|ol|ul)>)\s*(?:\r?\n)?/$1/img;
 #    say Dumper $result;
 #    $result =~ s/(<\/?(?:p|li|ol|ul)>)\s*\r?\n/$1/ig;
-
-
-
-
 
     # process no attribute tags
     $result =~ s/\[(i|code|b)\]/<$1>/mg;
@@ -183,6 +261,14 @@ sub startup {
   $r->get('/forum/:name')->to('forum#forum_name');
   $r->get('/topic/:name')->to('forum#topic_name');
 
+  $r->get('/support/response')->to('response#index');
+  $r->get('/support/response/:type')->to('response#summary');
+  $r->get('/support/response/:type/add')->to('response#response_prepare');
+  $r->post('/support/response/:type/add')->to('response#add');
+  $r->get('/support/response/:type/:stub')->to('response#detail');
+  $r->get('/support/response/:type/:stub/reply')->to('response#reply_get');
+  $r->post('/support/response/:type/:stub/reply')->to('response#reply');
+
   # download pages
   $r->get('/download')->to('site#download');
 
@@ -193,10 +279,12 @@ sub startup {
   $r->get('/news/:id')->to('news#post');
   $r->get('/news/:id/')->to('news#post');
   $r->get('/news/:id/edit')->to('news#post_edit');
+  $r->get('/news/:id/delete')->to('news#post_delete');
 
-  # authentication
+  # authentication and registration
   $r->any('/authenticate')->to('site#auth');
   $r->any('/deauthenticate')->to('site#deauth');
+  $r->get('/register')->to('site#register');
 
 
 
@@ -230,7 +318,7 @@ sub startup {
 
 
   # catch all
-  $r->get('/(*trap)')->to('site#index');
+#  $r->get('/(*trap)')->to('site#index');
 }
 
 1;

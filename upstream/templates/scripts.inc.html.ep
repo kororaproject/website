@@ -11,27 +11,41 @@
 <script>
   $(document).ready( function() {
     // configure korobar
-    var fixed = true;
+    var fixed   = true;
     var korobar = $('#korobar');
-    var page = $('.page-container');
+    var page    = $('.page-container');
     var footer  = $('footer');
+    var start   = 0;
 
-    // banner height correction
-    var start = $('#banner').length ? 256 : 0;
+    var resizeHelper = function() {
+      // banner correction
+      if( $('#banner').length ) {
+        start = $('#banner').outerHeight();
+      }
 
-    if( start - $(window).scrollTop() <= 0 ) {
-      korobar.css('top', 0);
-      korobar.css('position', 'fixed');
-      fixed = true;
+      if( start - $(window).scrollTop() <= 0 ) {
+        korobar.css({ position: 'fixed', top: 0 });
+        fixed = true;
+      }
+      else {
+        korobar.css({ position: 'absolute', top: start + 'px' });
+        fixed = false;
+      }
+
+      // frob page-container minimum height to at least the footer top
+      page.css({
+        'min-height': ($(window).height()-footer.outerHeight()) + 'px',
+        'margin-bottom': footer.outerHeight() + 'px'
+      });
+
+      // TODO: test
+      $('.page-content').css('min-height', $(window).height()-(footer.outerHeight()-48) + 'px');
     }
-    else {
-      korobar.css('position', 'absolute');
-      korobar.css('top', start + 'px');
-      fixed = false;
-    }
+
+    resizeHelper();
 
     // pin korobar to top when it passes
-    $(window).on('scroll', function () {
+    $(window).on('scroll', function() {
       if( !fixed && (korobar.offset().top - $(window).scrollTop() <= 0) ) {
         korobar.css({ position: 'fixed', top: 0, });
         fixed = true;
@@ -42,15 +56,6 @@
       }
     });
 
-    // frob page-container minimum height to at least the footer top
-    page.css({
-      'min-height': ($(window).height()-footer.outerHeight()) + 'px',
-      'margin-bottom': footer.outerHeight() + 'px'
-    });
-
-    // TODO: test
-    $('.page-content').css('min-height', $(window).height()-(footer.outerHeight()-48) + 'px');
-
-    // conduct any pretty printing
+    $(window).on('resize', resizeHelper);
   });
 </script>

@@ -11,50 +11,80 @@ Array.prototype.indexOfObject = function(prop, val) {
 }
 
 
-
-var canvas = angular.module('canvas', ['ngRoute', 'ngAnimate'])
-  .config(function($routeProvider, $locationProvider) {
-    $routeProvider
-      .when('/',                     { templateUrl: '/partials/home.html', controller: 'HomeController' })
-      .when('/about',                { templateUrl: '/partials/about.html', controller: 'AboutController' })
-      .when('/discover',             { templateUrl: '/partials/discover.html', controller: 'DiscoverController' })
-      .when('/download',             { templateUrl: '/partials/download.html', controller: 'DownloadController' })
-      .when('/canvas',               { templateUrl: '/partials/canvas.html', controller: 'CanvasController' })
-      .when('/canvas/packages',      { templateUrl: '/partials/packages.html', controller: 'PackageController' })
-      .when('/canvas/repositories',  { templateUrl: '/partials/repositories.html', controller: 'RepositoryController' })
-      .otherwise({redirectTo: '/'});
-
-    $locationProvider
-      .html5Mode(true)
-      .hashPrefix('!');
-  });
-
-
 /*
 ** DIRECTIVES
 */
+'use strict';
+angular.module('$strap.config', []).value('$strapConfig', {});
+angular.module('$strap.filters', ['$strap.config']);
+angular.module('$strap.directives', ['$strap.config']);
+angular.module('$strap', [
+  '$strap.filters',
+  '$strap.directives',
+  '$strap.config'
+]);
+angular.module('$strap.directives').directive('bsTooltip', [
+  '$parse',
+  '$compile',
+  function ($parse, $compile) {
+    return {
+      restrict: 'A',
+      scope: true,
+      link: function postLink(scope, element, attrs, ctrl) {
+        var getter = $parse(attrs.bsTooltip), setter = getter.assign, value = getter(scope);
+        scope.$watch(attrs.bsTooltip, function (newValue, oldValue) {
+          if (newValue !== oldValue) {
+            value = newValue;
+          }
+        });
+        if (!!attrs.unique) {
+          element.on('show', function (ev) {
+            $('.tooltip.in').each(function () {
+              var $this = $(this), tooltip = $this.data('tooltip');
+              if (tooltip && !tooltip.$element.is(element)) {
+                $this.tooltip('hide');
+              }
+            });
+          });
+        }
+        element.tooltip({
+          title: function () {
+            return angular.isFunction(value) ? value.apply(null, arguments) : value;
+          },
+          html: true
+        });
+        /*
+        var tooltip = element.data('tooltip');
+        tooltip.show = function () {
+          var r = $.fn.tooltip.Constructor.prototype.show.apply(this, arguments);
+          this.tip().data('tooltip', this);
+          return r;
+        };
+        */
+        scope._tooltip = function (event) {
+          element.tooltip(event);
+        };
+        scope.hide = function () {
+          element.tooltip('hide');
+        };
+        scope.show = function () {
+          element.tooltip('show');
+        };
+        scope.dismiss = scope.hide;
+      }
+    };
+  }
+]);
+
+
+var canvas = angular.module('canvas', ['ngAnimate', '$strap.directives']);
+
+
+
 
 /*
 ** SERVICES
 */
-
-canvas.service('CanvasNavigation', function($rootScope) {
-  var _page = '';
-  var _mode = '';
-
-  return {
-    setPage: function( page ) {
-      if( page.indexOf('canvas-') == 0 ) {
-        _mode = 'canvas';
-      }
-      else {
-        _mode = 'default';
-      }
-
-      $rootScope.$broadcast('routeLoaded', { slug: page, mode: _mode });
-    }
-  };
-});
 
 canvas.service('Database', function($resource) {
   return {
@@ -138,33 +168,16 @@ function NavigationController($scope, CanvasNavigation) {
 };
 
 
-function HomeController($scope, CanvasNavigation) {
+function HomeController($scope) {
   $scope.data = {};
-
-  //
-  // INIT
-  CanvasNavigation.setPage('home');
 };
 
-function AboutController($scope, CanvasNavigation) {
+function AboutController($scope) {
   $scope.data = {};
-
-  //
-  // INIT
-  CanvasNavigation.setPage('about');
-
-  $('#aboutdetails a').click(function (e) {
-    e.preventDefault()
-    $(this).tab('show')
-  });
 };
 
-function DiscoverController($scope, CanvasNavigation) {
+function DiscoverController($scope) {
   $scope.data = {};
-
-  //
-  // INIT
-  CanvasNavigation.setPage('discover');
 };
 
 function DownloadController($scope, $location) {
@@ -668,6 +681,8 @@ function DownloadController($scope, $location) {
   $scope.version = $scope.getPreferredVersion( args );
   $scope.arch = $scope.getPreferredArch( args );
   $scope.desktop = $scope.getPreferredDesktop( args );
+
+  console.log('done');
 };
 
 function CanvasController($scope) {

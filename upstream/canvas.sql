@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS canvas_package_screenshots;
 
 /* rebuild all tables from scratch */
 DROP TABLE IF EXISTS canvas_user;
+DROP TABLE IF EXISTS canvas_usermeta;
 DROP TABLE IF EXISTS canvas_usermembership;
 DROP TABLE IF EXISTS canvas_arch;
 DROP TABLE IF EXISTS canvas_rating;
@@ -26,37 +27,60 @@ DROP TABLE IF EXISTS canvas_templatepackage;
 DROP TABLE IF EXISTS canvas_templaterepository;
 DROP TABLE IF EXISTS canvas_machine;
 
+DROP TABLE IF EXISTS canvas_post;
+DROP TABLE IF EXISTS canvas_postvote;
+DROP TABLE IF EXISTS canvas_postview;
+DROP TABLE IF EXISTS canvas_vote;
+
+
+
+
+
 CREATE TABLE canvas_user (
-    id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-    name          VARCHAR(64)   NOT NULL,
-    uuid          VARCHAR(64)   NOT NULL,
-    description   TEXT,
+  id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  name          VARCHAR(64)   NOT NULL,
+  uuid          VARCHAR(64)   NOT NULL,
+  password      VARCHAR(64)   NOT NULL,
+  email         VARCHAR(128)  NOT NULL,
 
-    /* is this user an organisation  */
-    organisation  BOOL          NOT NULL  DEFAULT FALSE,
+  description   TEXT,
 
-    gpg_private   TEXT,
-    gpg_public    TEXT,
+  /* is this user an organisation  */
+  organisation  BOOL          NOT NULL  DEFAULT FALSE,
 
-    access        INTEGER       NOT NULL  DEFAULT 1,
+  gpg_private   TEXT,
+  gpg_public    TEXT,
 
-    created       DATETIME      NOT NULL,
-    updated       DATETIME      NOT NULL
+  access        INTEGER       NOT NULL  DEFAULT 1,
+
+  created       DATETIME      NOT NULL,
+  updated       DATETIME      NOT NULL,
+
+  UNIQUE (uuid)
 );
 
+CREATE TABLE canvas_usermeta (
+ meta_id     INTEGER           NOT NULL PRIMARY KEY  AUTO_INCREMENT,
+ user_id     INTEGER           NOT NULL REFERENCES canvas_user (id),
+ meta_key    VARCHAR(255)               DEFAULT  NULL,
+ meta_value  LONGTEXT                   DEFAULT  NULL
+);
+
+
+
 CREATE TABLE canvas_usermembership (
-    id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-    user_id       INTEGER       NOT NULL  REFERENCES canvas_user (id),
-    member_id     INTEGER       NOT NULL  REFERENCES canvas_user (id),
+  id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  user_id       INTEGER       NOT NULL  REFERENCES canvas_user (id),
+  member_id     INTEGER       NOT NULL  REFERENCES canvas_user (id),
 
-    /* default membership of a user is an owner */
-    name          VARCHAR(64)   NOT NULL  DEFAULT 'owner',
+  /* default membership of a user is an owner */
+  name          VARCHAR(64)   NOT NULL  DEFAULT 'owner',
 
-    /* default access is write (1) */
-    access        INTEGER       NOT NULL  DEFAULT 1,
+  /* default access is write (1) */
+  access        INTEGER       NOT NULL  DEFAULT 1,
 
-    created       DATETIME      NOT NULL,
-    updated       DATETIME      NOT NULL
+  created       DATETIME      NOT NULL  DEFAULT '0000-00-00 00:00:00',
+  updated       DATETIME      NOT NULL  DEFAULT '0000-00-00 00:00:00'
 );
 
 CREATE TABLE canvas_image (
@@ -269,6 +293,84 @@ CREATE TABLE canvas_machine (
 
     created       DATETIME      NOT NULL,
     updated       DATETIME      NOT NULL
+);
+
+
+
+
+/*
+** KORORA CANVAS - POST / ASK STRUCTURES
+*/
+
+/*
+
+
+*/
+CREATE TABLE canvas_post (
+  id            INTEGER               NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  author        INTEGER UNSIGNED      NOT NULL  REFERENCES canvas_user(id),
+
+  parent_id     INTEGER UNSIGNED      NOT NULL  DEFAULT 0,
+
+  /* encrypt the post with a password */
+  password      VARCHAR(32)           NOT NULL,
+
+  /* types: news, question, problem, thanks, idea */
+  type          VARCHAR(16)           NOT NULL,
+
+  /*
+  ** news: draft, publish
+  ** question: answered, waiting
+  ** problem: waiting, known, progress, not, solved
+  ** thanks: n/a
+  ** idea: considered, declined, planned, progress, complete, feedback, waiting
+  ** reply: standard, answer
+  */
+  status        VARCHAR(16)           NOT NULL,
+
+  /* name of the post */
+  name          VARCHAR(200)          NOT NULL  DEFAULT '',
+
+  /* name of the post */
+  title         TEXT                  NOT NULL  DEFAULT '',
+
+  /* optional introductory paragraph of post */
+  excerpt       TEXT                  NOT NULL  DEFAULT '',
+
+  /* primary content of post */
+  content       TEXT                  NOT NULL  DEFAULT '',
+
+  /*
+  ** open - replies are enabled
+  ** closed - post is closed from replies
+  */
+  reply_status  VARCHAR(16)           NOT NULL  DEFAULT 'open',
+  reply_count   INTEGER UNSIGNED      NOT NULL  DEFAULT 0,
+
+  created       DATETIME              NOT NULL,
+  updated       DATETIME              NOT NULL
+);
+
+CREATE TABLE canvas_vote (
+  id            INTEGER   NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  cast_value    INTEGER   NOT NULL  DEFAULT 0,
+  caster_value  INTEGER   NOT NULL  DEFAULT 0
+);
+
+CREATE TABLE canvas_postvote (
+  post_id       INTEGER       NOT NULL REFERENCES canvas_post(id),
+  user_id       INTEGER       NOT NULL REFERENCES canvas_user(id),
+  vote_id       INTEGER       NOT NULL REFERENCES canvas_vote(id),
+  created       DATETIME      NOT NULL,
+
+  PRIMARY KEY (post_id, user_id, vote_id)
+);
+
+CREATE TABLE canvas_postview (
+  post_id       INTEGER       NOT NULL REFERENCES canvas_post(id),
+  ip            VARCHAR(128),
+  user_agent    VARCHAR(256),
+  created       DATETIME      NOT NULL
 );
 
 COMMIT;

@@ -32,15 +32,29 @@ noscript {
   text-align: center;
 }
 
+.btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-radius: 0 !important;
+}
+.btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.btn-group>.btn:last-child:not(:first-child), .btn-group>.dropdown-toggle:not(:first-child) {
+  border-bottom-left-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+}
+
+
+
 .alert,
 .btn,
 .label,
 .form-control,
 pre{
   border-radius: 2px !important;
-  -webkit-border-radius: 2px !important;
-  -moz-border-radius: 2px !important;
 }
+
+
 
 /*
 ** SCROLLBARS
@@ -106,6 +120,15 @@ blockquote.title p {
 /*
 ** TYPOGRAPHY
 */
+strong {
+  font-weight: 600;
+}
+
+.page-title {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
 .subtitle {
   text-transform: uppercase;
   font-size: 12px;
@@ -148,9 +171,6 @@ blockquote p {
 ** LOGOS / IMAGES
 */
 #banner {
-  height: 256px;
-
-  padding: 16px;
   background-color: #428bca;
 
   color: #fff;
@@ -377,26 +397,42 @@ blockquote p {
   margin-bottom: 0;
 }
 
+.callout-problem,
 .callout-danger {
   background-color: #fdf7f7;
   border-color: #eed3d7;
 }
+.callout-problem h4,
 .callout-danger h4 {
   color: #b94a48;
 }
+.callout-question,
 .callout-warning {
   background-color: #faf8f0;
   border-color: #faebcc;
 }
+.callout-question h4,
 .callout-warning h4 {
   color: #c09853;
 }
+.callout-idea,
 .callout-info {
   background-color: #f4f8fa;
   border-color: #bce8f1;
 }
+.callout-idea h4,
 .callout-info h4 {
   color: #3a87ad;
+}
+
+.callout-thank,
+.callout-success {
+  background-color: #f7fdf7;
+  border-color: #d3eed7;
+}
+.callout-success h4,
+.callout-info h4 {
+  color: #4ab948;
 }
 
 /*
@@ -407,6 +443,22 @@ blockquote p {
   border-radius: 0;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
+}
+
+.nav-tab-danger>a:hover {
+  background-color: #fdf7f7;
+  border-color: #eed3d7;
+  color: #b94a48;
+}
+.nav-tab-warning>a:hover {
+  background-color: #faf8f0;
+  border-color: #faebcc;
+  color: #c09853;
+}
+.nav-tab-info>a:hover {
+  background-color: #f4f8fa;
+  border-color: #bce8f1;
+  color: #3a87ad;
 }
 
 .nav-tabs>li.active>a,
@@ -570,6 +622,21 @@ blockquote p {
 }
 
 /*
+** RESPONSE PAGES
+*/
+
+.reply-meta {
+  margin-left: 4px;
+}
+
+
+.reply-meta > p {
+  padding-bottom: 0;
+  margin-bottom: 0;
+
+  font-size: 12px;
+}
+/*
 ** FOOTER
 */
 
@@ -653,7 +720,7 @@ footer a:visited {
 }
 
 .row-table > .row-entry:nth-child(odd) {
-  background-color: #eee;
+  background-color: #f4f4f4;
 }
 
 .row-table > .row-entry blockquote {

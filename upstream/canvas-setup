@@ -20,17 +20,17 @@ my $firnsy = Canvas::Store::User->find_or_create({
 # create csmart
 my $csmart = Canvas::Store::User->find_or_create({
   name => 'csmart',
-  uuid => 'woot'
+  uuid => 'weet'
 });
 
 my $test = Canvas::Store::User->find_or_create({
   name => 'test_subscriber',
-  uuid => 'woot'
+  uuid => 'wuut'
 });
 
 my $woot = Canvas::Store::User->find_or_create({
   name => 'Anonymous',
-  uuid => 'woot'
+  uuid => 'wiit'
 });
 
 

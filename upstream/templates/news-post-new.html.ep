@@ -62,7 +62,7 @@
           <div class="row">
             <div class="col-sm-12">
               <a class="btn btn-danger" href="<%= substr url_for('current'), 0, -5 %>">Cancel</a>
-              <input type="submit" class="btn btn-success" value="Save"></button>
+              <input type="submit" class="btn btn-success" value="Save"></input>
             </div>
           </div>
           <div class="hr"></div>

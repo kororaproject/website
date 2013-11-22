@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'KororaProject'
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'support'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="page-title">Response</h1>
+          </div>
+        </div>
+% if( is_user_authenticated ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <ul class="nav nav-tabs nav-justified">
+              <li class="nav-tab-info active"><a href="#idea" data-toggle="tab"><i class="fa fa-lightbulb-o"></i> Share an Idea</a></li>
+              <li class="nav-tab-danger"><a href="#problem" data-toggle="tab"><i class="fa fa-bug"></i> Report a Problem</a></li>
+              <li class="nav-tab-warning"><a href="#question" data-toggle="tab"><i class="fa fa-question"></i> Ask a Question</a></li>
+              <li class="nav-tab-success"><a href="#thank" data-toggle="tab"><i class="fa fa-heart"></i> Say Thanks</a></li>
+            </ul>
+
+            <div class="tab-content">
+              <div class="tab-pane tab-info active" id="idea">
+                <form action="/support/response/idea/add" method="get" enctype="application/x-www-form-urlencoded">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <input type="text" name="title" class="form-control"></input>
+                      <div class="hr-sm"></div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-9">
+                      <h4>Share your idea; we'll find similar ones or add it.</h4>
+                    </div>
+                    <div class="col-sm-3">
+                      <input type="submit" class="btn btn-block btn-default" value="Continue"></input>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="tab-pane tab-info" id="problem">
+                <form action="/support/response/problem/add" method="get">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <input type="text" name="title" class="form-control"></input>
+                      <div class="hr-sm"></div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-9">
+                      <h4>Problem.</h4>
+                    </div>
+                    <div class="col-sm-3">
+                      <input type="submit" class="btn btn-block btn-default" value="Continue"></input>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="tab-pane tab-info" id="question">
+                <form action="/support/response/question/add" method="get">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <input type="text" name="title" class="form-control"></input>
+                      <div class="hr-sm"></div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-9">
+                      <h4>Ask a question.</h4>
+                    </div>
+                    <div class="col-sm-3">
+                      <input type="submit" class="btn btn-block btn-default" value="Continue"></input>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="tab-pane tab-info" id="thank">
+                <form action="/support/response/thank/add" method="get">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <input type="text" name="title" class="form-control"></input>
+                      <div class="hr-sm"></div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-9">
+                      <h4>Say thanks.</h4>
+                    </div>
+                    <div class="col-sm-3">
+                      <input type="submit" class="btn btn-block btn-default" value="Continue"></input>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+% }
+
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="btn-group btn-group-sm btn-group-justified">
+              <a href="" class="btn btn-default">All</a>
+              <a href="" class="btn btn-default">Ideas</a>
+              <a href="" class="btn btn-default">Problems</a>
+              <a href="" class="btn btn-default">Questions</a>
+              <a href="" class="btn btn-default">Thanks</a>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="btn-group btn-group-sm btn-group-justified">
+              <a href="" class="btn btn-default">Newest</a>
+              <a href="" class="btn btn-default">Active</a>
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+
+% foreach my $r ( @{ $responses->{items} } ) {
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="callout">
+                <div class="pull-right reply-meta">
+                  <h4 class="text-right"><%== response_icon( $r->type ) %></h4>
+                  <p class="text-right"><%= time_ago( $r->updated ) %></p>
+                  <p class="text-right"><%= $r->author->name %></p>
+                </div>
+                <a href="/support/response/<%= $r->type %>/<%= $r->name %>"><h4><%= $r->title %></h4></a>
+                <p class=""><%= pluralise( $r->reply_count, 'reply' ) %></p>
+              </div>
+            </div>
+          </div>
+% }
+        <div class="hr"></div>
+
+% if( $responses->{item_count} > $responses->{page_size} ) {
+        <div class="row">
+          <div class="col-sm-offset-5 col-sm-2 text-center">
+            <div class="btn-group">
+% if( $responses->{page} > 0 ) {
+              <a href="<%= url_for('/news?page=' . ($responses->{page} - 1) ) %>" class="btn btn-default"><b class="icon-chevron-left"></b></a>
+% }
+% if( $responses->{page} < $responses->{page_last} ) {
+              <a href="<%= url_for('/news?page=' . ($responses->{page} + 1) ) %>" class="btn btn-default"><b class="icon-chevron-right"></b></a>
+% }
+            </div>
+          </div>
+        </div>
+% }
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+  <script>
+    $(document).ready( function() {
+      $('.nav-tabs a').click( function(e) {
+        e.preventDefault()
+        $(this).tab('show')
+      });
+    });
+  </script>
+</body>
+</html>

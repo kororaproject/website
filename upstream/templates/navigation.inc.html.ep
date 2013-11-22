@@ -40,6 +40,7 @@
         <ul class="dropdown-menu" role="menu">
           <li><a href="/support">Overview</a></li>
           <li><a href="/support/forums">Forums</a></li>
+          <li><a href="/support/response">Response</a></li>
           <li><a href="/support/irc">IRC</a></li>
           <li><a href="/support/howto">HOWTOs / Tutorials</a></li>
         </ul>

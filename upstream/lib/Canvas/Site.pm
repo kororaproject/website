@@ -86,6 +86,26 @@ sub deauth {
   return $self->redirect_to( $url );
 };
 
+sub register {
+  my $self = shift;
+
+  my $to = $self->param('to') // 'firnsy@securixlive.com';
+  my $subject = $self->param('subject') // 'subject of awesomeness';
+  my $data = $self->param('data') // 'this is some content.';
+
+  $self->mail(
+    to      => $to,
+    subject => $subject,
+    data    => $data,
+  );
+
+  # extract the redirect url and fall back to the index
+  my $url = $self->param('redirect_to') // '/';
+
+  $self->redirect_to( $url );
+}
+
+
 #
 # CATCH ALL
 sub trap {

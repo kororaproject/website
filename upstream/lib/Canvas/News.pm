@@ -34,6 +34,36 @@ use Canvas::Store::WPPost;
 use Canvas::Store::Pager;
 
 #
+# HELPERS
+#
+
+
+sub sanitise_with_dashes($) {
+  my $stub = shift;
+
+  # preserve escaped octets
+  $stub =~ s|%([a-fA-F0-9][a-fA-F0-9])|---$1---|g;
+  # remove percent signs that are not part of an octet
+  $stub =~ s/%//g;
+  # restore octets.
+  $stub =~ s|---([a-fA-F0-9][a-fA-F0-9])---|%$1|g;
+
+  $stub = lc $stub;
+
+  # kill entities
+  $stub =~ s/&.+?;//g;
+  $stub =~ s/\./-/g;
+
+  $stub =~ s/[^%a-z0-9 _-]//g;
+  $stub =~ s/\s+/-/g;
+  $stub =~ s|-+|-|g;
+  $stub =~ s/-+$//g;
+
+  return $stub;
+}
+
+
+#
 # NEWS
 #
 
@@ -106,7 +136,7 @@ sub post_create {
   );
 
   my $cache = {
-    id            => undef,
+    id            => '',
     created       => '',
     updated       => '',
     title         => '',
@@ -163,29 +193,58 @@ sub post_update {
   );
 
   my $stub = $self->param('post_id');
-  my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
 
-  # update if we found the object
-  if( $p ) {
-    $p->post_title( $self->param('post_title') // '' );
-    $p->post_content( $self->param('post_content') // '' );
-    $p->post_excerpt( $self->param('post_excerpt') // '' );
+  if( $stub ne '' ) {
+    my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
 
-    $p->update;
+    # update if we found the object
+    if( $p ) {
+      $p->post_title( $self->param('post_title') // '' );
+      $p->post_content( $self->param('post_content') // '' );
+      $p->post_excerpt( $self->param('post_excerpt') // '' );
+
+      $p->update;
+    }
   }
   # otherwise create a new entry
   else {
-    my $stub = '';
+    $stub = sanitise_with_dashes( $self->param('post_title') );
 
-    $p = Canvas::Store::WPPost->create(
-      post_name    => $stub,
-      post_title   => $self->param('post_title'),
-      post_content => $self->param('post_content'),
-      post_excerpt => $self->param('post_excerpt'),
-    )
+    my $now = gmtime;
+
+    my $p = Canvas::Store::WPPost->create({
+      post_name         => $stub,
+      post_title        => $self->param('post_title'),
+      post_content      => $self->param('post_content'),
+      post_excerpt      => $self->param('post_excerpt'),
+      post_author       => $self->auth_user->{wpu}->ID,
+      post_date_gmt     => $now,
+      post_modified_gmt => $now,
+    });
   }
 
   $self->redirect_to( 'newsid', id => $stub );
+}
+
+sub post_delete {
+  my $self = shift;
+
+  # only allow authenticated and authorised users
+  $self->redirect_to('/') unless (
+    $self->is_user_authenticated() &&
+    $self->auth_user->{wpu}->is_admin
+  );
+
+  my $stub = $self->param('id');
+
+  my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
+
+  # check we found the post
+  if( $p ) {
+    $p->delete;
+  }
+
+  $self->redirect_to('/news');
 }
 
 1;
