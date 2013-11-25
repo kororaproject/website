@@ -14,15 +14,16 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="text-center">Support</h1>
+            <h1 class="page-title"><strong>Support.</strong> You have a question?</h1>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
             <p>We do hope that you won't run into any problems with Korora, however no system is perfect!</p>
 
-            <h2>Forums</h2>
-            <p>There are lots of ways to get help. Perhaps the best method, and certainly the one we recommend you try first, is via our <a href="/support/forums">forums</a>.</p>
+            <h2>Engage the Community</h2>
+            <p>There are lots of ways to get help. The best method, and certainly the one recommend is via <a href="/support/engage">Engage.</a></p>
+            <p><a href="/support/engage">Engage</a> is your portal to interact with the primary developers and wider community. It allows you to: submit your problems, ask questions, suggest idea and even just say thanks.</p>
 
             <h2>Social</h2>
             <p>We are also ready and waiting on IRC, identi.ca, Twitter, Facebook and Google+.</p>
@@ -40,8 +41,6 @@
               <p>Fedora Remixes are a valid component of the Fedora ecosystem. As always, remember to be nice.</p>
             </div>
 
-            <h2>Bugs and suggestions</h2>
-            <p>If you've found a bug or have a suggestion, please post it on our <a href="https://github.com/kororaproject/kp/issues/">GitHub issues page</a> or let us know in our <a href="/support/forums">forums</a>.
           </div>
         </div>
       </div>

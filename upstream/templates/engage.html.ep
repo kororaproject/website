@@ -14,7 +14,7 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="page-title">Response</h1>
+            <h1 class="page-title"><strong>Engage.</strong> Converse with the Community</h1>
           </div>
         </div>
 % if( is_user_authenticated ) {
@@ -29,7 +29,7 @@
 
             <div class="tab-content">
               <div class="tab-pane tab-info active" id="idea">
-                <form action="/support/response/idea/add" method="get" enctype="application/x-www-form-urlencoded">
+                <form action="/support/engage/idea/add" method="get" enctype="application/x-www-form-urlencoded">
                   <div class="row">
                     <div class="col-sm-12">
                       <input type="text" name="title" class="form-control"></input>
@@ -47,7 +47,7 @@
                 </form>
               </div>
               <div class="tab-pane tab-info" id="problem">
-                <form action="/support/response/problem/add" method="get">
+                <form action="/support/engage/problem/add" method="get">
                   <div class="row">
                     <div class="col-sm-12">
                       <input type="text" name="title" class="form-control"></input>
@@ -65,7 +65,7 @@
                 </form>
               </div>
               <div class="tab-pane tab-info" id="question">
-                <form action="/support/response/question/add" method="get">
+                <form action="/support/engage/question/add" method="get">
                   <div class="row">
                     <div class="col-sm-12">
                       <input type="text" name="title" class="form-control"></input>
@@ -83,7 +83,7 @@
                 </form>
               </div>
               <div class="tab-pane tab-info" id="thank">
-                <form action="/support/response/thank/add" method="get">
+                <form action="/support/engage/thank/add" method="get">
                   <div class="row">
                     <div class="col-sm-12">
                       <input type="text" name="title" class="form-control"></input>
@@ -109,11 +109,11 @@
         <div class="row">
           <div class="col-sm-6">
             <div class="btn-group btn-group-sm btn-group-justified">
-              <a href="" class="btn btn-default">All</a>
-              <a href="" class="btn btn-default">Ideas</a>
-              <a href="" class="btn btn-default">Problems</a>
-              <a href="" class="btn btn-default">Questions</a>
-              <a href="" class="btn btn-default">Thanks</a>
+              <a href="<%= url_with->query([t => undef]) %>" class="btn btn-default">All</a>
+              <a href="<%= url_with->query([t => 'idea']) %>" class="btn btn-default">Ideas</a>
+              <a href="<%= url_with->query([t => 'problem']) %>" class="btn btn-default">Problems</a>
+              <a href="<%= url_with->query([t => 'question']) %>" class="btn btn-default">Questions</a>
+              <a href="<%= url_with->query([t => 'thank']) %>" class="btn btn-default">Thanks</a>
             </div>
           </div>
           <div class="col-sm-6">
@@ -130,12 +130,17 @@
             <div class="col-sm-12">
               <div class="callout">
                 <div class="pull-right reply-meta">
-                  <h4 class="text-right"><%== response_icon( $r->type ) %></h4>
+                  <h4 class="text-right"><%== engage_icon( $r->type ) %></h4>
                   <p class="text-right"><%= time_ago( $r->updated ) %></p>
                   <p class="text-right"><%= $r->author->name %></p>
                 </div>
-                <a href="/support/response/<%= $r->type %>/<%= $r->name %>"><h4><%= $r->title %></h4></a>
+                <a href="/support/engage/<%= $r->type %>/<%= $r->name %>"><h4><%= $r->title %></h4></a>
                 <p class=""><%= pluralise( $r->reply_count, 'reply' ) %></p>
+                <div class="post-tags">
+% foreach my $t ( $r->tags ) {
+                  <span class="label label-default"><%= $t->name %></span>
+% }
+                </div>
               </div>
             </div>
           </div>

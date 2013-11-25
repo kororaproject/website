@@ -14,17 +14,23 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="text-center"><strong>Response.</strong></h1>
+            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Converse with the Community</h1>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
             <div class="callout callout-info">
-              <h4><%= $response->title %> <%== response_icon( $response->type, 'pull-right' )%></h4>
-%== $response->content
+              <h4><%= $response->title %> <%== engage_icon( $response->type, 'pull-right' )%></h4>
+%== render_post( $response->content )
+
+              <div class="post-tags">
+% foreach my $t ( $response->tags ) {
+                <span class="label label-default"><%= $t->name %></span>
+% }
+              </div>
 
 % if( post_can_edit( $response ) ) {
-              <button class="btn btn-sm btn-danger"><i class="fa fa-fw fa-edit"></i></button>
+              <a href="<%= url_for('current') . '/edit' %>" class="btn btn-sm btn-danger"><i class="fa fa-fw fa-edit"></i></a>
 % }
             </div>
           </div>

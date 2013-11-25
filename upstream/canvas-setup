@@ -10,27 +10,44 @@ use Data::Dumper;
 use Canvas::Store::WPUser;
 use Canvas::Store::User;
 
+sub migrate_wp_user {
+  my $u = shift;
+
+  return unless defined $u;
+
+  my $wp = Canvas::Store::WPUser->search({ user_login => $u->username })->first;
+
+  return unless defined $wp;
+
+  say 'Found WP user ' . $u->username . '! Migrating ...';
+
+  $u->password( $wp->user_pass );
+  $u->email( $wp->user_email );
+  $u->update;
+}
 
 # create firnsy
 my $firnsy = Canvas::Store::User->find_or_create({
-  name => 'firnsy',
-  uuid => 'woot'
+  username => 'firnsy',
+  status   => 'active',
+  access   => 255,
 });
 
 # create csmart
 my $csmart = Canvas::Store::User->find_or_create({
-  name => 'csmart',
-  uuid => 'weet'
+  username => 'csmart',
+  status   => 'active',
+  access   => 255,
 });
 
 my $test = Canvas::Store::User->find_or_create({
-  name => 'test_subscriber',
-  uuid => 'wuut'
+  username => 'test_subscriber',
+  status   => 'active',
 });
 
 my $woot = Canvas::Store::User->find_or_create({
-  name => 'Anonymous',
-  uuid => 'wiit'
+  username => 'Anonymous',
+  status   => 'active',
 });
 
 
@@ -43,3 +60,7 @@ $test->add_to_user_memberships({
   member_id => $csmart->id,
   access    => 128,
 });
+
+
+migrate_wp_user( $firnsy );
+migrate_wp_user( $csmart );

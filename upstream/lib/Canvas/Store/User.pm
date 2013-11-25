@@ -18,29 +18,161 @@
 package Canvas::Store::User;
 
 use strict;
-use base 'Canvas::Store';
+use Mojo::Base 'Canvas::Store';
 
+#
+# PERL INCLUDES
+#
+use Digest::MD5 qw(md5);
+use Data::Dumper;
+
+#
+# MODEL DEFINITION
+#
 __PACKAGE__->table('canvas_user');
-__PACKAGE__->columns(All => qw/id name uuid description organisation created updated/);
-
-__PACKAGE__->has_many(template_memberships  => 'Canvas::Store::TemplateMembership'  => 'user_id');
-__PACKAGE__->has_many(user_memberships      => 'Canvas::Store::UserMembership'      => 'user_id');
-__PACKAGE__->has_many(ratings               => 'Canvas::Store::Rating'              => 'user_id');
+__PACKAGE__->columns(All => qw/id username email password status realname description organisation access created updated/);
 
 #
-# DIRECT CONNECTIONS (via MAPS)
+# N:N MAPPINGS
 #
+__PACKAGE__->has_many(template_memberships  => 'Canvas::Store::TemplateMembership'    => 'user_id');
+__PACKAGE__->has_many(user_memberships      => 'Canvas::Store::UserMembership'        => 'user_id');
+__PACKAGE__->has_many(ratings               => 'Canvas::Store::Rating'                => 'user_id');
+
+__PACKAGE__->has_many(meta                  => 'Canvas::Store::UserMeta'              => 'user_id');
 __PACKAGE__->has_many(templates             => [ 'Canvas::Store::TemplateMembership'  => 'user_id' ]);
 
 # default value for created
 __PACKAGE__->set_sql(MakeNewObj => qq{
 INSERT INTO __TABLE__ (created, updated, %s)
-VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, %s)
+VALUES (UTC_TIMESTAMP(), UTC_TIMESTAMP(), %s)
 });
 
 __PACKAGE__->set_sql(update => qq {
 UPDATE __TABLE__
-  SET    updated = CURRENT_TIMESTAMP, %s
+  SET    updated = UTC_TIMESTAMP(), %s
   WHERE  __IDENTIFIER__
 });
+
+my $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+sub validate_password($$) {
+  my ( $self, $pass ) = @_;
+
+  my $setting = $self->password;
+
+  say Dumper $setting;
+  say Dumper $pass;
+
+  say Dumper _crypt_private( $pass, $setting );
+  return _crypt_private( $pass, $setting ) eq $self->password;
+}
+
+sub _get_random_bytes {
+  return "abcdef";
+}
+
+sub hash_password($$) {
+  my( $self, $pass ) = @_;
+
+  my $random = _get_random_bytes(6);
+  my $hash = _crypt_private($pass, _gensalt_private($random));
+
+  return length( $hash ) == 34 ? $hash : undef;
+}
+
+sub _crypt_private($$) {
+  my ( $pass, $setting ) = @_;
+
+  my $id = substr($setting, 0, 3);
+
+  # wordpress uses "$p$"
+  return 0 if( $id ne '$P$' && $id ne '$H$' );
+
+  my $count_log2 = index($itoa64, substr( $setting, 3, 1 ));
+  return 0 if( $count_log2 < 7 || $count_log2 > 30 );
+
+  my $count = 1 << $count_log2;
+
+  my $salt = substr $setting, 4, 8;
+  return 0 if( length $salt != 8 );
+
+  my $hash = md5($salt . $pass);
+  do {
+    $hash = md5($hash . $pass);
+  } while (--$count);
+
+  my $output = substr($setting, 0, 12);
+  $output .= _encode64($hash, 16);
+
+  return $output;
+}
+
+sub _gensalt_private($) {
+  my $input = shift;
+
+  my $output = '$P$';
+#  $output .= $itoa64[ min($this->iteration_count_log2 + 5, 30)];
+  # hardcode iterations to 8
+  $output .= substr( $itoa64, ( 8 + 5 ), 1 );
+  $output .= _encode64($input, 6);
+
+  return $output;
+}
+sub _encode64 {
+  my( $input, $count ) = @_;
+  my $output = '';
+  my $i = 0;
+
+  while( $i < $count ) {
+    my $value = ord( substr $input, $i++, 1);
+    $output .= substr $itoa64, ($value & 0x3f), 1;
+
+    if( $i < $count ) {
+      $value |= ord( substr $input, $i, 1 ) << 8;
+    }
+
+    $output .= substr $itoa64, (($value >> 6) & 0x3f), 1;
+
+    last if ($i++ >= $count);
+
+    if( $i < $count ) {
+      $value |= ord( substr $input, $i, 1 ) << 16;
+    }
+
+    $output .= substr $itoa64, (($value >> 12) & 0x3f), 1;
+
+    last if( $i++ >= $count );
+
+    $output .= substr $itoa64, (($value >> 18) & 0x3f), 1;
+  }
+
+  return $output;
+}
+
+
+sub metadata_clear($$) {
+  my( $self, $key ) = @_;
+
+  my @meta = grep { $key eq $_->meta_key } $self->meta;
+
+  return ( @meta ) ? $meta[0]->delete : undef;
+}
+
+sub metadata($$) {
+  my( $self, $key ) = @_;
+
+  my @meta = grep { $key eq $_->meta_key } $self->meta;
+
+  return ( @meta ) ? $meta[0]->meta_value : undef;
+}
+
+sub is_active_account($) {
+  return ( shift->status // '' ) eq 'active';
+}
+
+sub is_admin($) {
+  return ( shift->access // 0 ) == 255;
+}
+
 1;

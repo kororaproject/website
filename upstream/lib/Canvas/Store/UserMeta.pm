@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::Store::Tag;
+package Canvas::Store::UserMeta;
 
 use strict;
 use base 'Canvas::Store';
@@ -28,24 +28,11 @@ use Data::Dumper;
 #
 # MODEL DEFINITION
 #
-__PACKAGE__->table('canvas_tag');
-__PACKAGE__->columns(Primary => qw/id/);
-__PACKAGE__->columns(Essential => qw/name created/);
-
+__PACKAGE__->table('canvas_usermeta');
+__PACKAGE__->columns(All => qw/meta_id user_id meta_key meta_value/);
 
 #
-# N:N MAPPINGS
+# 1:N MAPPINGS
 #
-__PACKAGE__->has_many(post_tags => 'Canvas::Store::PostTag' => 'tag_id');
-__PACKAGE__->has_many(posts => [ 'Canvas::Store::PostTag' => 'post_id' ] );
-
-#
-# INFLATOR/DEFLATORS
-#
-__PACKAGE__->has_a(
-  created => 'Time::Piece',
-  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
-  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
-);
 
 1;

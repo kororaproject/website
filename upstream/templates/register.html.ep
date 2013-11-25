@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'KororaProject'
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'home'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="page-title"><strong>Register.</strong> Join the Community</h1>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6">
+            <h2>Benefits of Korora Prime</h2>
+            <p>The Korora Project is aspiring to provide the best out of box experience for new users through to power users and experts.</p>
+            <p>Right now, a Korora Prime account provides access to particpate with the entire community via <a href="/support/engage">Engage</a>.</p>
+            <p>Down the road, a Korora Prime account will provide single sign on access to other Korora Project services that you choose to be part of.</p>
+          </div>
+          <div class="col-sm-6 callout callout-nfo">
+
+            <form action="/register" method="post" class="form-signin" role="form">
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+                  <input type="text" class="form-control" name="user" placeholder="username">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
+                  <input type="email" class="form-control" name="email" placeholder="mail@domain.com">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
+                  <input type="password" class="form-control" name="pass" placeholder="password">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
+                  <input type="password" class="form-control" name="confirm" placeholder="confirm password">
+                </div>
+              </div>
+              <div class="form-group">
+                <button class="btn btn-large btn-success pull-right" type="submit">Register</button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>

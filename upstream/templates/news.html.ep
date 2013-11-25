@@ -1,11 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="canvas">
 <head>
-  <title>Canvas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
-  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
-  <link href="/css/canvas.css" rel="stylesheet" media="screen">
+  %= include 'header.inc', title => 'KororaProject'
 </head>
 <body>
   <div class="page-container">
@@ -18,7 +14,7 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="text-center">News</h1>
+            <h1 class="page-title"><strong>News.</strong> Latest Updates</h1>
           </div>
         </div>
         % foreach my $n ( @{ $news->{items} } ) {
@@ -50,7 +46,7 @@
           </div>
         </div>
 % }
-% if( is_user_authenticated && auth_user->{wpu}->is_admin  ) {
+% if( news_can_add ) {
         <div class="row">
           <div class="col-sm-12">
             <a class="btn btn-danger" href="/news/create">Create</a>

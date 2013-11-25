@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'KororaProject'
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'support'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="page-title"><strong>Engage.</strong> <%= $type->{title} %> <%== engage_icon( $type->{name} )%></h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <form action="/support/engage/<%= $type->{name} %>/add" method="post" enctype="application/x-www-form-urlencoded">
+              <input type="hidden" name="type" value="<%= $type->{name} %>"></input>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h3>Title</h3>
+                  <input type="text" name="title" class="form-control" value="<%= $title %>"></input>
+                  <div class="hr-sm"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h3>Description</h3>
+                  <textarea name="content" class="form-control" rows="10"></textarea>
+                  <div class="hr-sm"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h3>Status</h3>
+                  <input type="text" name="status" class="form-control"></input>
+                  <div class="hr-sm"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h3>Tags</h3>
+                  <input type="text" name="tags" class="form-control"></input>
+                  <div class="hr-sm"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-6 col-sm-offset-9 col-sm-3">
+                  <button type="submit" class="btn btn-block btn-default"><%== engage_icon( $type->{name} )%></i> Add</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+  <script>
+    $(document).ready( function() {
+      $('.nav-tabs a').click( function(e) {
+        e.preventDefault()
+        $(this).tab('show')
+      });
+    });
+  </script>
+</body>
+</html>

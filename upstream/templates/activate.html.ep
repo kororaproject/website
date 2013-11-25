@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'KororaProject'
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'home'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="page-title"><strong>Activate.</strong> Your Prime Account is Waiting</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h2>Benefits of Korora Prime</h2>
+            <p>The Korora Project is aspiring to provide the best out of box experience for new users through to power users and experts.</p>
+            <p>Right now, a Korora Prime account provides access to particpate with the entire community via <a href="/support/engage">Engage</a>.</p>
+            <p>Down the road, a Korora Prime account will provide single sign on access to other Korora Project services that you choose to be part of.</p>
+          </div>
+          <div class="col-sm-6 callout callout-nfo">
+            <form action="<%= url_with('current')%>" method="post" class="form-signin" role="form">
+              <p>Copy and paste the activation key you received in your email below. Click "Activate" to finalise your account creation.</p>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-key"></i></span>
+                  <input type="text" name="prefix" class="form-control" placeholder="activation code">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <button type="submit" class="btn btn-success">Activate</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+</body>
+</html>

@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS canvas_account;
 DROP TABLE IF EXISTS canvas_accountmembership;
 DROP TABLE IF EXISTS canvas_screenshot;
 DROP TABLE IF EXISTS canvas_package_screenshots;
+DROP TABLE IF EXISTS canvas_postvote;
 
 /* rebuild all tables from scratch */
 DROP TABLE IF EXISTS canvas_user;
@@ -28,22 +29,31 @@ DROP TABLE IF EXISTS canvas_templaterepository;
 DROP TABLE IF EXISTS canvas_machine;
 
 DROP TABLE IF EXISTS canvas_post;
-DROP TABLE IF EXISTS canvas_postvote;
+DROP TABLE IF EXISTS canvas_post_vote;
 DROP TABLE IF EXISTS canvas_postview;
 DROP TABLE IF EXISTS canvas_vote;
 
+DROP TABLE IF EXISTS canvas_tag;
+DROP TABLE IF EXISTS canvas_post_tag;
 
 
 
 
 CREATE TABLE canvas_user (
   id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-  name          VARCHAR(64)   NOT NULL,
-  uuid          VARCHAR(64)   NOT NULL,
+  username      VARCHAR(64)   NOT NULL,
   password      VARCHAR(64)   NOT NULL,
+
+  realname      VARCHAR(128)  NOT NULL,
   email         VARCHAR(128)  NOT NULL,
 
   description   TEXT,
+
+  /*
+  ** pending, active, suspended, closed
+  */
+
+  status        VARCHAR(16)   NOT NULL  DEFAULT 'pending',
 
   /* is this user an organisation  */
   organisation  BOOL          NOT NULL  DEFAULT FALSE,
@@ -56,14 +66,14 @@ CREATE TABLE canvas_user (
   created       DATETIME      NOT NULL,
   updated       DATETIME      NOT NULL,
 
-  UNIQUE (uuid)
+  UNIQUE (username)
 );
 
 CREATE TABLE canvas_usermeta (
- meta_id     INTEGER           NOT NULL PRIMARY KEY  AUTO_INCREMENT,
- user_id     INTEGER           NOT NULL REFERENCES canvas_user (id),
- meta_key    VARCHAR(255)               DEFAULT  NULL,
- meta_value  LONGTEXT                   DEFAULT  NULL
+  meta_id     INTEGER         NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  user_id     INTEGER         NOT NULL  REFERENCES canvas_user (id),
+  meta_key    VARCHAR(64)               DEFAULT  NULL,
+  meta_value  LONGTEXT                  DEFAULT  NULL
 );
 
 
@@ -299,7 +309,7 @@ CREATE TABLE canvas_machine (
 
 
 /*
-** KORORA CANVAS - POST / ASK STRUCTURES
+** KORORA CANVAS - POST / ENGAGE STRUCTURES
 */
 
 /*
@@ -323,7 +333,7 @@ CREATE TABLE canvas_post (
   ** question: answered, waiting
   ** problem: waiting, known, progress, not, solved
   ** thanks: n/a
-  ** idea: considered, declined, planned, progress, complete, feedback, waiting
+  ** idea: considered, declined, planned, progress, complete, feedback
   ** reply: standard, answer
   */
   status        VARCHAR(16)           NOT NULL,
@@ -351,13 +361,33 @@ CREATE TABLE canvas_post (
   updated       DATETIME              NOT NULL
 );
 
+
+CREATE TABLE canvas_tag (
+  id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  name          VARCHAR(255)  NOT NULL,
+
+  created       DATETIME      NOT NULL
+);
+
+CREATE TABLE canvas_post_tag (
+  tag_id        INTEGER       NOT NULL REFERENCES canvas_tag(id),
+  post_id       INTEGER       NOT NULL REFERENCES canvas_post(id),
+  created       DATETIME      NOT NULL,
+
+  PRIMARY KEY (tag_id, post_id)
+);
+
 CREATE TABLE canvas_vote (
   id            INTEGER   NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+
+  /* value to apply to vote tally */
   cast_value    INTEGER   NOT NULL  DEFAULT 0,
+
+  /* value to apply to the voter */
   caster_value  INTEGER   NOT NULL  DEFAULT 0
 );
 
-CREATE TABLE canvas_postvote (
+CREATE TABLE canvas_post_vote (
   post_id       INTEGER       NOT NULL REFERENCES canvas_post(id),
   user_id       INTEGER       NOT NULL REFERENCES canvas_user(id),
   vote_id       INTEGER       NOT NULL REFERENCES canvas_vote(id),

@@ -7,8 +7,8 @@
         <ul class="nav nav-tabs nav-justified">
           <li class="active"><a class="muted" href="#login" data-toggle="tab">Login</a></li>
           <li><a class="muted" href="#forgot" data-toggle="tab">Forgot Password</a></li>
-          <li><a class="" href="#signup" data-toggle="tab">Register</a></li>
         </ul>
+
         <div class="tab-content">
 
           <!-- TAB - LOGIN -->
@@ -52,43 +52,8 @@
             </form>
           </div>
 
-          <!-- TAB - REGISTER -->
-          <div id="signup" class="tab-pane">
-            <form action="index.html" class="form-signin" role="form">
-              <div class="form-group">
-              </div>
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                  <input type="text" class="form-control" name="user" placeholder="username">
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
-                  <input type="email" class="form-control" name="email" placeholder="mail@domain.com">
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-                  <input type="password" class="form-control" name="pass" placeholder="password">
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-                  <input type="password" class="form-control" name="confirm" placeholder="confirm password">
-                </div>
-              </div>
-              <div class="form-group">
-                <button class="btn btn-large btn-success btn-block" type="submit">Register</button>
-              </div>
-            </div>
-          </div>
-
         </div>
-      </form>
+      </div><!-- /.modal-body -->
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->

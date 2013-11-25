@@ -32,38 +32,20 @@ use Data::Dumper;
 __PACKAGE__->table('canvas_post');
 __PACKAGE__->columns(All => qw/id author parent_id password type status name title excerpt content reply_status reply_count created updated/);
 
+#
+# 1:N MAPPINGS
+#
 __PACKAGE__->has_a( parent_id => __PACKAGE__ );
 __PACKAGE__->has_a( author => 'Canvas::Store::User' );
 
+#
+# N:N MAPPINGS
+#
+__PACKAGE__->has_many(post_tags => 'Canvas::Store::PostTag' => 'post_id');
+__PACKAGE__->has_many(tags => [ 'Canvas::Store::PostTag' => 'tag_id' ] );
 
 #
-# IDEAS
-__PACKAGE__->add_constructor( forum_name => qq{ post_type='forum' AND post_name=? } );
-
-__PACKAGE__->add_constructor( ideas => qq{ type='idea' AND parent=? ORDER BY name } );
-__PACKAGE__->add_constructor( questions => qq{ type='question' AND parent=? ORDER BY name } );
-__PACKAGE__->add_constructor( problems => qq{ type='problem' AND parent=? ORDER BY name } );
-__PACKAGE__->add_constructor( thanks => qq{ type='thank' AND parent=? ORDER BY name } );
-
-#
-# TOPICS
-__PACKAGE__->add_constructor( topic_name => qq{ post_type='topic' AND post_name=? } );
-__PACKAGE__->add_constructor( topics_newest => qq{ post_type='topic' AND post_parent=? ORDER BY post_modified_gmt DESC,post_name } );
-__PACKAGE__->add_constructor( topics => qq{ post_type='topic' AND post_parent=? ORDER BY post_date_gmt DESC,post_name } );
-
-
-#
-# STREAM
-__PACKAGE__->add_constructor( replies => qq{ name=? AND parent_id != 0 ORDER BY created ASC } );
-
-sub freshness {
-  my $self = shift;
-
-  # post_parent=? ORDER BY post_modified_gmt DESC LIMIT 1
-}
-
-#
-# DATETIME FIELDS
+# INFLATOR/DEFLATORS
 #
 __PACKAGE__->has_a(
   created => 'Time::Piece',
@@ -78,11 +60,36 @@ __PACKAGE__->has_a(
 );
 
 #
+# DECORATORS
+#
+
+# GROUPS (ideas, questions, problems and thanks)
+__PACKAGE__->add_constructor( ideas => qq{ type='idea' AND parent=? ORDER BY name } );
+__PACKAGE__->add_constructor( questions => qq{ type='question' AND parent=? ORDER BY name } );
+__PACKAGE__->add_constructor( problems => qq{ type='problem' AND parent=? ORDER BY name } );
+__PACKAGE__->add_constructor( thanks => qq{ type='thank' AND parent=? ORDER BY name } );
+
+# REPLY STREAM
+__PACKAGE__->add_constructor( replies => qq{ name=? AND parent_id != 0 ORDER BY created ASC } );
+
+#
+# UPDATE HELPER
+#
+
+sub tag_list {
+  return join ', ', map { $_->name } shift->tags;
+}
+
+sub tag_list_array {
+  return map { $_->name } shift->tags;
+}
+
+#
 # UPDATE HELPER
 #
 __PACKAGE__->set_sql(update => qq{
  UPDATE __TABLE__
-  SET updated=NOW(), %s
+  SET updated=UTC_TIMESTAMP(), %s
    WHERE  __IDENTIFIER__
 });
 

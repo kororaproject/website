@@ -26,10 +26,35 @@ use Mojo::Base 'Mojolicious::Controller';
 # PERL INCLUDES
 #
 use Data::Dumper;
+use Mojo::Util qw(b64_encode url_escape url_unescape);
+
+#
+# LOCAL INCLUDES
+#
+use Canvas::Store::User;
+use Canvas::Store::UserMeta;
+
+#
+# INTERNAL HELPERS
+#
+
+#
+# create_auth_token()
+#
+sub create_auth_token {
+  open( DEV, "/dev/urandom" ) or die "Cannot open file: $!";
+  read( DEV, my $bytes, 48 );
+
+  close( DEV );
+  my $token = b64_encode( $bytes );
+  chomp $token;
+
+  return $token;
+}
 
 
 #
-# CONTROLLER HANDLERS
+# controller handlers
 #
 sub index {
   my $self = shift;
@@ -86,23 +111,160 @@ sub deauth {
   return $self->redirect_to( $url );
 };
 
-sub register {
+sub activated {
   my $self = shift;
 
-  my $to = $self->param('to') // 'firnsy@securixlive.com';
-  my $subject = $self->param('subject') // 'subject of awesomeness';
-  my $data = $self->param('data') // 'this is some content.';
+  my $username = $self->flash('username');
 
-  $self->mail(
-    to      => $to,
-    subject => $subject,
-    data    => $data,
+  return $self->redirect_to( '/' ) unless defined $username;
+
+  $self->stash( username => $username );
+  $self->render('activated');
+}
+
+sub activate_get {
+  my $self = shift;
+
+  my $suffix = $self->param('token');
+  my $username = $self->param('username');
+
+  # lookup the requested account for activation
+  my $u = Canvas::Store::User->search({ username => $username })->first;
+
+  # redirect to home unless account and activation token suffix exists
+  return $self->redirect_to('/') unless(
+    defined $u &&
+    defined $suffix
   );
+
+  $self->stash( username => $username );
+  $self->render('activate');
+}
+
+sub activate_post {
+  my $self = shift;
+
+  my $username = $self->param('username');
+  my $prefix = $self->param('prefix');
+  my $suffix = $self->param('token');
+
+  # lookup the requested account for activation
+  my $u = Canvas::Store::User->search({ username => $username })->first;
+
+  # redirect to home unless account and activation token prefix/suffix exists
+  return $self->redirect_to('/') unless(
+    defined $u &&
+    defined $prefix &&
+    defined $suffix
+  );
+
+  # TODO: check account age
+
+  # build the supplied token and fetch the stored token
+  my $token_supplied = $prefix . url_unescape( $suffix );
+  my $token = url_unescape( $u->metadata('activation_token') // '' );
+
+  # redirect to home unless supplied and stored tokens match
+  return $self->redirect_to('/') unless $token eq $token_supplied;
+
+  $u->status('active');
+  $u->update;
+
+  $u->metadata_clear('activation_token');
+
+  $self->flash( username => $username );
+
+  $self->redirect_to('/activated');
+}
+
+sub registered {
+  my $self = shift;
+
+  my $url  = $self->flash('redirect_to');
+  my $hash = $self->flash('hash');
+
+  return $self->redirect_to( '/' ) unless(
+    defined $url &&
+    defined $hash
+  );
+
+  $self->stash( redirect_to => $url, hash => $hash );
+  $self->render('registered');
+}
+
+sub register_get {
+  shift->render('register');
+}
+
+sub register_post {
+  my $self = shift;
 
   # extract the redirect url and fall back to the index
   my $url = $self->param('redirect_to') // '/';
 
-  $self->redirect_to( $url );
+  # grab registration details
+  my $user = $self->param('user');
+  my $pass = $self->param('pass');
+  my $pass_confirm = $self->param('confirm');
+  my $email = $self->param('email');
+
+  # TODO: validate email address
+
+
+  # validate passwords are the same and have length
+  return $self->redirect_to( $url ) unless(
+    length $pass >= 8 &&
+    $pass eq $pass_confirm
+  );
+
+  my $u = Canvas::Store::User->create({
+    username  => $user,
+    email     => $email,
+  });
+
+  my $message = '';
+
+  if( defined $u ) {
+    # store password as a salted hash
+    $u->password( $u->hash_password( $pass ) );
+    $u->update;
+
+    # generate activiation token
+    my $token = create_auth_token;
+
+    my $um = Canvas::Store::UserMeta->create({
+      user_id     => $u->id,
+      meta_key    => 'activation_token',
+      meta_value  => url_escape $token,
+    });
+
+    my $activation_key = substr( $token, 0, 31 );
+    my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 31 );
+
+    $message = "" .
+      "G'day,\n\n" .
+      "Thank you for registering to be part of our Korora community.\n\n".
+      "Your activiation key is: " . $activation_key . "\n\n" .
+      "In order to activate your Korora Prime account, copy your activation key and follow the prompts at: " . $activation_url . "\n\n" .
+      "Please note that you must activate your account within 24 hours.\n\n" .
+#      "If you have any questions regarding his process, click 'Reply' in your email client and we'll be only too happy to help.\n\n" .
+      "Regards,\n" .
+      "The Korora Team.\n";
+
+    my $subject = $self->param('subject') // 'subject of awesomeness';
+
+    # send the activiation email
+    $self->mail(
+      to      => $email,
+      from    => 'accounts@kororaproject.org',
+      subject => 'Korora Project - Prime Registration',
+      data    => $message,
+    );
+  }
+
+  $self->flash( redirect_to => $url, hash => $message );
+
+  $self->redirect_to('/registered');
 }
 
 

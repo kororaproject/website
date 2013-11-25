@@ -132,7 +132,7 @@ sub post_create {
   # only allow authenticated and authorised users
   $self->redirect_to('/') unless (
     $self->is_user_authenticated() &&
-    $self->auth_user->{wpu}->is_admin
+    $self->auth_user->is_admin
   );
 
   my $cache = {
@@ -153,15 +153,12 @@ sub post_create {
 sub post_edit {
   my $self = shift;
 
-  # only allow authenticated and authorised users
-  $self->redirect_to('/') unless (
-    $self->is_user_authenticated() &&
-    $self->auth_user->{wpu}->is_admin
-  );
-
   my $stub = $self->param('id');
 
   my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
+
+  # only allow authenticated and authorised users
+  $self->redirect_to('/') unless $self->post_can_edit( $p );
 
   # check we found the post
   $self->redirect_to('/') unless defined $p;
@@ -189,7 +186,7 @@ sub post_update {
   # only allow authenticated and authorised users
   $self->redirect_to('/') unless (
     $self->is_user_authenticated() &&
-    $self->auth_user->{wpu}->is_admin
+    $self->auth_user->is_admin
   );
 
   my $stub = $self->param('post_id');
@@ -217,7 +214,7 @@ sub post_update {
       post_title        => $self->param('post_title'),
       post_content      => $self->param('post_content'),
       post_excerpt      => $self->param('post_excerpt'),
-      post_author       => $self->auth_user->{wpu}->ID,
+      post_author       => $self->auth_user->id,
       post_date_gmt     => $now,
       post_modified_gmt => $now,
     });
@@ -232,7 +229,7 @@ sub post_delete {
   # only allow authenticated and authorised users
   $self->redirect_to('/') unless (
     $self->is_user_authenticated() &&
-    $self->auth_user->{wpu}->is_admin
+    $self->auth_user->is_admin
   );
 
   my $stub = $self->param('id');

@@ -33,6 +33,7 @@ use Mojo::JSON;
 use Mojolicious::Plugin::Authentication;
 
 use POSIX qw(floor);
+use Text::MultiMarkdown;
 use Time::Piece;
 
 #
@@ -40,7 +41,6 @@ use Time::Piece;
 #
 use Canvas::About;
 use Canvas::Site;
-use Canvas::Store::WPUser;
 use Canvas::Store::User;
 
 #
@@ -67,19 +67,15 @@ sub startup {
     load_user => sub {
       my ($app, $uid) = @_;
 
-      return {
-        wpu => Canvas::Store::WPUser->retrieve( user_login => $uid ),
-        u   => Canvas::Store::User->search( name => $uid )->first,
-      };
+      return Canvas::Store::User->search( username => $uid )->first;
     },
     validate_user => sub {
       my ($app, $user, $pass, $extradata) = @_;
 
-      my $wpu = Canvas::Store::WPUser->retrieve( user_login => $user );
-      my( $u ) = Canvas::Store::User->search( name => $user );
+      my $u = Canvas::Store::User->search( username => $user )->first;
 
-      if( defined($u) && defined($wpu) && $wpu->validate_password($pass) ) {
-        return $wpu->user_login;
+      if( defined($u) && $u->validate_password($pass) ) {
+        return $u->username;
       };
 
       return undef;
@@ -130,8 +126,10 @@ sub startup {
     $time = Time::Piece->new( $time ) unless ref $time eq 'Time::Piece';
 
     my $d = $now - $time;
-    my $t = 'One';
-    my $u = 'moment';
+    my $t;
+    my $u;
+
+    return 'One moment ago' if ( $d < 60 );
 
     if( $d > 604800 ) {
       $t = floor( $d / 604800 );
@@ -145,7 +143,7 @@ sub startup {
       $t = floor( $d / 3600 );
       $u = 'hour';
     }
-    elsif( $d > 60 ) {
+    else {
       $t = floor( $d / 60 );
       $u = 'minute';
     }
@@ -153,7 +151,7 @@ sub startup {
     return $self->pluralise( $t, $u ) . ' ago';
   });
 
-  $self->helper(response_icon => sub {
+  $self->helper(engage_icon => sub {
     my( $self, $type, $classes ) = @_;
 
     $classes //= '';
@@ -168,6 +166,30 @@ sub startup {
     return '<i class="fa ' . ( $map->{ $type } // 'fa-ban' ) . ' ' . $classes . '"></i>';
   });
 
+  $self->helper(render_post => sub {
+    my( $self, $post ) = @_;
+
+    my $m = Text::MultiMarkdown->new(
+      tab_width   => 2,
+      heading_ids => 0,
+      img_ids     => 0,
+    );
+
+    return $m->markdown( $post );
+  });
+
+  $self->helper(news_can_add => sub {
+    my( $self ) = @_;
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    return 1 if $self->auth_user->is_admin;
+
+    return 0;
+  });
+
   $self->helper(post_can_edit => sub {
     my( $self, $post ) = @_;
 
@@ -175,9 +197,13 @@ sub startup {
 
     return 0 unless defined $self->auth_user;
 
-    return 1 if $self->auth_user->{wpu}->is_admin;
+    return 0 unless $self->auth_user->is_active_account;
 
-    return 1 if $self->auth_user->{u}->id == $post->author->id;
+    say "is active";
+
+    return 1 if $self->auth_user->is_admin;
+
+    return 1 if $self->auth_user->id == $post->author->id;
 
     return 0;
   });
@@ -261,13 +287,15 @@ sub startup {
   $r->get('/forum/:name')->to('forum#forum_name');
   $r->get('/topic/:name')->to('forum#topic_name');
 
-  $r->get('/support/response')->to('response#index');
-  $r->get('/support/response/:type')->to('response#summary');
-  $r->get('/support/response/:type/add')->to('response#response_prepare');
-  $r->post('/support/response/:type/add')->to('response#add');
-  $r->get('/support/response/:type/:stub')->to('response#detail');
-  $r->get('/support/response/:type/:stub/reply')->to('response#reply_get');
-  $r->post('/support/response/:type/:stub/reply')->to('response#reply');
+  $r->get('/support/engage')->to('engage#index');
+  $r->get('/support/engage/:type')->to('engage#summary');
+  $r->get('/support/engage/:type/add')->to('engage#engage_prepare');
+  $r->post('/support/engage/:type/add')->to('engage#add');
+  $r->get('/support/engage/:type/:stub')->to('engage#detail');
+  $r->get('/support/engage/:type/:stub/edit')->to('engage#edit_get');
+  $r->post('/support/engage/:type/:stub/edit')->to('engage#edit');
+  $r->get('/support/engage/:type/:stub/reply')->to('engage#reply_get');
+  $r->post('/support/engage/:type/:stub/reply')->to('engage#reply');
 
   # download pages
   $r->get('/download')->to('site#download');
@@ -284,10 +312,12 @@ sub startup {
   # authentication and registration
   $r->any('/authenticate')->to('site#auth');
   $r->any('/deauthenticate')->to('site#deauth');
-  $r->get('/register')->to('site#register');
-
-
-
+  $r->get('/register')->to('site#register_get');
+  $r->post('/register')->to('site#register_post');
+  $r->get('/registered')->to('site#registered');
+  $r->get('/activate/:username')->to('site#activate_get');
+  $r->post('/activate/:username')->to('site#activate_post');
+  $r->get('/activated')->to('site#activated');
 
 
   my $r_api = $r->under('/api');
@@ -315,7 +345,6 @@ sub startup {
   $r_api->get('/user/:user/template/:name')->to('core#user_user_template_name_get');
   $r_api->put('/user/:user/template/:name')->to('core#user_user_template_name_put');
   $r_api->delete('/user/:user/template/:name')->to('core#user_user_template_name_del');
-
 
   # catch all
 #  $r->get('/(*trap)')->to('site#index');
