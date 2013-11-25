@@ -43,7 +43,7 @@
             <div class="callout">
               <div class="pull-right reply-meta">
                 <p class="text-right"><%= time_ago( $r->updated ) %></p>
-                <p class="text-right"><%= $r->author->name %></p>
+                <p class="text-right"><%= $r->author->username %></p>
               </div>
 %== $r->content
           </div>
