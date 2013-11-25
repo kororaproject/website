@@ -132,7 +132,7 @@
                 <div class="pull-right reply-meta">
                   <h4 class="text-right"><%== engage_icon( $r->type ) %></h4>
                   <p class="text-right"><%= time_ago( $r->updated ) %></p>
-                  <p class="text-right"><%= $r->author->name %></p>
+                  <p class="text-right"><%= $r->author->username %></p>
                 </div>
                 <a href="/support/engage/<%= $r->type %>/<%= $r->name %>"><h4><%= $r->title %></h4></a>
                 <p class=""><%= pluralise( $r->reply_count, 'reply' ) %></p>
