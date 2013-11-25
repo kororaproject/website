@@ -33,7 +33,8 @@ use Mojo::JSON;
 use Mojolicious::Plugin::Authentication;
 
 use POSIX qw(floor);
-use Text::MultiMarkdown;
+use Text::Markdown;
+#use Text::MultiMarkdown;
 use Time::Piece;
 
 #
@@ -169,10 +170,11 @@ sub startup {
   $self->helper(render_post => sub {
     my( $self, $post ) = @_;
 
-    my $m = Text::MultiMarkdown->new(
+#    my $m = Text::MultiMarkdown->new(
+    my $m = Text::Markdown->new(
       tab_width   => 2,
-      heading_ids => 0,
-      img_ids     => 0,
+#      heading_ids => 0,
+#      img_ids     => 0,
     );
 
     return $m->markdown( $post );

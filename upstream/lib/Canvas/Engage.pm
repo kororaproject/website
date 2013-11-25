@@ -226,7 +226,7 @@ sub add {
     type         => $type,
     title        => $self->param('title'),
     content      => $self->param('content'),
-    author       => $self->auth_user->{u}->id,
+    author       => $self->auth_user->id,
     created      => $now,
     updated      => $now,
   });
@@ -383,7 +383,7 @@ sub reply {
     name         => $stub,
     type         => 'reply',
     content      => $content,
-    author       => $self->auth_user->{u}->id,
+    author       => $self->auth_user->id,
     created      => $now,
     updated      => $now,
     parent_id    => $p->id
