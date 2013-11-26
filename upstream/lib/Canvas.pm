@@ -312,14 +312,15 @@ sub startup {
   $r->get('/news/:id/delete')->to('news#post_delete');
 
   # authentication and registration
-  $r->any('/authenticate')->to('site#auth');
-  $r->any('/deauthenticate')->to('site#deauth');
+  $r->any('/authenticate')->to('site#authenticate_any');
+  $r->any('/deauthenticate')->to('site#deauthenticate_any');
   $r->get('/register')->to('site#register_get');
   $r->post('/register')->to('site#register_post');
-  $r->get('/registered')->to('site#registered');
+  $r->get('/registered')->to('site#registered_get');
   $r->get('/activate/:username')->to('site#activate_get');
   $r->post('/activate/:username')->to('site#activate_post');
   $r->get('/activated')->to('site#activated');
+  $r->post('/forgot')->to('site#forgot_post');
 
 
   my $r_api = $r->under('/api');
@@ -349,7 +350,7 @@ sub startup {
   $r_api->delete('/user/:user/template/:name')->to('core#user_user_template_name_del');
 
   # catch all
-#  $r->get('/(*trap)')->to('site#index');
+  $r->any('/(*trap)')->to('site#trap');
 }
 
 1;

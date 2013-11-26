@@ -38,7 +38,6 @@ DROP TABLE IF EXISTS canvas_post_tag;
 
 
 
-
 CREATE TABLE canvas_user (
   id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
   username      VARCHAR(64)   NOT NULL,
@@ -66,7 +65,8 @@ CREATE TABLE canvas_user (
   created       DATETIME      NOT NULL,
   updated       DATETIME      NOT NULL,
 
-  UNIQUE (username)
+  UNIQUE (username),
+  UNIQUE (email)
 );
 
 CREATE TABLE canvas_usermeta (

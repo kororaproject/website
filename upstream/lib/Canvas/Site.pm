@@ -33,6 +33,7 @@ use Mojo::Util qw(b64_encode url_escape url_unescape);
 #
 use Canvas::Store::User;
 use Canvas::Store::UserMeta;
+use Canvas::Store::WPUser;
 
 #
 # INTERNAL HELPERS
@@ -82,25 +83,80 @@ sub login {
   $self->render('login');
 }
 
-sub auth {
+sub authenticate_any {
   my $self = shift;
   my $json = Mojo::JSON->new;
   my $data = $json->decode($self->req->body);
 
   # collect first out of the parameters and then json decoded body
-  my $u = $self->param('u') // $data->{u} // '';
-  my $p = $self->param('p') // $data->{p} // '';
-
-  if( $self->authenticate($u, $p) ) {
-  }
+  my $user = $self->param('u') // $data->{u} // '';
+  my $pass = $self->param('p') // $data->{p} // '';
 
   # extract the redirect url and fall back to the index
   my $url = $self->param('redirect_to') // $data->{redirect_to} // '/';
 
+  # TODO: remove after 2 months and 2 weeks of live
+
+  # attempt to find new backend user
+  my $u = Canvas::Store::User->search({ username => $user })->first;
+
+  # if now found fallback to WP backend detection
+  unless( defined $u ) {
+    my $wp = Canvas::Store::WPUser->search({ user_login => $user })->first;
+
+    # start migration if a WP user is found and the password is valid
+    if( defined $wp && $wp->validate_password( $pass ) ) {
+
+      # create new user based on WP details
+      $u = Canvas::Store::User->create({
+        username  => $user,
+        password  => $wp->user_pass,
+        email     => $wp->user_email,
+      });
+
+      # generate activiation token
+      my $token = create_auth_token;
+
+      my $um = Canvas::Store::UserMeta->create({
+        user_id     => $u->id,
+        meta_key    => 'activation_token',
+        meta_value  => url_escape $token,
+      });
+
+      my $activation_key = substr( $token, 0, 31 );
+      my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 31 );
+
+      my $message = "" .
+        "G'day,\n\n" .
+        "Thank you for continuing to be a part of our Korora community.\n\n".
+        "Your activiation key is: " . $activation_key . "\n\n" .
+        "In order to activate your migrated Korora Prime account, copy your activation key and follow the prompts at: " . $activation_url . "\n\n" .
+        "Please note that you must activate your account within 24 hours.\n\n" .
+        "Regards,\n" .
+        "The Korora Team.\n";
+
+      # send the activiation email
+      $self->mail(
+        to      => $email,
+        from    => 'accounts@kororaproject.org',
+        subject => 'Korora Project - Prime Registration',
+        data    => $message,
+      );
+
+      $self->flash( redirect_to => $url );
+
+      return $self->redirect_to('/registered');
+    }
+  }
+
+  unless( $self->authenticate($user, $pass) ) {
+    $self->flash( page_errors => 'The username or password was incorrect.' );
+  }
+
   return $self->redirect_to( $url );
 };
 
-sub deauth {
+sub deauthenticate_any {
   my $self = shift;
 
   $self->logout;
@@ -137,7 +193,13 @@ sub activate_get {
     defined $suffix
   );
 
-  $self->stash( username => $username );
+  my $error = $self->flash('error') // { code => 0, message => '' };
+
+  $self->stash(
+    username    => $username,
+    error       => $error
+  );
+
   $self->render('activate');
 }
 
@@ -165,7 +227,10 @@ sub activate_post {
   my $token = url_unescape( $u->metadata('activation_token') // '' );
 
   # redirect to home unless supplied and stored tokens match
-  return $self->redirect_to('/') unless $token eq $token_supplied;
+  unless( $token eq $token_supplied ) {
+    $self->flash( error => { code => 1, message => 'Your token is invalid.' });
+    return $self->redirect_to( $self->url_with('current') );
+  };
 
   $u->status('active');
   $u->update;
@@ -177,7 +242,69 @@ sub activate_post {
   $self->redirect_to('/activated');
 }
 
-sub registered {
+sub forgot_post {
+  my $self = shift;
+
+  my $email = $self->param('email');
+
+  # extract the redirect url and fall back to the index
+  my $url = $self->param('redirect_to') // '/';
+
+  # validate email address
+  unless( $email =~ m/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/ ) {
+    $self->flash( page_errors => 'Your email address is invalid.' );
+
+    return $self->redirect_to( $url );
+  }
+
+  my $u = Canvas::Store::User->search({ email => $email })->first;
+
+  # validate email is available
+  unless( defined $u ) {
+    $self->flash( page_errors => 'Your email is not registered.' );
+
+    return $self->redirect_to( $url );
+  }
+
+  # change account status to pending
+  $u->status('pending');
+  $u->update;
+
+  # generate activiation token
+  my $token = create_auth_token;
+
+  my $um = Canvas::Store::UserMeta->create({
+    user_id     => $u->id,
+    meta_key    => 'activation_token',
+    meta_value  => url_escape $token,
+  });
+
+  my $activation_key = substr( $token, 0, 31 );
+  my $activation_url = 'https://kororaproject.org/activate/' . $u->username . '?token=' . url_escape substr( $token, 31 );
+
+  my $message = "" .
+    "G'day,\n\n" .
+    "We've temporarily deactivated your account to prevent unauthorised activity.\n\n".
+    "Your activiation key is: " . $activation_key . "\n\n" .
+    "In order to activate your Korora Prime account, copy your activation key and follow the prompts at: " . $activation_url . "\n\n" .
+    "Please note that you must re-activate your account within 24 hours.\n\n" .
+#      "If you have any questions regarding his process, click 'Reply' in your email client and we'll be only too happy to help.\n\n" .
+    "Regards,\n" .
+    "The Korora Team.\n";
+
+  # send the activiation email
+  $self->mail(
+    to      => $email,
+    from    => 'accounts@kororaproject.org',
+    subject => 'Korora Project - Prime Re-activation / Lost Password',
+    data    => $message,
+  );
+
+  $self->flash( page_info => 'A re-activation email has been sent to your account.' );
+  $self->redirect_to( $url );
+}
+
+sub registered_get {
   my $self = shift;
 
   my $url  = $self->flash('redirect_to');
@@ -243,16 +370,23 @@ sub register_post {
     return $self->redirect_to('/register');
   }
 
+  # validate email is available
+  if( defined Canvas::Store::User->search({ email => $email, })->first ) {
+    $self->flash( error => { code => 4, message => 'That email already exists.' } );
+
+    return $self->redirect_to('/register');
+  }
+
   # validate passwords have sufficient length
   if( length $pass < 8 ) {
-    $self->flash( error => { code => 4, message => 'Your password must be at least 8 characters long.' });
+    $self->flash( error => { code => 5, message => 'Your password must be at least 8 characters long.' });
 
     return $self->redirect_to('/register');
   }
 
   # validate passwords match
   if( $pass ne $pass_confirm ) {
-    $self->flash( error => { code => 5, message => 'Your passwords don\'t match.' } );
+    $self->flash( error => { code => 6, message => 'Your passwords don\'t match.' } );
 
     return $self->redirect_to('/register');
   };
@@ -312,7 +446,7 @@ sub trap {
   my $path = $self->param('trap');
 
   # HTML5 mode forwarding based on valid paths
-  $self->redirect_to('/#!/' . $path);
+  $self->redirect_to('/');
 };
 
 

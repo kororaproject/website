@@ -27,40 +27,42 @@ sub migrate_wp_user {
 }
 
 # create firnsy
-my $firnsy = Canvas::Store::User->find_or_create({
-  username => 'firnsy',
-  status   => 'active',
-  access   => 255,
-});
+if( 0 ) {
+  my $firnsy = Canvas::Store::User->find_or_create({
+    username => 'firnsy',
+    status   => 'active',
+    access   => 255,
+  });
 
 # create csmart
-my $csmart = Canvas::Store::User->find_or_create({
-  username => 'csmart',
-  status   => 'active',
-  access   => 255,
-});
+  my $csmart = Canvas::Store::User->find_or_create({
+    username => 'csmart',
+    status   => 'active',
+    access   => 255,
+  });
 
-my $test = Canvas::Store::User->find_or_create({
-  username => 'test_subscriber',
-  status   => 'active',
-});
+  my $test = Canvas::Store::User->find_or_create({
+    username => 'test_subscriber',
+    status   => 'active',
+  });
 
-my $woot = Canvas::Store::User->find_or_create({
-  username => 'Anonymous',
-  status   => 'active',
-});
-
-
-$test->add_to_user_memberships({
-  member_id => $firnsy->id,
-  access    => 128,
-});
-
-$test->add_to_user_memberships({
-  member_id => $csmart->id,
-  access    => 128,
-});
+  my $woot = Canvas::Store::User->find_or_create({
+    username => 'Anonymous',
+    status   => 'active',
+  });
 
 
-migrate_wp_user( $firnsy );
-migrate_wp_user( $csmart );
+  $test->add_to_user_memberships({
+    member_id => $firnsy->id,
+    access    => 128,
+  });
+
+  $test->add_to_user_memberships({
+    member_id => $csmart->id,
+    access    => 128,
+  });
+
+
+  migrate_wp_user( $firnsy );
+  migrate_wp_user( $csmart );
+};
