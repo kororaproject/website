@@ -37,10 +37,10 @@
           <div class="col-sm-offset-5 col-sm-2 text-center">
             <div class="btn-group">
 % if( $news->{page} > 0 ) {
-              <a href="<%= url_for('/news?page=' . ($news->{page} - 1) ) %>" class="btn btn-default"><b class="icon-chevron-left"></b></a>
+              <a href="<%= url_for('/news?page=' . ($news->{page} - 1) ) %>" class="btn btn-default"><i class="fa fa-fw fa-chevron-left"></i></a>
 % }
 % if( $news->{page} < $news->{page_last} ) {
-              <a href="<%= url_for('/news?page=' . ($news->{page} + 1) ) %>" class="btn btn-default"><b class="icon-chevron-right"></b></a>
+              <a href="<%= url_for('/news?page=' . ($news->{page} + 1) ) %>" class="btn btn-default"><i class="fa fa-fw fa-chevron-right"></i></a>
 % }
             </div>
           </div>
