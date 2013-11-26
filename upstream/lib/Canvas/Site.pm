@@ -137,7 +137,7 @@ sub authenticate_any {
 
       # send the activiation email
       $self->mail(
-        to      => $email,
+        to      => $u->email,
         from    => 'accounts@kororaproject.org',
         subject => 'Korora Project - Prime Registration',
         data    => $message,
