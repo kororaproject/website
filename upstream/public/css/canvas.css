@@ -173,6 +173,12 @@ blockquote p {
 .modal-footer {
 }
 
+
+.modal-tab-content {
+  padding: 16px 0 0 0 !important;
+  margin-bottom: 0 !important;
+}
+
 /*
 ** LOGOS / IMAGES
 */
@@ -396,7 +402,7 @@ blockquote p {
 .callout > h2:first-child,
 .callout > h3:first-child,
 .callout > h4:first-child {
-  margin-top: 0;
+  margin-top: 4px;
   margin-bottom: 8px;
 }
 .callout p:last-child {
@@ -561,6 +567,18 @@ blockquote p {
 .navbar-default .nav-home {
   border-right: 2px solid #3276b1;
   border-left: 2px solid transparent;
+}
+
+
+#page-notifications {
+  position: fixed;
+
+  top: 0;
+  width: 100%;
+
+  text-align: center;
+
+  z-index: 999999;
 }
 
 #social {
@@ -911,12 +929,4 @@ h4.step {
   margin-left: 2px;
   cursor: pointer;
   cursor: hand;
-}
-
-/*
-** MODALS
-*/
-
-#login-modal {
-  min-height: 380px;
 }
