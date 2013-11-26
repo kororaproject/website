@@ -181,19 +181,22 @@ sub registered {
   my $self = shift;
 
   my $url  = $self->flash('redirect_to');
-  my $hash = $self->flash('hash');
 
-  return $self->redirect_to( '/' ) unless(
-    defined $url &&
-    defined $hash
-  );
+  return $self->redirect_to( '/' ) unless defined $url;
 
-  $self->stash( redirect_to => $url, hash => $hash );
+  $self->stash( redirect_to => $url );
   $self->render('registered');
 }
 
 sub register_get {
-  shift->render('register');
+  my $self = shift;
+
+  my $error = $self->flash('error') // { code => 0, message => '' };
+  my $values = $self->flash('values') // { user => '', email => '' };
+
+  $self->stash( error => $error, values => $values );
+
+  $self->render('register');
 }
 
 sub register_post {
@@ -208,16 +211,52 @@ sub register_post {
   my $pass_confirm = $self->param('confirm');
   my $email = $self->param('email');
 
-  # TODO: validate email address
-
-
-  # validate passwords are the same and have length
-  return $self->redirect_to( $url ) unless(
-    length $pass >= 8 &&
-    $pass eq $pass_confirm
+  # flash the redirect and previous values for future redirects
+  $self->flash(
+    redirect_to => $url,
+    values      => { user => $user, email => $email }
   );
 
-  my $u = Canvas::Store::User->create({
+  # validate username
+  unless( $user =~ m/^[a-zA-Z0-9_]+$/ ) {
+    $self->flash( error => { code => 1, message => 'Your username can only consist of alphanumeric characters and underscores only [A-Z, a-z, 0-9, _].' });
+
+    return $self->redirect_to('/register');
+  }
+
+  # validate user name is available
+  my $u = Canvas::Store::User->search({
+    username => $user,
+  })->first;
+
+  if( defined $u ) {
+    $self->flash( error => { code => 2, message => 'That username already exists.' } );
+
+    return $self->redirect_to('/register');
+  }
+
+  # validate email address
+  unless( $email =~ m/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/ ) {
+    $self->flash( error => { code => 3, message => 'Your email address is invalid.' });
+
+    return $self->redirect_to('/register');
+  }
+
+  # validate passwords have sufficient length
+  if( length $pass < 8 ) {
+    $self->flash( error => { code => 4, message => 'Your password must be at least 8 characters long.' });
+
+    return $self->redirect_to('/register');
+  }
+
+  # validate passwords match
+  if( $pass ne $pass_confirm ) {
+    $self->flash( error => { code => 5, message => 'Your passwords don\'t match.' } );
+
+    return $self->redirect_to('/register');
+  };
+
+  $u = Canvas::Store::User->create({
     username  => $user,
     email     => $email,
   });
@@ -251,8 +290,6 @@ sub register_post {
       "Regards,\n" .
       "The Korora Team.\n";
 
-    my $subject = $self->param('subject') // 'subject of awesomeness';
-
     # send the activiation email
     $self->mail(
       to      => $email,
@@ -261,8 +298,6 @@ sub register_post {
       data    => $message,
     );
   }
-
-  $self->flash( redirect_to => $url, hash => $message );
 
   $self->redirect_to('/registered');
 }

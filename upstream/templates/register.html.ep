@@ -27,17 +27,22 @@
           </div>
           <div class="col-sm-6 callout callout-nfo">
 
-            <form action="/register" method="post" class="form-signin" role="form">
+            <form action="<%= url_with('current') %>" method="post" class="form-signin" role="form">
+% if( $error->{code} ) {
+              <div class="alert alert-danger">
+                <p><%= $error->{message} %></p>
+              </div>
+% }
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                  <input type="text" class="form-control" name="user" placeholder="username">
+                  <input type="text" class="form-control" name="user" placeholder="username" value="<%= $values->{user} %>">
                 </div>
               </div>
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
-                  <input type="email" class="form-control" name="email" placeholder="mail@domain.com">
+                  <input type="email" class="form-control" name="email" placeholder="you@example.org" value="<%= $values->{email} %>">
                 </div>
               </div>
               <div class="form-group">

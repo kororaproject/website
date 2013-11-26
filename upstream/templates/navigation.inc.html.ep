@@ -59,7 +59,7 @@
 % else {
     <div class="nav navbar-right">
       <div id="register" class="navbar-btn btn-group btn-group-sm">
-        <a href="/register" class="btn btn-default">Register</a>
+        <a href="/register?redirect_to=<%= url_for('current') %>" class="btn btn-default">Register</a>
         <a data-toggle="modal" href="#loginModal" class="btn btn-success">Log In</a>
       </div>
     </div>
