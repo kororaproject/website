@@ -27,13 +27,14 @@
           </div>
           <div class="col-sm-6 callout callout-nfo">
 
-            <form action="<%= url_with('current') %>" method="post" class="form-signin" role="form">
+            <form action="<%= url_for('current') %>" method="post" class="form-signin" role="form">
 % if( $error->{code} ) {
               <div class="alert alert-danger">
                 <p><%= $error->{message} %></p>
               </div>
 % }
               <div class="form-group">
+                <input type="hidden" name="redirect_to" value="<%= $redirect_to %>"></input>
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
                   <input type="text" class="form-control" name="user" placeholder="username" value="<%= $values->{user} %>">

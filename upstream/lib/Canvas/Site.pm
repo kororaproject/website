@@ -193,8 +193,9 @@ sub register_get {
 
   my $error = $self->flash('error') // { code => 0, message => '' };
   my $values = $self->flash('values') // { user => '', email => '' };
+  my $url = $self->param('redirect_to') // ( $self->flash('redirect_to') // '' );
 
-  $self->stash( error => $error, values => $values );
+  $self->stash( error => $error, values => $values, redirect_to => $url );
 
   $self->render('register');
 }
