@@ -50,14 +50,14 @@ sub create_auth_token {
 
   # extract randomness from /dev/urandom
   if( open( DEV, "/dev/urandom" ) ) {
-    read( DEV, my $bytes, 48 );
+    read( DEV, $bytes, 48 );
     close( DEV );
   }
   # otherwise seed from the sha512 sum of the current time
   # including microseconds
   else {
     my( $t, $u ) = gettimeofday();
-    $bytes = substr sha512( $t . '.' . $u ), 0, 48
+    $bytes = substr sha512( $t . '.' . $u ), 0, 48;
   }
 
   my $token = b64_encode( $bytes );
@@ -235,7 +235,7 @@ sub activate_post {
 
   # check account age is less than 24 hours
   if( (gmtime - $u->created)->seconds > 86400 ) {
-    $self->flash( error => { code => 1, message => 'Activation of this account has been over 24 hours.' });
+    $self->flash( page_errors => { code => 1, message => 'Activation of this account has been over 24 hours.' });
 
     $u->metadata_clear('activiation_token');
     $u->delete;
@@ -249,7 +249,7 @@ sub activate_post {
 
   # redirect to home unless supplied and stored tokens match
   unless( $token eq $token_supplied ) {
-    $self->flash( error => { code => 2, message => 'Your token is invalid.' });
+    $self->flash( page_errors => { code => 2, message => 'Your token is invalid.' });
     return $self->redirect_to( $self->url_with('current') );
   };
 
