@@ -222,12 +222,13 @@ sub activate_post {
   my $username = $self->param('username');
   my $prefix = $self->param('prefix');
   my $suffix = $self->param('token');
+  my $url = $self->param('redirect_to') // '/';
 
   # lookup the requested account for activation
   my $u = Canvas::Store::User->search({ username => $username })->first;
 
-  # redirect to home unless account and activation token prefix/suffix exists
-  return $self->redirect_to('/') unless(
+  # redirect unless account and activation token prefix/suffix exists
+  return $self->redirect_to( $url ) unless(
     defined $u &&
     defined $prefix &&
     defined $suffix
@@ -237,13 +238,14 @@ sub activate_post {
   my $token_supplied = $prefix . url_unescape( $suffix );
   my $token = url_unescape( $u->metadata('activation_token') // '' );
 
-  # redirect to home unless supplied and stored tokens match
+  # redirect to same page unless supplied and stored tokens match
   unless( $token eq $token_supplied ) {
     $self->flash( page_errors => 'Your token is invalid.' );
     return $self->redirect_to( $self->url_with('current') );
   };
 
-  # check account age is less than 24 hours
+  # remove activation if account age is more than 24 hours
+  # and then return to redirect or home
   my $now = gmtime;
   if( ($now - $u->created) > 86400 ) {
     $self->flash( page_errors => 'Activation of this account has been over 24 hours.' );
@@ -251,7 +253,7 @@ sub activate_post {
     $u->metadata_clear('activiation_token');
     $u->delete;
 
-    return $self->redirect_to( $self->url_with('current') );
+    return $self->redirect_to( $url );
   }
 
   $u->status('active');
