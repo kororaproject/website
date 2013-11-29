@@ -51,7 +51,7 @@ noscript {
 .label,
 .form-control,
 pre{
-  border-radius: 2px !important;
+  border-radius: 2px;
 }
 
 

@@ -63,7 +63,7 @@
         <div class="hr"></div>
         <div class="row">
           <div class="col-sm-12">
-            <div class="alert alert-warning">
+            <div class="callout callout-warning">
               <p><a name="footnote" href=""></a><sup>1</sup> RPMFusion provides software that the Fedora Project doesn’t want to ship, such as support for MP3s and proprietary video drivers.</p>
             </div>
           </div>

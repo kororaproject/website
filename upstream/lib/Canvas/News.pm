@@ -97,35 +97,24 @@ sub list_status_for_post {
 sub index {
   my $self = shift;
 
-  my $cache = {};
 
   my $pager = Canvas::Store::Post->pager(
-    where             => { type => 'news' },
+    where             => { type => 'news', status => 'publish' },
     order_by          => 'created DESC',
     entries_per_page  => 5,
     current_page      => ( $self->param('page') // 1 ) - 1,
   );
 
-  $cache->{items} = [ $pager->search_where ];
-  $cache->{item_count} = $pager->total_entries;
-  $cache->{page_size} = $pager->entries_per_page;
-  $cache->{page} = $pager->current_page + 1;
-  $cache->{page_last} = floor($pager->total_entries / $pager->entries_per_page);
+  my $news = {
+    items       => [ $pager->search_where ],
+    item_count  => $pager->total_entries,
+    page_size   => $pager->entries_per_page,
+    page        => $pager->current_page + 1,
+    page_last   => floor($pager->total_entries / $pager->entries_per_page),
+  };
 
-#  my foreach my $p ( @posts ) {
-#    push @$cache, {
-#      id            => $p->ID,
-#      created       => $p->post_date_gmt,
-#      updated       => $p->post_modified_gmt,
-#      title         => $p->post_title,
-#      content       => $p->post_content,
-#      excerpt       => $p->post_excerpt,
-#      name          => $p->post_name,
-#      author        => $p->post_author->user_nicename,
-#    };
-#  }
+  $self->stash( news => $news );
 
-  $self->stash( news => $cache );
   $self->render('news');
 }
 

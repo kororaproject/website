@@ -254,8 +254,8 @@ sub add {
 
   my $type = $self->param('type');
   my $stub = sanitise_with_dashes( $self->param('title') );
-
   my $content = $self->param('content');
+
   return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless length trim $content;
 
   # ensure it's a valid type
@@ -278,6 +278,15 @@ sub add {
       $status = '';
     }
   }
+
+  # check for existing stubs and append the ID + 1 of the last
+  my( @e ) = Canvas::Store::Post->search({
+      name => $stub,
+      type => $type,
+  });
+
+  $stub .= '-' . ( $e[-1]->id + 1 ) if @e;
+
   # create the post
   my $p = Canvas::Store::Post->create({
     name         => $stub,

@@ -150,8 +150,8 @@
         <div class="hr"></div>
         <div class="row">
           <div class="col-sm-12">
-            <div class="alert alert-warning">
-              <p><a name="footnote" href=""></a><sup>1</sup> Korora is not provided or supported by the <a href="http://fedoraproject.org/" class="alert-link">Fedora Project</a>. Official, unmodified Fedora software is available through the Fedora Project website.</p>
+            <div class="callout callout-warning">
+              <p><a name="footnote" href=""></a><sup>1</sup> Korora is not provided or supported by the <a href="http://fedoraproject.org/">Fedora Project</a>. Official, unmodified Fedora software is available through the Fedora Project website.</p>
             </div>
           </div>
         </div>

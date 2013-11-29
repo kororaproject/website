@@ -21,81 +21,65 @@
         <div class="row">
           <div class="col-sm-12">
             <ul class="nav nav-tabs nav-justified">
-              <li class="nav-tab-info active"><a href="#idea" data-toggle="tab"><i class="fa fa-lightbulb-o"></i> Share an Idea</a></li>
-              <li class="nav-tab-danger"><a href="#problem" data-toggle="tab"><i class="fa fa-bug"></i> Report a Problem</a></li>
-              <li class="nav-tab-warning"><a href="#question" data-toggle="tab"><i class="fa fa-question"></i> Ask a Question</a></li>
-              <li class="nav-tab-success"><a href="#thank" data-toggle="tab"><i class="fa fa-heart"></i> Say Thanks</a></li>
+              <li class="active"><a href="#idea" data-toggle="tab"><i class="fa fa-lightbulb-o"></i> Share an Idea</a></li>
+              <li class=""><a href="#problem" data-toggle="tab"><i class="fa fa-bug"></i> Report a Problem</a></li>
+              <li class=""><a href="#question" data-toggle="tab"><i class="fa fa-question"></i> Ask a Question</a></li>
+              <li class=""><a href="#thank" data-toggle="tab"><i class="fa fa-heart"></i> Say Thanks</a></li>
             </ul>
 
             <div class="tab-content">
-              <div class="tab-pane tab-info active" id="idea">
+              <div class="tab-pane active" id="idea">
                 <form action="/support/engage/idea/add" method="get" enctype="application/x-www-form-urlencoded">
                   <div class="row">
                     <div class="col-sm-12">
-                      <input type="text" name="title" class="form-control"></input>
-                      <div class="hr-sm"></div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-9">
-                      <h4>Share your idea; we'll find similar ones or add it.</h4>
-                    </div>
-                    <div class="col-sm-3">
-                      <input type="submit" class="btn btn-block btn-default" value="Continue"></input>
+                      <div class="input-group">
+                        <input type="text" name="title" class="form-control"></input>
+                        <span class="input-group-btn">
+                          <button type="submit" class="btn btn-info">Continue</button>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </form>
               </div>
-              <div class="tab-pane tab-info" id="problem">
+              <div class="tab-pane" id="problem">
                 <form action="/support/engage/problem/add" method="get">
                   <div class="row">
                     <div class="col-sm-12">
-                      <input type="text" name="title" class="form-control"></input>
-                      <div class="hr-sm"></div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-9">
-                      <h4>Problem.</h4>
-                    </div>
-                    <div class="col-sm-3">
-                      <input type="submit" class="btn btn-block btn-default" value="Continue"></input>
+                      <div class="input-group">
+                        <input type="text" name="title" class="form-control"></input>
+                        <span class="input-group-btn">
+                          <button type="submit" class="btn btn-danger">Continue</button>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </form>
               </div>
-              <div class="tab-pane tab-info" id="question">
+              <div class="tab-pane" id="question">
                 <form action="/support/engage/question/add" method="get">
                   <div class="row">
                     <div class="col-sm-12">
-                      <input type="text" name="title" class="form-control"></input>
-                      <div class="hr-sm"></div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-9">
-                      <h4>Ask a question.</h4>
-                    </div>
-                    <div class="col-sm-3">
-                      <input type="submit" class="btn btn-block btn-default" value="Continue"></input>
+                      <div class="input-group">
+                        <input type="text" name="title" class="form-control"></input>
+                        <span class="input-group-btn">
+                          <button type="submit" class="btn btn-warning">Continue</button>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </form>
               </div>
-              <div class="tab-pane tab-info" id="thank">
+              <div class="tab-pane" id="thank">
                 <form action="/support/engage/thank/add" method="get">
                   <div class="row">
                     <div class="col-sm-12">
-                      <input type="text" name="title" class="form-control"></input>
-                      <div class="hr-sm"></div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-9">
-                      <h4>Say thanks.</h4>
-                    </div>
-                    <div class="col-sm-3">
-                      <input type="submit" class="btn btn-block btn-default" value="Continue"></input>
+                      <div class="input-group">
+                        <input type="text" name="title" class="form-control"></input>
+                        <span class="input-group-btn">
+                          <button type="submit" class="btn btn-success">Continue</button>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </form>
@@ -107,7 +91,7 @@
 % }
 
         <div class="row">
-          <div class="col-sm-6">
+          <div class="col-sm-12">
             <div class="btn-group btn-group-sm btn-group-justified">
               <a href="<%= url_with->query([t => undef]) %>" class="btn btn-default">All</a>
               <a href="<%= url_with->query([t => 'idea']) %>" class="btn btn-default">Ideas</a>
