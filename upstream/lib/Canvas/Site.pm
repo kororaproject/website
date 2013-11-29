@@ -27,6 +27,9 @@ use Mojo::Base 'Mojolicious::Controller';
 #
 use Data::Dumper;
 use Mojo::Util qw(b64_encode url_escape url_unescape);
+use Time::Piece;
+use Time::HiRes qw(gettimeofday);
+use Digest::SHA qw(sha512);
 
 #
 # LOCAL INCLUDES
@@ -43,10 +46,20 @@ use Canvas::Store::WPUser;
 # create_auth_token()
 #
 sub create_auth_token {
-  open( DEV, "/dev/urandom" ) or die "Cannot open file: $!";
-  read( DEV, my $bytes, 48 );
+  my $bytes;
 
-  close( DEV );
+  # extract randomness from /dev/urandom
+  if( open( DEV, "/dev/urandom" ) ) {
+    read( DEV, my $bytes, 48 );
+    close( DEV );
+  }
+  # otherwise seed from the sha512 sum of the current time
+  # including microseconds
+  else {
+    my( $t, $u ) = gettimeofday();
+    $bytes = substr sha512( $t . '.' . $u ), 0, 48
+  }
+
   my $token = b64_encode( $bytes );
   chomp $token;
 
@@ -220,7 +233,15 @@ sub activate_post {
     defined $suffix
   );
 
-  # TODO: check account age
+  # check account age is less than 24 hours
+  if( (gmtime - $u->created)->seconds > 86400 ) {
+    $self->flash( error => { code => 1, message => 'Activation of this account has been over 24 hours.' });
+
+    $u->metadata_clear('activiation_token');
+    $u->delete;
+
+    return $self->redirect_to( $self->url_with('current') );
+  }
 
   # build the supplied token and fetch the stored token
   my $token_supplied = $prefix . url_unescape( $suffix );
@@ -228,7 +249,7 @@ sub activate_post {
 
   # redirect to home unless supplied and stored tokens match
   unless( $token eq $token_supplied ) {
-    $self->flash( error => { code => 1, message => 'Your token is invalid.' });
+    $self->flash( error => { code => 2, message => 'Your token is invalid.' });
     return $self->redirect_to( $self->url_with('current') );
   };
 
