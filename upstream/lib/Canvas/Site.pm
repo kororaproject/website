@@ -239,14 +239,14 @@ sub activate_post {
 
   # redirect to home unless supplied and stored tokens match
   unless( $token eq $token_supplied ) {
-    $self->flash( page_errors => { code => 1, message => 'Your token is invalid.' });
+    $self->flash( page_errors => 'Your token is invalid.' );
     return $self->redirect_to( $self->url_with('current') );
   };
 
   # check account age is less than 24 hours
   my $now = gmtime;
   if( ($now - $u->created)->seconds > 86400 ) {
-    $self->flash( page_errors => { code => 2, message => 'Activation of this account has been over 24 hours.' });
+    $self->flash( page_errors => 'Activation of this account has been over 24 hours.' );
 
     $u->metadata_clear('activiation_token');
     $u->delete;
