@@ -48,6 +48,21 @@ INSERT INTO __TABLE__ (created, updated, %s)
 VALUES (UTC_TIMESTAMP(), UTC_TIMESTAMP(), %s)
 });
 
+#
+# INFLATOR/DEFLATORS
+#
+__PACKAGE__->has_a(
+  created => 'Time::Piece',
+  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
+  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
+);
+
+__PACKAGE__->has_a(
+  updated => 'Time::Piece',
+  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
+  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
+);
+
 __PACKAGE__->set_sql(update => qq {
 UPDATE __TABLE__
   SET    updated = UTC_TIMESTAMP(), %s

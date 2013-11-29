@@ -245,7 +245,7 @@ sub activate_post {
 
   # check account age is less than 24 hours
   my $now = gmtime;
-  if( ($now - $u->created)->seconds > 86400 ) {
+  if( ($now - $u->created) > 86400 ) {
     $self->flash( page_errors => 'Activation of this account has been over 24 hours.' );
 
     $u->metadata_clear('activiation_token');
