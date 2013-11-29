@@ -56,7 +56,9 @@
               </div>
               <div class="row">
                 <div class="col-xs-6 col-sm-offset-9 col-sm-3">
-                  <button type="submit" class="btn btn-block btn-danger"><i class="fa fa-save"></i> Save</button>
+                  <div class="text-right">
+                    <button type="submit" class="btn btn-danger">Save</button>
+                  </div>
                 </div>
               </div>
             </form>

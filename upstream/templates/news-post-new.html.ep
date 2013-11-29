@@ -13,52 +13,55 @@
 
       <div id="page-about" class="container">
         <form action="/news" method="post">
-          <input type="hidden" name="post_id" value="<%= $post->{stub} %>">
+          <input type="hidden" name="post_id" value="<%= $post->name %>">
           <div class="row">
             <div class="col-sm-12">
               <h1 class="text-center"><%= ($mode eq 'edit') ? 'Edit' : 'Create' %> News Post</h1>
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-8">
               <h2>Title</h2>
-              <input type="text" name="post_title" class="form-control" value="<%= $post->{title} %>">
+              <input type="text" name="title" class="form-control" value="<%= $post->title %>">
+            </div>
+            <div class="col-sm-4">
+              <h2>Status</h2>
+              %= select_field status => $statuses, class => "form-control"
+              <div class="hr-sm"></div>
             </div>
           </div>
           <div class="hr"></div>
           <div class="row">
             <div class="col-sm-12">
               <h2>Introduction</h2>
-              <textarea name="post_excerpt" class="form-control" rows="3"><%= $post->{excerpt} %></textarea>
+              <textarea name="excerpt" class="form-control" rows="3"><%= $post->excerpt %></textarea>
             </div>
           </div>
           <div class="hr"></div>
           <div class="row">
             <div class="col-sm-12">
               <h2>Body</h2>
-              <textarea name="post_content" class="form-control" rows="20"><%= $post->{content} %></textarea>
+              <textarea name="content" class="form-control" rows="20"><%= $post->content %></textarea>
             </div>
           </div>
           <div class="hr"></div>
           <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-8">
               <h2>Tags</h2>
-              <input type="text" name="post_tags" class="form-control">
-            </div>
-            <div class="col-sm-4">
-              <h2>Category</h2>
-              <input type="text" name="post_category" class="form-control">
+              <input type="text" name="tags" class="form-control" value="<%= $post->tag_list %>">
             </div>
             <div class="col-sm-4">
               <h2>Date</h2>
-              <input type="text" name="post_modified_gmt" class="form-control">
+              <input type="datetime" name="created" class="form-control" value="<%= $post->created %>">
             </div>
           </div>
           <div class="hr hr-sm"></div>
           <div class="row">
             <div class="col-sm-12">
-              <a class="btn btn-danger" href="<%= substr url_for('current'), 0, -5 %>">Cancel</a>
-              <input type="submit" class="btn btn-success" value="Save"></input>
+              <div class="text-right">
+                <a class="btn btn-danger" href="<%= substr url_for('current'), 0, -5 %>">Cancel</a>
+                <button type="submit" class="btn btn-success">Save</button>
+              </div>
             </div>
           </div>
           <div class="hr"></div>

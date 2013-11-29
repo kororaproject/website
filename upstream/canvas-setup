@@ -7,7 +7,9 @@ use feature ':5.10';
 
 use Data::Dumper;
 
+use Canvas::Store::WPPost;
 use Canvas::Store::WPUser;
+use Canvas::Store::Post;
 use Canvas::Store::User;
 
 sub migrate_wp_user {
@@ -26,43 +28,44 @@ sub migrate_wp_user {
   $u->update;
 }
 
-# create firnsy
-if( 0 ) {
-  my $firnsy = Canvas::Store::User->find_or_create({
-    username => 'firnsy',
-    status   => 'active',
-    access   => 255,
-  });
+my $create = $ARGV[0] eq "create";
 
-# create csmart
+# create firnsy
+if( $create ) {
   my $csmart = Canvas::Store::User->find_or_create({
     username => 'csmart',
     status   => 'active',
     access   => 255,
   });
 
-  my $test = Canvas::Store::User->find_or_create({
-    username => 'test_subscriber',
+  my $firnsy = Canvas::Store::User->find_or_create({
+    username => 'firnsy',
     status   => 'active',
+    access   => 255,
+    email    => '1',
   });
-
-  my $woot = Canvas::Store::User->find_or_create({
-    username => 'Anonymous',
-    status   => 'active',
-  });
-
-
-  $test->add_to_user_memberships({
-    member_id => $firnsy->id,
-    access    => 128,
-  });
-
-  $test->add_to_user_memberships({
-    member_id => $csmart->id,
-    access    => 128,
-  });
-
 
   migrate_wp_user( $firnsy );
   migrate_wp_user( $csmart );
 };
+
+
+#
+# CONVERT NEWS POSTS
+#
+
+my( @posts ) = Canvas::Store::WPPost->search({ post_type => 'post' });
+
+foreach my $post ( @posts ) {
+  my $p = Canvas::Store::Post->create({
+    name        => $post->post_name,
+    content     => $post->post_content,
+    excerpt     => $post->post_excerpt,
+    status      => $post->post_status,
+    title       => $post->post_title,
+    created     => $post->post_date_gmt,
+    updated     => $post->post_modified_gmt,
+    author_id   => $post->post_author->ID,
+    type        => 'news',
+  });
+}

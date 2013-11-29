@@ -20,12 +20,16 @@
         % foreach my $n ( @{ $news->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
-            <a href="/news/<%= $n->post_name %>"><h2><%= $n->post_title %></h2></a>
-            <h3 class="subtitle"><%= $n->post_author->display_name %> | <%= $n->post_modified_gmt->strftime('%e %B, %Y') %></h3>
+            <a href="/news/<%= $n->name %>"><h2><%= $n->title %></h2></a>
+            <h3 class="subtitle"><%= $n->author_id->username %> | <%= $n->created->strftime('%e %B, %Y') %></h3>
+            <div class="news-excerpt">
 
-%== $n->post_excerpt;
+%== render_markdown( $n->excerpt );
 
-            <a class="btn btn-default" href="/news/<%= $n->post_name %>">Read more ... </a>
+            </div>
+            <div>
+              <a class="btn btn-default" href="/news/<%= $n->name %>">Read more ... </a>
+            </div>
 
           </div>
         </div>
@@ -36,10 +40,10 @@
         <div class="row">
           <div class="col-sm-offset-5 col-sm-2 text-center">
             <div class="btn-group">
-% if( $news->{page} > 0 ) {
+% if( $news->{page} > 1 ) {
               <a href="<%= url_for('/news?page=' . ($news->{page} - 1) ) %>" class="btn btn-default"><i class="fa fa-fw fa-chevron-left"></i></a>
 % }
-% if( $news->{page} < $news->{page_last} ) {
+% if( $news->{page} < $news->{page_last}+1 ) {
               <a href="<%= url_for('/news?page=' . ($news->{page} + 1) ) %>" class="btn btn-default"><i class="fa fa-fw fa-chevron-right"></i></a>
 % }
             </div>

@@ -19,19 +19,22 @@
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <div class="callout callout-info">
-              <h4><%= $response->title %> <%== engage_icon( $response->type, 'pull-right' )%></h4>
-%== render_post( $response->content )
+            <div class="callout engage-detail engage-<%= $response->type %>">
+              <%== engage_icon( $response->type, 'engage-detail-title-icon' )%>
+              <h2 class="engage-detail-title"><%= $response->title %></h2>
+%== render_markdown( $response->content )
 
-              <div class="post-tags">
+              <div class="engage-detail-tags">
 % foreach my $t ( $response->tags ) {
                 <span class="label label-default"><%= $t->name %></span>
 % }
               </div>
 
-% if( post_can_edit( $response ) ) {
-              <a href="<%= url_for('current') . '/edit' %>" class="btn btn-sm btn-danger"><i class="fa fa-fw fa-edit"></i></a>
+              <div class="engage-detail-admin">
+% if( engage_post_can_edit( $response ) ) {
+                <a href="<%= url_for('current') . '/edit' %>" class="btn btn-xs btn-danger"><i class="fa fa-fw fa-edit"></i> Edit</a>
 % }
+              </div>
             </div>
           </div>
         </div>

@@ -30,13 +30,13 @@ use Data::Dumper;
 # MODEL DEFINITION
 #
 __PACKAGE__->table('canvas_post');
-__PACKAGE__->columns(All => qw/id author parent_id password type status name title excerpt content reply_status reply_count created updated/);
+__PACKAGE__->columns(All => qw/id author_id parent_id password type status name title excerpt content reply_status reply_count created updated/);
 
 #
 # 1:N MAPPINGS
 #
 __PACKAGE__->has_a( parent_id => __PACKAGE__ );
-__PACKAGE__->has_a( author => 'Canvas::Store::User' );
+__PACKAGE__->has_a( author_id => 'Canvas::Store::User' );
 
 #
 # N:N MAPPINGS

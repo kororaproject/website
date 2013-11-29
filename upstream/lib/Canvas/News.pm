@@ -25,18 +25,29 @@ use strict;
 #
 use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
+use POSIX qw(floor);
 use Time::Piece;
 
 #
 # LOCAL INCLUDES
 #
-use Canvas::Store::WPPost;
+use Canvas::Store::Post;
 use Canvas::Store::Pager;
+
+#
+# CONSTANTS
+#
+
+use constant POST_STATUS_MAP => (
+  [ 'In Draft'  => 'draft' ],
+  [ 'Review'    => 'planned'  ],
+  [ 'Published' => 'published' ],
+);
+
 
 #
 # HELPERS
 #
-
 
 sub sanitise_with_dashes($) {
   my $stub = shift;
@@ -62,6 +73,22 @@ sub sanitise_with_dashes($) {
   return $stub;
 }
 
+sub list_status_for_post {
+  my $type = shift;
+  my $selected = shift;
+
+  my $status = [];
+
+  foreach my $s ( POST_STATUS_MAP ) {
+    push @$status, [ ( defined $selected && grep { m/$selected/ } @$s) ?
+      ( @$s, 'selected', 'selected' ) :
+      ( @$s )
+    ]
+  }
+
+  return $status;
+}
+
 
 #
 # NEWS
@@ -72,18 +99,18 @@ sub index {
 
   my $cache = {};
 
-  my $pager = Canvas::Store::WPPost->pager(
-    where             => { post_type => 'post' },
-    order_by          => 'post_modified_gmt DESC',
+  my $pager = Canvas::Store::Post->pager(
+    where             => { type => 'news' },
+    order_by          => 'created DESC',
     entries_per_page  => 5,
-    current_page      => $self->param('page') // 0,
+    current_page      => ( $self->param('page') // 1 ) - 1,
   );
 
   $cache->{items} = [ $pager->search_where ];
   $cache->{item_count} = $pager->total_entries;
   $cache->{page_size} = $pager->entries_per_page;
-  $cache->{page} = $pager->current_page;
-  $cache->{page_last} = ($pager->total_entries / $pager->entries_per_page) - 1;
+  $cache->{page} = $pager->current_page + 1;
+  $cache->{page_last} = floor($pager->total_entries / $pager->entries_per_page);
 
 #  my foreach my $p ( @posts ) {
 #    push @$cache, {
@@ -106,23 +133,12 @@ sub post {
   my $self = shift;
   my $post = $self->param('id');
 
-  my $p = Canvas::Store::WPPost->search({ post_name => $post })->first;
+  my $p = Canvas::Store::Post->search({ name => $post })->first;
 
   # check we found the post
   $self->redirect_to('/') unless defined $p;
 
-  my $cache = {
-    id            => $p->ID,
-    created       => $p->post_date_gmt->strftime('%e %B, %Y'),
-    updated       => $p->post_modified_gmt->strftime('%e %B, %Y'),
-    title         => $p->post_title,
-    content       => $p->post_content,
-    excerpt       => $p->post_excerpt,
-    name          => $p->post_name,
-    author        => $p->post_author->user_nicename,
-  };
-
-  $self->stash( post => $cache );
+  $self->stash( post => $p );
   $self->render('news-post');
 }
 
@@ -155,28 +171,20 @@ sub post_edit {
 
   my $stub = $self->param('id');
 
-  my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
-
-  # only allow authenticated and authorised users
-  $self->redirect_to('/') unless $self->post_can_edit( $p );
+  my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
   # check we found the post
   $self->redirect_to('/') unless defined $p;
 
-  my $cache = {
-    id            => $p->ID,
-    created       => $p->post_date_gmt->strftime('%e %B, %Y at %H:%M'),
-    updated       => $p->post_modified_gmt->strftime('%e %B, %Y at %H:%M'),
-    title         => $p->post_title,
-    content       => $p->post_content,
-    excerpt       => $p->post_excerpt,
-    stub          => $p->post_name,
-    author        => $p->post_author->user_nicename,
-  };
+  # only allow authenticated and authorised users
+  $self->redirect_to('/') unless $self->news_post_can_edit( $p );
 
   # build the cancel path
 
-  $self->stash( mode => 'edit', post => $cache );
+  $self->stash( mode => 'edit', post => $p );
+
+  $self->stash( statuses => list_status_for_post( $p->type, $p->status ) );
+
   $self->render('news-post-new');
 }
 
@@ -192,13 +200,13 @@ sub post_update {
   my $stub = $self->param('post_id');
 
   if( $stub ne '' ) {
-    my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
+    my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
     # update if we found the object
     if( $p ) {
-      $p->post_title( $self->param('post_title') // '' );
-      $p->post_content( $self->param('post_content') // '' );
-      $p->post_excerpt( $self->param('post_excerpt') // '' );
+      $p->title( $self->param('title') // '' );
+      $p->content( $self->param('content') // '' );
+      $p->excerpt( $self->param('excerpt') // '' );
 
       $p->update;
     }
@@ -209,14 +217,14 @@ sub post_update {
 
     my $now = gmtime;
 
-    my $p = Canvas::Store::WPPost->create({
-      post_name         => $stub,
-      post_title        => $self->param('post_title'),
-      post_content      => $self->param('post_content'),
-      post_excerpt      => $self->param('post_excerpt'),
-      post_author       => $self->auth_user->id,
-      post_date_gmt     => $now,
-      post_modified_gmt => $now,
+    my $p = Canvas::Store::Post->create({
+      name         => $stub,
+      title        => $self->param('post_title'),
+      content      => $self->param('post_content'),
+      excerpt      => $self->param('post_excerpt'),
+      author       => $self->auth_user->id,
+      created      => $now,
+      updated      => $now,
     });
   }
 
@@ -234,7 +242,7 @@ sub post_delete {
 
   my $stub = $self->param('id');
 
-  my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
+  my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
   # check we found the post
   if( $p ) {

@@ -14,15 +14,15 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
-            <h1><%= $post->{title}%></h1>
-            <h2 class="subtitle"><%= $post->{author} %> | <%= $post->{created} %></h2>
+            <h1><%= $post->title %></h1>
+            <h2 class="subtitle"><%= $post->author_id->username %> | <%= $post->created->strftime('%e %B, %Y') %></h2>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
 
-%== $post->{excerpt};
-%== $post->{content};
+%== render_markdown( $post->excerpt );
+%== render_markdown( $post->content );
 
           </div>
         </div>
@@ -34,8 +34,10 @@
 % if( is_user_authenticated && auth_user->is_admin  ) {
         <div class="row">
           <div class="col-sm-12">
-            <a class="btn btn-danger" href="<%= url_for('current') . '/edit' %>">Edit</a>
-            <a class="btn btn-danger" href="<%= url_for('current') . '/delete' %>">Delete</a>
+            <div class="text-right">
+              <a class="btn btn-danger" href="<%= url_for('current') . '/edit' %>">Edit</a>
+              <a class="btn btn-danger" href="<%= url_for('current') . '/delete' %>">Delete</a>
+            </div>
           </div>
         </div>
         <div class="hr"></div>

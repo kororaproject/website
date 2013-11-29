@@ -318,7 +318,7 @@ CREATE TABLE canvas_machine (
 */
 CREATE TABLE canvas_post (
   id            INTEGER               NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-  author        INTEGER UNSIGNED      NOT NULL  REFERENCES canvas_user(id),
+  author_id     INTEGER UNSIGNED      NOT NULL  REFERENCES canvas_user(id),
 
   parent_id     INTEGER UNSIGNED      NOT NULL  DEFAULT 0,
 

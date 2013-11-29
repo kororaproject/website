@@ -36,6 +36,33 @@ use Canvas::Store::PostTag;
 use Canvas::Store::Tag;
 
 #
+# CONSTANTS
+#
+
+use constant TYPE_STATUS_MAP => {
+  idea => [
+    [ 'Under Consideration' => 'consider' ],
+    [ 'Declined'            => 'declined' ],
+    [ 'Planned'             => 'planned'  ],
+    [ 'In Progress'         => 'progress' ],
+    [ 'Completed'           => 'complete' ],
+    [ 'Gathering Feedback'  => 'feedback' ],
+  ],
+  problem => [
+    [ 'Known Problem' => 'known'     ],
+    [ 'Declined'      => 'noproblem' ],
+    [ 'Solved'        => 'solved'    ],
+    [ 'In Progress'   => 'progress'  ],
+  ],
+  question => [
+    [ 'Answered'    => 'answered'   ],
+    [ 'Need Answer' => 'unanswered' ],
+  ],
+  thanks => [],
+};
+
+
+#
 # HELPERS
 #
 
@@ -63,7 +90,7 @@ sub sanitise_with_dashes($) {
   return $stub;
 }
 
-sub validate_types($) {
+sub filter_valid_types($) {
   my $types_valid_map =  {
     idea => 1,
     problem => 1,
@@ -81,6 +108,22 @@ sub validate_types($) {
   return $v;
 }
 
+sub list_status_for_type {
+  my $type = shift;
+  my $selected = shift;
+
+  my $status = [];
+
+  foreach my $s ( @{ TYPE_STATUS_MAP->{ $type } // [] } ) {
+    push @$status, [ ( defined $selected && grep { m/$selected/ } @$s) ?
+      ( @$s, 'selected', 'selected' ) :
+      ( @$s )
+    ]
+  }
+
+  return $status;
+}
+
 #
 # NEWS
 #
@@ -88,8 +131,8 @@ sub validate_types($) {
 sub index {
   my $self = shift;
 
-  my $filter_type = validate_types( $self->param('t') );
-  my $filter_tags = validate_types( $self->param('s') );
+  my $filter_type = filter_valid_types( $self->param('t') );
+  my $filter_tags = filter_valid_types( $self->param('s') );
 
   my $cache = {};
 
@@ -220,13 +263,28 @@ sub add {
 
   my $now = gmtime;
 
+  my $status;
+  given( $type ) {
+    when('idea') {
+      $status = 'consider';
+    }
+    when('problem') {
+      $status = 'consider';
+    }
+    when('question') {
+      $status = 'consider';
+    }
+    default {
+      $status = '';
+    }
+  }
   # create the post
   my $p = Canvas::Store::Post->create({
     name         => $stub,
     type         => $type,
     title        => $self->param('title'),
     content      => $self->param('content'),
-    author       => $self->auth_user->id,
+    author_id    => $self->auth_user->id,
     created      => $now,
     updated      => $now,
   });
@@ -253,47 +311,12 @@ sub edit_get {
 
   # only allow authenticated and authorised users
   return $self->redirect_to('/support/engage') unless (
-    $self->post_can_edit( $p )
+    $self->engage_post_can_edit( $p )
   );
-
-  my $status;
-  given( $p->type ) {
-    when('idea') {
-      $status = [
-        [ 'Under Consideration' => 'consider' ],
-        [ 'Declined'            => 'declined' ],
-        [ 'Planned'             => 'planned'  ],
-        [ 'In Progress'         => 'progress' ],
-        [ 'Completed'           => 'complete' ],
-        [ 'Gathering Feedback'  => 'feedback' ],
-      ];
-
-      $self->param( status => 'consider' );
-    }
-    when('problem') {
-      $status = [
-        [ 'Known Problem' => 'known'     ],
-        [ 'Declined'      => 'noproblem' ],
-        [ 'Solved'        => 'solved'    ],
-        [ 'In Progress'   => 'progress'  ],
-      ];
-    }
-    when('question') {
-      $status = [
-        [ 'Answered'    => 'answered'   ],
-        [ 'Need Answer' => 'unanswered' ],
-      ];
-
-      $self->param( 'status' => 'unanswered' );
-    }
-    default {
-      $status = [];
-    }
-  }
 
   my @r = Canvas::Store::Post->replies( $stub );
 
-  $self->stash( response => $p, statuses => $status, replies => \@r );
+  $self->stash( response => $p, statuses => list_status_for_type( $p->type, $p->status ), replies => \@r );
 
   $self->render('engage-edit');
 }
@@ -310,7 +333,7 @@ sub edit {
 
   # only allow authenticated and authorised users
   return $self->redirect_to('/support/engage') unless (
-    $self->post_can_edit( $p )
+    $self->engage_post_can_edit( $p )
   );
 
   # update title, content and status
@@ -383,7 +406,7 @@ sub reply {
     name         => $stub,
     type         => 'reply',
     content      => $content,
-    author       => $self->auth_user->id,
+    author_id    => $self->auth_user->id,
     created      => $now,
     updated      => $now,
     parent_id    => $p->id

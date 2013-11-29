@@ -33,14 +33,14 @@ use Mojo::JSON;
 use Mojolicious::Plugin::Authentication;
 
 use POSIX qw(floor);
-use Text::Markdown;
-#use Text::MultiMarkdown;
 use Time::Piece;
 
 #
 # LOCAL INCLUDES
 #
 use Canvas::About;
+use Canvas::Helpers;
+use Canvas::Helpers::Engage;
 use Canvas::Site;
 use Canvas::Store::User;
 
@@ -66,12 +66,12 @@ sub startup {
     autoload_user => 0,
     current_user_fn => 'auth_user',
     load_user => sub {
-      my ($app, $uid) = @_;
+      my( $app, $uid ) = @_;
 
       return Canvas::Store::User->search( username => $uid )->first;
     },
     validate_user => sub {
-      my ($app, $user, $pass, $extradata) = @_;
+      my( $app, $user, $pass, $extra ) = @_;
 
       my $u = Canvas::Store::User->search( username => $user )->first;
 
@@ -84,181 +84,14 @@ sub startup {
   });
 
   $self->plugin('mail' => {
-    from => 'firnsy@gmail.com',
     type => 'text/plain',
   });
 
   #
   # HELPERS
-  $self->helper(build_query => sub {
-    my $self = shift;
-    my $map = shift;
-
-    return {} unless( ref( $map ) eq 'HASH' );
-
-    my $q = {};
-
-    while( my ( $k, $v ) = each %{ $map } ) {
-      foreach my $r ( @{ $v } ) {
-        $q->{ $k } = $self->param( $r ) if defined( $self->param( $r ) );
-      }
-    }
-
-    return $q;
-  });
-
-  $self->helper(pluralise => sub {
-    my( $self, $amount, $unit ) = @_;
-
-    if( $amount ne '1' ) {
-      $unit .= 's';
-      $unit =~ s/os$/oes/;
-      $unit =~ s/ys$/ies/;
-    }
-
-    return $amount . ' ' . $unit;
-  });
-
-  # time prettifier
-  $self->helper(time_ago => sub {
-    my( $self, $time ) = @_;
-
-    my $now = gmtime;
-    $time = Time::Piece->new( $time ) unless ref $time eq 'Time::Piece';
-
-    my $d = $now - $time;
-    my $t;
-    my $u;
-
-    return 'One moment ago' if ( $d < 60 );
-
-    if( $d > 604800 ) {
-      $t = floor( $d / 604800 );
-      $u = 'week';
-    }
-    elsif( $d > 84600 ) {
-      $t = floor( $d / 86400 );
-      $u = 'day';
-    }
-    elsif( $d > 3600 ) {
-      $t = floor( $d / 3600 );
-      $u = 'hour';
-    }
-    else {
-      $t = floor( $d / 60 );
-      $u = 'minute';
-    }
-
-    return $self->pluralise( $t, $u ) . ' ago';
-  });
-
-  $self->helper(engage_icon => sub {
-    my( $self, $type, $classes ) = @_;
-
-    $classes //= '';
-
-    my $map = {
-      idea      => 'fa-lightbulb-o',
-      problem   => 'fa-bug',
-      question  => 'fa-question',
-      thank     => 'fa-heart',
-    };
-
-    return '<i class="fa ' . ( $map->{ $type } // 'fa-ban' ) . ' ' . $classes . '"></i>';
-  });
-
-  $self->helper(render_post => sub {
-    my( $self, $post ) = @_;
-
-#    my $m = Text::MultiMarkdown->new(
-    my $m = Text::Markdown->new(
-      tab_width   => 2,
-#      heading_ids => 0,
-#      img_ids     => 0,
-    );
-
-    return $m->markdown( $post );
-  });
-
-  $self->helper(news_can_add => sub {
-    my( $self ) = @_;
-
-    return 0 unless defined $self->auth_user;
-
-    return 0 unless $self->auth_user->is_active_account;
-
-    return 1 if $self->auth_user->is_admin;
-
-    return 0;
-  });
-
-  $self->helper(post_can_edit => sub {
-    my( $self, $post ) = @_;
-
-    return 0 unless ref $post eq 'Canvas::Store::Post';
-
-    return 0 unless defined $self->auth_user;
-
-    return 0 unless $self->auth_user->is_active_account;
-
-    say "is active";
-
-    return 1 if $self->auth_user->is_admin;
-
-    return 1 if $self->auth_user->id == $post->author->id;
-
-    return 0;
-  });
-
-  $self->helper(post_content => sub {
-    my( $self, $content ) = @_;
-
-    my $result = $content; # '<pre>' . $content . '</pre>';
-    #
-
-    # remove newlines immediately proceeding tags
-#    say Dumper $result;
-    $result =~ s/(?:\r?\n)?(<\/?(?:p|li|ol|ul)>)\s*(?:\r?\n)?/$1/img;
-#    say Dumper $result;
-#    $result =~ s/(<\/?(?:p|li|ol|ul)>)\s*\r?\n/$1/ig;
-
-    # process no attribute tags
-    $result =~ s/\[(i|code|b)\]/<$1>/mg;
-    $result =~ s/\[\/(i|code|b)\]/<\/$1>/mg;
-
-    # process urls
-    $result =~ s/\[url\]([^\[]+)\[\/url\]/<a href="$1">$1<\/a>/ig;
-    $result =~ s/\[url="([^"]+)"\]([^\[]+)\[\/url\]/<a href="$1">$2<\/a>/mig;
-    $result =~ s/((?:ht|f)tps?:\/\/[^\s]+)/<a href="$1">$1<\/a>/ig;
-
-    # process images
-    $result =~ s/\[img\]([^\[]+)\[\/img\]/<img class="img-responsive" src="$1"><\/img>/mig;
-
-    # compress multiple breaks into one
-    #$result =~ s/(<br\/>)+/<br\/>/g;
-
-    # process quotes
-    $result =~ s/\[quote(:[a-zA-Z0-9]+)?\]/<blockquote>/mg;
-    $result =~ s/\[quote="([^"]+)"\]/<cite>$1 wrote:<\/cite><blockquote>/mg;
-    $result =~ s/\[\/quote(:[a-zA-Z0-9]+)?\]/<\/blockquote>/mg;
-
-
-    # turn newlines into breaks
-    #$result =~ s/(\r?\n>)+/[n]/g;
-#  $result =~ s/(\r?\n|<br\s?\/?>)+/\n\n/mg;
-#    $result =~ s/^(\r?\n|<br\s?\/?>)+/\n/mg;
-#    $result =~ s/(\r?\n|<br\s?\/?>)+/<br\/>/g;
-    #$result =~ s/(<br\s?\/?>)+/<br\/>/g;
-    my @lines = split /(\r?\n)+/, $result;
-    #my @lines = split /(\r?\n|<br\s?\/?>)+/, $result;
-    say Dumper map { "<p>$_</p>" } grep { ! /\n/ } @lines;
-
-    # strip empty paragraphs
-    $result =~ s/<p>\s*<\/p>//ig;
-
-
-    return Mojo::ByteStream->new( $result );
-  });
+  $self->plugin('Canvas::Helpers');
+  $self->plugin('Canvas::Helpers::Engage');
+  $self->plugin('Canvas::Helpers::News');
 
   #
   # ROUTES

@@ -116,7 +116,7 @@
               <a href="<%= url_with->query([t => 'thank']) %>" class="btn btn-default">Thanks</a>
             </div>
           </div>
-          <div class="col-sm-6">
+          <div class="col-sm-6 hide">
             <div class="btn-group btn-group-sm btn-group-justified">
               <a href="" class="btn btn-default">Newest</a>
               <a href="" class="btn btn-default">Active</a>
@@ -128,13 +128,14 @@
 % foreach my $r ( @{ $responses->{items} } ) {
           <div class="row">
             <div class="col-sm-12">
-              <div class="callout">
+              <div class="callout engage-summary engage-<%= $r->type %>">
+<a href="/support/engage/<%= $r->type %>/<%= $r->name %>">
                 <div class="pull-right reply-meta">
-                  <h4 class="text-right"><%== engage_icon( $r->type ) %></h4>
+                  <div class="text-right"><%== engage_icon( $r->type, 'engage-summary-title-icon' ) %></div>
                   <p class="text-right"><%= time_ago( $r->updated ) %></p>
-                  <p class="text-right"><%= $r->author->username %></p>
+                  <p class="text-right"><%= $r->author_id->username %></p>
                 </div>
-                <a href="/support/engage/<%= $r->type %>/<%= $r->name %>"><h4><%= $r->title %></h4></a>
+                <h4 class="engage-summary-title"><%= $r->title %></h4>
                 <p class=""><%= pluralise( $r->reply_count, 'reply' ) %></p>
                 <div class="post-tags">
 % foreach my $t ( $r->tags ) {
@@ -142,6 +143,8 @@
 % }
                 </div>
               </div>
+
+            </a>
             </div>
           </div>
 % }
