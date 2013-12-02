@@ -328,7 +328,7 @@ sub add {
       # send the activiation email
       $self->mail(
         from    => 'engage@kororaproject.org',
-        to      => $user->email,
+        to      => $_um->user_id->email,
         subject => $subject,
         data    => $message,
       );
@@ -547,7 +547,7 @@ sub reply {
       # send the activiation email
       $self->mail(
         from    => 'engage@kororaproject.org',
-        to      => $user->email,
+        to      => $_um->user_id->email,
         subject => $subject,
         data    => $message,
       );
