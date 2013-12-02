@@ -162,6 +162,8 @@ sub authenticate_any {
     }
   }
 
+  # TODO: END
+
   unless( $self->authenticate($user, $pass) ) {
     $self->flash( page_errors => 'The username or password was incorrect.' );
   }

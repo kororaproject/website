@@ -305,6 +305,13 @@ sub add {
     my $pt = Canvas::Store::PostTag->find_or_create({ post_id => $p->id, tag_id => $t->id })
   }
 
+  # auto-subscribe the creator (engage_subscriptions)
+  Canvas::Store::UserMeta->find_or_create({
+    user_id     => $self->auth_user->id,
+    meta_key    => 'engage_subscriptions',
+    meta_value  => $p->id,
+  });
+
   # mail all admins with "notify new engage items" checked
   my @um = Canvas::Store::UserMeta->search({
     meta_key   => 'engage_notify_on_new',
@@ -430,8 +437,8 @@ sub subscribe {
   # check we found the post
   return $self->redirect_to('/support/engage') unless defined $p;
 
-  # find or create metadata (engage_subscriptions)
-  my $um = Canvas::Store::UserMeta->find_or_create({
+  # subscribe (engage_subscriptions)
+  Canvas::Store::UserMeta->find_or_create({
     user_id     => $self->auth_user->id,
     meta_key    => 'engage_subscriptions',
     meta_value  => $p->id,
@@ -497,6 +504,7 @@ sub reply {
 
   my $type = $self->param('type');
   my $stub = $self->param('stub');
+  my $subscribe = $self->param('subscribe') // 0;
 
   # ensure we have content
   my $content = $self->param('content');
@@ -523,6 +531,13 @@ sub reply {
   my @c = Canvas::Store::Post->search({ parent_id => $p->id });
   $p->reply_count( scalar @c );
   $p->update;
+
+  # auto-subscribe participants (engage_subscriptions)
+  Canvas::Store::UserMeta->find_or_create({
+    user_id     => $self->auth_user->id,
+    meta_key    => 'engage_subscriptions',
+    meta_value  => $p->id,
+  });
 
   # mail all subscribers
   my @um = Canvas::Store::UserMeta->search({
