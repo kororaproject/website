@@ -92,6 +92,8 @@ sub startup {
     say Dumper "Loading dummy MAILER";
 
     $self->helper('mail' => sub {
+      my $self = shift;
+
       say Dumper @_;
     });
   }

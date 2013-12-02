@@ -299,7 +299,8 @@ sub add {
   });
 
   # create the tags
-  foreach my $tag ( split /,/, $self->param('tags') ) {
+  my %tags = map { sanitise_with_dashes( trim $_ ) => 1 } split /,/, $self->param('tags');
+  foreach my $tag ( keys %tags ) {
     $tag = trim $tag;
     my $t  = Canvas::Store::Tag->find_or_create({ name => $tag });
     my $pt = Canvas::Store::PostTag->find_or_create({ post_id => $p->id, tag_id => $t->id })
@@ -397,7 +398,7 @@ sub edit {
 
     # find tags to add and remove
     my @tags_old = $p->tag_list_array;
-    my @tags_new = map { trim $_ } split( ',', $self->param('tags') ); 
+    my @tags_new = map { sanitise_with_dashes( trim $_ ) } split( ',', $self->param('tags') );
 
     my %to = map { $_ => 1 } @tags_old;
     my %tn = map { $_ => 1 } @tags_new;
