@@ -24,7 +24,6 @@ use Mojo::Base 'Canvas::Store';
 # PERL INCLUDES
 #
 use Digest::MD5 qw(md5);
-use Data::Dumper;
 
 #
 # MODEL DEFINITION
@@ -76,10 +75,6 @@ sub validate_password($$) {
 
   my $setting = $self->password;
 
-  say Dumper $setting;
-  say Dumper $pass;
-
-  say Dumper _crypt_private( $pass, $setting );
   return _crypt_private( $pass, $setting ) eq $self->password;
 }
 
