@@ -20,6 +20,12 @@ package Canvas::Helpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 #
+# PERL INCLUDES
+#
+use Time::Piece;
+use POSIX qw(floor);
+
+#
 # LOCAL INCLUDES
 #
 use Canvas::Util::MultiMarkdown;
@@ -80,16 +86,17 @@ sub register {
 
   # time prettifier
   $app->helper(time_ago => sub {
-    my( $self, $time ) = @_;
+    my( $self, $time, $format ) = @_;
 
     my $now = gmtime;
     $time = Time::Piece->new( $time ) unless ref $time eq 'Time::Piece';
 
     my $d = $now - $time;
-    my $t;
-    my $u;
 
     return 'One moment ago' if ( $d < 60 );
+
+    my $t;
+    my $u;
 
     if( $d > 604800 ) {
       $t = floor( $d / 604800 );
