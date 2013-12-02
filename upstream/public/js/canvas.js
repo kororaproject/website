@@ -767,21 +767,24 @@ function DownloadController($scope, $location) {
 
   $scope.getPreferredVersion = function( args ) {
     // check for specified arch
-    var i = -1;
     if( args.hasOwnProperty('v') ) {
       for(var n=0, l=$scope.downloads.length; n<l; n++ ) {
         if( $scope.downloads[n].version === args.v ) {
-          i = n;
-          continue;
+          return $scope.downloads[n];
+        }
+      }
+    }
+    // otherise pick most current stable
+    else {
+      for(var n=0, l=$scope.downloads.length; n<l; n++ ) {
+        if( $scope.downloads[n].isCurrent &&
+            $scope.downloads[n].isStable ) {
+          return $scope.downloads[n];
         }
       }
     }
 
-    if( i < 0 ) {
-      i = 0;
-    }
-
-    return $scope.downloads[i];
+    return $scope.downloads[0];
   };
 
   $scope.getPreferredArch = function( args ) {
@@ -863,15 +866,9 @@ function DownloadController($scope, $location) {
 
   args = $location.search();
 
-  console.log( args );
-  console.log( $location.absUrl() );
-  console.log( $location.search() );
-
   $scope.version = $scope.getPreferredVersion( args );
   $scope.arch = $scope.getPreferredArch( args );
   $scope.desktop = $scope.getPreferredDesktop( args );
-
-  console.log('done');
 };
 
 function CanvasController($scope) {

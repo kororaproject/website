@@ -1,9 +1,8 @@
-<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&skin=desert"></script>
+<script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&skin=desert"></script>
 
-<script src="/js/jquery.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="/js/bootstrap.js"></script>
-<script src="/js/bootstrap-dropdown-hover.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
 <script src="/js/canvas.js"></script>
 
 <script>
