@@ -70,7 +70,7 @@ CREATE TABLE canvas_user (
 );
 
 CREATE TABLE canvas_usermeta (
-  meta_id     INTEGER         NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  meta_id     BIGINT(20)      NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
   user_id     INTEGER         NOT NULL  REFERENCES canvas_user (id),
   meta_key    VARCHAR(64)               DEFAULT  NULL,
   meta_value  LONGTEXT                  DEFAULT  NULL

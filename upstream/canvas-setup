@@ -38,11 +38,23 @@ if( $create ) {
     access   => 255,
   });
 
+  my $notify_csmart = Canvas::Store::UserMeta->find_or_create({
+    user_id     => $csmart->id,
+    meta_key    => 'engage_notify_on_new',
+    meta_value  => 1,
+  });
+
   my $firnsy = Canvas::Store::User->find_or_create({
     username => 'firnsy',
     status   => 'active',
     access   => 255,
     email    => '1',
+  });
+
+  my $notify_firnsy = Canvas::Store::UserMeta->find_or_create({
+    user_id     => $firnsy->id,
+    meta_key    => 'engage_notify_on_new',
+    meta_value  => 1,
   });
 
   migrate_wp_user( $firnsy );
