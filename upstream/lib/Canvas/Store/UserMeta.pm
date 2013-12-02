@@ -34,5 +34,6 @@ __PACKAGE__->columns(All => qw/meta_id user_id meta_key meta_value/);
 #
 # 1:N MAPPINGS
 #
+__PACKAGE__->has_a(user_id  => 'Canvas::Store::User');
 
 1;

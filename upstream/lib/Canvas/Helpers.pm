@@ -27,6 +27,16 @@ use Canvas::Util::MultiMarkdown;
 sub register {
   my( $self, $app ) = @_;
 
+  $app->helper(is_active_auth => sub {
+    my( $self ) = @_;
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    return 1
+  });
+
   $app->helper(render_markdown => sub {
     my( $self, $post ) = @_;
 

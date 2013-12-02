@@ -30,11 +30,18 @@
 % }
               </div>
 
+% if( is_active_auth ) {
               <div class="engage-detail-admin">
-% if( engage_post_can_edit( $response ) ) {
+%   if( engage_post_can_subscribe( $response ) ) {
+                <a href="<%= url_for('current') . '/subscribe' %>" class="btn btn-xs btn-danger"><i class="fa fa-fw fa-bookmark"></i> Subscribe</a>
+%   } else {
+                <a href="<%= url_for('current') . '/unsubscribe' %>" class="btn btn-xs btn-danger"><i class="fa fa-fw fa-bookmark-o"></i> Unsubscribe</a>
+%   }
+%   if( engage_post_can_edit( $response ) ) {
                 <a href="<%= url_for('current') . '/edit' %>" class="btn btn-xs btn-danger"><i class="fa fa-fw fa-edit"></i> Edit</a>
-% }
+%   }
               </div>
+% }
             </div>
           </div>
         </div>
@@ -43,13 +50,13 @@
 % for my $r ( @$replies ) {
         <div class="row">
           <div class="col-sm-12">
-            <div class="callout">
+            <div id="reply-<%= $r->id %>" class="callout">
               <div class="pull-right reply-meta">
                 <p class="text-right"><%= time_ago( $r->updated ) %></p>
-                <p class="text-right"><%= $r->author->username %></p>
+                <p class="text-right"><%= $r->author_id->username %></p>
               </div>
 %== $r->content
-          </div>
+            </div>
           </div>
         </div>
 % }
@@ -69,7 +76,9 @@
               </div>
               <div class="row">
                 <div class="col-sm-offset-9 col-sm-3">
-                  <button type="submit" class="btn btn-block btn-default">Reply</button>
+                  <div class="text-right">
+                    <button type="submit" class="btn btn-default">Reply</button>
+                  </div>
                 </div>
               </div>
             </form>

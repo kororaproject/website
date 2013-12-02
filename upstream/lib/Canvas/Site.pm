@@ -420,8 +420,6 @@ sub register_post {
     email     => $email,
   });
 
-  my $message = '';
-
   if( defined $u ) {
     # store password as a salted hash
     $u->password( $u->hash_password( $pass ) );
@@ -439,7 +437,7 @@ sub register_post {
     my $activation_key = substr( $token, 0, 31 );
     my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 31 );
 
-    $message = "" .
+    my $message = "" .
       "G'day,\n\n" .
       "Thank you for registering to be part of our Korora community.\n\n".
       "Your activiation key is: " . $activation_key . "\n\n" .

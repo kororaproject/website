@@ -37,10 +37,27 @@ sub register {
     return '<i class="fa ' . ( $map->{ $type } // 'fa-ban' ) . ' ' . $classes . '"></i>';
   });
 
-  $app->helper(engage_post_can_edit => sub {
+  $app->helper(engage_post_can_subscribe => sub {
     my( $self, $post ) = @_;
 
-    say Dumper $post;
+    return 0 unless ref $post eq 'Canvas::Store::Post';
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    my $um = Canvas::Store::UserMeta->search({
+      user_id     => $self->auth_user->id,
+      meta_key    => 'engage_subscriptions',
+      meta_value  => $post->id,
+    })->first;
+
+    # determine if we're subscribed
+    return not defined $um;
+  });
+
+  $app->helper(engage_post_can_edit => sub {
+    my( $self, $post ) = @_;
 
     return 0 unless ref $post eq 'Canvas::Store::Post';
 

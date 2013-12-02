@@ -129,6 +129,8 @@ sub startup {
   $r->get('/support/engage/:type/:stub')->to('engage#detail');
   $r->get('/support/engage/:type/:stub/edit')->to('engage#edit_get');
   $r->post('/support/engage/:type/:stub/edit')->to('engage#edit');
+  $r->any('/support/engage/:type/:stub/subscribe')->to('engage#subscribe');
+  $r->any('/support/engage/:type/:stub/unsubscribe')->to('engage#unsubscribe');
   $r->get('/support/engage/:type/:stub/reply')->to('engage#reply_get');
   $r->post('/support/engage/:type/:stub/reply')->to('engage#reply');
 

@@ -305,6 +305,37 @@ sub add {
     my $pt = Canvas::Store::PostTag->find_or_create({ post_id => $p->id, tag_id => $t->id })
   }
 
+  # mail all admins with "notify new engage items" checked
+  my @um = Canvas::Store::UserMeta->search({
+    meta_key   => 'engage_notify_on_new',
+    meta_value => 1,
+  });
+
+  if( @um ) {
+    my $subject = 'Korora Project - New Engage Item: ' . $p->title;
+    my $message = join "",
+      "G'day,\n\n",
+      "A new engage item has been posted by " . $p->author_id->username . "\n\n",
+      "URL: https://kororaproject.org" . $self->url_for( 'supportengagetypestub', type=> $type, stub => $stub ) . "\n",
+      "Type: " . $p->type .. "\n",
+      "Status: " . $p->type .. "\n",
+      "Excerpt:\n",
+      $p->content . "\n\n",
+      "Regards,\n",
+      "The Korora Team.\n";
+
+    foreach my $_um ( @um ) {
+      # send the activiation email
+      $self->mail(
+        from    => 'engage@kororaproject.org',
+        to      => $user->email,
+        subject => $subject,
+        data    => $message,
+      );
+    }
+  }
+
+
   # redirect to the detail
   $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
 }
@@ -380,6 +411,73 @@ sub edit {
   $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
 }
 
+sub subscribe {
+  my $self = shift;
+
+  my $stub = $self->param('stub');
+  my $type = $self->param('type');
+
+  my $url = $self->url_for('supportengagetypestub', type => $type, stub => $stub);
+
+  # redirect unless we're actively auth'd
+  return $self->redirect_to( $url ) unless $self->is_active_auth;
+
+  my $p = Canvas::Store::Post->search({
+    type => $type,
+    name => $stub
+  })->first;
+
+  # check we found the post
+  return $self->redirect_to('/support/engage') unless defined $p;
+
+  # find or create metadata (engage_subscriptions)
+  my $um = Canvas::Store::UserMeta->find_or_create({
+    user_id     => $self->auth_user->id,
+    meta_key    => 'engage_subscriptions',
+    meta_value  => $p->id,
+  });
+
+  return $self->redirect_to( $url );
+}
+
+sub unsubscribe {
+  my $self = shift;
+
+  my $stub = $self->param('stub');
+  my $type = $self->param('type');
+
+
+  my $url = $self->url_for('supportengagetypestub', type => $type, stub => $stub);
+
+  # redirect unless we're actively auth'd
+  return $self->redirect_to( $url ) unless $self->is_active_auth;
+
+  my $p = Canvas::Store::Post->search({
+    type => $type,
+    name => $stub
+  })->first;
+
+  # check we found the post
+  return $self->redirect_to('/support/engage') unless defined $p;
+
+  # only allow authenticated and authorised users
+  return $self->redirect_to('/support/engage') unless (
+    $self->engage_post_can_edit( $p )
+  );
+
+  # find metadata (engage_subscriptions)
+  my $um = Canvas::Store::UserMeta->search({
+    user_id     => $self->auth_user->id,
+    meta_key    => 'engage_subscriptions',
+    meta_value  => $p->id,
+  })->first;
+
+  $um->delete if defined $um;
+
+  return $self->redirect_to( $url );
+}
+
+
 sub reply_get {
   my $self = shift;
 
@@ -425,6 +523,36 @@ sub reply {
   my @c = Canvas::Store::Post->search({ parent_id => $p->id });
   $p->reply_count( scalar @c );
   $p->update;
+
+  # mail all subscribers
+  my @um = Canvas::Store::UserMeta->search({
+    meta_key   => 'engage_subscriptions',
+    meta_value => $p->id,
+  });
+
+  if( @um ) {
+    my $subject = 'Korora Project - Engage Reply: ' . $p->title;
+    my $message = join "",
+      "G'day,\n\n",
+      "A new reply has been posted by " . $r->author_id->username . "\n\n",
+      "URL: https://kororaproject.org" . $self->url_for( 'supportengagetypestub', type=> $type, stub => $stub ) . '#reply-' . $r->id . "\n",
+      "Type: " . $p->type .. "\n",
+      "Status: " . $p->type .. "\n",
+      "Excerpt:\n",
+      $r->content . "\n\n",
+      "Regards,\n",
+      "The Korora Team.\n";
+
+    foreach my $_um ( @um ) {
+      # send the activiation email
+      $self->mail(
+        from    => 'engage@kororaproject.org',
+        to      => $user->email,
+        subject => $subject,
+        data    => $message,
+      );
+    }
+  }
 
   # redirect to the detail
   $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
