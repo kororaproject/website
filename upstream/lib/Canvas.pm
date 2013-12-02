@@ -83,9 +83,18 @@ sub startup {
     },
   });
 
-  $self->plugin('mail' => {
-    type => 'text/plain',
-  });
+  if( $self->mode ne 'development' ) {
+    $self->plugin('mail' => {
+      type => 'text/plain',
+    });
+  }
+  else {
+    say Dumper "Loading dummy MAILER";
+
+    $self->helper('mail' => sub {
+      say Dumper @_;
+    });
+  }
 
   #
   # HELPERS
