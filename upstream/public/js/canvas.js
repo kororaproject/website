@@ -77,8 +77,10 @@ angular.module('$strap.directives').directive('bsTooltip', [
 ]);
 
 
-var canvas = angular.module('canvas', ['ngAnimate', '$strap.directives']);
-
+var canvas = angular.module('canvas', ['$strap.directives'])
+  .config(['$locationProvider', function($locationProvider) {
+      $locationProvider.html5Mode(true);
+  }]);
 
 
 
@@ -186,6 +188,190 @@ function DownloadController($scope, $location) {
   //
 
   $scope.downloads = [
+  {
+    name: 'Korora 20',
+      version: '20',
+      codename: 'Peach',
+      isStable: false,
+      isCurrent: true,
+      released: '29 Nov 2013',
+      archs: [
+        { name: 'x86_64', label: '64-bit (x86_64)' },
+        { name: 'i686',   label: '32-bit (i686)' }
+      ],
+      desktops: [
+        { name: 'cinnamon', label: 'CINNAMON' },
+        { name: 'gnome',    label: 'GNOME'    },
+        { name: 'kde',      label: 'KDE'      },
+        { name: 'mate',     label: 'MATE'     },
+        { name: 'xfce',     label: 'XFCE'     },
+      ],
+      links: [
+        {
+          arch: 'i686',
+          desktop: 'cinnamon',
+          link: [
+            { type: 'HTTP', url: 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-i386-cinnamon-live.iso/download', },
+          ]
+        },
+        {
+          arch: 'i686',
+          desktop: 'gnome',
+          link: [
+            { type: 'HTTP', url: 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-i386-gnome-live.iso/download', },
+          ]
+        },
+        {
+          arch: 'i686',
+          desktop: 'kde',
+          link: [
+            { type: 'HTTP', url: 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-i386-kde-live.iso/download', },
+          ]
+        },
+        {
+          arch: 'i686',
+          desktop: 'mate',
+          link: [
+            { type: 'HTTP', url: 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-i386-mate-live.iso/download', },
+          ]
+        },
+        {
+          arch: 'i686',
+          desktop: 'xfce',
+          link: [
+            { type: 'HTTP', url: 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-i386-xfce-live.iso/download', },
+          ]
+        },
+        {
+          arch: 'x86_64',
+          desktop: 'cinnamon',
+          link: [
+            { type: 'HTTP', url: 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-x86_64-cinnamon-live.iso/download', },
+          ]
+        },
+        {
+          arch: 'x86_64',
+          desktop: 'gnome',
+          link: [
+            { type: 'HTTP', url: 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-x86_64-gnome-live.iso/download', },
+          ]
+        },
+        {
+          arch: 'x86_64',
+          desktop: 'kde',
+          link: [
+            { type: 'HTTP', url: 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-x86_64-kde-live.iso/download', },
+          ]
+        },
+        {
+          arch: 'x86_64',
+          desktop: 'mate',
+          link: [
+            { type: 'HTTP', url: 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-x86_64-mate-live.iso/download', },
+          ]
+        },
+        {
+          arch: 'x86_64',
+          desktop: 'xfce',
+          link: [
+            { type: 'HTTP', url: 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-x86_64-xfce-live.iso/download', },
+          ]
+        }
+      ],
+      checksums: [
+        {
+          arch: 'i686',
+          desktop: 'cinnamon',
+          checksum: [
+            { type: 'md5', hash: '6d9e5953effe741298c037a1ba66e4a7' },
+            { type: 'sha', hash: '5063a350fc966f37d1959c2f309eddc717d46fae' },
+            { type: 'sha256', hash: '76f4c38387388ac695f68dd0333a90dcd897317f793a3fdf4998260c84c45f13' },
+          ]
+        },
+        {
+          arch: 'i686',
+          desktop: 'gnome',
+          checksum: [
+            { type: 'md5', hash: 'c6ef9ec1c56197d13bdc6f54f58c2c18' },
+            { type: 'sha', hash: 'ae37750b48bd5849b6806626bcad32d625c51d1c' },
+            { type: 'sha256', hash: '88958873bd396a5470255c747cb35dec568df4048b2fb95d1383698c461ab6ad' },
+          ]
+        },
+        {
+          arch: 'i686',
+          desktop: 'kde',
+          checksum: [
+            { type: 'md5', hash: '233c1522c9f53f2be2de1498fa2157ee' },
+            { type: 'sha', hash: 'a541c4938f919aa477bb04b3b90ca1432619f0ac' },
+            { type: 'sha256', hash: 'e45936c17a5d8f8d508492d1e295ea64e99051daaf560dcbeb69a703781966bc' },
+          ]
+        },
+        {
+          arch: 'i686',
+          desktop: 'mate',
+          checksum: [
+            { type: 'md5', hash: '14b7594011a078d4fac7d848dcca06c8' },
+            { type: 'sha', hash: '72f98c04f1ba791e8180279ab9e220f38c5be198' },
+            { type: 'sha256', hash: '4d25d654a1db2295c2de6e6819f168c92e65f44b35141be7e75cb36c082822d3' },
+          ]
+        },
+        {
+          arch: 'i686',
+          desktop: 'xfce',
+          checksum: [
+            { type: 'md5', hash: '012e5a512db1b787e41ebe34868be671' },
+            { type: 'sha', hash: 'f3d3737ceed52d326aacf44a0b38386422434aa2' },
+            { type: 'sha256', hash: '01bef27250f2e9452855f2be8dffb6a465453ae4382802b7ea062b25c6ad229f' },
+          ]
+        },
+        {
+          arch: 'x86_64',
+          desktop: 'cinnamon',
+          checksum: [
+            { type: 'md5', hash: 'cdaad5f13b3ab0de50496ee4842d04cf' },
+            { type: 'sha', hash: 'c1fc7ce6056835a7ee1ab2132536a7e531ca63e5' },
+            { type: 'sha256', hash: '54f5de26b90bfa67ba54f988c30c1a9c2382f7f03766e4630960ccf6f3577ff0' },
+          ]
+        },
+        {
+          arch: 'x86_64',
+          desktop: 'gnome',
+          checksum: [
+            { type: 'md5', hash: 'eb1633dbc2a4ddc5a2bfde813847c512' },
+            { type: 'sha', hash: '479a917cb267d76b0300e23b64f3b34e06867f8e' },
+            { type: 'sha256', hash: 'bbc023c7612acfa9b5a77e899de93128d235e055ef9f5c923ea0367132cb9ae3' },
+          ]
+        },
+        {
+          arch: 'x86_64',
+          desktop: 'kde',
+          checksum: [
+            { type: 'md5', hash: '6901173323dfed0c90e425796ca06fa9' },
+            { type: 'sha', hash: '59aa81bb6cd1aa93418b2a16849bc6eeac54e8c9' },
+            { type: 'sha256', hash: '10e1df39ab20f3d8d15c960323983b76e9c4d760889b384f7e6bccf4657c383f' },
+          ]
+        },
+        {
+          arch: 'x86_64',
+          desktop: 'mate',
+          checksum: [
+            { type: 'md5', hash: 'bdc2cec74aa727ad5f4e75ec8b5c6ced' },
+            { type: 'sha', hash: 'f528f10dbeed766a58c3147ea4c398bbf53e3615' },
+            { type: 'sha256', hash: '2156a75507a1007016fa74a8d225e2a4224c1ec1fd61beb9c7ecbc15f7d610af' },
+          ]
+        },
+        {
+          arch: 'x86_64',
+          desktop: 'xfce',
+          checksum: [
+            { type: 'md5', hash: '7fb43e9624b2799a37a9ae843d32f872' },
+            { type: 'sha', hash: '2cc3ccf04dd6656761b55437e94325401300c62f' },
+            { type: 'sha256', hash: '0ed3d599c1992663de65af4dc716adb38d3e1ddc36994061c635562c436c4eb6' },
+          ]
+        }
+      ],
+      available: true,
+    },
     {
       name: 'Korora 19.1',
       version: '19.1',
@@ -677,7 +863,10 @@ function DownloadController($scope, $location) {
 
   args = $location.search();
 
-  $scope.version = $scope.downloadsAvailable()[0];
+  console.log( args );
+  console.log( $location.absUrl() );
+  console.log( $location.search() );
+
   $scope.version = $scope.getPreferredVersion( args );
   $scope.arch = $scope.getPreferredArch( args );
   $scope.desktop = $scope.getPreferredDesktop( args );
