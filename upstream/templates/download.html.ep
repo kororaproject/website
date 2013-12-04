@@ -20,7 +20,7 @@
           </div>
         </div>
         <div class="hr"></div>
-        <div class="ng-cloak row alert" ng-class="{'alert-info': isVersionStable(), 'alert-warning': !isVersionStable()}">
+        <div class="ng-cloak row callout" ng-class="{'callout-info': isVersionStable(), 'callout-warning': !isVersionStable()}">
           <div class="col-sm-12">
             <h2>{{version.name}} ({{version.codename}})</h2>
           </div>
@@ -40,7 +40,7 @@
             <div class="container">
               <div class="row">
                 <div class="col-sm-3">
-                  <h4 class="step">Step 1</h4>
+                  <h4 class="step">Step&nbsp;1</h4>
                 </div>
                 <div class="col-sm-9">
                   <select class="form-control" ng-model="version" ng-options="v.name for v in downloadsAvailable()" ng-change="setArchDefault()"></select>
@@ -49,7 +49,7 @@
               <div class="hr hr-sm"></div>
               <div class="row">
                 <div class="col-sm-3">
-                  <h4 class="step">Step 2</h4>
+                  <h4 class="step">Step&nbsp;2</h4>
                 </div>
                 <div class="col-sm-9">
                   <select class="form-control" ng-model="arch" ng-options="a.label for a in version.archs"></select>
@@ -58,7 +58,7 @@
               <div class="hr hr-sm"></div>
               <div class="row">
                 <div class="col-sm-3">
-                  <h4 class="step">Step 3</h4>
+                  <h4 class="step">Step&nbsp;3</h4>
                 </div>
                 <div class="col-sm-9">
                   <div class="text-center form-control form-control-generic">
@@ -71,7 +71,7 @@
               <div class="hr hr-sm"></div>
               <div class="row">
                 <div class="col-sm-3">
-                  <h4 class="step">Step 4</h4>
+                  <h4 class="step">Step&nbsp;4</h4>
                 </div>
                 <div class="col-sm-9">
                   <div ng-repeat="ls in version.links | filter:arch.name | filter:desktop.name">
