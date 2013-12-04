@@ -5,18 +5,7 @@
   <link href="/css/layerslider.css" rel="stylesheet" media="screen">
 </head>
 <body>
-  <noscript style="">
-    <div>
-      <h1 class="kp-logo">KORORA<span>PROJECT</span></h1>
-      <h3>Oops! JavaScript is not enabled!</h3>
-      <div class="hr"></div>
-      <div class="">
-        <p>In order to get the intended Korora Project experience you must enable JavaScript.</p>
-        <p>We have carefully crafted an innovative experience for Korora community and we hope you find us trustworthy enough to enable try it out in it's full glory.</p>
-        <p>Thankyou for your consideration.</p>
-      </div>
-    </div>
-  </noscript>
+  %= include 'noscript.inc'
 
   <div class="page-container">
 

@@ -13,23 +13,14 @@ html {
   overflow-y: scroll;
 }
 
+/*
+** NO-SCRIPTS
+*/
 noscript {
-  position: fixed;
-
-  height: 100%;
-  width: 100%;
-
-  top: 0;
-  left: 0;
-
-  padding: 16px;
-
-  z-index: 99999;
+  display: block;
 
   background-color: #600;
   color: #fff;
-
-  text-align: center;
 }
 
 .btn-group>.btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
@@ -44,6 +35,9 @@ noscript {
   border-top-left-radius: 0 !important;
 }
 
+noscript h1 {
+  font-size: 64px;
+}
 
 
 .alert,

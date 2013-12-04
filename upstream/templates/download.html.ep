@@ -4,6 +4,8 @@
   %= include 'header.inc', title => 'KororaProject'
 </head>
 <body>
+  %= include 'noscript.inc'
+
   <div class="page-container">
 
     %= include 'navigation.inc', active => 'download'
@@ -18,7 +20,7 @@
           </div>
         </div>
         <div class="hr"></div>
-        <div class="row alert ng-cloak" ng-class="{'alert-info': isVersionStable(), 'alert-warning': !isVersionStable()}">
+        <div class="ng-cloak row alert" ng-class="{'alert-info': isVersionStable(), 'alert-warning': !isVersionStable()}">
           <div class="col-sm-12">
             <h2>{{version.name}} ({{version.codename}})</h2>
           </div>

@@ -4,6 +4,8 @@
   %= include 'header.inc', title => 'KororaProject'
 </head>
 <body>
+  %= include 'noscript.inc'
+
   <div class="page-container">
 
     %= include 'navigation.inc', active => 'news'
