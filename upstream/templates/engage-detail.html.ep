@@ -54,10 +54,10 @@
           <div class="col-sm-12">
             <div id="reply-<%= $r->id %>" class="callout">
               <div class="pull-right reply-meta">
-                <p class="text-right"><%= time_ago( $r->updated ) %></p>
+                <p class="text-right"><%= distance_of_time_in_words( $r->updated ) %></p>
                 <p class="text-right"><%= $r->author_id->username %></p>
               </div>
-%== $r->content
+%== render_markdown( $r->content )
             </div>
           </div>
         </div>

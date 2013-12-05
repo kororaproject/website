@@ -22,13 +22,59 @@ use Mojo::Base 'Mojolicious::Plugin';
 #
 # PERL INCLUDES
 #
-use Time::Piece;
+use Data::Dumper;
+use List::MoreUtils qw(any);
 use POSIX qw(floor);
+use Time::Piece;
 
 #
 # LOCAL INCLUDES
 #
 use Canvas::Util::MultiMarkdown;
+
+my $DISTANCE_TIME_FORMAT = {
+  less_than_x_seconds => {
+    one   => "less than one second ago.",
+    other => "less than %d seconds ago.",
+  },
+  less_than_x_minutes => {
+    one   => "less than one minute ago.",
+    other => "less than %d minutes ago.",
+  },
+  x_minutes           => {
+    one   => "one minute ago.",
+    other => "%d minutes ago.",
+  },
+  half_a_minute       => "half a minute ago.",
+  about_x_hours       => {
+    one   => "about one hour ago.",
+    other => "about %d hours ago.",
+  },
+  x_days              => {
+    one   => "one day ago.",
+    other => "%d days ago.",
+  },
+  about_x_months      => {
+    one   => "about one month ago.",
+    other => "about %d months ago.",
+  },
+  x_months            => {
+    one   => "one month ago.",
+    other => "%d months ago.",
+  },
+  about_x_years       => {
+    one   => "about one year ago.",
+    other => "about %d years ago.",
+  },
+  over_x_years        => {
+    one   => "over one year ago.",
+    other => "over %d years ago.",
+  },
+  almost_x_years      => {
+    one   => "almost one year ago.",
+    other => "almost %d years ago.",
+  },
+};
 
 sub register {
   my( $self, $app ) = @_;
@@ -84,38 +130,101 @@ sub register {
     return $amount . ' ' . $unit;
   });
 
+
   # time prettifier
-  $app->helper(time_ago => sub {
-    my( $self, $time, $format ) = @_;
+  $app->helper(locale_time => sub {
+    my( $self, $label, $count ) = @_;
 
-    my $now = gmtime;
-    $time = Time::Piece->new( $time ) unless ref $time eq 'Time::Piece';
+    if( defined $count ) {
+      my $plural = "other";
 
-    my $d = $now - $time;
+      if( $count == 1 && exists  $DISTANCE_TIME_FORMAT->{ $label }{one} ) {
+        $plural = 'one';
+      }
+      elsif( $count < 1 && exists  $DISTANCE_TIME_FORMAT->{ $label }{zero} ) {
+        $plural = 'zero';
+      }
 
-    return 'One moment ago' if ( $d < 60 );
-
-    my $t;
-    my $u;
-
-    if( $d > 604800 ) {
-      $t = floor( $d / 604800 );
-      $u = 'week';
+      return sprintf($DISTANCE_TIME_FORMAT->{ $label }{ $plural }, $count);
     }
-    elsif( $d > 84600 ) {
-      $t = floor( $d / 86400 );
-      $u = 'day';
+
+    return $DISTANCE_TIME_FORMAT->{ $label };
+  });
+
+  # time prettifier
+  $app->helper(distance_of_time_in_words => sub {
+    my( $self, $from_time, $to_time ) = (shift, shift, shift);
+    my %options = @_;
+
+    return 'not sure' unless ref $from_time eq 'Time::Piece';
+
+    $to_time //= gmtime;
+
+    my $distance = $to_time - $from_time;
+    my $distance_in_minutes = floor($distance->minutes);
+    my $distance_in_seconds = $distance->seconds - ( $distance_in_minutes * 60 );
+
+    if( any { $distance_in_minutes == $_ } (0..1) ) {
+      unless( $options{include_seconds} ) {
+        return $distance_in_minutes == 0 ?
+          $self->locale_time('less_than_x_minutes', 1) :
+          $self->locale_time('x_minutes', $distance_in_minutes);
+      }
+
+      if( any { $distance_in_seconds == $_ } (0..4) ) {
+        return $self->locale_time('less_than_x_seconds', 5);
+      }
+      elsif( any { $distance_in_seconds == $_ } (5..9) ) {
+        return $self->locale_time('less_than_x_seconds', 10);
+      }
+      elsif( any { $distance_in_seconds == $_ } (10..19) ) {
+        return $self->locale_time('less_than_x_seconds', 20);
+      }
+      elsif( any { $distance_in_seconds == $_ } (20..39) ) {
+        return $self->locale_time('half_a_minute');
+      }
+      elsif( any { $distance_in_seconds == $_ } (40..59) ) {
+        return $self->locale_time('less_than_x_minutes', 1);
+      }
+      else {
+        return $self->locale_time('x_minutes', 1);
+      }
     }
-    elsif( $d > 3600 ) {
-      $t = floor( $d / 3600 );
-      $u = 'hour';
+    elsif( any { $distance_in_minutes == $_ } (2..44) ) {
+      return $self->locale_time('x_minutes', $distance_in_minutes);
+    }
+    elsif( any { $distance_in_minutes == $_ } (45..89) ) {
+      return $self->locale_time('about_x_hours', 1);
+    }
+    elsif( any { $distance_in_minutes == $_ } (90..1439) ) {
+      return $self->locale_time('about_x_hours', floor($distance_in_minutes / 60.0) );
+    }
+    elsif( any { $distance_in_minutes == $_ } (1440..2519) ) {
+      return $self->locale_time('x_days', 1);
+    }
+    elsif( any { $distance_in_minutes == $_ } (2520..43199) ) {
+      return $self->locale_time('x_days', floor($distance_in_minutes / 1440.0));
+    }
+    elsif( any { $distance_in_minutes == $_ } (43200..86399) ) {
+      return $self->locale_time('about_x_months', 1);
+    }
+    elsif( any { $distance_in_minutes == $_ } (86400..525599) ) {
+      return $self->locale_time('x_months', floor($distance_in_minutes / 43200.0) );
     }
     else {
-      $t = floor( $d / 60 );
-      $u = 'minute';
-    }
+      my $remainder         = ($distance_in_minutes % 525600);
+      my $distance_in_years = $distance->years;
 
-    return $self->pluralise( $t, $u ) . ' ago';
+      if( $remainder < 131400 ) {
+        return $self->locale_time('about_x_years',  $distance_in_years);
+      }
+      elsif( $remainder < 394200 ) {
+        return $self->locale_time('over_x_years',   $distance_in_years);
+      }
+      else {
+        return $self->locale_time('almost_x_years', $distance_in_years + 1);
+      }
+    }
   });
 }
 

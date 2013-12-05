@@ -118,7 +118,7 @@
 <a href="/support/engage/<%= $r->type %>/<%= $r->name %>">
                 <div class="pull-right reply-meta">
                   <div class="text-right"><%== engage_icon( $r->type, 'engage-summary-title-icon' ) %></div>
-                  <p class="text-right"><%= time_ago( $r->updated ) %></p>
+                  <p class="text-right"><%= distance_of_time_in_words( $r->updated ) %></p>
                   <p class="text-right"><%= $r->author_id->username %></p>
                 </div>
                 <h4 class="engage-summary-title"><%= $r->title %></h4>
