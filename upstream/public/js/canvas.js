@@ -77,10 +77,7 @@ angular.module('$strap.directives').directive('bsTooltip', [
 ]);
 
 
-var canvas = angular.module('canvas', ['$strap.directives'])
-  .config(['$locationProvider', function($locationProvider) {
-      $locationProvider.html5Mode(true);
-  }]);
+var canvas = angular.module('canvas', ['$strap.directives']);
 
 
 
@@ -864,7 +861,17 @@ function DownloadController($scope, $location) {
   // INIT
   //
 
-  args = $location.search();
+  var args = {}, hash;
+  var q = document.URL.split('?')[1];
+  if( q != undefined ) {
+    q = q.split('&');
+    for( var i = 0; i < q.length; i++ ) {
+      hash = q[i].split('=');
+      args[hash[0]] = hash[1];
+    }
+  }
+
+  console.log(args);
 
   $scope.version = $scope.getPreferredVersion( args );
   $scope.arch = $scope.getPreferredArch( args );
