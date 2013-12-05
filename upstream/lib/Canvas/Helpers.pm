@@ -34,45 +34,45 @@ use Canvas::Util::MultiMarkdown;
 
 my $DISTANCE_TIME_FORMAT = {
   less_than_x_seconds => {
-    one   => "less than one second ago.",
-    other => "less than %d seconds ago.",
+    one   => "less than one second ago",
+    other => "less than %d seconds ago",
   },
   less_than_x_minutes => {
-    one   => "less than one minute ago.",
-    other => "less than %d minutes ago.",
+    one   => "less than one minute ago",
+    other => "less than %d minutes ago",
   },
   x_minutes           => {
-    one   => "one minute ago.",
-    other => "%d minutes ago.",
+    one   => "one minute ago",
+    other => "%d minutes ago",
   },
-  half_a_minute       => "half a minute ago.",
+  half_a_minute       => "half a minute ago",
   about_x_hours       => {
-    one   => "about one hour ago.",
-    other => "about %d hours ago.",
+    one   => "about one hour ago",
+    other => "about %d hours ago",
   },
   x_days              => {
-    one   => "one day ago.",
-    other => "%d days ago.",
+    one   => "one day ago",
+    other => "%d days ago",
   },
   about_x_months      => {
-    one   => "about one month ago.",
-    other => "about %d months ago.",
+    one   => "about one month ago",
+    other => "about %d months ago",
   },
   x_months            => {
-    one   => "one month ago.",
-    other => "%d months ago.",
+    one   => "one month ago",
+    other => "%d months ago",
   },
   about_x_years       => {
-    one   => "about one year ago.",
-    other => "about %d years ago.",
+    one   => "about one year ago",
+    other => "about %d years ago",
   },
   over_x_years        => {
-    one   => "over one year ago.",
-    other => "over %d years ago.",
+    one   => "over one year ago",
+    other => "over %d years ago",
   },
   almost_x_years      => {
-    one   => "almost one year ago.",
-    other => "almost %d years ago.",
+    one   => "almost one year ago",
+    other => "almost %d years ago",
   },
 };
 
@@ -124,7 +124,7 @@ sub register {
     if( $amount ne '1' ) {
       $unit .= 's';
       $unit =~ s/os$/oes/;
-      $unit =~ s/ys$/ies/;
+      $unit =~ s/[^aeiou]ys$/ies/;
     }
 
     return $amount . ' ' . $unit;

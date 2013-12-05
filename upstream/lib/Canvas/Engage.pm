@@ -26,6 +26,7 @@ use strict;
 use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(trim);
+use POSIX qw(floor);
 use Time::Piece;
 
 #
@@ -134,20 +135,20 @@ sub index {
   my $filter_type = filter_valid_types( $self->param('t') );
   my $filter_tags = filter_valid_types( $self->param('s') );
 
-  my $cache = {};
-
   my $pager = Canvas::Store::Post->pager(
     where             => { type => $filter_type },
     order_by          => 'updated DESC',
     entries_per_page  => 10,
-    current_page      => $self->param('page') // 0,
+    current_page      => ( $self->param('page') // 1) - 1,
   );
 
-  $cache->{items} = [ $pager->search_where ];
-  $cache->{item_count} = $pager->total_entries;
-  $cache->{page_size} = $pager->entries_per_page;
-  $cache->{page} = $pager->current_page;
-  $cache->{page_last} = ($pager->total_entries / $pager->entries_per_page) - 1;
+  my $cache = {
+    items       => [ $pager->search_where ],
+    item_count  => $pager->total_entries,
+    page_size   => $pager->entries_per_page,
+    page        => $pager->current_page + 1,
+    page_last   => floor($pager->total_entries / $pager->entries_per_page),
+  };
 
   $self->stash( responses => $cache );
   $self->render('engage');
