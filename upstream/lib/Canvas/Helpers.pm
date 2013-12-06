@@ -24,6 +24,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 #
 use Data::Dumper;
 use List::MoreUtils qw(any);
+use Mojo::Util qw(md5_sum url_escape);
 use POSIX qw(floor);
 use Time::Piece;
 
@@ -118,13 +119,23 @@ sub register {
     return $q;
   });
 
+  $app->helper(post_gravatar => sub {
+    my( $self, $post, $size, $class ) = @_;
+
+    return '' unless ref $post eq 'Canvas::Store::Post';
+
+    $size //= 32;
+
+    return '<img src="http://www.gravatar.com/avatar/' . md5_sum( $post->author_id->email ) . '.jpg?s=' . $size . '&d=retro' .  '" class="' . $class . '"></img>';
+  });
+
   $app->helper(pluralise => sub {
     my( $self, $amount, $unit ) = @_;
 
     if( $amount ne '1' ) {
       $unit .= 's';
       $unit =~ s/os$/oes/;
-      $unit =~ s/[^aeiou]ys$/ies/;
+      $unit =~ s/([^aeiou])ys$/$1ies/;
     }
 
     return $amount . ' ' . $unit;

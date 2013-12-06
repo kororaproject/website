@@ -16,7 +16,7 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Edit <%== engage_icon( $response->type )%></h1>
+            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Edit <%== engage_icon( $post->type )%></h1>
           </div>
         </div>
         <div class="row">
@@ -27,7 +27,7 @@
                   <div class="container">
                     <div class="row">
                         <h3>Title</h3>
-                        <input type="text" name="title" class="form-control" value="<%= $response->title %>"></input>
+                        <input type="text" name="title" class="form-control" value="<%= $post->title %>"></input>
                         <div class="hr-sm"></div>
                     </div>
                   </div>
@@ -36,7 +36,7 @@
                   <div class="container">
                     <div class="row">
                       <h3>Status</h3>
-                      %= select_field status => $statuses, class => "form-control"
+                      %= select_field status => engage_status_list( $post ), class => "form-control"
                       <div class="hr-sm"></div>
                     </div>
                   </div>
@@ -45,14 +45,14 @@
               <div class="row">
                 <div class="col-sm-12">
                   <h3>Description</h3>
-                  <textarea name="content" class="form-control" rows="10"><%= $response->content %></textarea>
+                  <textarea name="content" class="form-control" rows="10"><%= $post->content %></textarea>
                   <div class="hr-sm"></div>
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-12">
                   <h3>Tags</h3>
-                  <input type="text" name="tags" class="form-control" value="<%= $response->tag_list %>"></input>
+                  <input type="text" name="tags" class="form-control" value="<%= $post->tag_list %>"></input>
                   <div class="hr-sm"></div>
                 </div>
               </div>

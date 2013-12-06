@@ -40,28 +40,6 @@ use Canvas::Store::Tag;
 # CONSTANTS
 #
 
-use constant TYPE_STATUS_MAP => {
-  idea => [
-    [ 'Under Consideration' => 'consider' ],
-    [ 'Declined'            => 'declined' ],
-    [ 'Planned'             => 'planned'  ],
-    [ 'In Progress'         => 'progress' ],
-    [ 'Completed'           => 'complete' ],
-    [ 'Gathering Feedback'  => 'feedback' ],
-  ],
-  problem => [
-    [ 'Known Problem' => 'known'     ],
-    [ 'Declined'      => 'noproblem' ],
-    [ 'Solved'        => 'solved'    ],
-    [ 'In Progress'   => 'progress'  ],
-  ],
-  question => [
-    [ 'Answered'    => 'answered'   ],
-    [ 'Need Answer' => 'unanswered' ],
-  ],
-  thanks => [],
-};
-
 
 #
 # HELPERS
@@ -109,22 +87,6 @@ sub filter_valid_types($) {
   return $v;
 }
 
-sub list_status_for_type {
-  my $type = shift;
-  my $selected = shift;
-
-  my $status = [];
-
-  foreach my $s ( @{ TYPE_STATUS_MAP->{ $type } // [] } ) {
-    push @$status, [ ( defined $selected && grep { m/$selected/ } @$s) ?
-      ( @$s, 'selected', 'selected' ) :
-      ( @$s )
-    ]
-  }
-
-  return $status;
-}
-
 #
 # NEWS
 #
@@ -132,13 +94,16 @@ sub list_status_for_type {
 sub index {
   my $self = shift;
 
-  my $filter_type = filter_valid_types( $self->param('t') );
-  my $filter_tags = filter_valid_types( $self->param('s') );
+  my $filter = {
+    type => filter_valid_types( $self->param('t') )
+  };
+
+  $filter->{status} = $self->param('s') if defined $self->param('s');
 
   my $pager = Canvas::Store::Post->pager(
-    where             => { type => $filter_type },
+    where             => $filter,
     order_by          => 'updated DESC',
-    entries_per_page  => 10,
+    entries_per_page  => 20,
     current_page      => ( $self->param('page') // 1) - 1,
   );
 
@@ -264,22 +229,6 @@ sub add {
 
   my $now = gmtime;
 
-  my $status;
-  given( $type ) {
-    when('idea') {
-      $status = 'consider';
-    }
-    when('problem') {
-      $status = 'consider';
-    }
-    when('question') {
-      $status = 'consider';
-    }
-    default {
-      $status = '';
-    }
-  }
-
   # check for existing stubs and append the ID + 1 of the last
   my( @e ) = Canvas::Store::Post->search({
       name => $stub,
@@ -292,6 +241,7 @@ sub add {
   my $p = Canvas::Store::Post->create({
     name         => $stub,
     type         => $type,
+    status       => '',
     title        => $self->param('title'),
     content      => $self->param('content'),
     author_id    => $self->auth_user->id,
@@ -365,7 +315,7 @@ sub edit_get {
 
   my @r = Canvas::Store::Post->replies( $stub );
 
-  $self->stash( response => $p, statuses => list_status_for_type( $p->type, $p->status ), replies => \@r );
+  $self->stash( post => $p, replies => \@r );
 
   $self->render('engage-edit');
 }

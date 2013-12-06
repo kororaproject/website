@@ -450,6 +450,10 @@ blockquote p {
   -moz-border-radius: 0;
 }
 
+.navbar-container {
+  margin: 0 auto;
+}
+
 .nav-tab-danger>a:hover {
   background-color: #fdf7f7;
   border-color: #eed3d7;
@@ -611,7 +615,10 @@ blockquote p {
 }
 
 .page-content {
+  margin: 0 auto;
   padding-top: 96px;
+
+  max-width: 1000px;
 }
 
 .hr {
@@ -667,6 +674,12 @@ blockquote p {
   border-color: #eed3d7;
 }
 
+.engage-summary-title {
+  display: inline-block;
+
+  margin-top: 4px;
+}
+
 .engage-problem > .engage-detail-title-icon,
 .engage-problem .engage-summary-title-icon {
   color: #b94a48;
@@ -702,8 +715,17 @@ blockquote p {
 .engage-problem .engage-summary-title-icon,
 .engage-question .engage-summary-title-icon,
 .engage-thank .engage-summary-title-icon {
-  font-size: 18px;
-  line-height: 19px;
+  float: left;
+  width: 32px;
+
+  font-size: 24px;
+  line-height: 32px;
+
+  text-align: center;
+}
+
+.engage-summary-content {
+  margin-left: 48px;
 }
 
 .engage-summary-meta,

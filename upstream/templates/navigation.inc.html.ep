@@ -1,69 +1,71 @@
 <!-- NAVIGATION -->
 <nav id="korobar" class="navbar navbar-default" role="navigation">
-  <div class="navbar-header">
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-primary-collapse">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <div class="navbar-brand kp-logo-48"></div>
-  </div>
-
-  <!-- navigation content for toggling -->
-  <div class="collapse navbar-collapse navbar-primary-collapse">
-    <ul class="nav navbar-nav">
-      <li class="<%= 'active' if ( $active eq 'home' ) %>"><a href="/">Home</a></li>
-      <li class="dropdown <%= 'active' if ( $active eq 'about' ) %>">
-        <a href="" class="dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
-        <ul class="dropdown-menu" role="menu">
-          <li><a href="/about">Overview</a></li>
-          <li><a href="/about/why-fedora">Why Fedora?</a></li>
-          <li><a href="/about/whats-inside">What's Inside</a></li>
-          <li><a href="/about/team">Team</a></li>
-          <li><a href="/about/roadmap">Roadmap</a></li>
-        </ul>
-      </li>
-      <li class="dropdown <%= 'active' if ( $active eq 'discover' ) %>">
-        <a href="" class="dropdown-toggle" data-toggle="dropdown">Discover <b class="caret"></b></a>
-        <ul class="dropdown-menu" role="menu">
-          <li><a href="/discover">Overview</a></li>
-          <li><a href="/discover/gnome">GNOME Desktop</a></li>
-          <li><a href="/discover/kde">KDE Desktop</a></li>
-          <li><a href="/discover/cinnamon">Cinnamon Desktop</a></li>
-          <li><a href="/discover/mate">MATE Desktop</a></li>
-        </ul>
-      </li>
-      <li class="<%= 'active' if ( $active eq 'download' ) %>"><a href="/download">Download</a></li>
-      <li class="dropdown <%= 'active' if ( $active eq 'support' ) %>">
-        <a href="" class="dropdown-toggle" data-toggle="dropdown">Support <b class="caret"></b></a>
-        <ul class="dropdown-menu" role="menu">
-          <li><a href="/support">Overview</a></li>
-          <li class="hide"><a href="/support/forums">Forums</a></li>
-          <li><a href="/support/engage">Engage</a></li>
-          <li><a href="/support/documentation">Documentation</a></li>
-        </ul>
-      </li>
-      <li class="<%= 'active' if ( $active eq 'news' ) %>"><a href="/news">News</a></li>
-    </ul>
-% if( is_user_authenticated ) {
-    <ul class="nav navbar-nav navbar-right">
-      <li class="dropdown">
-        <a href="" class="dropdown-toggle" data-toggle="dropdown"><%= auth_user->username %> <b class="caret"></b></a>
-        <ul class="dropdown-menu" role="menu">
-          <li><a href="/deauthenticate?redirect_to=<%= url_for('current') %>">Log Out</a></li>
-        </ul>
-      </li>
-    </ul>
-% }
-% else {
-    <div class="nav navbar-right">
-      <div id="register" class="navbar-btn btn-group btn-group-sm">
-        <a href="/register?redirect_to=<%= url_for('current') %>" class="btn btn-default">Register</a>
-        <a data-toggle="modal" href="#loginModal" class="btn btn-success">Log In</a>
-      </div>
+  <div class="navbar-container col-sm-12">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-primary-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <div class="navbar-brand kp-logo-48"></div>
     </div>
-% }
+
+    <!-- navigation content for toggling -->
+    <div class="collapse navbar-collapse navbar-primary-collapse">
+      <ul class="nav navbar-nav">
+        <li class="<%= 'active' if ( $active eq 'home' ) %>"><a href="/">Home</a></li>
+        <li class="dropdown <%= 'active' if ( $active eq 'about' ) %>">
+          <a href="" class="dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/about">Overview</a></li>
+            <li><a href="/about/why-fedora">Why Fedora?</a></li>
+            <li><a href="/about/whats-inside">What's Inside</a></li>
+            <li><a href="/about/team">Team</a></li>
+            <li><a href="/about/roadmap">Roadmap</a></li>
+          </ul>
+        </li>
+        <li class="dropdown <%= 'active' if ( $active eq 'discover' ) %>">
+          <a href="" class="dropdown-toggle" data-toggle="dropdown">Discover <b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/discover">Overview</a></li>
+            <li><a href="/discover/gnome">GNOME Desktop</a></li>
+            <li><a href="/discover/kde">KDE Desktop</a></li>
+            <li><a href="/discover/cinnamon">Cinnamon Desktop</a></li>
+            <li><a href="/discover/mate">MATE Desktop</a></li>
+          </ul>
+        </li>
+        <li class="<%= 'active' if ( $active eq 'download' ) %>"><a href="/download">Download</a></li>
+        <li class="dropdown <%= 'active' if ( $active eq 'support' ) %>">
+          <a href="" class="dropdown-toggle" data-toggle="dropdown">Support <b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/support">Overview</a></li>
+            <li class="hide"><a href="/support/forums">Forums</a></li>
+            <li><a href="/support/engage">Engage</a></li>
+            <li><a href="/support/documentation">Documentation</a></li>
+          </ul>
+        </li>
+        <li class="<%= 'active' if ( $active eq 'news' ) %>"><a href="/news">News</a></li>
+      </ul>
+  % if( is_user_authenticated ) {
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="" class="dropdown-toggle" data-toggle="dropdown"><%= auth_user->username %> <b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/deauthenticate?redirect_to=<%= url_for('current') %>">Log Out</a></li>
+          </ul>
+        </li>
+      </ul>
+  % }
+  % else {
+      <div class="nav navbar-right">
+        <div id="register" class="navbar-btn btn-group btn-group-sm">
+          <a href="/register?redirect_to=<%= url_for('current') %>" class="btn btn-default">Register</a>
+          <a data-toggle="modal" href="#loginModal" class="btn btn-success">Log In</a>
+        </div>
+      </div>
+  % }
+    </div>
   </div>
 </nav>
 

@@ -19,6 +19,38 @@ package Canvas::Helpers::Engage;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
+#
+# PERL INCLUDES
+#
+use Data::Dumper;
+
+#
+# CONSTANTS
+#
+my $TYPE_STATUS_MAP = {
+  idea => [
+    [ 'Under Consideration' => 'under-consideration'],
+    [ 'Declined'            => 'declined'           ],
+    [ 'Planned'             => 'planned'            ],
+    [ 'In Progress'         => 'in-progress'        ],
+    [ 'Completed'           => 'completed'          ],
+    [ 'Gathering Feedback'  => 'gathering-feedback' ],
+  ],
+  problem => [
+    [ 'Known Problem' => 'known-problem'],
+    [ 'Declined'      => 'declined'     ],
+    [ 'Solved'        => 'solved'       ],
+    [ 'In Progress'   => 'in-progress'  ],
+  ],
+  question => [
+    [ 'Answered'    => 'answered'   ],
+    [ 'Need Answer' => 'need-answer'],
+  ],
+  thanks => [
+    [ 'Noted'       => 'noted'],
+  ],
+};
+
 sub register {
   my( $self, $app ) = @_;
 
@@ -35,6 +67,44 @@ sub register {
     };
 
     return '<i class="fa ' . ( $map->{ $type } // 'fa-ban' ) . ' ' . $classes . '"></i>';
+  });
+
+
+  $app->helper(engage_status => sub {
+    my( $self, $post ) = @_;
+
+    return 'unknown' unless ref $post eq 'Canvas::Store::Post';
+
+    # it's new if no replies and no modified status
+    return 'new' if $post->status eq '' && $post->reply_count == 0;
+    return 'active' if $post->status eq '';
+
+    my $t = $TYPE_STATUS_MAP->{ $post->type };
+
+    say Dumper $t, $post->status;
+    my( $s ) = ( grep { $post->status ~~ @$_ } @$t );
+
+    return 'unknown' unless defined $s;
+
+    return lc $s->[0];
+  });
+
+
+  $app->helper(engage_status_list => sub {
+    my( $self, $post ) = @_;
+
+    return [] unless ref $post eq 'Canvas::Store::Post';
+
+    my $status = [];
+
+    foreach my $s ( @{ $TYPE_STATUS_MAP->{ $post->type } // [] } ) {
+      push @$status, [ ( grep { m/$post->status/ } @$s) ?
+        ( @$s, 'selected', 'selected' ) :
+        ( @$s )
+      ]
+    }
+
+    return $status;
   });
 
   $app->helper(engage_post_can_subscribe => sub {
