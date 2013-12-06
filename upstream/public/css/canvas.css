@@ -1042,6 +1042,7 @@ h4.step {
 
 .checksums span.label {
   margin-left: 2px;
+  font-size: 10px;
   cursor: pointer;
   cursor: hand;
 }

@@ -191,10 +191,10 @@ function DownloadController($scope, $location) {
       codename: 'Peach',
       isStable: false,
       isCurrent: true,
-      released: '29 Nov 2013',
+      released: '29 November 2013',
       archs: [
-        { name: 'x86_64', label: '64-bit (x86_64)' },
-        { name: 'i686',   label: '32-bit (i686)' }
+        { name: 'x86_64', label: '64-bit' },
+        { name: 'i686',   label: '32-bit' }
       ],
       desktops: [
         { name: 'cinnamon', label: 'CINNAMON' },
@@ -375,15 +375,15 @@ function DownloadController($scope, $location) {
       codename: 'Bruce',
       isStable: true,
       isCurrent: true,
-      released: '07 Oct 2013',
+      released: '07 October 2013',
       archs: [
         {
           name: 'x86_64',
-          label: '64-bit (x86_64)'
+          label: '64-bit'
         },
         {
           name: 'i686',
-          label: '32-bit (i686)'
+          label: '32-bit'
         }
       ],
       desktops: [
@@ -556,11 +556,11 @@ function DownloadController($scope, $location) {
       archs: [
         {
           name: 'x86_64',
-          label: '64-bit (x86_64)'
+          label: '64-bit'
         },
         {
           name: 'i686',
-          label: '32-bit (i686)'
+          label: '32-bit'
         }
       ],
       desktops: [
@@ -870,8 +870,6 @@ function DownloadController($scope, $location) {
       args[hash[0]] = hash[1];
     }
   }
-
-  console.log(args);
 
   $scope.version = $scope.getPreferredVersion( args );
   $scope.arch = $scope.getPreferredArch( args );
