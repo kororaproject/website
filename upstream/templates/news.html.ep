@@ -23,7 +23,7 @@
         <div class="row">
           <div class="col-sm-12">
             <a href="/news/<%= $n->name %>"><h2><%= $n->title %></h2></a>
-            <h3 class="subtitle"><%= $n->author_id->username %> | <%= $n->created->strftime('%e %B, %Y') %></h3>
+            <h3 class="subtitle"><%= $n->author_id->username %> | <%= $n->created->strftime('%e %B %Y') %></h3>
             <div class="news-excerpt">
 
 %== render_markdown( $n->excerpt );

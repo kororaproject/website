@@ -17,7 +17,7 @@
         <div class="row">
           <div class="col-sm-12">
             <h1><%= $post->title %></h1>
-            <h2 class="subtitle"><%= $post->author_id->username %> | <%= $post->created->strftime('%e %B, %Y') %></h2>
+            <h2 class="subtitle"><%= $post->author_id->username %> | <%= $post->created->strftime('%e %B %Y') %></h2>
           </div>
         </div>
         <div class="row">
