@@ -166,17 +166,99 @@ function NavigationController($scope, CanvasNavigation) {
   };
 };
 
+function RegisterController($scope, $http) {
+  $scope.username = '';
+  $scope.email = '';
+  $scope.password = '';
+  $scope.verify = '';
 
-function HomeController($scope) {
-  $scope.data = {};
-};
+  $scope.error = {
+    username: 'Username is already taken.',
+    email: 'Email is invalid.',
+    password: 'Password must be at least 8 characters.',
+    verify: 'Passwords must match.'
+  };
 
-function AboutController($scope) {
-  $scope.data = {};
-};
+  $scope.usernames = {};
+  $scope._lookup_username = false;
 
-function DiscoverController($scope) {
-  $scope.data = {};
+  $scope.lookupUsername = function() {
+    $scope._lookup_username = true;
+
+    /* check profile status */
+    $http({
+      method: 'GET',
+      url: '/profile/' + $scope.username + '/status'
+    })
+      .success( function(data, status, headers, config) {
+        if( data.hasOwnProperty('name') ) {
+          $scope.usernames[ data.name ] = ( data.status === 1 ) ? false : true;
+        }
+        $scope._lookup_username = false;
+      })
+      .error( function(data, status, headers, config) {
+        console.log( data );
+        $scope._lookup_username = false;
+      });
+  };
+
+  $scope.usernameIsValid = function() {
+    if( $scope.usernames.hasOwnProperty( $scope.username ) ) {
+      if( $scope.usernames[ $scope.username ] ) {
+        $scope.error.username = '';
+        return true;
+      }
+      else {
+        $scope.error.username = 'Username is already taken.';
+      }
+    }
+    else {
+      $scope.error.username = 'Username can\'t be checked.';
+    }
+
+    return false;
+  };
+
+  $scope.emailIsValid = function() {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    return re.test($scope.email);
+  };
+
+  $scope.passwordIsValid = function() {
+    return $scope.password.length >= 8;
+  };
+
+  $scope.verifyIsValid = function() {
+    return $scope.verify === $scope.password;
+  };
+
+  $scope.usernameIsState = function(state) {
+    return $scope.usernames.hasOwnProperty( $scope.username ) &&
+           ( state === $scope.usernameIsValid() );
+  };
+
+  $scope.emailIsState = function(state) {
+    return $scope.email.length > 0 && ( state === $scope.emailIsValid() );
+  };
+
+  $scope.passwordIsState = function(state) {
+    return $scope.password.length > 0 && ( state === $scope.passwordIsValid() );
+  };
+
+  $scope.verifyIsState = function(state) {
+    return $scope.verify.length > 0 && ( state === $scope.verifyIsValid() );
+  };
+
+
+  $scope.canRegister = function() {
+    return $scope.usernameIsValid() &&
+           $scope.emailIsValid()    &&
+           $scope.passwordIsValid() &&
+           $scope.verifyIsValid();
+  };
+
+  console.log('WOOT');
 };
 
 function DownloadController($scope, $location) {

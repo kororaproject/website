@@ -11,7 +11,7 @@
     <div class="page-content">
       <!-- CONTENT -->
 
-      <div class="container">
+      <div class="container" ng-controller="RegisterController">
         <div class="row">
           <div class="col-sm-12">
             <h1 class="page-title"><strong>Register.</strong> Join the Community</h1>
@@ -26,40 +26,44 @@
             <p>Down the road, a Korora Prime account will provide single sign on access to other Korora Project services that you choose to be part of.</p>
           </div>
           <div class="col-sm-6 callout callout-nfo">
-
+            <h2>Please complete ...</h2>
             <form action="<%= url_for('current') %>" method="post" class="form-signin" role="form">
+              <input type="hidden" name="redirect_to" value="<%= $redirect_to %>"></input>
 % if( $error->{code} ) {
               <div class="alert alert-danger">
                 <p><%= $error->{message} %></p>
               </div>
 % }
-              <div class="form-group">
-                <input type="hidden" name="redirect_to" value="<%= $redirect_to %>"></input>
+              <div class="form-group" ng-class="{'has-error': usernameIsState(false), 'has-success': usernameIsState(true)}">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                  <input type="text" class="form-control" name="user" placeholder="username" value="<%= $values->{user} %>">
+                  <input type="text" class="form-control" name="user" placeholder="username" value="<%= $values->{user} %>" ng-model="username" ng-blur="lookupUsername()">
                 </div>
+                <span class="help-block ng-hide" ng-show="usernameIsState(false)">{{error.username}}</span>
               </div>
-              <div class="form-group">
+              <div class="form-group" ng-class="{'has-error': emailIsState(false), 'has-success': emailIsState(true)}">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
-                  <input type="email" class="form-control" name="email" placeholder="you@example.org" value="<%= $values->{email} %>">
+                  <input type="input" class="form-control" name="email" placeholder="you@example.org" value="<%= $values->{email} %>" ng-model="email">
                 </div>
+                <span class="help-block ng-hide" ng-show="emailIsState(false)">{{error.email}}</span>
               </div>
-              <div class="form-group">
+              <div class="form-group" ng-class="{'has-error': passwordIsState(false), 'has-success': passwordIsState(true)}">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-                  <input type="password" class="form-control" name="pass" placeholder="password">
+                  <input type="password" class="form-control" name="pass" placeholder="password" ng-model="password">
                 </div>
+                <span class="help-block ng-hide" ng-show="passwordIsState(false)">{{error.password}}</span>
               </div>
-              <div class="form-group">
+              <div class="form-group" ng-class="{'has-error': verifyIsState(false), 'has-success': verifyIsState(true)}">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-                  <input type="password" class="form-control" name="confirm" placeholder="confirm password">
+                  <input type="password" class="form-control" name="confirm" placeholder="confirm password" ng-model="verify">
                 </div>
+                <span class="help-block ng-hide" ng-show="verifyIsState(false)">{{error.verify}}</span>
               </div>
               <div class="form-group">
-                <button class="btn btn-large btn-success pull-right" type="submit">Register</button>
+                <button class="btn btn-large btn-success pull-right" ng-class="{disabled: !canRegister()}" type="submit">Register</button>
               </div>
             </form>
           </div>

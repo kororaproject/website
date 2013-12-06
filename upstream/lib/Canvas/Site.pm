@@ -462,6 +462,28 @@ sub register_post {
 }
 
 
+
+sub profile_get {
+  my $self = shift;
+
+}
+
+sub profile_status_get {
+  my $self = shift;
+
+  my $u = Canvas::Store::User->search({
+    username  => $self->param('name'),
+  })->first;
+
+  my $status = defined $u ? 1 : 0;
+
+  $self->render( json => {
+    name    => $self->param('name'),
+    status  => $status
+  });
+}
+
+
 #
 # CATCH ALL
 sub trap {
