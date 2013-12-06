@@ -802,6 +802,10 @@ blockquote p {
   margin-bottom: 16px;
 }
 
+#site-map h4 {
+  font-weight: bold;
+}
+
 #site-map a,
 #site-map a:visited,
 #site-map a:active {
@@ -833,6 +837,14 @@ footer li {
 footer .copyright {
   margin: 0;
   line-height: 24px;
+}
+
+footer .copyright > a,
+footer .copyright > a:hover,
+footer .copyright > a:active,
+footer .copyright > a:visited {
+  color: #fff;
+  font-weight: 600;
 }
 
 footer p {
