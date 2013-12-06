@@ -87,6 +87,8 @@ body.modal-open,
 */
 body {
   font-family:'Open Sans';
+  font-size: 16px;
+  line-height: 24px;
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
@@ -103,7 +105,7 @@ p.feature-block {
 }
 
 blockquote.title p {
-  font: 18px;
+  font-size: 18px;
   text-align: left;
 }
 
