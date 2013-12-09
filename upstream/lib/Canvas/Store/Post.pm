@@ -23,8 +23,9 @@ use base 'Canvas::Store';
 #
 # PERL INCLUDES
 #
-use Digest::MD5 qw(md5);
 use Data::Dumper;
+use Digest::MD5 qw(md5);
+use POSIX qw(floor);
 
 #
 # MODEL DEFINITION
@@ -82,6 +83,72 @@ sub tag_list {
 
 sub tag_list_array {
   return map { $_->name } shift->tags;
+}
+
+sub search_type_status_and_tags {
+  my $self = shift;
+  my %params = @_ > 1 ? @_ : ref $_[0] eq 'HASH' ? %{ $_[0] } : ();
+
+  my $dbh = $self->db_Main();
+
+  # pagination
+  my $items_per_page = $params{items_per_page}  //= 10;
+  my $current_page   = $params{current_page}    //= 1;
+
+  # filters
+  my $type_filter    = '';
+  my $status_filter  = '';
+  my $tags_filter    = '';
+  my @filter = ();
+
+  # filter on type
+  if( length $params{type} > 0 ) {
+    push @filter, ' p.type IN (' . join(',', map { $dbh->quote( $_ )} @{ $params{type} }) . ')';
+  }
+
+  # filter on type
+  if( length $params{status} > 0 ) {
+    push @filter, ' p.status=' . $dbh->quote( $params{status} );
+  }
+
+  # filter on tags
+  if( length $params{tags} > 0 ) {
+    push @filter, 'pt.tag_id=t.id AND (t.name IN (' . join( ',', map { $dbh->quote( $_ ) } split(/[ ,]/, $params{tags})) . ')) AND p.id=pt.post_id';
+  }
+
+  # filter on full text
+  if( length $params{text} > 0 ) {
+    push @filter, 'p.title LIKE %% OR p.content LIKE %%';
+  };
+
+  # build total count query
+  my $raw_count_sql = 'SELECT COUNT(DISTINCT(p.id)) FROM canvas_post_tag pt, canvas_post p, canvas_tag t WHERE (' . join( ') AND (', @filter ) . ')' ;
+
+  # build paginated query
+  my $raw_sql = 'SELECT p.id FROM canvas_post_tag pt, canvas_post p, canvas_tag t WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id ORDER BY updated DESC' ;
+
+  $raw_sql .= ' LIMIT ' . $items_per_page . ' OFFSET ' . ( $items_per_page * ( $current_page - 1 ) );
+
+  print Dumper %params;
+
+  # fetch the total item count
+  my $sth = $dbh->prepare_cached($raw_count_sql);
+  $sth->execute;
+  my( $total_items ) = $sth->fetchrow_array;
+  $sth->finish;
+
+  # fetch the paginated items
+  $sth = $dbh->prepare_cached($raw_sql);
+  $sth->execute;
+  my @results = $self->sth_to_objects($sth);
+
+  return {
+    items       => \@results,
+    item_count  => $total_items,
+    page_size   => $items_per_page,
+    page        => $current_page,
+    page_last   => floor($total_items / $items_per_page),
+  }
 }
 
 #

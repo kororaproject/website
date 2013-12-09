@@ -29,6 +29,7 @@ use Data::Dumper;
 #
 my $TYPE_STATUS_MAP = {
   idea => [
+    [ ''                    => ''                   ],
     [ 'Under Consideration' => 'under-consideration'],
     [ 'Declined'            => 'declined'           ],
     [ 'Planned'             => 'planned'            ],
@@ -37,16 +38,19 @@ my $TYPE_STATUS_MAP = {
     [ 'Gathering Feedback'  => 'gathering-feedback' ],
   ],
   problem => [
+    [ ''              => ''             ],
     [ 'Known Problem' => 'known-problem'],
     [ 'Declined'      => 'declined'     ],
     [ 'Solved'        => 'solved'       ],
     [ 'In Progress'   => 'in-progress'  ],
   ],
   question => [
+    [ ''            => ''           ],
     [ 'Answered'    => 'answered'   ],
     [ 'Need Answer' => 'need-answer'],
   ],
-  thanks => [
+  thank => [
+    [ ''            => ''     ],
     [ 'Noted'       => 'noted'],
   ],
 };
@@ -81,7 +85,6 @@ sub register {
 
     my $t = $TYPE_STATUS_MAP->{ $post->type };
 
-    say Dumper $t, $post->status;
     my( $s ) = ( grep { $post->status ~~ @$_ } @$t );
 
     return 'unknown' unless defined $s;
@@ -141,6 +144,6 @@ sub register {
 
     return 0;
   });
-
 }
+
 1;

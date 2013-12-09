@@ -80,6 +80,16 @@ my $DISTANCE_TIME_FORMAT = {
 sub register {
   my( $self, $app ) = @_;
 
+  $app->helper(url_for_path => sub {
+    my( $self, $modifier ) = @_;
+
+    $modifier //= 0;
+
+    my @path = split /\//, $self->url_for->path;
+
+    return join '/', @path[0..($#path+$modifier)];
+  });
+
   $app->helper(is_active_auth => sub {
     my( $self ) = @_;
 

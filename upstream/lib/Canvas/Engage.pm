@@ -94,26 +94,13 @@ sub filter_valid_types($) {
 sub index {
   my $self = shift;
 
-  my $filter = {
-    type => filter_valid_types( $self->param('t') )
-  };
-
-  $filter->{status} = $self->param('s') if defined $self->param('s');
-
-  my $pager = Canvas::Store::Post->pager(
-    where             => $filter,
-    order_by          => 'updated DESC',
-    entries_per_page  => 20,
-    current_page      => ( $self->param('page') // 1) - 1,
+  my $cache = Canvas::Store::Post->search_type_status_and_tags(
+    type            => filter_valid_types( $self->param('type') ),
+    status          => $self->param('status') // '',
+    tags            => $self->param('tags')   // '',
+    items_per_page  => 20,
+    current_page    => $self->param('page'),
   );
-
-  my $cache = {
-    items       => [ $pager->search_where ],
-    item_count  => $pager->total_entries,
-    page_size   => $pager->entries_per_page,
-    page        => $pager->current_page + 1,
-    page_last   => floor($pager->total_entries / $pager->entries_per_page),
-  };
 
   $self->stash( responses => $cache );
   $self->render('engage');

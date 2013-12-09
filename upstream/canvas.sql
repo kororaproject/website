@@ -336,7 +336,7 @@ CREATE TABLE canvas_post (
   ** idea: considered, declined, planned, progress, complete, feedback
   ** reply: standard, answer
   */
-  status        VARCHAR(16)           NOT NULL,
+  status        VARCHAR(32)           NOT NULL,
 
   /* name of the post */
   name          VARCHAR(200)          NOT NULL  DEFAULT '',

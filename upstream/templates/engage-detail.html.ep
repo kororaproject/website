@@ -16,7 +16,7 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Converse with the Community</h1>
+            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Your Community</h1>
           </div>
         </div>
         <div class="row">
@@ -24,6 +24,7 @@
             <div class="callout engage-detail engage-<%= $response->type %>">
               <%== engage_icon( $response->type, 'engage-detail-title-icon' )%>
               <h2 class="engage-detail-title"><%= $response->title %></h2>
+
 %== render_markdown( $response->content )
 
               <div class="engage-detail-tags">
