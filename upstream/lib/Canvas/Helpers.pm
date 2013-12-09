@@ -81,13 +81,15 @@ sub register {
   my( $self, $app ) = @_;
 
   $app->helper(url_for_path => sub {
-    my( $self, $modifier ) = @_;
+    my( $self, $modifier ) = ( shift, shift );
 
     $modifier //= 0;
 
     my @path = split /\//, $self->url_for->path;
+    @path = @path[0..($#path+$modifier)];
+    push @path, @_;
 
-    return join '/', @path[0..($#path+$modifier)];
+    return join '/', @path;
   });
 
   $app->helper(is_active_auth => sub {

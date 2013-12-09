@@ -92,7 +92,7 @@
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <p>Korora comes in a <a href="../discover/">few different versions</a> and is available for download <a href="https://sourceforge.net/projects/kororaproject/files/">via direct mirror</a> (thanks to SourceForge). It includes all system updates available at the time of release.</p>
+            <p>Korora comes in a <a href="<%= url_for_path(-1, 'discover') %>">few different versions</a> and is available for download <a href="https://sourceforge.net/projects/kororaproject/files/">via direct mirror</a> (thanks to SourceForge). It includes all system updates available at the time of release.</p>
             <h2>Try it out!</h2>
             <p>Burn the <a href="http://docs.fedoraproject.org/en-US/Fedora/19/html/Installation_Guide/sn-making-media.html#sn-making-disc-media">ISO image to disk</a> (CD/DVD), turn it into a <a href="http://docs.fedoraproject.org/en-US/Fedora/19/html/Installation_Guide/Making_USB_Media.html">Live USB</a>, or just kick it off inside a virtual machine.  If you're already running a Linux distro, you can easily turn the ISO into a bootable USB stick with the <em>dd</em> command.</p>
             <p>Using the example below, replace the path to the ISO with a real one and change the device (sdX) to your 2GB+ USB stick device (not a partition on it).</p>
