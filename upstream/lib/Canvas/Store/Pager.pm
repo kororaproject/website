@@ -58,8 +58,6 @@ sub pager {
     __pager_last_page         => 0,
     __pager_total_entries     => 0,
     __pager_where             => {},
-    __pager_raw_sql           => undef,
-    __pager_raw_count_sql     => undef,
   }, $class;
 
   $self->_init( @_ );
@@ -86,8 +84,6 @@ sub _init {
   else {
     my %args  = @_;
 
-    $raw        = $args{raw_sql};
-    $raw_count  = $args{raw_count_sql};
     $where      = $args{where};
     $order_by   = $args{order_by};
     $per_page   = $args{entries_per_page};
@@ -101,16 +97,6 @@ sub _init {
   $self->where( $where )                if $where;
   $self->order_by( $order_by )          if $order_by;
   $self->current_page( $page )          if $page;
-
-  if( length( $raw ) || length( $raw_count ) ) {
-    if( length( $raw ) || length( $raw_count ) ) {
-      $self->raw_sql( $raw );
-      $self->raw_count_sql( $raw_count );
-    }
-    else {
-      croak( 'Need to supply both the raw_sql and the raw_count_sql!' );
-    }
-  }
 }
 
 =item search_where
@@ -129,46 +115,29 @@ sub search_where {
 
   my $cdbi = $self->{__pager_cdbi_app};
 
-  unless( defined $self->raw_sql ) {
-    my $order_by  = $self->order_by || [ $cdbi->primary_columns ];
-    my $where     = $self->where;
-    my $sql       = Canvas::Util::Abstract->new();
+  my $order_by  = $self->order_by || [ $cdbi->primary_columns ];
+  my $where     = $self->where;
+  my $sql       = Canvas::Util::Abstract->new();
 
-    $order_by = [ $order_by ] unless ref $order_by;
-    my( $phrase, @bind ) = $sql->where( $where, $order_by );
+  $order_by = [ $order_by ] unless ref $order_by;
+  my( $phrase, @bind ) = $sql->where( $where, $order_by );
 
-    # If the phrase starts with the ORDER clause (i.e. no WHERE spec), then we are
-    # emulating a { 1 => 1 } search, but avoiding the bug in Class::DBI::Plugin::AbstractCount 0.04,
-    # so we need to replace the spec - patch from Will Hawes
-    if( $phrase =~ /^\s*ORDER\s*/i ) {
-      $phrase = ' 1=1' . $phrase;
-    }
-
-    # add paged limit and offset
-    if( $self->{__pager_total_entries} ) {
-      $phrase .= ' LIMIT ' . $self->{__pager_entries_per_page};
-      $phrase .= ' OFFSET ' . ( $self->{__pager_entries_per_page} * $self->{__pager_current_page} ) . ' ';
-    };
-
-    $phrase =~ s/^\s*WHERE\s*//i;
-
-    return $cdbi->retrieve_from_sql( $phrase, @bind );
+  # If the phrase starts with the ORDER clause (i.e. no WHERE spec), then we are
+  # emulating a { 1 => 1 } search, but avoiding the bug in Class::DBI::Plugin::AbstractCount 0.04,
+  # so we need to replace the spec - patch from Will Hawes
+  if( $phrase =~ /^\s*ORDER\s*/i ) {
+    $phrase = ' 1=1' . $phrase;
   }
-
-  # otherwise we're paging raw style
-  my $sql = $self->{__pager_raw_sql};
 
   # add paged limit and offset
   if( $self->{__pager_total_entries} ) {
-    $sql .= ' LIMIT ' . $self->{__pager_entries_per_page};
-    $sql .= ' OFFSET ' . ( $self->{__pager_entries_per_page} * $self->{__pager_current_page} ) . ' ';
+    $phrase .= ' LIMIT ' . $self->{__pager_entries_per_page};
+    $phrase .= ' OFFSET ' . ( $self->{__pager_entries_per_page} * $self->{__pager_current_page} ) . ' ';
   };
 
-  my $dbh = $cdbi->db_Main();
-  my $sth = $dbh->prepare_cached($sql);
-  $sth->execute;
+  $phrase =~ s/^\s*WHERE\s*//i;
 
-  my @results = $cdbi->sth_to_objects($sth);
+  return $cdbi->retrieve_from_sql( $phrase, @bind );
 }
 
 =item retrieve_all
@@ -207,15 +176,7 @@ sub _setup_pager
 {
   my ( $self ) = @_;
 
-  # get the total count for our query
-  unless( defined $self->raw_sql ) {
-    $self->{__pager_total_entries} = $self->_count_search_where( $self->{__pager_where} // {} );
-  }
-  # get the total from our raw query
-  else {
-    $self->{__pager_total_entries} = $self->_count_search_raw;
-  }
-
+  $self->{__pager_total_entries} = $self->_count_search_where( $self->{__pager_where} // {} );
 
   # calculate total pages and last page
   if( $self->{__pager_total_entries} ) {
@@ -295,28 +256,6 @@ sub entries_per_page {
   }
 
   return $self->{__pager_entries_per_page};
-}
-
-sub raw_sql {
-  my $self = shift;
-  my $_raw = $_[0];
-
-  if( defined($_raw) ) {
-    $self->{__pager_raw_sql} = $_raw;
-  }
-
-  return $self->{__pager_raw_sql};
-}
-
-sub raw_count_sql {
-  my $self = shift;
-  my $_raw_count = $_[0];
-
-  if( defined($_raw_count) ) {
-    $self->{__pager_raw_count_sql} = $_raw_count;
-  }
-
-  return $self->{__pager_raw_count_sql};
 }
 
 sub where {
