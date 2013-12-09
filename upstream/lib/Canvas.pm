@@ -83,18 +83,18 @@ sub startup {
     },
   });
 
-  if( $self->mode ne 'development' ) {
-    $self->plugin('mail' => {
-      type => 'text/plain',
-    });
-  }
-  else {
-    say Dumper "Loading dummy MAILER";
+  if( ( $ENV{'CANVAS_MODE'} // '' ) ne 'production' ) {
+    $self->app->log->info('Loading dummy mail handler for non-production testing.');
 
     $self->helper('mail' => sub {
       my $self = shift;
 
       say Dumper @_;
+    });
+  }
+  else {
+    $self->plugin('mail' => {
+      type => 'text/plain',
     });
   }
 
