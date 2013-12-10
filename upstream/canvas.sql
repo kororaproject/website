@@ -60,7 +60,7 @@ CREATE TABLE canvas_user (
   gpg_private   TEXT,
   gpg_public    TEXT,
 
-  access        INTEGER       NOT NULL  DEFAULT 1,
+  access        INTEGER       NOT NULL  DEFAULT 0,
 
   created       DATETIME      NOT NULL,
   updated       DATETIME      NOT NULL,
