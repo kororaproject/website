@@ -129,8 +129,6 @@ sub search_type_status_and_tags {
 
   $raw_sql .= ' LIMIT ' . $items_per_page . ' OFFSET ' . ( $items_per_page * ( $current_page - 1 ) );
 
-  print Dumper %params;
-
   # fetch the total item count
   my $sth = $dbh->prepare_cached($raw_count_sql);
   $sth->execute;
