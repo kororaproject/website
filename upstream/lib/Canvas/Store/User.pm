@@ -181,8 +181,30 @@ sub is_active_account($) {
   return ( shift->status // '' ) eq 'active';
 }
 
+#
+# ACCESS CONTROL
+#
+
+#
+# bit: 7 = god
+#      6 = reserved
+#      5 = reserved
+#      4 = reserved
+#      3 = reserved
+#      2 = can_news_moderate
+#      1 = can_engage_moderate
+#      0 = can_engage
+#
+sub is_engage_moderator($) {
+  return ( shift->access // 0 ) & 0x02;
+}
+
+sub is_news_moderator($) {
+  return ( shift->access // 0 ) & 0x04;
+}
+
 sub is_admin($) {
-  return ( shift->access // 0 ) == 255;
+  return ( shift->access // 0 ) & 0x80;
 }
 
 1;

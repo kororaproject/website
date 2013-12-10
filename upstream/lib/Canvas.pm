@@ -62,6 +62,7 @@ sub startup {
 
   #
   # AUTHENTICATION
+  $self->app->log->info('Loading authentication handler.');
   $self->plugin('authentication' => {
     autoload_user => 0,
     current_user_fn => 'auth_user',
@@ -87,12 +88,11 @@ sub startup {
     $self->app->log->info('Loading dummy mail handler for non-production testing.');
 
     $self->helper('mail' => sub {
-      my $self = shift;
-
-      say Dumper @_;
+      shift->app->log->debub(join "\n", @_);
     });
   }
   else {
+    $self->app->log->info('Loading production mail handler.');
     $self->plugin('mail' => {
       type => 'text/plain',
     });
@@ -100,6 +100,7 @@ sub startup {
 
   #
   # HELPERS
+  $self->app->log->info('Loading page helpers.');
   $self->plugin('Canvas::Helpers');
   $self->plugin('Canvas::Helpers::Engage');
   $self->plugin('Canvas::Helpers::News');

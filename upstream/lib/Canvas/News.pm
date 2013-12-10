@@ -135,10 +135,7 @@ sub post_create {
   my $self = shift;
 
   # only allow authenticated and authorised users
-  $self->redirect_to('/') unless (
-    $self->is_user_authenticated() &&
-    $self->auth_user->is_admin
-  );
+  $self->redirect_to('/') unless $self->news_post_can_add;
 
   my $cache = {
     id            => '',
@@ -162,17 +159,14 @@ sub post_edit {
 
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
-  # check we found the post
-  $self->redirect_to('/') unless defined $p;
-
-  # only allow authenticated and authorised users
+  # only allow those who are authorised to edit posts
   $self->redirect_to('/') unless $self->news_post_can_edit( $p );
 
-  # build the cancel path
-
-  $self->stash( mode => 'edit', post => $p );
-
-  $self->stash( statuses => list_status_for_post( $p->type, $p->status ) );
+  $self->stash(
+    mode      => 'edit',
+    post      => $p,
+    statuses  => list_status_for_post( $p->type, $p->status )
+  );
 
   $self->render('news-post-new');
 }
@@ -180,28 +174,25 @@ sub post_edit {
 sub post_update {
   my $self = shift;
 
-  # only allow authenticated and authorised users
-  $self->redirect_to('/') unless (
-    $self->is_user_authenticated() &&
-    $self->auth_user->is_admin
-  );
-
   my $stub = $self->param('post_id');
 
   if( $stub ne '' ) {
     my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
     # update if we found the object
-    if( $p ) {
+    if( $self->news_post_can_edit( $p ) ) {
       $p->title( $self->param('title') // '' );
       $p->content( $self->param('content') // '' );
       $p->excerpt( $self->param('excerpt') // '' );
 
       $p->update;
     }
+    else {
+      return $self->redirect_to('/');
+    }
   }
   # otherwise create a new entry
-  else {
+  elsif( $self->news_post_can_add ) {
     $stub = sanitise_with_dashes( $self->param('post_title') );
 
     my $now = gmtime;
@@ -216,6 +207,9 @@ sub post_update {
       updated      => $now,
     });
   }
+  else {
+    return $self->redirect_to('/');
+  }
 
   $self->redirect_to( 'newsid', id => $stub );
 }
@@ -223,18 +217,15 @@ sub post_update {
 sub post_delete {
   my $self = shift;
 
-  # only allow authenticated and authorised users
-  $self->redirect_to('/') unless (
-    $self->is_user_authenticated() &&
-    $self->auth_user->is_admin
-  );
+  # only allow authenticated users
+  $self->redirect_to('/') unless $self->is_user_authenticated;
 
   my $stub = $self->param('id');
 
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
   # check we found the post
-  if( $p ) {
+  if( $self->news_post_can_delete( $p ) ) {
     $p->delete;
   }
 

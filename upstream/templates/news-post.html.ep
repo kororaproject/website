@@ -33,17 +33,19 @@
           </div>
         </div>
         <div class="hr"></div>
-% if( is_user_authenticated && auth_user->is_admin  ) {
         <div class="row">
           <div class="col-sm-12">
             <div class="text-right">
+% if( news_post_can_edit( $post ) ) {
               <a class="btn btn-danger" href="<%= url_for('current') . '/edit' %>">Edit</a>
+% }
+% if( news_post_can_delete( $post ) ) {
               <a class="btn btn-danger" href="<%= url_for('current') . '/delete' %>">Delete</a>
+% }
             </div>
           </div>
         </div>
         <div class="hr"></div>
-% }
       </div>
 
       <!-- END CONTENT -->

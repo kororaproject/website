@@ -138,7 +138,7 @@ sub register {
 
     return 0 unless $self->auth_user->is_active_account;
 
-    return 1 if $self->auth_user->is_admin;
+    return 1 if $self->auth_user->is_engage_moderator;
 
     return 1 if $self->auth_user->id == $post->author->id;
 
