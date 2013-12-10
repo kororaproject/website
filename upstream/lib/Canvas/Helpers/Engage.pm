@@ -140,7 +140,7 @@ sub register {
 
     return 1 if $self->auth_user->is_engage_moderator;
 
-    return 1 if $self->auth_user->id == $post->author->id;
+    return 1 if $self->auth_user->id == $post->author_id->id;
 
     return 0;
   });

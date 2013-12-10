@@ -59,8 +59,6 @@ sub register {
 
     return 1 if $self->auth_user->is_news_moderator;
 
-    return 1 if $self->auth_user->id == $post->author->id;
-
     return 0;
   });
 
