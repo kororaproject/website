@@ -113,6 +113,16 @@ blockquote.title p {
   font-weight: 600;
 }
 
+
+/*
+** ICONOGRAPHY
+*/
+
+.fa-fwl {
+  width: 1.28571428571em;
+  text-align: left;
+}
+
 /*
 ** TYPOGRAPHY
 */
@@ -677,27 +687,9 @@ blockquote p {
 ** ENGAGE PAGES
 */
 
-.engage-detail {
-  background-color: #fafafa;
-}
-
-.engage-summary:hover {
-  background-color: #fafafa;
-}
-
-.engage-summary > a {
-  color: inherit;
-  text-decoration: none;
-}
 
 .engage-problem {
   border-color: #eed3d7;
-}
-
-.engage-summary-title {
-  display: inline-block;
-
-  margin-top: 4px;
 }
 
 .engage-problem > .engage-detail-title-icon,
@@ -744,8 +736,22 @@ blockquote p {
   text-align: center;
 }
 
+.engage-summary:hover {
+  background-color: #fafafa;
+}
+
+.engage-summary > a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.engage-summary-title {
+  display: inline-block;
+
+  margin-top: 4px;
+}
 .engage-summary-content {
-  margin-left: 48px;
+  margin-left: 36px;
 }
 
 .engage-summary-meta,
@@ -768,6 +774,11 @@ blockquote p {
   font-size: 12px;
 }
 
+.engage-detail {
+  margin-bottom: 0;
+  background-color: #fafafa;
+}
+
 .engage-detail-title {
   margin-top: 0;
   padding-left: 32px;
@@ -781,21 +792,65 @@ blockquote p {
   font-size: 24px;
 }
 
-.engage-detail-admin {
-  text-align: right;
-}
-
-.engage-detail-admin > a {
-  font-size:10px;
-}
-
 .engage-detail-tags {
-  margin-bottom: 4px;
+  margin-top: 8px;
 
-  text-align: right;
   font-size: 12px;
 }
 
+.engage-reply {
+  margin-bottom: 0;
+}
+
+.engage-reply:hover {
+  background-color: #fafafa;
+}
+
+.engage-detail-footer,
+.engage-reply-footer {
+  padding: 0;
+  margin-bottom: 16px;
+
+  text-align: right;
+}
+
+.engage-detail-footer .engage-detail-footer-metadata p,
+.engage-reply-footer .engage-reply-footer-metadata p {
+  padding-top: 2px;
+  margin-bottom: 2px;
+
+  font-size: 12px;
+  line-height: 12px;
+}
+
+.engage-detail-footer .engage-detail-footer-metadata img,
+.engage-reply-footer .engage-reply-footer-metadata img {
+  display: inline-block;
+}
+
+.engage-detail-footer-admin,
+.engage-reply-footer-admin {
+  padding: 8px 0px 4px 4px;
+  display: inline-block;
+
+  vertical-align: top;
+}
+
+.engage-detail-footer-metadata,
+.engage-reply-footer-metadata {
+  display: inline-block;
+  vertical-align: top;
+
+  margin-left: 4px;
+}
+
+.engage-detail-footer-metadata {
+  margin-top: 8px;
+}
+
+.engage-reply-footer-metadata {
+  margin-top: 4px;
+}
 /*
 ** FOOTER
 */

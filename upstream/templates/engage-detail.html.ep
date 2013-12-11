@@ -35,18 +35,32 @@
 % }
               </div>
 
-% if( is_active_auth ) {
-              <div class="engage-detail-admin">
-%   if( engage_post_can_subscribe( $response ) ) {
-                <a href="<%= url_for('current') . '/subscribe' %>" class="btn btn-xs btn-danger"><i class="fa fa-fw fa-bookmark"></i> Subscribe</a>
-%   } else {
-                <a href="<%= url_for('current') . '/unsubscribe' %>" class="btn btn-xs btn-danger"><i class="fa fa-fw fa-bookmark-o"></i> Unsubscribe</a>
-%   }
-%   if( engage_post_can_edit( $response ) ) {
-                <a href="<%= url_for('current') . '/edit' %>" class="btn btn-xs btn-danger"><i class="fa fa-fw fa-edit"></i> Edit</a>
-%   }
+            </div>
+            <div class="engage-detail-footer">
+              <div class="engage-detail-footer-metadata">
+                <p class="text-right">asked <%= distance_of_time_in_words( $response->created ) %></p>
+                <p class="text-right">by <%= $response->author_id->username %></p>
               </div>
-% }
+              <div class="engage-detail-footer-metadata">
+                <%== post_gravatar( $response, 32 ) %>
+              </div>
+% if( is_active_auth ) {
+              <div class="engage-detail-footer-metadata">
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-default dropdown-toggle" type="button" id="post-detail-admin-dropdown" data-toggle="dropdown"><i class="fa fa-fw fa-cogs"></i></button>
+                  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="post-detail-admin-dropdown">
+%   if( engage_post_can_subscribe( $response ) ) {
+                      <li><a href="<%= url_for('current') . '/subscribe' %>" class="text-left"><i class="fa fa-fwl fa-bookmark"></i> Subscribe</a></li>
+  %   } else {
+                      <li><a href="<%= url_for('current') . '/unsubscribe' %>" class="text-left"><i class="fa fa-fwl fa-bookmark-o"></i> Unsubscribe</a></li>
+  %   }
+  %   if( engage_post_can_edit( $response ) ) {
+                      <li><a href="<%= url_for('current') . '/edit' %>" class="text-left"><i class="fa fa-fwl fa-edit"></i> Edit</a></li>
+  %   }
+                    </ul>
+                  </div>
+                </div>
+  % }
             </div>
           </div>
         </div>
@@ -55,19 +69,23 @@
 % for my $r ( @$replies ) {
         <div class="row">
           <div class="col-sm-12">
-            <div id="reply-<%= $r->id %>" class="callout">
-              <div class="pull-right reply-meta">
-                <p class="text-right"><%= distance_of_time_in_words( $r->updated ) %></p>
-                <p class="text-right"><%= $r->author_id->username %></p>
-              </div>
+            <div id="reply-<%= $r->id %>" class="callout engage-reply">
 %== render_markdown( $r->content )
+            </div>
+            <div class="engage-reply-footer">
+              <div class="engage-reply-footer-metadata">
+                <p class="text-right">replied <%= distance_of_time_in_words( $r->created ) %></p>
+                <p class="text-right">by <%= $r->author_id->username %></p>
+              </div>
+              <div class="engage-reply-footer-metadata">
+                <%== post_gravatar( $r, 32 ) %>
+              </div>
             </div>
           </div>
         </div>
 % }
 
 % if( is_user_authenticated ) {
-        <div class="hr hr-lg"></div>
         <div class="row">
           <div class="col-sm-12">
             <form action="<%= url_for('current') . '/reply' %>" method="post">

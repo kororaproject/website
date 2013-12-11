@@ -18,11 +18,11 @@
       <div class="container">
         <div class="row">
           <div class="col-sm-6 col-md-offset-1 col-md-5 col-lg-offset-2 col-lg-4">
+            <div class="hr hr-sm"></div>
             <img class="img-responsive" src="/img/laptop-korora.png"></img>
             <div class="hr hr-lg"></div>
           </div>
-          <div class="col-sm-6 col-md-5 col-lg-4">
-            <div class="hr hr-sm"></div>
+          <div class="col-sm-6 col-md-5">
             <blockquote class="title">
               <p>With a special blend of aesthetic and functionality, Korora aims to make Linux easier for new users, while still being useful for experts.</p>
               <p>We provide a complete, easy to use computing system that "just works" out of the box.</p>

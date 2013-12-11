@@ -39,6 +39,59 @@ use Canvas::Store::Tag;
 #
 # CONSTANTS
 #
+use constant TYPE_MAP => {
+    ''        => {
+      status => {
+        ''  => 'All Responses'
+      }
+    },
+    idea      => {
+      name  => 'idea',
+      title => 'Share a New Idea',
+      icon  => 'fa-lightbulb-o',
+      status  => {
+        ''                    => 'All Ideas',
+        'under-consideration' => 'Ideas - Under Consideration',
+        'declined'            => 'Ideas - Declined',
+        'planned'             => 'Ideas - Planned',
+        'in-progress'         => 'Ideas - In Progress',
+        'completed'           => 'Ideas - Completed',
+        'gathering-feedback'  => 'Ideas - Gathering Feedback',
+      },
+    },
+    problem   => {
+      name  => 'problem',
+      title => 'Add a New Problem',
+      icon  => 'fa-bug',
+      status  => {
+        ''              => 'All Problems',
+        'known-problem' => 'Problems - Known Problem',
+        'declined'      => 'Problems - Declined',
+        'planned'       => 'Problems - Solved',
+        'in-progress'   => 'Problems - In Progress',
+      },
+    },
+    question  => {
+      name  => 'question',
+      title => 'Ask a New Question',
+      icon  => 'fa-question',
+      status  => {
+        ''            => 'All Questions',
+        'need-answer' => 'Questions - Need Answer',
+        'answered'    => 'Questions - Answered',
+      },
+    },
+    thank     => {
+      name  => 'thank',
+      title => 'Say Thanks',
+      icon  => 'fa-trophy',
+      status  => {
+        ''      => 'All Thanks',
+        'noted' => 'Thanks - Noted',
+      },
+    },
+  };
+
 
 
 #
@@ -94,6 +147,9 @@ sub filter_valid_types($) {
 sub index {
   my $self = shift;
 
+  my $type = $self->param('type') // '';
+  my $status = $self->param('status') // '';
+
   my $cache = Canvas::Store::Post->search_type_status_and_tags(
     type            => filter_valid_types( $self->param('type') ),
     status          => $self->param('status') // '',
@@ -102,7 +158,10 @@ sub index {
     current_page    => $self->param('page'),
   );
 
-  $self->stash( responses => $cache );
+  $self->stash(
+    responses => $cache,
+    filter    => TYPE_MAP->{ $type }{ status }{ $status },
+  );
   $self->render('engage');
 }
 
@@ -120,32 +179,9 @@ sub engage_prepare {
     $self->is_user_authenticated()
   );
 
-  my $map = {
-    idea      => {
-      name  => 'idea',
-      title => 'Share a New Idea',
-      icon  => 'fa-lightbulb-o',
-    },
-    problem   => {
-      name  => 'problem',
-      title => 'Add a New Problem',
-      icon  => 'fa-bug',
-    },
-    question  => {
-      name  => 'question',
-      title => 'Ask a New Question',
-      icon  => 'fa-question',
-    },
-    thank     => {
-      name  => 'thank',
-      title => 'Say Thanks',
-      icon  => 'fa-trophy',
-    }
-  };
-
   $self->stash(
-    type  => $map->{ $type },
-    title => $title
+    type    => TYPE_MAP->{ $type },
+    title   => $title
   );
 
   $self->render('engage-new');
