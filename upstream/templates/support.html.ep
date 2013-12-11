@@ -31,10 +31,10 @@
 
             <ul>
               <li>IRC: Join us on the #korora IRC channel on irc.freenode.net server.</li>
-              <li>Identi.ca: Follow us on kororaproject@identi.ca, or join the korora@identi.ca group.</li>
-              <li>Twitter: @kororaproject</li>
-              <li>Facebook: kororaproject</li>
-              <li>Google+: kororaproject</li>
+              <li>Google+: <a href="https://plus.google.com/u/0/113276359756252515026">kororaproject</a></li>
+              <li>Facebook: <a href="http://facebook.com/kororaproject">kororaproject</a></li>
+              <li>Identi.ca: Follow us on <a href="http://identi.ca/kororaproject">kororaproject@identi.ca</a>, or join the korora@identi.ca group.</li>
+              <li>Twitter: <a href="http://twitter.com/#!/kororaproject">@kororaproject</a></li>
             </ul>
             <div class="callout callout-info">
               <p>If you're specifically after Fedora assistance, perhaps try their <a href="https://fedoraforumorg">community forums</a>, <a href="https://admin.fedoraproject.org/mailman/listinfo/users">official user mailing list</a>, or their #fedora IRC channel on irc.freenode.net.</p>
