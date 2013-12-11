@@ -826,6 +826,8 @@ blockquote p {
 .engage-detail-footer .engage-detail-footer-metadata img,
 .engage-reply-footer .engage-reply-footer-metadata img {
   display: inline-block;
+
+  border-radius: 2px;
 }
 
 .engage-detail-footer-admin,
