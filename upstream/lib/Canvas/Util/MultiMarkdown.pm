@@ -1687,9 +1687,9 @@ sub _DoFootnotes {
     if (defined $self->{_footnotes}{$id} ) {
       $self->{_footnote_counter}++;
       if ($self->{_footnotes}{$id} =~ /^(<p>)?glossary:/i) {
-        $result = "<a href=\"#fn:$id\" id=\"fnref:$id\" title=\"see glossary\" class=\"footnote glossary\">$self->{_footnote_counter}</a>";
+        $result = "<a href=\"#fn:$id\" id=\"fnref:$id\" title=\"see glossary\" class=\"footnote glossary\"><sup>$self->{_footnote_counter}</sup></a>";
       } else {
-        $result = "<a href=\"#fn:$id\" id=\"fnref:$id\" title=\"see footnote\" class=\"footnote\">$self->{_footnote_counter}</a>";
+        $result = "<a href=\"#fn:$id\" id=\"fnref:$id\" title=\"see footnote\" class=\"footnote\"><sup>$self->{_footnote_counter}</sup></a>";
       }
       push (@{$self->{_used_footnotes}},$id);
     }
