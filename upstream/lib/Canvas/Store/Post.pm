@@ -74,7 +74,7 @@ __PACKAGE__->add_constructor( thanks => qq{ type='thank' AND parent=? ORDER BY n
 __PACKAGE__->add_constructor( replies => qq{ name=? AND parent_id != 0 ORDER BY created ASC } );
 
 #
-# UPDATE HELPER
+# TAG HELPERS
 #
 
 sub tag_list {
@@ -83,6 +83,20 @@ sub tag_list {
 
 sub tag_list_array {
   return map { $_->name } shift->tags;
+}
+
+sub latest_reply {
+  my $self = shift;
+
+  my $dbh = $self->db_Main();
+  my $sth = $dbh->prepare_cached("SELECT * FROM canvas_post WHERE parent_id=? ORDER BY created DESC LIMIT 1");
+
+  $sth->execute( $self->id );
+  my( $reply ) = $self->sth_to_objects($sth);
+
+  return $reply if defined $reply;
+
+  return $self;
 }
 
 sub search_type_status_and_tags {

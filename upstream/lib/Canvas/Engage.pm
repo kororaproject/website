@@ -40,57 +40,57 @@ use Canvas::Store::Tag;
 # CONSTANTS
 #
 use constant TYPE_MAP => {
-    ''        => {
-      status => {
-        ''  => 'All Responses'
-      }
+  '' => {
+    status => {
+      ''  => 'All Responses'
+    }
+  },
+  idea      => {
+    name  => 'idea',
+    title => 'Share a New Idea',
+    icon  => 'fa-lightbulb-o',
+    status  => {
+      ''                    => 'All Ideas',
+      'under-consideration' => 'Ideas - Under Consideration',
+      'declined'            => 'Ideas - Declined',
+      'planned'             => 'Ideas - Planned',
+      'in-progress'         => 'Ideas - In Progress',
+      'completed'           => 'Ideas - Completed',
+      'gathering-feedback'  => 'Ideas - Gathering Feedback',
     },
-    idea      => {
-      name  => 'idea',
-      title => 'Share a New Idea',
-      icon  => 'fa-lightbulb-o',
-      status  => {
-        ''                    => 'All Ideas',
-        'under-consideration' => 'Ideas - Under Consideration',
-        'declined'            => 'Ideas - Declined',
-        'planned'             => 'Ideas - Planned',
-        'in-progress'         => 'Ideas - In Progress',
-        'completed'           => 'Ideas - Completed',
-        'gathering-feedback'  => 'Ideas - Gathering Feedback',
-      },
+  },
+  problem   => {
+    name  => 'problem',
+    title => 'Add a New Problem',
+    icon  => 'fa-bug',
+    status  => {
+      ''              => 'All Problems',
+      'known-problem' => 'Problems - Known Problem',
+      'declined'      => 'Problems - Declined',
+      'planned'       => 'Problems - Solved',
+      'in-progress'   => 'Problems - In Progress',
     },
-    problem   => {
-      name  => 'problem',
-      title => 'Add a New Problem',
-      icon  => 'fa-bug',
-      status  => {
-        ''              => 'All Problems',
-        'known-problem' => 'Problems - Known Problem',
-        'declined'      => 'Problems - Declined',
-        'planned'       => 'Problems - Solved',
-        'in-progress'   => 'Problems - In Progress',
-      },
+  },
+  question  => {
+    name  => 'question',
+    title => 'Ask a New Question',
+    icon  => 'fa-question',
+    status  => {
+      ''            => 'All Questions',
+      'need-answer' => 'Questions - Need Answer',
+      'answered'    => 'Questions - Answered',
     },
-    question  => {
-      name  => 'question',
-      title => 'Ask a New Question',
-      icon  => 'fa-question',
-      status  => {
-        ''            => 'All Questions',
-        'need-answer' => 'Questions - Need Answer',
-        'answered'    => 'Questions - Answered',
-      },
+  },
+  thank     => {
+    name  => 'thank',
+    title => 'Say Thanks',
+    icon  => 'fa-trophy',
+    status  => {
+      ''      => 'All Thanks',
+      'noted' => 'Thanks - Noted',
     },
-    thank     => {
-      name  => 'thank',
-      title => 'Say Thanks',
-      icon  => 'fa-trophy',
-      status  => {
-        ''      => 'All Thanks',
-        'noted' => 'Thanks - Noted',
-      },
-    },
-  };
+  },
+};
 
 
 

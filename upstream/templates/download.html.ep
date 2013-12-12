@@ -99,7 +99,7 @@
             <div class="callout callout-danger">
               <p>Note that this action will wipe the entire contents of the memory stick! Ensure you back up anything you want to keep on it.</p>
             </div>
-            <pre><code>sudo dd if=/path/to/korora.iso of=/dev/sdX bs=4M &amp;&amp; sync</code></pre>
+            <pre><code class="bash">$ sudo dd if=/path/to/korora.iso of=/dev/sdX bs=4M &amp;&amp; sync</code></pre>
             <p>Make sure that the drive has finished writing before you unplug it!</p>
             <h2>Known Issues</h2>
             <p>The following is a list of known issues with this release.</p>

@@ -48,6 +48,9 @@ pre{
   border-radius: 2px;
 }
 
+pre {
+  background-color: #f8f8ff;
+}
 
 
 /*
@@ -473,8 +476,7 @@ blockquote p {
 
 .navbar {
   border-radius: 0;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
+  z-index: 9999;
 }
 
 .navbar-container {
@@ -798,8 +800,8 @@ blockquote p {
   text-align: right;
 }
 
-.engage-detail-footer .engage-detail-footer-metadata p,
-.engage-reply-footer .engage-reply-footer-metadata p {
+.engage-detail-footer-metadata p,
+.engage-reply-footer-metadata p {
   padding-top: 2px;
   margin-bottom: 2px;
 
@@ -807,8 +809,8 @@ blockquote p {
   line-height: 12px;
 }
 
-.engage-detail-footer .engage-detail-footer-metadata img,
-.engage-reply-footer .engage-reply-footer-metadata img {
+.engage-detail-footer-metadata img,
+.engage-reply-footer-metadata img {
   display: inline-block;
 
   border-radius: 2px;

@@ -1,8 +1,10 @@
-<script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&skin=desert"></script>
-
+<!-- CDN sources -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="/js/bootstrap.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4/highlight.min.js"></script>
+
+<!-- CANVAS sources -->
 <script src="/js/canvas.js"></script>
 
 <script>
@@ -55,5 +57,7 @@
     });
 
     $(window).on('resize', resizeHelper);
+
+    hljs.initHighlightingOnLoad();
   });
 </script>
