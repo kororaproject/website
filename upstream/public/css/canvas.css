@@ -774,15 +774,6 @@ blockquote p {
 
 .engage-detail-title {
   margin-top: 0;
-  padding-left: 32px;
-}
-
-.engage-detail-title-icon {
-  float: left;
-  margin-top: 6px;
-  width: 24px;
-  text-align: center;
-  font-size: 24px;
 }
 
 .engage-detail-tags {

@@ -22,7 +22,6 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="callout engage-detail engage-<%= $response->type %>">
-              <%== engage_icon( $response->type, 'engage-detail-title-icon' ) %>
               <h1 class="engage-detail-title"><%= $response->title %></h1>
 
               <div class="engage-detail-content">
@@ -30,6 +29,7 @@
               </div>
 
               <div class="engage-detail-tags">
+                <%== engage_icon_label( $response->type, 'fa-fw' ) %>
 % foreach my $t ( $response->tags ) {
                 <span class="label label-default"><%= $t->name %></span>
 % }
