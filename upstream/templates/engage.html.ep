@@ -139,7 +139,6 @@
           <div class="row">
             <div class="col-sm-12">
               <div class="callout engage-summary engage-<%= $r->type %>">
-                <%== engage_icon( $r->type, "engage-summary-title-icon" ) %>
                 <div class="pull-right reply-meta">
                   <p class="text-right"><%= distance_of_time_in_words( $r->updated ) %></p>
                   <p class="text-right"><%= pluralise( $r->reply_count, 'reply' ) %></p>
@@ -151,7 +150,8 @@
                   </a>
                 </div>
                 <div class="post-tags">
-                  <span class="label label-primary"><%= engage_status( $r ) %></span>
+                  <%== engage_icon_label( $r->type, 'fa-fw' ) %>
+                  <%== engage_label( $r->type, '',  engage_status( $r ) ) %></span>
 % foreach my $t ( $r->tags ) {
                   <span class="label label-default"><%= $t->name %></span>
 % }

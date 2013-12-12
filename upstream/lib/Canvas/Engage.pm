@@ -165,7 +165,7 @@ sub index {
   $self->render('engage');
 }
 
-sub engage_prepare {
+sub engage_post_prepare_add_get {
   my $self = shift;
 
   my $type = $self->param('type');
@@ -186,76 +186,51 @@ sub engage_prepare {
 
   $self->render('engage-new');
 }
-
-sub detail {
-  my $self = shift;
-  my $stub = $self->param('stub');
-
-  my $p = Canvas::Store::Post->search({ name => $stub })->first;
-  my @r = Canvas::Store::Post->replies( $stub );
-
-  # check we found the post
-  return $self->redirect_to('/support/engage') unless defined $p;
-
-  $self->stash( response => $p, replies => \@r );
-  $self->render('engage-detail');
-}
-
-sub post_edit {
+sub engage_post_add_post {
   my $self = shift;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless (
-    $self->is_user_authenticated() &&
-    $self->auth_user->is_admin
-  );
+  return $self->redirect_to('/support/engage') unless $self->is_user_authenticated;
 
-  my $stub = $self->param('stub');
-
-  my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
-
-  # check we found the post
-  return $self->redirect_to('/support/engage') unless defined $p;
-
-  my $cache = {
-    id            => $p->ID,
-    created       => $p->post_date_gmt->strftime('%e %B, %Y at %H:%M'),
-    updated       => $p->post_modified_gmt->strftime('%e %B, %Y at %H:%M'),
-    title         => $p->post_title,
-    content       => $p->post_content,
-    excerpt       => $p->post_excerpt,
-    stub          => $p->post_name,
-    author        => $p->post_author->user_nicename,
-  };
-
-  # build the cancel path
-  $self->stash( mode => 'edit', post => $cache );
-  $self->render('news-post-new');
-}
-
-sub add {
-  my $self = shift;
-
-  # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless (
-    $self->is_user_authenticated()
-  );
-
-  my $type = $self->param('type');
-  my $stub = sanitise_with_dashes( $self->param('title') );
-  my $content = $self->param('content');
-
-  return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless length trim $content;
+  my $type      = $self->param('type');
+  my $title     = trim $self->param('title');
+  my $content   = trim $self->param('content');
+  my $tag_list  = trim $self->param('tags');
 
   # ensure it's a valid type
-  return $self->redirect_to('/support/engage') unless grep { $_ eq $type } qw(idea problem question thank);
+  unless( grep { $_ eq $type } qw(idea problem question thank) ) {
+    $self->flash( page_errors => 'Your title lacks a little description. Pleast use at least least 16 characters.' );
+    return $self->redirect_to('/support/engage')
+  }
+
+  # ensure we have some sane title (at least 16 characters)
+  unless( length $title > 16 ) {
+    $self->flash( page_errors => 'Your title lacks a little description. Pleast use at least least 16 characters.' );
+    return $self->redirect_to( 'supportengagetypeadd', type => $type );
+  }
+
+  # ensure we have some sane content (at least 32 characters)
+  unless( length $content > 32 ) {
+    $self->flash( page_errors => 'Your content lacks a little description. Pleast use at least least 32 characters.' );
+    return $self->redirect_to( 'supportengagetypeadd', type => $type );
+  }
+
+  my %tags = map { sanitise_with_dashes( trim $_ ) => 1 } split /,/, $tag_list;
+
+  # ensure we have some at least one tag
+  unless( keys %tags ) {
+    $self->flash( page_errors => 'Your post will be a lot easier to find with tags added. Please add at least one tag.' );
+    return $self->redirect_to( 'supportengagetypeadd', type => $type );
+  }
+
 
   my $now = gmtime;
+  my $stub = sanitise_with_dashes( $title );
 
   # check for existing stubs and append the ID + 1 of the last
   my( @e ) = Canvas::Store::Post->search({
-      name => $stub,
-      type => $type,
+    name => $stub,
+    type => $type,
   });
 
   $stub .= '-' . ( $e[-1]->id + 1 ) if @e;
@@ -265,19 +240,21 @@ sub add {
     name         => $stub,
     type         => $type,
     status       => '',
-    title        => $self->param('title'),
-    content      => $self->param('content'),
+    title        => $title,
+    content      => $content,
     author_id    => $self->auth_user->id,
     created      => $now,
     updated      => $now,
   });
 
   # create the tags
-  my %tags = map { sanitise_with_dashes( trim $_ ) => 1 } split /,/, $self->param('tags');
   foreach my $tag ( keys %tags ) {
     $tag = trim $tag;
     my $t  = Canvas::Store::Tag->find_or_create({ name => $tag });
-    my $pt = Canvas::Store::PostTag->find_or_create({ post_id => $p->id, tag_id => $t->id })
+    my $pt = Canvas::Store::PostTag->find_or_create({
+      post_id => $p->id,
+      tag_id  => $t->id
+    });
   }
 
   # auto-subscribe the creator (engage_subscriptions)
@@ -322,7 +299,21 @@ sub add {
   $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
 }
 
-sub edit_get {
+sub engage_post_detail_get {
+  my $self = shift;
+  my $stub = $self->param('stub');
+
+  my $p = Canvas::Store::Post->search({ name => $stub })->first;
+  my @r = Canvas::Store::Post->replies( $stub );
+
+  # check we found the post
+  return $self->redirect_to('/support/engage') unless defined $p;
+
+  $self->stash( response => $p, replies => \@r );
+  $self->render('engage-detail');
+}
+
+sub engage_post_edit_get {
   my $self = shift;
 
   my $stub = $self->param('stub');
@@ -343,7 +334,39 @@ sub edit_get {
   $self->render('engage-edit');
 }
 
-sub edit {
+sub engagage_post_edit_get {
+  my $self = shift;
+
+  # only allow authenticated and authorised users
+  return $self->redirect_to('/support/engage') unless (
+    $self->is_user_authenticated() &&
+    $self->auth_user->is_admin
+  );
+
+  my $stub = $self->param('stub');
+
+  my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
+
+  # check we found the post
+  return $self->redirect_to('/support/engage') unless defined $p;
+
+  my $cache = {
+    id            => $p->ID,
+    created       => $p->post_date_gmt->strftime('%e %B, %Y at %H:%M'),
+    updated       => $p->post_modified_gmt->strftime('%e %B, %Y at %H:%M'),
+    title         => $p->post_title,
+    content       => $p->post_content,
+    excerpt       => $p->post_excerpt,
+    stub          => $p->post_name,
+    author        => $p->post_author->user_nicename,
+  };
+
+  # build the cancel path
+  $self->stash( mode => 'edit', post => $cache );
+  $self->render('news-post-new');
+}
+
+sub engage_post_edit_post {
   my $self = shift;
 
   my $stub = $self->param('stub');
@@ -393,7 +416,7 @@ sub edit {
   $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
 }
 
-sub subscribe {
+sub engage_post_subscribe_any {
   my $self = shift;
 
   my $stub = $self->param('stub');
@@ -422,7 +445,7 @@ sub subscribe {
   return $self->redirect_to( $url );
 }
 
-sub unsubscribe {
+sub engage_post_unsubscribe_any {
   my $self = shift;
 
   my $stub = $self->param('stub');
@@ -460,7 +483,7 @@ sub unsubscribe {
 }
 
 
-sub reply_get {
+sub engage_reply_get {
   my $self = shift;
 
   my $type = $self->param('type');
@@ -469,7 +492,7 @@ sub reply_get {
   $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
 }
 
-sub reply {
+sub engage_reply_post {
   my $self = shift;
 
   # only allow authenticated and authorised users

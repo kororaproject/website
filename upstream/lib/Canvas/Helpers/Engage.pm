@@ -27,7 +27,7 @@ use Data::Dumper;
 #
 # CONSTANTS
 #
-my $TYPE_STATUS_MAP = {
+use constant TYPE_STATUS_MAP => {
   idea => [
     [ ''                    => ''                   ],
     [ 'Under Consideration' => 'under-consideration'],
@@ -55,6 +55,26 @@ my $TYPE_STATUS_MAP = {
   ],
 };
 
+use constant TYPE_ICON_COLOUR_MAP => {
+  idea => {
+    icon    => 'fa-lightbulb-o',
+    colour  => 'info',
+  },
+  problem => {
+    icon    => 'fa-bug',
+    colour  => 'danger',
+  },
+  question => {
+    icon    => 'fa-question',
+    colour  => 'warning',
+  },
+  thank => {
+    icon    => 'fa-heart',
+    colour  => 'success',
+  },
+};
+
+
 sub register {
   my( $self, $app ) = @_;
 
@@ -63,14 +83,24 @@ sub register {
 
     $classes //= '';
 
-    my $map = {
-      idea      => 'fa-lightbulb-o',
-      problem   => 'fa-bug',
-      question  => 'fa-question',
-      thank     => 'fa-heart',
-    };
+    return '<i class="fa ' . ( TYPE_ICON_COLOUR_MAP->{ $type }{icon} // 'fa-ban' ) . ' ' . $classes . '"></i>';
+  });
 
-    return '<i class="fa ' . ( $map->{ $type } // 'fa-ban' ) . ' ' . $classes . '"></i>';
+  $app->helper(engage_icon_label => sub {
+    my( $self, $type, $classes, $text ) = @_;
+
+    $classes //= '';
+    $text    //= '';
+
+    return '<span class="label label-' . TYPE_ICON_COLOUR_MAP->{ $type }{colour} . '"><i class="fa ' . ( TYPE_ICON_COLOUR_MAP->{ $type }{icon} // 'fa-ban' ) . ' ' . $classes . '"></i>' . $text . '</span>';
+  });
+  $app->helper(engage_label => sub {
+    my( $self, $type, $classes, $text ) = @_;
+
+    $classes //= '';
+    $text    //= '';
+
+    return '<span class="label label-' . TYPE_ICON_COLOUR_MAP->{ $type }{colour} . ' ' . $classes . '">' . $text . '</span>';
   });
 
 
@@ -83,7 +113,7 @@ sub register {
     return 'new' if $post->status eq '' && $post->reply_count == 0;
     return 'active' if $post->status eq '';
 
-    my $t = $TYPE_STATUS_MAP->{ $post->type };
+    my $t = TYPE_STATUS_MAP->{ $post->type };
 
     my( $s ) = ( grep { $post->status ~~ @$_ } @$t );
 
@@ -100,7 +130,7 @@ sub register {
 
     my $status = [];
 
-    foreach my $s ( @{ $TYPE_STATUS_MAP->{ $post->type } // [] } ) {
+    foreach my $s ( @{ TYPE_STATUS_MAP->{ $post->type } // [] } ) {
       push @$status, [ ( grep { m/$post->status/ } @$s) ?
         ( @$s, 'selected', 'selected' ) :
         ( @$s )

@@ -88,7 +88,7 @@ sub startup {
     $self->app->log->info('Loading dummy mail handler for non-production testing.');
 
     $self->helper('mail' => sub {
-      shift->app->log->debub(join "\n", @_);
+      shift->app->log->debug('Sending an email ' . join "\n", @_);
     });
   }
   else {
@@ -135,16 +135,16 @@ sub startup {
   $r->get('/topic/:name')->to('forum#topic_name');
 
   $r->get('/support/engage')->to('engage#index');
-  $r->get('/support/engage/:type')->to('engage#summary');
-  $r->get('/support/engage/:type/add')->to('engage#engage_prepare');
-  $r->post('/support/engage/:type/add')->to('engage#add');
-  $r->get('/support/engage/:type/:stub')->to('engage#detail');
-  $r->get('/support/engage/:type/:stub/edit')->to('engage#edit_get');
-  $r->post('/support/engage/:type/:stub/edit')->to('engage#edit');
-  $r->any('/support/engage/:type/:stub/subscribe')->to('engage#subscribe');
-  $r->any('/support/engage/:type/:stub/unsubscribe')->to('engage#unsubscribe');
-  $r->get('/support/engage/:type/:stub/reply')->to('engage#reply_get');
-  $r->post('/support/engage/:type/:stub/reply')->to('engage#reply');
+  $r->get('/support/engage/:type')->to('engage#engage_summary');
+  $r->get('/support/engage/:type/add')->to('engage#engage_post_prepare_add_get');
+  $r->post('/support/engage/:type/add')->to('engage#engage_post_add_post');
+  $r->get('/support/engage/:type/:stub')->to('engage#engage_post_detail_get');
+  $r->get('/support/engage/:type/:stub/edit')->to('engage#engage_post_edit_get');
+  $r->post('/support/engage/:type/:stub/edit')->to('engage#engage_post_edit_post');
+  $r->any('/support/engage/:type/:stub/subscribe')->to('engage#engage_post_subscribe_any');
+  $r->any('/support/engage/:type/:stub/unsubscribe')->to('engage#engage_post_unsubscribe_any');
+  $r->get('/support/engage/:type/:stub/reply')->to('engage#engage_reply_get');
+  $r->post('/support/engage/:type/:stub/reply')->to('engage#engage_reply_post');
 
   # download pages
   $r->get('/download')->to('site#download');
@@ -173,6 +173,8 @@ sub startup {
 
   $r->get('/profile/:name/status')->to('site#profile_status_get');
 
+  # catch all
+  $r->any('/(*trap)')->to('site#trap');
 
   my $r_api = $r->under('/api');
 
@@ -199,9 +201,6 @@ sub startup {
   $r_api->get('/user/:user/template/:name')->to('core#user_user_template_name_get');
   $r_api->put('/user/:user/template/:name')->to('core#user_user_template_name_put');
   $r_api->delete('/user/:user/template/:name')->to('core#user_user_template_name_del');
-
-  # catch all
-  $r->any('/(*trap)')->to('site#trap');
 }
 
 1;
