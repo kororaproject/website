@@ -169,7 +169,9 @@ sub engage_post_prepare_add_get {
   my $self = shift;
 
   my $type = $self->param('type');
-  my $title = $self->param('title');
+  my $title = $self->param('title') // $self->flash('title') // '';
+  my $content = $self->flash('content') // '';
+  my $tags = $self->flash('tags') // '';
 
   # ensure it's a valid type
   return $self->redirect_to('/support/engage') unless grep { $_ eq $type } qw(idea problem question thank);
@@ -181,7 +183,9 @@ sub engage_post_prepare_add_get {
 
   $self->stash(
     type    => TYPE_MAP->{ $type },
-    title   => $title
+    title   => $title,
+    content => $content,
+    tags    => $tags,
   );
 
   $self->render('engage-new');
@@ -196,6 +200,12 @@ sub engage_post_add_post {
   my $title     = trim $self->param('title');
   my $content   = trim $self->param('content');
   my $tag_list  = trim $self->param('tags');
+
+  $self->flash(
+    title   => $title,
+    content => $content,
+    tags    => $tag_list,
+  );
 
   # ensure it's a valid type
   unless( grep { $_ eq $type } qw(idea problem question thank) ) {
