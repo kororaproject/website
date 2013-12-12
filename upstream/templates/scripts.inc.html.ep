@@ -36,7 +36,8 @@
       });
 
       // TODO: test
-      $('.page-content').css('min-height', $(window).height()-(footer.outerHeight()-48) + 'px');
+      $('.page-content').css('min-height', ( $(window).height() - 96 )  + 'px');
+
     }
 
     resizeHelper();
