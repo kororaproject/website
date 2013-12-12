@@ -439,6 +439,8 @@ sub _RunBlockGamut {
 #
   my $text = shift;
 
+  $text = $self->_DoFencedCodeBlocks($text);
+
   $text = $self->_DoHeaders($text);
 
   # Do tables first to populate the table id's for cross-refs
@@ -1072,8 +1074,6 @@ sub _ProcessListItems {
   return $list_str;
 }
 
-
-
 sub _DoCodeBlocks {
   my $self = shift;
 #
@@ -1101,6 +1101,41 @@ sub _DoCodeBlocks {
       $codeblock =~ s/\n+\z//; # trim trailing newlines
 
       $result = "\n\n<pre><code>" . $codeblock . "</code></pre>\n\n"; # CHANGED: Removed newline for MMD
+
+      $result;
+    }egmx;
+
+  return $text;
+}
+
+sub _DoFencedCodeBlocks {
+  my $self = shift;
+#
+# Process Markdown `<pre><code>` blocks.
+#
+
+
+  my $text = shift;
+  $text =~ s{
+      ```(.*)\n           # leader
+      (             # $1 = the code block -- one or more lines, starting with a space/tab
+        (?:
+          (?!```)
+          .*\n+
+        )+
+      )
+      ((?=```)|\Z) # Lookahead for fence-end, or end of doc
+      ```
+    }{
+      my $language = $1;
+      my $codeblock = $2;
+      my $result; # return value
+
+      $codeblock = $self->_EncodeCode($codeblock);
+      $codeblock =~ s/\A\n+//; # trim leading newlines
+      $codeblock =~ s/\n+\z//; # trim trailing newlines
+
+      $result = "\n\n<pre><code class=\"" . $language . "\">" . $codeblock . "</code></pre>\n\n"; # CHANGED: Removed newline for MMD
 
       $result;
     }egmx;
@@ -1182,6 +1217,7 @@ sub _EncodeCode {
   s! \[ !$g_escape_table{'['}!gx;
   s! \] !$g_escape_table{']'}!gx;
   s! \\ !$g_escape_table{'\\'}!gx;
+  s! \# !$g_escape_table{'#'}!gx;
 
   return $_;
 }
@@ -1625,7 +1661,7 @@ sub _StripFootnoteDefinitions {
     my $footnote = "$2\n";
     $footnote =~ s/^[ ]{0,$self->{params}{tab_width}}//gm;
 
-    $self->{_footnotes}{id2footnote($id)} = $footnote;
+    $self->{_footnotes}{ $self->id2footnote($id) } = $footnote;
   }
 
   return $text;
@@ -1647,7 +1683,7 @@ sub _DoFootnotes {
     \[\^(.+?)\]   # id = $1
   }{
     my $result = "";
-    my $id = id2footnote($1);
+    my $id = $self->id2footnote($1);
     if (defined $self->{_footnotes}{$id} ) {
       $self->{_footnote_counter}++;
       if ($self->{_footnotes}{$id} =~ /^(<p>)?glossary:/i) {
@@ -2181,13 +2217,14 @@ sub _PrintMarkdownBibliography{
   my $citation_counter = 0;
   my $result;
 
-  foreach my $id (@{$self->{_used_references}}) {
+  foreach my $id ( @{$self->{_used_references}} ) {
     $citation_counter++;
     $result.="<div id=\"$id\"><p>[$citation_counter] <span class=\"item\">$self->{_references}{$id}</span></p></div>\n\n";
   }
+
   $result .= "</div>";
 
-  if ($citation_counter > 0) {
+  if($citation_counter > 0 ) {
     $result = "\n\n<div class=\"bibliography\">\n<hr$self->{params}{empty_element_suffix}\n<p>$self->{params}{bibliography_title}</p>\n\n".$result;
   } else {
     $result = "";
