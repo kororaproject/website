@@ -175,8 +175,15 @@ blockquote p {
 
 
 /*
-** NAVIGATION
+** HIGHLIGHTS
 */
+
+.hi {
+  background-color: #ddd;
+}
+.spaces {
+  background-color: #ffff7f;
+}
 
 /*
 ** INPUT

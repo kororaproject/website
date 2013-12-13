@@ -165,6 +165,12 @@ sub index {
   $self->render('engage');
 }
 
+sub engage_syntax_get {
+  my $self = shift;
+
+  $self->render('engage-syntax-help');
+}
+
 sub engage_post_prepare_add_get {
   my $self = shift;
 

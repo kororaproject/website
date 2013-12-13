@@ -63,7 +63,7 @@ sub new {
 
     $p{base_url} ||= ''; # This is the base url to be used for WikiLinks
 
-    $p{tab_width} = 2 unless (defined $p{tab_width} and $p{tab_width} =~ m/^\d+$/);
+    $p{tab_width} = 4 unless (defined $p{tab_width} and $p{tab_width} =~ m/^\d+$/);
 
     $p{document_format} ||= '';
     $p{allow_mathml} = 0;

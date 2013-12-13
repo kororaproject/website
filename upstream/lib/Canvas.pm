@@ -135,6 +135,7 @@ sub startup {
   $r->get('/topic/:name')->to('forum#topic_name');
 
   $r->get('/support/engage')->to('engage#index');
+  $r->get('/support/engage/syntax')->to('engage#engage_syntax_get');
   $r->get('/support/engage/:type')->to('engage#engage_summary');
   $r->get('/support/engage/:type/add')->to('engage#engage_post_prepare_add_get');
   $r->post('/support/engage/:type/add')->to('engage#engage_post_add_post');
