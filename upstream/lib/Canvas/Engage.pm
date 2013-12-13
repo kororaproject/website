@@ -573,6 +573,9 @@ sub engage_reply_post {
       "The Korora Team.\n";
 
     foreach my $_um ( @um ) {
+      # don't send a notification to the author of the reply
+      next if( $_um->user_id->username eq $p->author_id->username);
+
       # send the activiation email
       $self->mail(
         from    => 'engage@kororaproject.org',
