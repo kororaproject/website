@@ -174,9 +174,6 @@ sub startup {
 
   $r->get('/profile/:name/status')->to('site#profile_status_get');
 
-  # catch all
-  $r->any('/(*trap)')->to('site#trap');
-
   my $r_api = $r->under('/api');
 
   $r_api->get('/packages')->to('core#packages_get');
