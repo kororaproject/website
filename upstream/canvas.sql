@@ -89,8 +89,8 @@ CREATE TABLE canvas_usermembership (
   /* default access is write (1) */
   access        INTEGER       NOT NULL  DEFAULT 1,
 
-  created       DATETIME      NOT NULL  DEFAULT '0000-00-00 00:00:00',
-  updated       DATETIME      NOT NULL  DEFAULT '0000-00-00 00:00:00'
+  created       DATETIME      NOT NULL,
+  updated       DATETIME      NOT NULL
 );
 
 CREATE TABLE canvas_image (
