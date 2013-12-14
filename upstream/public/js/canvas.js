@@ -261,7 +261,9 @@ function RegisterController($scope, $http) {
   console.log('WOOT');
 };
 
-function DownloadController($scope, $location) {
+function DownloadController($scope) {
+  $scope.pageLoaded = false;
+
   //
   // GLOBALS
   //
@@ -956,6 +958,8 @@ function DownloadController($scope, $location) {
   $scope.version = $scope.getPreferredVersion( args );
   $scope.arch = $scope.getPreferredArch( args );
   $scope.desktop = $scope.getPreferredDesktop( args );
+
+  $scope.pageLoaded = true;
 };
 
 function CanvasController($scope) {
