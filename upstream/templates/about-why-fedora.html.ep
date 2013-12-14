@@ -40,9 +40,9 @@
             <p>Yum (and RPM) have made leaps and bounds over the last few years and you might actually enjoy using it now (and it's quite fast!). Having said that, most package commands are run through PackageKit these days thanks to graphical package managers. As for RPMs themselves, they're just a binary package format like Debs – it's the package manager that makes the difference.</p>
             <p>Download an RPM from the net and you can install it with Yum (or via the GUI using PackageKit), which will automatically pull in any dependencies for you. You rarely use the <em>rpm</em>command, just like in Debian and Ubuntu you rarely use <em>dpkg</em>. The days of <em>"RPM hell"</em> are long gone.</p>
             <p>Fedora also has a wonderful addition, called groups. After some educational software, office programs, or support for your language? It's easy, just install the group you need, like so:</p>
-            <pre><code>yum groupinstall "Educational Software"</code></pre>
+            <pre><code class="bash">$ sudo yum groupinstall "Educational Software"</code></pre>
             <p>If you're a developer, getting started with Fedora is easy. Just install the development group you need, such as GNOME, KDE, Java, Kernel, Perl, or even the Web.</p>
-            <pre><code>yum groupinstall "Development Tools"</code></pre>
+            <pre><code class="bash">$ sudo yum groupinstall "Development Tools"</code></pre>
             <p>There are almost 200 groups, ready to make your life easier!</p>
             <p>Fedora also has several <a href="http://repos.fedorapeople.org/">contributor repositories available</a> for end users, which is sort-of similar to Ubuntu's PPA (Personal Package Archive). However, Fedora often provides updates for major packages anyway, so you don't actually need to add a separate
             repository to get the latest version of things like KDE.</p>
