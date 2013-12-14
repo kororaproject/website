@@ -33,7 +33,7 @@ use Time::Piece;
 #
 use Canvas::Util::MultiMarkdown;
 
-my $DISTANCE_TIME_FORMAT = {
+use constant DISTANCE_TIME_FORMAT => {
   less_than_x_seconds => {
     one   => "less than one second ago",
     other => "less than %d seconds ago",
@@ -131,13 +131,26 @@ sub register {
     return $q;
   });
 
+  $app->helper(auth_gravatar => sub {
+    my( $self, $size, $class ) = @_;
+
+    return '' unless defined $self->auth_user;
+
+    return '' unless $self->auth_user->is_active_account;
+
+    $size   //= 32;
+    $class  //= '';
+
+    return '<img src="http://www.gravatar.com/avatar/' . md5_sum( $self->auth_user->email ) . '.jpg?s=' . $size . '&d=retro' .  '" class="' . $class . '"></img>';
+  });
+
   $app->helper(post_gravatar => sub {
     my( $self, $post, $size, $class ) = @_;
 
     return '' unless ref $post eq 'Canvas::Store::Post';
 
-    $size //= 32;
-    $class //= '';
+    $size   //= 32;
+    $class  //= '';
 
     return '<img src="http://www.gravatar.com/avatar/' . md5_sum( $post->author_id->email ) . '.jpg?s=' . $size . '&d=retro' .  '" class="' . $class . '"></img>';
   });
@@ -162,17 +175,17 @@ sub register {
     if( defined $count ) {
       my $plural = "other";
 
-      if( $count == 1 && exists  $DISTANCE_TIME_FORMAT->{ $label }{one} ) {
+      if( $count == 1 && exists DISTANCE_TIME_FORMAT->{ $label }{one} ) {
         $plural = 'one';
       }
-      elsif( $count < 1 && exists  $DISTANCE_TIME_FORMAT->{ $label }{zero} ) {
+      elsif( $count < 1 && exists DISTANCE_TIME_FORMAT->{ $label }{zero} ) {
         $plural = 'zero';
       }
 
-      return sprintf($DISTANCE_TIME_FORMAT->{ $label }{ $plural }, $count);
+      return sprintf(DISTANCE_TIME_FORMAT->{ $label }{ $plural }, $count);
     }
 
-    return $DISTANCE_TIME_FORMAT->{ $label };
+    return DISTANCE_TIME_FORMAT->{ $label };
   });
 
   # time prettifier
