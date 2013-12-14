@@ -626,7 +626,7 @@ blockquote p {
 }
 
 #register {
-  margin: 12px 0 0 0;
+  margin: 16px auto;
 }
 
 #register > a,
@@ -1016,6 +1016,10 @@ footer a:visited {
     background-size: 64px 64px;
     line-height: 64px;
     font-size: 56px;
+  }
+
+  #register {
+    margin: 12px 0 0 0;
   }
 
   .col-img-leader {
