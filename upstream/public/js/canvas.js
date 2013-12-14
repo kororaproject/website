@@ -208,7 +208,7 @@ function RegisterController($scope, $http) {
 
     /* check profile status */
     $http({
-      method: 'GET',
+      method: 'POST',
       url: '/profile/' + $scope.username + '/status'
     })
       .success( function(data, status, headers, config) {

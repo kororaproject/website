@@ -172,7 +172,7 @@ sub startup {
 
   $r->get('/profile/:name')->to('site#profile_get');
 
-  $r->get('/profile/:name/status')->to('site#profile_status_get');
+  $r->post('/profile/:name/status')->to('site#profile_status_post');
 
   my $r_api = $r->under('/api');
 
