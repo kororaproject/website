@@ -170,9 +170,8 @@ sub startup {
   $r->get('/activated')->to('site#activated');
   $r->post('/forgot')->to('site#forgot_post');
 
+  $r->post('/profile/status')->to('site#profile_status_post');
   $r->get('/profile/:name')->to('site#profile_get');
-
-  $r->post('/profile/:name/status')->to('site#profile_status_post');
 
   my $r_api = $r->under('/api');
 

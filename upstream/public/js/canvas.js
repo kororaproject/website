@@ -201,49 +201,79 @@ function RegisterController($scope, $http) {
   };
 
   $scope.usernames = {};
-  $scope._lookup_username = false;
+  $scope.emails    = {};
+  $scope._lookup_details = false;
 
-  $scope.lookupUsername = function() {
-    $scope._lookup_username = true;
+  $scope.lookupDetails = function() {
+    /* check for cached results */
+    if( $scope.usernames.hasOwnProperty( $scope.username ) &&
+        $scope.emails.hasOwnProperty( $scope.email ) ) {
+      return;
+    }
 
     /* check profile status */
+    $scope._lookup_details = true;
+
     $http({
       method: 'POST',
-      url: '/profile/' + $scope.username + '/status'
+      url: '/profile/status',
+      params: {
+        name:   $scope.username,
+        email:  $scope.email,
+      }
     })
       .success( function(data, status, headers, config) {
-        if( data.hasOwnProperty('name') ) {
-          $scope.usernames[ data.name ] = ( data.status === 1 ) ? false : true;
+        if( data.hasOwnProperty('username') ) {
+          $scope.usernames[ data.username.key ] = ( data.username.status === 1 ) ? false : true;
         }
-        $scope._lookup_username = false;
+        if( data.hasOwnProperty('email') ) {
+          $scope.emails[ data.email.key ] = ( data.email.status === 1 ) ? false : true;
+        }
+        $scope._lookup_details = false;
       })
       .error( function(data, status, headers, config) {
-        console.log( data );
-        $scope._lookup_username = false;
+        $scope._lookup_details = false;
       });
   };
 
   $scope.usernameIsValid = function() {
-    if( $scope.usernames.hasOwnProperty( $scope.username ) ) {
-      if( $scope.usernames[ $scope.username ] ) {
-        $scope.error.username = '';
-        return true;
+    if( $scope.username.length > 0 ) {
+      if( $scope.usernames.hasOwnProperty( $scope.username ) ) {
+        if( $scope.usernames[ $scope.username ] ) {
+          $scope.error.username = '';
+          return true;
+        }
+        else {
+          $scope.error.username = 'Username is already taken.';
+        }
       }
       else {
-        $scope.error.username = 'Username is already taken.';
+        $scope.error.username = 'Username can\'t be checked.';
       }
-    }
-    else {
-      $scope.error.username = 'Username can\'t be checked.';
     }
 
     return false;
   };
 
   $scope.emailIsValid = function() {
-    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if( $scope.email.length > 0 ) {
+      if( $scope.emails.hasOwnProperty( $scope.email ) ) {
+        if( $scope.emails[ $scope.email ] ) {
+          var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    return re.test($scope.email);
+          $scope.error.email = '';
+          return re.test($scope.email);
+        }
+        else {
+          $scope.error.email = 'Email address is already taken.';
+        }
+      }
+      else {
+        $scope.error.email = 'Email address can\'t be checked.';
+      }
+    }
+
+    return false;
   };
 
   $scope.passwordIsValid = function() {
@@ -260,7 +290,8 @@ function RegisterController($scope, $http) {
   };
 
   $scope.emailIsState = function(state) {
-    return $scope.email.length > 0 && ( state === $scope.emailIsValid() );
+    return $scope.emails.hasOwnProperty( $scope.email ) &&
+           ( state === $scope.emailIsValid() );
   };
 
   $scope.passwordIsState = function(state) {

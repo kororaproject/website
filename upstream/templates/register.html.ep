@@ -37,14 +37,14 @@
               <div class="form-group" ng-class="{'has-error': usernameIsState(false), 'has-success': usernameIsState(true)}">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                  <input type="text" class="form-control" name="user" placeholder="username" value="<%= $values->{user} %>" ng-model="username" ng-blur="lookupUsername()">
+                  <input type="text" class="form-control" name="user" placeholder="username" value="<%= $values->{user} %>" ng-model="username" ng-blur="lookupDetails()">
                 </div>
                 <span class="help-block ng-hide" ng-show="usernameIsState(false)">{{error.username}}</span>
               </div>
               <div class="form-group" ng-class="{'has-error': emailIsState(false), 'has-success': emailIsState(true)}">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
-                  <input type="input" class="form-control" name="email" placeholder="you@example.org" value="<%= $values->{email} %>" ng-model="email">
+                  <input type="input" class="form-control" name="email" placeholder="you@example.org" value="<%= $values->{email} %>" ng-model="email" ng-blur="lookupDetails()">
                 </div>
                 <span class="help-block ng-hide" ng-show="emailIsState(false)">{{error.email}}</span>
               </div>

@@ -716,8 +716,10 @@ sub register_post {
       meta_value  => url_escape $token,
     });
 
-    my $activation_key = substr( $token, 0, 31 );
-    my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 31 );
+    my $activation_key = substr( $token, 0, 32 );
+    my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 32 );
+
+    say Dumper $token;
 
     my $message = "" .
       "G'day,\n\n" .
@@ -746,21 +748,46 @@ sub register_post {
 sub profile_get {
   my $self = shift;
 
-}
-
-sub profile_status_get {
-  my $self = shift;
-
   my $u = Canvas::Store::User->search({
     username  => $self->param('name'),
   })->first;
 
-  my $status = defined $u ? 1 : 0;
+  $self->stash( user => $u );
+  $self->render('profile');
+}
 
-  $self->render( json => {
-    name    => $self->param('name'),
-    status  => $status
-  });
+sub profile_status_post {
+  my $self = shift;
+
+  my $username = $self->param('name')   // '';
+  my $email    = $self->param('email')  // '';
+
+  my $result = {};
+
+  if( length $username ) {
+    my $u = Canvas::Store::User->search({
+      username  => $username,
+    })->first;
+
+    $result->{username} = {
+      key     => $username,
+      status  => defined $u ? 1 : 0,
+    };
+  }
+
+  if( length $email ) {
+    my $e = Canvas::Store::User->search({
+      email  => $email,
+    })->first;
+
+    $result->{email} = {
+      key     => $email,
+      status  => defined $e ? 1 : 0,
+    }
+  }
+
+
+  $self->render( json => $result );
 }
 
 
