@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'KororaProject'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'user'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="text-center"><strong>Profile.</strong> Your Korora</h1>
+          </div>
+          <div class="col-sm-12">
+            <div class="text-center">
+              %== auth_gravatar(128)
+              <h2><%= $user->realname %></h2>
+              <h3><%= $user->username %></h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>
