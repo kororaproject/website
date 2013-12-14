@@ -18,7 +18,11 @@
           <div class="col-sm-12">
             <h1 class="page-title"><strong>Engage.</strong> The Community</h1>
           </div>
+          <div class="col-sm-12">
+            <p>Engage is your portal to the entire Korora Community. From here you can search through the available questions, problems, ideas and thanks that other members have posted. Alternatively, submit your own and let the community help you.</p>
+          </div>
         </div>
+        <div class="hr"></div>
 % if( is_user_authenticated ) {
         <div class="row">
           <div class="col-sm-12">
