@@ -166,6 +166,27 @@ function NavigationController($scope, CanvasNavigation) {
   };
 };
 
+function ActivateController($scope, $http) {
+  $scope.token = '';
+
+  $scope.error = {
+    token: 'Token is invalid.'
+  };
+
+  $scope.tokenIsValid = function() {
+    return $scope.token.length == 32;
+  };
+
+  $scope.tokenIsState = function(state) {
+    return $scope.token.length > 0 && ( state === $scope.tokenIsValid() );
+  };
+
+
+  $scope.canActivate = function() {
+    return $scope.tokenIsValid();
+  };
+};
+
 function RegisterController($scope, $http) {
   $scope.username = '';
   $scope.email = '';
@@ -257,8 +278,6 @@ function RegisterController($scope, $http) {
            $scope.passwordIsValid() &&
            $scope.verifyIsValid();
   };
-
-  console.log('WOOT');
 };
 
 function DownloadController($scope) {

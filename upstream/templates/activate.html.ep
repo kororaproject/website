@@ -11,7 +11,7 @@
     <div class="page-content">
       <!-- CONTENT -->
 
-      <div id="page-about" class="container">
+      <div class="container" ng-controller="ActivateController">
         <div class="row">
           <div class="col-sm-12">
             <h1 class="page-title"><strong>Activate.</strong> Your Prime Account is Waiting</h1>
@@ -33,15 +33,16 @@
                 <p><%= $error->{message} %></p>
               </div>
 % }
-              <div class="form-group">
+              <div class="form-group" ng-class="{'has-error': tokenIsState(false), 'has-success': tokenIsState(true)}">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-key"></i></span>
-                  <input type="text" name="prefix" class="form-control" placeholder="activation code">
+                  <input type="text" name="prefix" class="form-control" placeholder="activation code" ng-model="token">
                 </div>
+                <span class="help-block ng-hide" ng-show="tokenIsState(false)">{{error.token}}</span>
               </div>
               <div class="form-group">
                 <div class="input-group">
-                  <button type="submit" class="btn btn-success">Activate</button>
+                  <button type="submit" class="btn btn-success pull-right" ng-class="{disabled: !canActivate()}">Activate</button>
                 </div>
               </div>
             </form>
