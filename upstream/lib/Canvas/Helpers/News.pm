@@ -35,9 +35,7 @@ sub register {
   });
 
   $app->helper(news_post_can_delete => sub {
-    my( $self, $post ) = @_;
-
-    return 0 unless ref $post eq 'Canvas::Store::Post';
+    my( $self ) = @_;
 
     return 0 unless defined $self->auth_user;
 
@@ -49,9 +47,7 @@ sub register {
   });
 
   $app->helper(news_post_can_edit => sub {
-    my( $self, $post ) = @_;
-
-    return 0 unless ref $post eq 'Canvas::Store::Post';
+    my( $self ) = @_;
 
     return 0 unless defined $self->auth_user;
 
@@ -61,7 +57,6 @@ sub register {
 
     return 0;
   });
-
 }
 
 1;

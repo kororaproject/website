@@ -20,7 +20,7 @@
           </div>
           <div class="col-sm-12">
             <div class="text-center">
-              %== auth_gravatar(128)
+              %== user_gravatar($user, 128)
               <h2><%= $user->realname %></h2>
               <h3><%= $user->username %></h3>
             </div>

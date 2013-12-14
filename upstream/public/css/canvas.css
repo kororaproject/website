@@ -605,6 +605,9 @@ blockquote p {
   border-left: 2px solid transparent;
 }
 
+.nav a.user-avatar {
+  padding: 9px 15px;
+}
 
 #page-notifications {
   position: fixed;

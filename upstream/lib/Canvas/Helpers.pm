@@ -131,17 +131,15 @@ sub register {
     return $q;
   });
 
-  $app->helper(auth_gravatar => sub {
-    my( $self, $size, $class ) = @_;
+  $app->helper(user_gravatar => sub {
+    my( $self, $user, $size, $class ) = @_;
 
-    return '' unless defined $self->auth_user;
-
-    return '' unless $self->auth_user->is_active_account;
+    return '' unless ref $user eq 'Canvas::Store::User';
 
     $size   //= 32;
     $class  //= '';
 
-    return '<img src="http://www.gravatar.com/avatar/' . md5_sum( $self->auth_user->email ) . '.jpg?s=' . $size . '&d=retro' .  '" class="' . $class . '"></img>';
+    return '<img src="http://www.gravatar.com/avatar/' . md5_sum( $user->email ) . '.jpg?s=' . $size . '&d=retro' .  '" class="' . $class . '"></img>';
   });
 
   $app->helper(post_gravatar => sub {
