@@ -695,6 +695,38 @@ blockquote p {
   margin-bottom: 16px;
 }
 
+.news-summary-subtitle {
+  margin-bottom: 8px;
+}
+
+.news-detail-subtitle {
+  margin-bottom: 32px;
+}
+
+.news-summary-subtitle-metadata,
+.news-detail-subtitle-metadata {
+  display: inline-block;
+  vertical-align: top;
+
+  margin-right: 4px;
+}
+
+.news-summary-subtitle-metadata p,
+.news-detail-subtitle-metadata p {
+  padding-top: 2px;
+  margin-bottom: 2px;
+
+  font-size: 12px;
+  line-height: 12px;
+}
+
+.news-summary-subtitle-metadata img,
+.news-detail-subtitle-metadata img {
+  display: inline-block;
+
+  border-radius: 2px;
+}
+
 /*
 ** ENGAGE PAGES
 */

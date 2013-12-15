@@ -154,8 +154,7 @@ sub startup {
   $r->get('/news')->to('news#index');
   $r->get('/news/create')->to('news#post_create');
   $r->post('/news')->to('news#post_update');
-  $r->get('/news/:id')->to('news#post');
-  $r->get('/news/:id/')->to('news#post');
+  $r->get('/news/:id')->to('news#news_post_get');
   $r->get('/news/:id/edit')->to('news#post_edit');
   $r->get('/news/:id/delete')->to('news#post_delete');
 

@@ -118,16 +118,17 @@ sub index {
   $self->render('news');
 }
 
-sub post {
+sub news_post_get {
   my $self = shift;
-  my $post = $self->param('id');
+  my $stub = $self->param('id');
 
-  my $p = Canvas::Store::Post->search({ name => $post })->first;
+  my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
   # check we found the post
-  $self->redirect_to('/') unless defined $p;
+  return $self->redirect_to('news') unless defined $p;
 
   $self->stash( post => $p );
+
   $self->render('news-post');
 }
 
@@ -135,7 +136,7 @@ sub post_create {
   my $self = shift;
 
   # only allow authenticated and authorised users
-  $self->redirect_to('/') unless $self->news_post_can_add;
+  return $self->redirect_to('/') unless $self->news_post_can_add;
 
   my $cache = {
     id            => '',
@@ -160,7 +161,7 @@ sub post_edit {
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
   # only allow those who are authorised to edit posts
-  $self->redirect_to('/') unless $self->news_post_can_edit( $p );
+  return $self->redirect_to('/') unless $self->news_post_can_edit( $p );
 
   $self->stash(
     mode      => 'edit',
@@ -218,7 +219,7 @@ sub post_delete {
   my $self = shift;
 
   # only allow authenticated users
-  $self->redirect_to('/') unless $self->is_user_authenticated;
+  return $self->redirect_to('/') unless $self->is_user_authenticated;
 
   my $stub = $self->param('id');
 

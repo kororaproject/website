@@ -17,7 +17,15 @@
         <div class="row">
           <div class="col-sm-12">
             <h1><%= $post->title %></h1>
-            <h2 class="subtitle"><%= $post->author_id->username %> | <%= $post->created->strftime('%e %B %Y') %></h2>
+            <div class="news-detail-subtitle">
+              <div class="news-detail-subtitle-metadata">
+                <%== post_gravatar( $post, 32 ) %>
+              </div>
+              <div class="news-detail-subtitle-metadata">
+                <p>written on <%= $post->created->strftime('%e %B %Y') %></p>
+                <p>by <%= $post->author_id->username %></p>
+              </div>
+            </div>
           </div>
         </div>
         <div class="row">
