@@ -16,6 +16,11 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about">About</a></li>
+              <li class="active">Why Fedora?</li>
+            </ol>
             <h1 class="text-center"><strong>About.</strong> Why Fedora?</h1>
           </div>
         </div>

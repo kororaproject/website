@@ -137,6 +137,10 @@ blockquote.title p {
 ** TYPOGRAPHY
 */
 
+.rss {
+  color: #ff7f00;
+}
+
 .breadcrumb {
   font-size: 12px;
   padding: 4px 0px;
@@ -666,7 +670,7 @@ blockquote p {
 
 .page-container {
   min-height: 100%;
-  padding-bottom: 96px; /* match top padding of page-content */
+  padding-bottom: 64px; /* match top padding of page-content */
   margin-bottom: 256px; /* auto-calculated */
 
   background-color: #fff;
@@ -675,8 +679,9 @@ blockquote p {
 
 .page-content {
   margin: 0 auto;
-  padding-top: 96px;
+  padding-top: 64px; /* match bottom padding of page-container */
 
+  min-height: 100%;
   max-width: 1000px;
 }
 

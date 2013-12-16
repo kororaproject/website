@@ -16,16 +16,18 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li><a href="/support">Support</a></li>
+              <li><a href="/support/engage">Engage</a></li>
+              <li><a href="<%= url_with('/support/engage')->query([ type => $response->type]) %>"><%= ucfirst $response->type %>s</a></li>
+              <li class="active"><%= $response->title %></li>
+            </ol>
             <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Your Community</h1>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <ol class="breadcrumb">
-              <li><a href="/support/engage">Engage</a></li>
-              <li><a href="<%= url_with('/support/engage')->query([ type => $response->type]) %>"><%= ucfirst $response->type %>s</a></li>
-              <li class="active"><%= $response->title %></li>
-            </ol>
             <div class="callout engage-detail engage-<%= $response->type %>">
               <h1 class="engage-detail-title"><%= $response->title %></h1>
 

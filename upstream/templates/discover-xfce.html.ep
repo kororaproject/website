@@ -16,7 +16,12 @@
       <div id="page-discover" class="container">
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="text-center"><strong>Discover.</strong> The XFCE Desktop</h1>
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li><a href="/discover">Discover</a></li>
+              <li class="active">Xfce</li>
+            </ol>
+            <h1 class="text-center"><strong>Discover.</strong> The Xfce Desktop</h1>
           </div>
         </div>
       </div>

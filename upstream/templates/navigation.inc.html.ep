@@ -33,7 +33,7 @@
             <li><a href="/discover/kde">KDE Desktop</a></li>
             <li><a href="/discover/cinnamon">Cinnamon Desktop</a></li>
             <li><a href="/discover/mate">MATE Desktop</a></li>
-            <li><a href="/discover/xfce">XFCE Desktop</a></li>
+            <li><a href="/discover/xfce">Xfce Desktop</a></li>
           </ul>
         </li>
         <li class="<%= 'active' if ( $active eq 'download' ) %>"><a href="/download">Download</a></li>

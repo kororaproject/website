@@ -38,7 +38,7 @@
       });
 
       // TODO: test
-      $('.page-content').css('min-height', ( $(window).height() - 96 )  + 'px');
+      $('.page-content').css('min-height', ( $(window).height() - 64 )  + 'px');
 
     }
 

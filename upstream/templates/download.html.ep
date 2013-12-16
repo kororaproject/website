@@ -16,6 +16,10 @@
       <div id="page-download" class="container" ng-controller="DownloadController">
         <div class="row">
           <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li class="active">Download</li>
+            </ol>
             <h1 class="text-center"><strong>Download.</strong> Give Korora a Spin</h1>
           </div>
         </div>

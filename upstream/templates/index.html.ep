@@ -9,7 +9,6 @@
 
   <div class="page-container">
 
-    %= include 'banner.inc'
     %= include 'navigation.inc', active => 'home'
 
     <div class="page-content">

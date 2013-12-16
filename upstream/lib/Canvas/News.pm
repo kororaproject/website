@@ -118,6 +118,34 @@ sub index {
   $self->render('news');
 }
 
+sub rss_get {
+  my $self = shift;
+
+  my $pager = Canvas::Store::Post->pager(
+    where             => { type => 'news', status => 'publish' },
+    order_by          => 'created DESC',
+    entries_per_page  => 10,
+    current_page      => 1,
+  );
+
+  my $rss = '<?xml version="1.0" ?><rss version="2.0"><channel>';
+  $rss .= '<title>News</title>';
+  $rss .= '<link>http://kororaproject.org/news</link>';
+
+  foreach my $n ( $pager->search_where ) {
+    $rss .= '<item>';
+    $rss .= '<title>' . $n->title . '</title>';
+    $rss .= '<link>http://kororaproject.org/news/' . $n->name . '</link>';
+    $rss .= '<description>' . $n->excerpt . '</description>';
+    $rss .= '<pubDate>' . $n->created->strftime('%a, %d %b %Y %H:%M:%S GMT') . '</pubDate>';
+    $rss .= '</item>';
+  }
+
+  $rss .= '</channel></rss>';
+
+  $self->render( text => $rss, format => 'xml' );
+}
+
 sub news_post_get {
   my $self = shift;
   my $stub = $self->param('id');

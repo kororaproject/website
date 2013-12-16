@@ -16,6 +16,10 @@
       <div id="page-discover" class="container">
         <div class="row">
           <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li class="active">Discover</li>
+            </ol>
             <h1 class="page-title"><strong>Discover.</strong> The Korora Landscape</h1>
           </div>
         </div>
