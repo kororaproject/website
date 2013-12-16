@@ -61,5 +61,11 @@ sub mate {
   $self->render('discover-mate');
 }
 
+sub xfce {
+  my $self = shift;
+
+  $self->render('discover-xfce');
+}
+
 
 1;

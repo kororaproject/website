@@ -124,6 +124,7 @@ sub startup {
   $r->get('/discover/kde')->to('discover#kde');
   $r->get('/discover/cinnamon')->to('discover#cinnamon');
   $r->get('/discover/mate')->to('discover#mate');
+  $r->get('/discover/xfce')->to('discover#xfce');
 
   # support pages
   $r->get('/support')->to('support#index');
