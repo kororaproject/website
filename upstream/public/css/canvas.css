@@ -143,6 +143,10 @@ blockquote.title p {
   background-color: #fff;
 }
 
+.breadcrumb > .active {
+  color: #000;
+}
+
 .form-control {
   font-size: 16px;
 }
