@@ -102,6 +102,37 @@ sub register {
     return 1
   });
 
+  $app->helper(paginate => sub {
+    my( $self, $pager ) = ( shift, shift );
+
+    my $items     = $pager->{item_count}  // 0;
+    my $page_size = $pager->{page_size}   // 0;
+    my $page      = $pager->{page}        // 1;
+    my $page_last = $pager->{page_last}   // 0;
+
+    # only build if we have more than one page
+    if( $page_last > 1 ) {
+      my $page_show = 5;
+      my $url = $self->url_with;
+
+      my @pager_items;
+
+      # add "previous" marker
+      push @pager_items,'<li class="' . ( ($page > 1 ) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => ($page > 1) ? ($page-1) : undef ]) . '"><i class="fa fa-fw fa-chevron-left"></i></a></li>';
+
+      foreach my $p ( 1..$page_last ) {
+        push @pager_items, '<li class="' . ( ( $p == $page ) ? 'active': '' ) . '"><a href="' . $url->query([ page => ($p > 1) ? $p : undef ]) . '">' . $p . '</a></li>';
+      }
+
+      # add "next" marker
+      push @pager_items,'<li class="' . ( ( $page < $page_last ) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => $page+1 ]) . '"><i class="fa fa-fw fa-chevron-right"></i></a></li>';
+
+      return '<ul class="pagination pagination-sm">' . join('', @pager_items) . '</ul>';
+    }
+
+    return '';
+  });
+
   $app->helper(render_markdown => sub {
     my( $self, $post ) = @_;
 

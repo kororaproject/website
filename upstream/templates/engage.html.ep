@@ -175,15 +175,8 @@
 
 % if( $responses->{item_count} > $responses->{page_size} ) {
         <div class="row">
-          <div class="col-sm-offset-5 col-sm-2 text-center">
-            <div class="btn-group">
-% if( $responses->{page} > 1 ) {
-              <a href="<%= url_with->query([page => ($responses->{page} - 1)] ) %>" class="btn btn-default"><i class="fa fa-fw fa-chevron-left"></i></a>
-% }
-% if( $responses->{page} < $responses->{page_last}+1 ) {
-              <a href="<%= url_with->query([page => ($responses->{page} + 1)] ) %>" class="btn btn-default"><i class="fa fa-fw fa-chevron-right"></i></a>
-% }
-            </div>
+          <div class="col-sm-12 text-center">
+            <%== paginate( $responses ) %>
           </div>
         </div>
 % }

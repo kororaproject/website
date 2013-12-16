@@ -25,7 +25,7 @@ use base 'Canvas::Store';
 #
 use Data::Dumper;
 use Digest::MD5 qw(md5);
-use POSIX qw(floor);
+use POSIX qw(ceil);
 
 #
 # MODEL DEFINITION
@@ -106,8 +106,10 @@ sub search_type_status_and_tags {
   my $dbh = $self->db_Main();
 
   # pagination
-  my $items_per_page = $params{items_per_page}  //= 10;
-  my $current_page   = $params{current_page}    //= 1;
+  my $page_size = $params{page_size}  //= 10;
+  my $page      = $params{page}       //= 1;
+
+  $page = 1 if $page < 1;
 
   # filters
   my $type_filter    = '';
@@ -141,12 +143,12 @@ sub search_type_status_and_tags {
   # build paginated query
   my $raw_sql = 'SELECT p.id FROM canvas_post_tag pt, canvas_post p, canvas_tag t WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id ORDER BY updated DESC' ;
 
-  $raw_sql .= ' LIMIT ' . $items_per_page . ' OFFSET ' . ( $items_per_page * ( $current_page - 1 ) );
+  $raw_sql .= ' LIMIT ' . $page_size . ' OFFSET ' . ( $page_size * ( $page - 1 ) );
 
   # fetch the total item count
   my $sth = $dbh->prepare_cached($raw_count_sql);
   $sth->execute;
-  my( $total_items ) = $sth->fetchrow_array;
+  my( $item_count ) = $sth->fetchrow_array;
   $sth->finish;
 
   # fetch the paginated items
@@ -156,10 +158,10 @@ sub search_type_status_and_tags {
 
   return {
     items       => \@results,
-    item_count  => $total_items,
-    page_size   => $items_per_page,
-    page        => $current_page,
-    page_last   => floor($total_items / $items_per_page),
+    item_count  => $item_count,
+    page_size   => $page_size,
+    page        => $page,
+    page_last   => ceil($item_count / $page_size),
   }
 }
 

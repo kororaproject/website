@@ -25,7 +25,7 @@ use strict;
 #
 use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
-use POSIX qw(floor);
+use POSIX qw(ceil);
 use Time::Piece;
 
 #
@@ -110,7 +110,7 @@ sub index {
     item_count  => $pager->total_entries,
     page_size   => $pager->entries_per_page,
     page        => $pager->current_page + 1,
-    page_last   => floor($pager->total_entries / $pager->entries_per_page),
+    page_last   => ceil($pager->total_entries / $pager->entries_per_page),
   };
 
   $self->stash( news => $news );

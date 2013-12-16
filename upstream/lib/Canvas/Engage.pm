@@ -26,7 +26,6 @@ use strict;
 use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(trim);
-use POSIX qw(floor);
 use Time::Piece;
 
 #
@@ -141,7 +140,7 @@ sub filter_valid_types($) {
 }
 
 #
-# NEWS
+# ENGAGE
 #
 
 sub index {
@@ -151,11 +150,11 @@ sub index {
   my $status = $self->param('status') // '';
 
   my $cache = Canvas::Store::Post->search_type_status_and_tags(
-    type            => filter_valid_types( $self->param('type') ),
-    status          => $self->param('status') // '',
-    tags            => $self->param('tags')   // '',
-    items_per_page  => 20,
-    current_page    => $self->param('page'),
+    type      => filter_valid_types( $self->param('type') ),
+    status    => $self->param('status') // '',
+    tags      => $self->param('tags')   // '',
+    page_size => 2,
+    page      => $self->param('page'),
   );
 
   $self->stash(
