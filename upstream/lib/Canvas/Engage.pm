@@ -153,7 +153,7 @@ sub index {
     type      => filter_valid_types( $self->param('type') ),
     status    => $self->param('status') // '',
     tags      => $self->param('tags')   // '',
-    page_size => 2,
+    page_size => 20,
     page      => $self->param('page'),
   );
 
