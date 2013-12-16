@@ -41,9 +41,10 @@ noscript h1 {
 
 
 .alert,
+.breadcrumb,
 .btn,
-.label,
 .form-control,
+.label,
 pre{
   border-radius: 2px;
 }
@@ -85,6 +86,12 @@ body.modal-open,
 .modal-open .navbar-fixed-bottom {
   margin-right: 0;
 }
+
+.modal-dialog-responsive {
+  width: 75%;
+  min-width: 600px;
+}
+
 /*
 ** FONTS
 */
@@ -129,6 +136,12 @@ blockquote.title p {
 /*
 ** TYPOGRAPHY
 */
+
+.breadcrumb {
+  font-size: 12px;
+  padding: 4px 0px;
+  background-color: #fff;
+}
 
 .form-control {
   font-size: 16px;
