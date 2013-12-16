@@ -66,9 +66,13 @@ if( $create ) {
 # CONVERT NEWS POSTS
 #
 
+say "Migrating NEWS posts ...";
 my( @posts ) = Canvas::Store::WPPost->search({ post_type => 'post' });
 
 foreach my $post ( @posts ) {
+
+  my $u = Canvas::Store::User->search({ username => $post->post_author->user_login })->first;
+
   my $p = Canvas::Store::Post->create({
     name        => $post->post_name,
     content     => $post->post_content,
@@ -77,7 +81,7 @@ foreach my $post ( @posts ) {
     title       => $post->post_title,
     created     => $post->post_date_gmt,
     updated     => $post->post_modified_gmt,
-    author_id   => $post->post_author->ID,
+    author_id   => $u ? $u->id : 1,
     type        => 'news',
   });
 }
