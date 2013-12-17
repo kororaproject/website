@@ -51,7 +51,7 @@
 
           </div>
         </div>
-        <div class="hr"></div>
+        <div class="hr hr-lg"></div>
 % }
 
 % if( $news->{item_count} > $news->{page_size} ) {
