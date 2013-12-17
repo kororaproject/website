@@ -417,7 +417,9 @@ sub authenticate_any {
       });
 
       my $activation_key = substr( $token, 0, 31 );
-      my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 31 );
+      # current url for dev and testing, assuming that when this hits prod it will replace current website on current domain.
+      my $activation_url = 'https://canvas.kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 31 );
+      #my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 31 );
 
       my $message = "" .
         "G'day,\n\n" .
@@ -586,7 +588,9 @@ sub forgot_post {
   });
 
   my $activation_key = substr( $token, 0, 31 );
-  my $activation_url = 'https://kororaproject.org/activate/' . $u->username . '?token=' . url_escape substr( $token, 31 );
+  # current url for dev and testing, assuming that when this hits prod it will replace current website on current domain.
+  my $activation_url = 'https://canvas.kororaproject.org/activate/' . $u->username . '?token=' . url_escape substr( $token, 31 );
+  #my $activation_url = 'https://kororaproject.org/activate/' . $u->username . '?token=' . url_escape substr( $token, 31 );
 
   my $message = "" .
     "G'day,\n\n" .
@@ -717,7 +721,9 @@ sub register_post {
     });
 
     my $activation_key = substr( $token, 0, 32 );
-    my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 32 );
+    # current url for dev and testing, assuming that when this hits prod it will replace current website on current domain.
+    my $activation_url = 'https://canvas.kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 32 );
+    #my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 32 );
 
     say Dumper $token;
 
