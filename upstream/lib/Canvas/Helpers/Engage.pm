@@ -140,6 +140,49 @@ sub register {
     return $status;
   });
 
+  $app->helper(engage_post_admin_template => sub {
+    my( $self, $post ) = @_;
+
+    my @caps;
+
+    my $url = $self->url_for('current');
+
+    if( $post->type ne 'reply' ) {
+      if( $self->engage_post_can_subscribe( $post ) ) {
+        push @caps, '<li><a href="' . $url . '/subscribe" class="text-left"><i class="fa fa-fwl fa-bookmark"></i> Subscribe</a></li>';
+      }
+      else {
+         push @caps, '<li><a href="' . $url . '/unsubscribe" class="text-left"><i class="fa fa-fwl fa-bookmark-o"></i> Unsubscribe</a></li>';
+      }
+    }
+    else {
+      $url .= '/reply/' . $post->id;
+    }
+
+    if( $self->engage_post_can_edit( $post ) ) {
+      push @caps, '<li><a href="' . $url . '/edit" class="text-left"><i class="fa fa-fwl fa-edit"></i> Edit</a></li>';
+    }
+
+    my $template = '';
+
+    if( @caps ) {
+      $template .= qq(
+        <div class="engage-detail-footer-metadata">
+          <div class="dropdown">
+            <button class="btn btn-sm btn-default dropdown-toggle" type="button" id="post-detail-admin-dropdown" data-toggle="dropdown"><i class="fa fa-fw fa-cogs"></i></button>
+            <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="post-detail-admin-dropdown"> );
+
+      $template .= join('', @caps);
+
+      $template .= qq(
+            </ul>
+          </div>
+        </div>);
+    }
+
+    return $template;
+  });
+
   $app->helper(engage_post_can_subscribe => sub {
     my( $self, $post ) = @_;
 

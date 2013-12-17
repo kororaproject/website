@@ -445,7 +445,7 @@ sub authenticate_any {
   # TODO: END
 
   unless( $self->authenticate($user, $pass) ) {
-    $self->flash( page_errors => 'The username or password was incorrect.' );
+    $self->flash( page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?' );
   }
 
   return $self->redirect_to( $url );

@@ -51,23 +51,9 @@
               <div class="engage-detail-footer-metadata">
                 <%== post_gravatar( $response, 32 ) %>
               </div>
-% if( is_active_auth ) {
-              <div class="engage-detail-footer-metadata">
-                <div class="dropdown">
-                  <button class="btn btn-sm btn-default dropdown-toggle" type="button" id="post-detail-admin-dropdown" data-toggle="dropdown"><i class="fa fa-fw fa-cogs"></i></button>
-                  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="post-detail-admin-dropdown">
-%   if( engage_post_can_subscribe( $response ) ) {
-                      <li><a href="<%= url_for('current') . '/subscribe' %>" class="text-left"><i class="fa fa-fwl fa-bookmark"></i> Subscribe</a></li>
-  %   } else {
-                      <li><a href="<%= url_for('current') . '/unsubscribe' %>" class="text-left"><i class="fa fa-fwl fa-bookmark-o"></i> Unsubscribe</a></li>
-  %   }
-  %   if( engage_post_can_edit( $response ) ) {
-                      <li><a href="<%= url_for('current') . '/edit' %>" class="text-left"><i class="fa fa-fwl fa-edit"></i> Edit</a></li>
-  %   }
-                    </ul>
-                  </div>
-                </div>
-  % }
+
+              <%== engage_post_admin_template( $response) %>
+
             </div>
           </div>
         </div>
@@ -87,6 +73,8 @@
               <div class="engage-reply-footer-metadata">
                 <%== post_gravatar( $r, 32 ) %>
               </div>
+
+              <%== engage_post_admin_template( $r ) %>
             </div>
           </div>
         </div>
@@ -101,7 +89,7 @@
                 <div class="col-sm-12">
                   <a href="" class="btn pull-right" data-toggle="modal" data-target="#modalEngageSyntax"><i class="fa fa-fw fa-question"></i></a>
                   <h3>Reply</h3>
-                  <textarea name="content" rows="5" class="form-control"></textarea>
+                  <textarea name="content" rows="5" class="form-control"><%= $content %></textarea>
                   <div class="hr-sm"></div>
                   <div class="text-right">
                     <button type="submit" class="btn btn-default">Reply</button>

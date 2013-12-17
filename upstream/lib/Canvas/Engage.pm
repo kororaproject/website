@@ -226,7 +226,7 @@ sub engage_post_add_post {
 
   # ensure we have some sane content (at least 32 characters)
   unless( length $content > 32 ) {
-    $self->flash( page_errors => 'Your content lacks a little description. Pleast use at least least 32 characters.' );
+    $self->flash( page_errors => 'Your content lacks a little description. Pleast use at least least 32 characters to convey something meaningful.' );
     return $self->redirect_to( 'supportengagetypeadd', type => $type );
   }
 
@@ -318,13 +318,16 @@ sub engage_post_detail_get {
   my $self = shift;
   my $stub = $self->param('stub');
 
+  # could have flashed 'content' from an attempted reply
+  my $content = $self->flash('content') // '';
+
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
   my @r = Canvas::Store::Post->replies( $stub );
 
   # check we found the post
   return $self->redirect_to('/support/engage') unless defined $p;
 
-  $self->stash( response => $p, replies => \@r );
+  $self->stash( response => $p, replies => \@r, content => $content );
   $self->render('engage-detail');
 }
 
@@ -498,15 +501,6 @@ sub engage_post_unsubscribe_any {
 }
 
 
-sub engage_reply_get {
-  my $self = shift;
-
-  my $type = $self->param('type');
-  my $stub = $self->param('stub');
-
-  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
-}
-
 sub engage_reply_post {
   my $self = shift;
 
@@ -518,10 +512,15 @@ sub engage_reply_post {
   my $type = $self->param('type');
   my $stub = $self->param('stub');
   my $subscribe = $self->param('subscribe') // 0;
+  my $content = $self->param('content') // '';
 
   # ensure we have content
-  my $content = $self->param('content');
-  return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless length( trim $content ) > 0;
+  unless( length( trim $content ) > 32 ) {
+    $self->flash( content => $content );
+
+    $self->flash( page_errors => 'Your reply lacks a little description. Pleast use at least least 32 characters to convey something meaningful.' );
+    return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+  }
 
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
@@ -584,6 +583,61 @@ sub engage_reply_post {
       );
     }
   }
+
+  # redirect to the detail
+  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+}
+
+sub engage_reply_edit_get {
+  my $self = shift;
+
+  my $type = $self->param('type');
+  my $stub = $self->param('stub');
+
+  my $id = $self->param('id');
+
+  my $r = Canvas::Store::Post->search({
+    type  => 'reply',
+    id    => $id,
+  })->first;
+
+  return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless $self->engage_post_can_edit( $r );
+
+  my $content = $self->flash('content') // $r->content;
+
+  $self->stash( reply => $r, content => $content );
+
+  $self->render('engage-reply-edit');
+}
+
+sub engage_reply_edit_post {
+  my $self = shift;
+
+  my $type    = $self->param('type');
+  my $stub    = $self->param('stub');
+  my $id      = $self->param('id');
+  my $content = $self->param('content');
+
+  $self->flash(
+    content => $content,
+  );
+
+  # ensure edits maintain some context
+  unless( length( trim $content ) > 32 ) {
+    $self->flash( page_errors => 'Your editted reply lacks a little description. Pleast use at least least 32 characters to convey something meaningful.' );
+    return $self->redirect_to( $self->url_with('current') );
+  }
+
+  my $r = Canvas::Store::Post->search({
+    type  => 'reply',
+    id    => $id,
+  })->first;
+
+  # ensure we have edit capabilities
+  return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless $self->engage_post_can_edit( $r );
+
+  $r->content( $content );
+  $r->update;
 
   # redirect to the detail
   $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );

@@ -76,7 +76,7 @@ sub startup {
 
       my $u = Canvas::Store::User->search( username => $user )->first;
 
-      if( defined($u) && $u->validate_password($pass) ) {
+      if( defined($u) && $u->status eq 'active' && $u->validate_password($pass)  ) {
         return $u->username;
       };
 
@@ -145,8 +145,9 @@ sub startup {
   $r->post('/support/engage/:type/:stub/edit')->to('engage#engage_post_edit_post');
   $r->any('/support/engage/:type/:stub/subscribe')->to('engage#engage_post_subscribe_any');
   $r->any('/support/engage/:type/:stub/unsubscribe')->to('engage#engage_post_unsubscribe_any');
-  $r->get('/support/engage/:type/:stub/reply')->to('engage#engage_reply_get');
   $r->post('/support/engage/:type/:stub/reply')->to('engage#engage_reply_post');
+  $r->get('/support/engage/:type/:stub/reply/:id/edit')->to('engage#engage_reply_edit_get');
+  $r->post('/support/engage/:type/:stub/reply/:id/edit')->to('engage#engage_reply_edit_post');
 
   # download pages
   $r->get('/download')->to('site#download');
