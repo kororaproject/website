@@ -418,6 +418,64 @@ blockquote p {
 }
 
 /*
+** LIGHTBOX
+*/
+
+.lightbox-container {
+  position:relative;
+}
+.lightbox-nav-overlay {
+  z-index:100;
+  position: absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+}
+.lightbox-nav-overlay a {
+  opacity: 0;
+  -webkit-transition: opacity 0.5s;
+  -moz-transition: opacity 0.5s;
+  -o-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+  color:#fff;
+  font-size:30px;
+  height: 100%;
+  width:49%;
+  display:block;
+  padding-top:45%;
+  text-shadow: 2px 2px 4px #000;
+  filter: dropshadow(color=#000, offx=2, offy=2);
+  z-index:100;
+}
+
+.lightbox-nav-overlay a:empty {
+  width: 20%;
+}
+
+.lightbox a:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.lightbox .fa-chevron-left {
+  padding-left:15px;
+  float:left;
+  left:0;
+  text-align: left;
+}
+.lightbox .fa-chevron-right {
+  padding-right:15px;
+  float:right;
+  right:0;
+  text-align: right;
+}
+
+.lightbox .modal-footer {
+  text-align: left;
+}
+
+/*
 ** PAGINATION
 */
 .pagination {
@@ -670,19 +728,19 @@ blockquote p {
 
 .page-container {
   min-height: 100%;
-  padding-bottom: 64px; /* match top padding of page-content */
   margin-bottom: 256px; /* auto-calculated */
+  padding-bottom: 64px; /* match top padding of page-content */
 
   background-color: #fff;
   box-shadow: 0px 4px 16px #111;
 }
 
 .page-content {
-  margin: 0 auto;
-  padding-top: 64px; /* match bottom padding of page-container */
-
   min-height: 100%;
   max-width: 1000px;
+
+  margin: 0 auto;
+  padding-top: 64px; /* match bottom padding of page-container */
 }
 
 .hr {

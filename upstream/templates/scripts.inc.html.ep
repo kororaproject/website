@@ -3,6 +3,8 @@
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4/highlight.min.js"></script>
+<script src="/js/bootstrap-lightbox.js"></script>
+
 
 <!-- CANVAS sources -->
 <script src="/js/canvas.js"></script>
@@ -31,15 +33,14 @@
         fixed = false;
       }
 
+      // from page-content minimum height to consume immediate window
+      $('.page-content').css('min-height', ( $(window).height() - 64 )  + 'px');
+
       // frob page-container minimum height to at least the footer top
       page.css({
         'min-height': ($(window).height()-footer.outerHeight()) + 'px',
         'margin-bottom': footer.outerHeight() + 'px'
       });
-
-      // TODO: test
-      $('.page-content').css('min-height', ( $(window).height() - 64 )  + 'px');
-
     }
 
     resizeHelper();
@@ -58,6 +59,7 @@
 
     $(window).on('resize', resizeHelper);
 
+    // initialise highlight blocks
     hljs.initHighlightingOnLoad();
   });
 </script>

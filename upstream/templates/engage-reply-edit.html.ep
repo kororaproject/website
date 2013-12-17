@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'KororaProject'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'support'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Edit Reply<%== engage_icon( $reply->parent_id->type )%></h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <form action="<%= url_for('current') %>" method="post" enctype="application/x-www-form-urlencoded">
+              <div class="row">
+                <div class="col-sm-12">
+                  <h3>Reply</h3>
+                  <textarea name="content" class="form-control" rows="10"><%= $content %></textarea>
+                  <div class="hr-sm"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="text-right">
+                    <a href="<%= url_for_path(-3) %>" class="btn btn-danger">Cancel</a>
+                    <button type="submit" class="btn btn-success">Save</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+  <script>
+    $(document).ready( function() {
+      $('.nav-tabs a').click( function(e) {
+        e.preventDefault()
+        $(this).tab('show')
+      });
+    });
+  </script>
+</body>
+</html>
