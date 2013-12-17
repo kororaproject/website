@@ -125,7 +125,7 @@ sub rss_get {
     where             => { type => 'news', status => 'publish' },
     order_by          => 'created DESC',
     entries_per_page  => 10,
-    current_page      => 1,
+    current_page      => 0,
   );
 
   my $rss = '<?xml version="1.0" ?><rss version="2.0"><channel>';
