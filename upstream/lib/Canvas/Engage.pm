@@ -618,12 +618,10 @@ sub engage_reply_edit_post {
   my $id      = $self->param('id');
   my $content = $self->param('content');
 
-  $self->flash(
-    content => $content,
-  );
 
   # ensure edits maintain some context
   unless( length( trim $content ) > 32 ) {
+    $self->flash( content => $content,);
     $self->flash( page_errors => 'Your editted reply lacks a little description. Pleast use at least least 32 characters to convey something meaningful.' );
     return $self->redirect_to( $self->url_with('current') );
   }
