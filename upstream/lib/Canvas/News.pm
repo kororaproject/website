@@ -129,7 +129,7 @@ sub rss_get {
   );
 
   my $rss = '<?xml version="1.0" ?><rss version="2.0"><channel>';
-  $rss .= '<title>News</title>';
+  $rss .= '<title>KororaProject - News</title>';
   $rss .= '<link>http://kororaproject.org/news</link>';
 
   foreach my $n ( $pager->search_where ) {
