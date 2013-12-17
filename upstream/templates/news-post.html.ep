@@ -2,6 +2,9 @@
 <html lang="en" ng-app="canvas">
 <head>
   %= include 'header.inc', title => 'KororaProject'
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="KororaProject - News" href="/news/rss">
 </head>
 <body>
   %= include 'noscript.inc'
