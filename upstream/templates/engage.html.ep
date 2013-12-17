@@ -98,9 +98,15 @@
             </div>
           </div>
         </div>
-        <div class="hr"></div>
+% } else {
+        <div class="row">
+          <div class="col-sm-12">
+            <p class="text-center">Please <a data-toggle="modal" href="#loginModal" class="btn btn btn-default">Log In</a> to particpate with the community.</p>
+          </div>
+        </div>
 % }
 
+        <div class="hr"></div>
         <div class="row">
           <div class="col-sm-12">
             <form action="<%= url_with->query([tags => undef]) %>" method="get">
