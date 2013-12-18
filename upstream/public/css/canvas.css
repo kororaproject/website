@@ -916,7 +916,8 @@ blockquote p {
 
 .engage-reply-accepted,
 .engage-reply-accepted:hover {
-  background-color: #fafffa;
+  border-left: 3px solid #666;
+  background-color: #fafafa;
 }
 
 .engage-detail-footer {
