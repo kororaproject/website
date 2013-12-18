@@ -92,6 +92,7 @@
             <%== paginate( $replies ) %>
           </div>
         </div>
+        <div class="hr"></div>
 % }
 
 % if( is_user_authenticated ) {
