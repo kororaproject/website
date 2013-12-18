@@ -149,18 +149,26 @@ sub register {
 
     if( $post->type ne 'reply' ) {
       if( $self->engage_post_can_subscribe( $post ) ) {
-        push @caps, '<li><a href="' . $url . '/subscribe" class="text-left"><i class="fa fa-fwl fa-bookmark"></i> Subscribe</a></li>';
+        push @caps, sprintf '<li><a href="%s/subscribe" class="text-left"><i class="fa fa-fwl fa-bookmark"></i> Subscribe</a></li>', $url;
       }
       else {
-         push @caps, '<li><a href="' . $url . '/unsubscribe" class="text-left"><i class="fa fa-fwl fa-bookmark-o"></i> Unsubscribe</a></li>';
+         push @caps, sprintf '<li><a href="%s/unsubscribe" class="text-left"><i class="fa fa-fwl fa-bookmark-o"></i> Unsubscribe</a></li>', $url;
       }
     }
     else {
       $url .= '/reply/' . $post->id;
     }
 
+    if( $self->engage_post_can_accept( $post ) ) {
+      push @caps, sprintf '<li><a href="%s/accept" class="text-left"><i class="fa fa-fwl fa-check-square-o"></i> Accept</a></li>', $url;
+    }
+
+    if( $self->engage_post_can_unaccept( $post ) ) {
+      push @caps, sprintf '<li><a href="%s/unaccept" class="text-left"><i class="fa fa-fwl fa-square-o"></i> Unaccept</a></li>', $url;
+    }
+
     if( $self->engage_post_can_edit( $post ) ) {
-      push @caps, '<li><a href="' . $url . '/edit" class="text-left"><i class="fa fa-fwl fa-edit"></i> Edit</a></li>';
+      push @caps, sprintf '<li><a href="%s/edit" class="text-left"><i class="fa fa-fwl fa-edit"></i> Edit</a></li>', $url;
     }
 
     my $template = '';
@@ -181,6 +189,38 @@ sub register {
     }
 
     return $template;
+  });
+
+  $app->helper(engage_post_can_accept => sub {
+    my( $self, $post ) = @_;
+
+    return 0 unless ref $post eq 'Canvas::Store::Post';
+
+    return 0 unless $post->type eq 'reply' && $post->status ne 'accepted';
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    return 1 if $self->auth_user->is_engage_moderator;
+
+    return 0;
+  });
+
+  $app->helper(engage_post_can_unaccept => sub {
+    my( $self, $post ) = @_;
+
+    return 0 unless ref $post eq 'Canvas::Store::Post';
+
+    return 0 unless $post->type eq 'reply' && $post->status eq 'accepted';
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    return 1 if $self->auth_user->is_engage_moderator;
+
+    return 0;
   });
 
   $app->helper(engage_post_can_subscribe => sub {

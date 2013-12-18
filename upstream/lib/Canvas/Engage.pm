@@ -317,17 +317,20 @@ sub engage_post_add_post {
 sub engage_post_detail_get {
   my $self = shift;
   my $stub = $self->param('stub');
+  my $page = $self->param('page') // 1;
 
   # could have flashed 'content' from an attempted reply
   my $content = $self->flash('content') // '';
 
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
-  my @r = Canvas::Store::Post->replies( $stub );
+  my $r = $p->search_replies(
+    page => $page
+  );
 
   # check we found the post
   return $self->redirect_to('/support/engage') unless defined $p;
 
-  $self->stash( response => $p, replies => \@r, content => $content );
+  $self->stash( response => $p, replies => $r, content => $content );
   $self->render('engage-detail');
 }
 
@@ -583,6 +586,52 @@ sub engage_reply_post {
       );
     }
   }
+
+  # redirect to the detail
+  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+}
+
+sub engage_reply_accept_any {
+  my $self = shift;
+
+  my $type    = $self->param('type');
+  my $stub    = $self->param('stub');
+  my $id      = $self->param('id');
+  my $content = $self->param('content');
+
+  my $r = Canvas::Store::Post->search({
+    type  => 'reply',
+    id    => $id,
+  })->first;
+
+  # ensure we have edit capabilities
+  return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless $self->engage_post_can_accept( $r );
+
+  $r->status( 'accepted' );
+  $r->update;
+
+  # redirect to the detail
+  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+}
+
+sub engage_reply_unaccept_any {
+  my $self = shift;
+
+  my $type    = $self->param('type');
+  my $stub    = $self->param('stub');
+  my $id      = $self->param('id');
+  my $content = $self->param('content');
+
+  my $r = Canvas::Store::Post->search({
+    type  => 'reply',
+    id    => $id,
+  })->first;
+
+  # ensure we have edit capabilities
+  return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless $self->engage_post_can_unaccept( $r );
+
+  $r->status( '' );
+  $r->update;
 
   # redirect to the detail
   $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );

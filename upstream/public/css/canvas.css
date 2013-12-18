@@ -879,7 +879,7 @@ blockquote p {
 .engage-summary-meta > .engage-summary-icon {
 }
 
-.engage-summary--meta > p,
+.engage-summary-meta > p,
 .reply-meta > p {
   padding-bottom: 0;
   margin-bottom: 0;
@@ -892,7 +892,7 @@ blockquote p {
 }
 
 .engage-detail {
-  margin-bottom: 0;
+  margin-bottom: 4px;
   background-color: #fafafa;
 }
 
@@ -914,16 +914,19 @@ blockquote p {
   background-color: #fafafa;
 }
 
-.engage-detail-footer,
-.engage-reply-footer {
+.engage-reply-accepted,
+.engage-reply-accepted:hover {
+  background-color: #fafffa;
+}
+
+.engage-detail-footer {
   padding: 0;
   margin-bottom: 16px;
 
   text-align: right;
 }
 
-.engage-detail-footer-metadata p,
-.engage-reply-footer-metadata p {
+.engage-detail-footer-metadata p {
   padding-top: 2px;
   margin-bottom: 2px;
 
@@ -931,36 +934,27 @@ blockquote p {
   line-height: 12px;
 }
 
-.engage-detail-footer-metadata img,
-.engage-reply-footer-metadata img {
+.engage-detail-footer-metadata img {
   display: inline-block;
 
   border-radius: 2px;
 }
 
-.engage-detail-footer-admin,
-.engage-reply-footer-admin {
+.engage-detail-footer-admin {
   padding: 8px 0px 4px 4px;
   display: inline-block;
 
   vertical-align: top;
 }
 
-.engage-detail-footer-metadata,
-.engage-reply-footer-metadata {
+.engage-detail-footer-metadata {
   display: inline-block;
   vertical-align: top;
 
   margin-left: 4px;
-}
-
-.engage-detail-footer-metadata {
-  margin-top: 8px;
-}
-
-.engage-reply-footer-metadata {
   margin-top: 4px;
 }
+
 /*
 ** FOOTER
 */

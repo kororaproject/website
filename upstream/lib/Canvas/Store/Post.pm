@@ -74,6 +74,63 @@ __PACKAGE__->add_constructor( thanks => qq{ type='thank' AND parent=? ORDER BY n
 __PACKAGE__->add_constructor( replies => qq{ name=? AND parent_id != 0 ORDER BY created ASC } );
 
 #
+# REPLY HELPERS
+#
+sub latest_reply {
+  my $self = shift;
+
+  my $dbh = $self->db_Main();
+  my $sth = $dbh->prepare_cached("SELECT * FROM canvas_post WHERE parent_id=? ORDER BY created DESC");
+
+  $sth->execute( $self->id );
+  my( $reply ) = $self->sth_to_objects($sth);
+
+  return $reply if defined $reply;
+
+  return $self;
+}
+
+sub search_replies {
+  my $self = shift;
+  my %params = @_ > 1 ? @_ : ref $_[0] eq 'HASH' ? %{ $_[0] } : ();
+
+  my $dbh = $self->db_Main();
+
+  # pagination
+  my $page_size = $params{page_size}  //= 5;
+  my $page      = $params{page}       //= 1;
+  $page = 1 if $page < 1;
+
+  my $offset = ( $page_size * ( $page - 1 ) );
+
+  my $count_sql = sprintf "SELECT COUNT(id) FROM canvas_post WHERE parent_id=? ORDER BY created DESC";
+
+  my $sql = sprintf "SELECT * FROM canvas_post WHERE parent_id=? ORDER BY status DESC, created DESC LIMIT %d OFFSET %d", $page_size, $offset;
+
+  print Dumper $sql;
+
+  # fetch the item count
+  my $sth = $dbh->prepare_cached($count_sql);
+  $sth->execute( $self->id );
+  my( $item_count ) = $sth->fetchrow_array;
+  $sth->finish;
+
+  # fetch the paginated items
+
+  $sth = $dbh->prepare_cached($sql);
+  $sth->execute( $self->id );
+  my @results = $self->sth_to_objects($sth);
+
+  return {
+    items       => \@results,
+    item_count  => $item_count,
+    page_size   => $page_size,
+    page        => $page,
+    page_last   => ceil($item_count / $page_size),
+  }
+}
+
+#
 # TAG HELPERS
 #
 
@@ -85,19 +142,6 @@ sub tag_list_array {
   return map { $_->name } shift->tags;
 }
 
-sub latest_reply {
-  my $self = shift;
-
-  my $dbh = $self->db_Main();
-  my $sth = $dbh->prepare_cached("SELECT * FROM canvas_post WHERE parent_id=? ORDER BY created DESC LIMIT 1");
-
-  $sth->execute( $self->id );
-  my( $reply ) = $self->sth_to_objects($sth);
-
-  return $reply if defined $reply;
-
-  return $self;
-}
 
 sub search_type_status_and_tags {
   my $self = shift;

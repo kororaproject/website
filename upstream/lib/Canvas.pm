@@ -148,6 +148,8 @@ sub startup {
   $r->post('/support/engage/:type/:stub/reply')->to('engage#engage_reply_post');
   $r->get('/support/engage/:type/:stub/reply/:id/edit')->to('engage#engage_reply_edit_get');
   $r->post('/support/engage/:type/:stub/reply/:id/edit')->to('engage#engage_reply_edit_post');
+  $r->any('/support/engage/:type/:stub/reply/:id/accept')->to('engage#engage_reply_accept_any');
+  $r->any('/support/engage/:type/:stub/reply/:id/unaccept')->to('engage#engage_reply_unaccept_any');
 
   # download pages
   $r->get('/download')->to('site#download');

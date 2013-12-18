@@ -59,23 +59,37 @@
         </div>
         <div class="hr"></div>
 
-% for my $r ( @$replies ) {
+% for my $r ( @{ $replies->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
-            <div id="reply-<%= $r->id %>" class="callout engage-reply">
-%== render_markdown( $r->content )
+            <div id="reply-<%= $r->id %>" class="callout engage-reply <%= ( $r->status eq 'accepted' ) ? 'engage-reply-accepted' : '' %>">
+              <%== render_markdown( $r->content ) %>
+
+%   if( $r->status eq 'accepted' ) {
+              <div class="engage-detail-tags">
+                <span class="label label-default">accepted</span>
+              </div>
+%   }
             </div>
-            <div class="engage-reply-footer">
-              <div class="engage-reply-footer-metadata">
+            <div class="engage-detail-footer">
+              <div class="engage-detail-footer-metadata">
                 <p class="text-right">replied <%= distance_of_time_in_words( $r->created ) %></p>
                 <p class="text-right">by <%= $r->author_id->username %></p>
               </div>
-              <div class="engage-reply-footer-metadata">
+              <div class="engage-detail-footer-metadata">
                 <%== post_gravatar( $r, 32 ) %>
               </div>
 
               <%== engage_post_admin_template( $r ) %>
             </div>
+          </div>
+        </div>
+% }
+
+% if( $replies->{item_count} > $replies->{page_size} ) {
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <%== paginate( $replies ) %>
           </div>
         </div>
 % }
