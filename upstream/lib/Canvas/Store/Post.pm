@@ -96,6 +96,9 @@ sub search_replies {
 
   my $dbh = $self->db_Main();
 
+  # reply order
+  my $order = ( $params{order} // '' ) eq 'newest' ? 'DESC' : 'ASC';
+
   # pagination
   my $page_size = $params{page_size}  //= 5;
   my $page      = $params{page}       //= 1;
@@ -105,7 +108,7 @@ sub search_replies {
 
   my $count_sql = sprintf "SELECT COUNT(id) FROM canvas_post WHERE parent_id=? ORDER BY created DESC";
 
-  my $sql = sprintf "SELECT * FROM canvas_post WHERE parent_id=? ORDER BY status DESC, created DESC LIMIT %d OFFSET %d", $page_size, $offset;
+  my $sql = sprintf "SELECT * FROM canvas_post WHERE parent_id=? ORDER BY status DESC, created %s LIMIT %d OFFSET %d", $order, $page_size, $offset;
 
   print Dumper $sql;
 
