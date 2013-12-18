@@ -110,8 +110,6 @@ sub search_replies {
 
   my $sql = sprintf "SELECT * FROM canvas_post WHERE parent_id=? ORDER BY status DESC, created %s LIMIT %d OFFSET %d", $order, $page_size, $offset;
 
-  print Dumper $sql;
-
   # fetch the item count
   my $sth = $dbh->prepare_cached($count_sql);
   $sth->execute( $self->id );
