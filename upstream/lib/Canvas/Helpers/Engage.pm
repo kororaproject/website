@@ -148,11 +148,13 @@ sub register {
     my $url = $self->url_for('current');
 
     if( $post->type ne 'reply' ) {
-      if( $self->engage_post_can_subscribe( $post ) ) {
-        push @caps, sprintf '<li><a href="%s/subscribe" class="text-left"><i class="fa fa-fwl fa-bookmark"></i> Subscribe</a></li>', $url;
-      }
-      else {
-         push @caps, sprintf '<li><a href="%s/unsubscribe" class="text-left"><i class="fa fa-fwl fa-bookmark-o"></i> Unsubscribe</a></li>', $url;
+      if( $self->auth_user && $self->auth_user->is_active_account ) {
+        if( $self->engage_post_can_subscribe( $post ) ) {
+          push @caps, sprintf '<li><a href="%s/subscribe" class="text-left"><i class="fa fa-fwl fa-bookmark"></i> Subscribe</a></li>', $url;
+        }
+        else {
+           push @caps, sprintf '<li><a href="%s/unsubscribe" class="text-left"><i class="fa fa-fwl fa-bookmark-o"></i> Unsubscribe</a></li>', $url;
+        }
       }
     }
     else {
