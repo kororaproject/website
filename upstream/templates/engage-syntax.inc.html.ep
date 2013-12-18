@@ -84,10 +84,7 @@ Visit <span class="hi">[us][web]</span>.
 </pre>
 
 <h2 id="link-bare-urls">Bare URLs</h2>
-<p>We have modified our Markdown parser to support "naked" URLs (in most but not <i>all</i> cases -- beware of unusual characters in your URLs); they will be converted to links automatically:</p>
-<pre>I often visit http://example.com.
-</pre>
-<p>Force URLs by enclosing them in angle brackets:</p>
+<p>We do not support "naked" URLs. To force URLs, enclose them in angle brackets:</p>
 <pre>Have you seen <span class="hi">&lt;</span>http://example.com<span class="hi">&gt;</span>?
 </pre>
 <p>URLs can be relative or full.</p>
