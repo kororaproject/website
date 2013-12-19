@@ -254,12 +254,12 @@ sub news_post {
 sub news_post_delete_any {
   my $self = shift;
 
-  # only allow authenticated users
-  return $self->redirect_to('/') unless $self->is_user_authenticated;
-
   my $stub = $self->param('id');
 
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
+
+  # only allow authenticated users
+  return $self->redirect_to('/news') unless $self->news_post_can_delete( $p );
 
   # check we found the post
   if( $self->news_post_can_delete( $p ) ) {
