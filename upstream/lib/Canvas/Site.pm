@@ -748,9 +748,13 @@ sub register_post {
 sub profile_get {
   my $self = shift;
 
+  return $self->redirect_to('/') unless $self->is_user_authenticated;
+
   my $u = Canvas::Store::User->search({
     username  => $self->param('name'),
   })->first;
+
+  return $self->redirect_to('/') unless defined $u;
 
   $self->stash( user => $u );
   $self->render('profile');
