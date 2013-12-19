@@ -51,11 +51,8 @@ foreach my $char (split //, '\\`*_{}[]()>#+-.!') {
 sub new {
     my ($class, %p) = @_;
 
-    # Default metadata to 1
-    $p{use_metadata} = 1 unless exists $p{use_metadata};
-    # Squash value to [01]
-    $p{use_metadata} = $p{use_metadata} ? 1 : 0;
-
+    $p{use_attributes} = ( $p{use_attributes} // 0 ) ? 1 : 0;
+    $p{use_metadata} = ( $p{use_metadata} // 1 )? 1 : 0;
     $p{use_metadata_newline} //= {
       default   => "\n",
       keywords  => ',',
@@ -265,7 +262,7 @@ sub _StripLinkDefinitions {
     }
 
     # MultiMarkdown addition "
-    if ($4) {
+    if( $4 && $self->{params}{use_attributes} ) {
       $self->{_attributes}{lc $1} = $4;
     }
     # /addition
@@ -1083,7 +1080,7 @@ sub _DoCodeBlocks {
   my $text = shift;
 
   $text =~ s{
-      (?:\n\n|\A)
+      (?:\n+|\A)
       (             # $1 = the code block -- one or more lines, starting with a space/tab
         (?:
           (?:[ ]{$self->{params}{tab_width}} | \t)  # Lines must start with a tab or a tab-width of spaces
@@ -2478,8 +2475,6 @@ B<MultiMarkdown>
 
 =head1 SYNOPSIS
 
-B<MultiMarkdown.pl> [ B<--html4tags> ] [ B<--version> ] [ B<-shortversion> ]
-    [ I<file> ... ]
 
 
 =head1 DESCRIPTION
@@ -2502,54 +2497,6 @@ HTML tags (like <div> and <table> as well).
 For more information about Markdown's syntax, see:
 
     http://daringfireball.net/projects/markdown/
-
-
-=head1 OPTIONS
-
-Use "--" to end switch parsing. For example, to open a file named "-z", use:
-
-  Markdown.pl -- -z
-
-=over 4
-
-
-=item B<--html4tags>
-
-Use HTML 4 style for empty element tags, e.g.:
-
-    <br>
-
-instead of Markdown's default XHTML style tags, e.g.:
-
-    <br />
-
-
-=item B<-v>, B<--version>
-
-Display Markdown's version number and copyright information.
-
-
-=item B<-s>, B<--shortversion>
-
-Display the short-form version number.
-
-
-=back
-
-
-
-=head1 BUGS
-
-To file bug reports or feature requests (other than topics listed in the
-Caveats section above) please send email to:
-
-    support@daringfireball.net (for Markdown issues)
-
-    owner@fletcherpenney.net (for MultiMarkdown issues)
-
-Please include with your report: (1) the example input; (2) the output
-you expected; (3) the output (Multi)Markdown actually produced.
-
 
 =head1 AUTHOR
 
