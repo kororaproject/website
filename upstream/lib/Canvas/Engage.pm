@@ -317,14 +317,14 @@ sub engage_post_add_post {
 sub engage_post_detail_get {
   my $self = shift;
   my $stub = $self->param('stub');
-  my $page = $self->param('page') // 1;
 
   # could have flashed 'content' from an attempted reply
   my $content = $self->flash('content') // '';
 
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
   my $r = $p->search_replies(
-    page => $page
+    page_size => 20,
+    page      => $self->param('page'),
   );
 
   # check we found the post

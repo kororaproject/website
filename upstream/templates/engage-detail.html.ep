@@ -59,17 +59,18 @@
         </div>
         <div class="hr"></div>
 
-% for my $r ( @{ $replies->{items} } ) {
+% if( @{ $replies->{items} } ) {
+%   for my $r ( @{ $replies->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
             <div id="reply-<%= $r->id %>" class="callout engage-reply <%= ( $r->status eq 'accepted' ) ? 'engage-reply-accepted' : '' %>">
               <%== render_markdown( $r->content ) %>
 
-%   if( $r->status eq 'accepted' ) {
+%     if( $r->status eq 'accepted' ) {
               <div class="engage-detail-tags">
                 <span class="label label-default">accepted</span>
               </div>
-%   }
+%     }
             </div>
             <div class="engage-detail-footer">
               <div class="engage-detail-footer-metadata">
@@ -84,6 +85,8 @@
             </div>
           </div>
         </div>
+%   }
+        <div class="hr"></div>
 % }
 
 % if( $replies->{item_count} > $replies->{page_size} ) {
