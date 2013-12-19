@@ -29,7 +29,7 @@ use Data::Dumper;
 use Mojo::Util qw(b64_encode url_escape url_unescape);
 use Time::Piece;
 use Time::HiRes qw(gettimeofday);
-use Digest::SHA qw(sha512);
+use Digest::SHA qw(sha512 sha256_hex);
 
 #
 # LOCAL INCLUDES
@@ -338,10 +338,7 @@ sub create_auth_token {
     $bytes = substr sha512( $t . '.' . $u ), 0, 48;
   }
 
-  my $token = b64_encode( $bytes );
-  chomp $token;
-
-  return $token;
+  return sha256_hex( $bytes );
 }
 
 
@@ -413,11 +410,11 @@ sub authenticate_any {
       my $um = Canvas::Store::UserMeta->create({
         user_id     => $u->id,
         meta_key    => 'activation_token',
-        meta_value  => url_escape $token,
+        meta_value  => $token,
       });
 
-      my $activation_key = substr( $token, 0, 31 );
-      my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 31 );
+      my $activation_key = substr( $token, 0, 32 );
+      my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 32 );
 
       my $message = "" .
         "G'day,\n\n" .
@@ -518,7 +515,7 @@ sub activate_post {
 
   # build the supplied token and fetch the stored token
   my $token_supplied = $prefix . url_unescape( $suffix );
-  my $token = url_unescape( $u->metadata('activation_token') // '' );
+  my $token = $u->metadata('activation_token') // '';
 
   # redirect to same page unless supplied and stored tokens match
   unless( $token eq $token_supplied ) {
@@ -529,7 +526,7 @@ sub activate_post {
   # remove activation if account age is more than 24 hours
   # and then return to redirect or home
   my $now = gmtime;
-  if( ($now - $u->created) > 86400 ) {
+  if( ($now - $u->updated) > 86400 ) {
     $self->flash( page_errors => 'Activation of this account has been over 24 hours.' );
 
     $u->metadata_clear('activiation_token');
@@ -576,17 +573,20 @@ sub forgot_post {
   $u->status('pending');
   $u->update;
 
+  # erase existing tokens
+  $u->metadata_clear('activation_token');
+
   # generate activiation token
   my $token = create_auth_token;
 
   my $um = Canvas::Store::UserMeta->create({
     user_id     => $u->id,
     meta_key    => 'activation_token',
-    meta_value  => url_escape $token,
+    meta_value  => $token,
   });
 
-  my $activation_key = substr( $token, 0, 31 );
-  my $activation_url = 'https://kororaproject.org/activate/' . $u->username . '?token=' . url_escape substr( $token, 31 );
+  my $activation_key = substr( $token, 0, 32 );
+  my $activation_url = 'https://kororaproject.org/activate/' . $u->username . '?token=' . url_escape substr( $token, 32 );
 
   my $message = "" .
     "G'day,\n\n" .
@@ -713,7 +713,7 @@ sub register_post {
     my $um = Canvas::Store::UserMeta->create({
       user_id     => $u->id,
       meta_key    => 'activation_token',
-      meta_value  => url_escape $token,
+      meta_value  => $token,
     });
 
     my $activation_key = substr( $token, 0, 32 );

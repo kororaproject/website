@@ -164,9 +164,10 @@ sub _encode64 {
 sub metadata_clear($$) {
   my( $self, $key ) = @_;
 
-  my @meta = grep { $key eq $_->meta_key } $self->meta;
-
-  return ( @meta ) ? $meta[0]->delete : undef;
+  # clears all metadata items of the specified key
+  foreach my $m ( grep { $key eq $_->meta_key } $self->meta ) {
+    $m->delete;
+  }
 }
 
 sub metadata($$) {
@@ -190,7 +191,7 @@ sub is_active_account($) {
 #      6 = reserved
 #      5 = reserved
 #      4 = reserved
-#      3 = reserved
+#      3 = can_documentation_moderate
 #      2 = can_news_moderate
 #      1 = can_engage_moderate
 #      0 = can_engage
@@ -201,6 +202,10 @@ sub is_engage_moderator($) {
 
 sub is_news_moderator($) {
   return ( shift->access // 0 ) & 0x04;
+}
+
+sub is_document_moderator($) {
+  return ( shift->access // 0 ) & 0x08;
 }
 
 sub is_admin($) {
