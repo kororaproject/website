@@ -42,8 +42,9 @@ __PACKAGE__->has_a( author_id => 'Canvas::Store::User' );
 #
 # N:N MAPPINGS
 #
-__PACKAGE__->has_many(post_tags => 'Canvas::Store::PostTag' => 'post_id');
-__PACKAGE__->has_many(tags => [ 'Canvas::Store::PostTag' => 'tag_id' ] );
+__PACKAGE__->has_many(post_tags => 'Canvas::Store::PostTag'   => 'post_id');
+__PACKAGE__->has_many(tags      => [ 'Canvas::Store::PostTag' => 'tag_id' ] );
+__PACKAGE__->has_many(meta      => 'Canvas::Store::PostMeta'  => 'user_id');
 
 #
 # INFLATOR/DEFLATORS
@@ -209,6 +210,26 @@ sub search_type_status_and_tags {
     page_last   => ceil($item_count / $page_size),
   }
 }
+
+#
+# METADATA HELPERS
+#
+sub metadata_clear($$) {
+  my( $self, $key ) = @_;
+
+  my @meta = grep { $key eq $_->meta_key } $self->meta;
+
+  return ( @meta ) ? $meta[0]->delete : undef;
+}
+
+sub metadata($$) {
+  my( $self, $key ) = @_;
+
+  my @meta = grep { $key eq $_->meta_key } $self->meta;
+
+  return ( @meta ) ? $meta[0]->meta_value : undef;
+}
+
 
 #
 # UPDATE HELPER

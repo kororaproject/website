@@ -29,6 +29,7 @@ DROP TABLE IF EXISTS canvas_templaterepository;
 DROP TABLE IF EXISTS canvas_machine;
 
 DROP TABLE IF EXISTS canvas_post;
+DROP TABLE IF EXISTS canvas_postmeta;
 DROP TABLE IF EXISTS canvas_post_vote;
 DROP TABLE IF EXISTS canvas_postview;
 DROP TABLE IF EXISTS canvas_vote;
@@ -359,6 +360,13 @@ CREATE TABLE canvas_post (
 
   created       DATETIME              NOT NULL,
   updated       DATETIME              NOT NULL
+);
+
+CREATE TABLE canvas_postmeta (
+  meta_id     BIGINT(20)      NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  post_id     INTEGER         NOT NULL  REFERENCES canvas_post (id),
+  meta_key    VARCHAR(64)               DEFAULT  NULL,
+  meta_value  LONGTEXT                  DEFAULT  NULL
 );
 
 
