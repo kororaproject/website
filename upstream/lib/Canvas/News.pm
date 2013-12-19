@@ -40,8 +40,8 @@ use Canvas::Store::Pager;
 
 use constant POST_STATUS_MAP => (
   [ 'In Draft'  => 'draft' ],
-  [ 'Review'    => 'planned'  ],
-  [ 'Published' => 'published' ],
+  [ 'Review'    => 'review'  ],
+  [ 'Published' => 'publish' ],
 );
 
 
@@ -153,35 +153,26 @@ sub news_post_get {
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
   # check we found the post
-  return $self->redirect_to('news') unless defined $p;
+  return $self->redirect_to('news') unless $self->news_post_can_view( $p );
 
   $self->stash( post => $p );
 
   $self->render('news-post');
 }
 
-sub post_create {
+sub news_add_get {
   my $self = shift;
 
   # only allow authenticated and authorised users
   return $self->redirect_to('/') unless $self->news_post_can_add;
 
-  my $cache = {
-    id            => '',
-    created       => '',
-    updated       => '',
-    title         => '',
-    content       => '',
-    excerpt       => '',
-    name          => '',
-    author        => '',
-  };
-
-  $self->stash( mode => 'create', post => $cache );
+  $self->stash(
+    statuses  => list_status_for_post( 'news', 'draft' )
+  );
   $self->render('news-post-new');
 }
 
-sub post_edit {
+sub news_post_edit_get {
   my $self = shift;
 
   my $stub = $self->param('id');
@@ -189,18 +180,17 @@ sub post_edit {
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
 
   # only allow those who are authorised to edit posts
-  return $self->redirect_to('/') unless $self->news_post_can_edit( $p );
+  return $self->redirect_to('/news') unless $self->news_post_can_edit( $p );
 
   $self->stash(
-    mode      => 'edit',
     post      => $p,
     statuses  => list_status_for_post( $p->type, $p->status )
   );
 
-  $self->render('news-post-new');
+  $self->render('news-post-edit');
 }
 
-sub post_update {
+sub news_post {
   my $self = shift;
 
   my $stub = $self->param('post_id');
@@ -210,9 +200,27 @@ sub post_update {
 
     # update if we found the object
     if( $self->news_post_can_edit( $p ) ) {
-      $p->title( $self->param('title') // '' );
-      $p->content( $self->param('content') // '' );
-      $p->excerpt( $self->param('excerpt') // '' );
+      $p->title( $self->param('title') );
+      $p->content( $self->param('content') );
+      $p->excerpt( $self->param('excerpt') );
+      $p->status( $self->param('status') );
+
+      # update author if changed
+      if( $self->param('author') ne $p->author_id->username ) {
+        my $u = Canvas::Store::User->search({ username => $self->param('author') } )->first;
+
+        if( $u ) {
+          $p->author_id( $u->id );
+        }
+      }
+
+      # update created if changed
+      my $t = Time::Piece->strptime( $self->param('created'), "%d/%m/%Y %H:%M:%S" );
+
+      if( $t ne $p->created ) {
+        $p->created( $t );
+      }
+
 
       $p->update;
     }
@@ -243,7 +251,7 @@ sub post_update {
   $self->redirect_to( 'newsid', id => $stub );
 }
 
-sub post_delete {
+sub news_post_delete_any {
   my $self = shift;
 
   # only allow authenticated users
@@ -260,5 +268,37 @@ sub post_delete {
 
   $self->redirect_to('/news');
 }
+
+
+
+sub news_admin_get {
+  my $self = shift;
+
+  # only allow authenticated and authorised users
+  return $self->redirect_to('/news') unless (
+    $self->news_post_can_add ||
+    $self->news_post_can_delete
+  );
+
+  my $pager = Canvas::Store::Post->pager(
+    where             => { type => 'news' },
+    order_by          => 'created DESC',
+    entries_per_page  => 20,
+    current_page      => ( $self->param('page') // 1 ) - 1,
+  );
+
+  my $news = {
+    items       => [ $pager->search_where ],
+    item_count  => $pager->total_entries,
+    page_size   => $pager->entries_per_page,
+    page        => $pager->current_page + 1,
+    page_last   => ceil($pager->total_entries / $pager->entries_per_page),
+  };
+
+  $self->stash( news => $news );
+
+  $self->render('news-admin');
+}
+
 
 1;

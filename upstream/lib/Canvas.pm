@@ -156,12 +156,13 @@ sub startup {
 
   # news pages
   $r->get('/news')->to('news#index');
-  $r->get('/news/create')->to('news#post_create');
-  $r->post('/news')->to('news#post_update');
+  $r->post('/news')->to('news#news_post');
+  $r->get('/news/admin')->to('news#news_admin_get');
+  $r->get('/news/add')->to('news#news_add_get');
   $r->get('/news/rss')->to('news#rss_get');
   $r->get('/news/:id')->to('news#news_post_get');
-  $r->get('/news/:id/edit')->to('news#post_edit');
-  $r->get('/news/:id/delete')->to('news#post_delete');
+  $r->get('/news/:id/edit')->to('news#news_post_edit_get');
+  $r->any('/news/:id/delete')->to('news#news_post_delete_any');
 
 
 

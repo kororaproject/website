@@ -807,6 +807,7 @@ blockquote p {
   border-radius: 2px;
 }
 
+
 /*
 ** ENGAGE PAGES
 */
@@ -1024,6 +1025,7 @@ footer a:visited {
 /*
 ** DIV-TABLES
 */
+
 .alert-footnote {
   background-color: #ffb147;
   color: #a66a17;
@@ -1036,9 +1038,6 @@ footer a:visited {
 /*
 ** DIV-TABLES
 */
-.row-table {
-
-}
 
 .row-table > .row-header,
 .row-table > .row-entry {
@@ -1060,6 +1059,19 @@ footer a:visited {
   border-left: 2px solid #428bca;
 
   background-color: #f0f0f0;
+}
+
+/* ADMIN TABLES */
+
+.admin-row-table > .row-header h1 {
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+.admin-row-table > .row-entry a,
+.admin-row-table > .row-entry p {
+  font-size: 12px;
+  margin-bottom: 0;
 }
 
 .package-actions {

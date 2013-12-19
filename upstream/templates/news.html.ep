@@ -29,7 +29,8 @@
             <h1 class="page-title"><strong>News.</strong> Latest Updates</h1>
           </div>
         </div>
-        % foreach my $n ( @{ $news->{items} } ) {
+
+% foreach my $n ( @{ $news->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
             <a href="/news/<%= $n->name %>"><h2><%= $n->title %></h2></a>
@@ -64,16 +65,7 @@
           </div>
         </div>
 % }
-% if( news_post_can_add ) {
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="text-right">
-              <a class="btn btn-danger" href="/news/create">Create</a>
-            </div>
-          </div>
-        </div>
-        <div class="hr"></div>
-% }
+
       </div>
 
       <!-- END CONTENT -->

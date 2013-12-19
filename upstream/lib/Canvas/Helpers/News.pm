@@ -22,6 +22,22 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my( $self, $app ) = @_;
 
+  $app->helper(news_post_can_view => sub {
+    my( $self, $post ) = @_;
+
+    return 0 unless ref $post eq 'Canvas::Store::Post';
+
+    return 1 if $post->status eq 'publish';
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    return 1 if $self->auth_user->is_news_moderator;
+
+    return 0;
+  });
+
   $app->helper(news_post_can_add => sub {
     my( $self ) = @_;
 
