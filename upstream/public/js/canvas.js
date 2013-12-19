@@ -187,6 +187,37 @@ function ActivateController($scope, $http) {
   };
 };
 
+function PasswordResetController($scope, $http) {
+  $scope.password = '';
+  $scope.verify = '';
+
+  $scope.error = {
+    password: 'Password must be at least 8 characters.',
+    verify: 'Passwords must match.'
+  };
+
+  $scope.passwordIsValid = function() {
+    return $scope.password.length >= 8;
+  };
+
+  $scope.verifyIsValid = function() {
+    return $scope.verify === $scope.password;
+  };
+
+  $scope.passwordIsState = function(state) {
+    return $scope.password.length > 0 && ( state === $scope.passwordIsValid() );
+  };
+
+  $scope.verifyIsState = function(state) {
+    return $scope.verify.length > 0 && ( state === $scope.verifyIsValid() );
+  };
+
+  $scope.canResetPassword = function() {
+    return $scope.passwordIsValid() &&
+           $scope.verifyIsValid();
+  };
+};
+
 function RegisterController($scope, $http) {
   $scope.username = '';
   $scope.email = '';

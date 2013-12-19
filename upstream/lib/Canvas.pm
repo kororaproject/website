@@ -177,8 +177,10 @@ sub startup {
   $r->get('/activated')->to('site#activated');
   $r->post('/forgot')->to('site#forgot_post');
 
-  $r->post('/profile/status')->to('site#profile_status_post');
-  $r->get('/profile/:name')->to('site#profile_get');
+  $r->post('/profile/status')->to('profile#profile_status_post');
+  $r->get('/profile/:name')->to('profile#profile_get');
+  $r->get('/profile/:name/reset')->to('profile#profile_reset_password_get');
+  $r->post('/profile/:name/reset')->to('profile#profile_reset_password_post');
 
   my $r_api = $r->under('/api');
 

@@ -535,6 +535,8 @@ sub activate_post {
     return $self->redirect_to( $url );
   }
 
+  my $status = $u->status;
+
   $u->status('active');
   $u->update;
 
@@ -569,29 +571,30 @@ sub forgot_post {
     return $self->redirect_to( $url );
   }
 
-  # change account status to pending
-  $u->status('pending');
-  $u->update;
+  # validate account is active
+  unless( $u->is_active_account ) {
+    $self->flash( page_errors => 'Your account has not been activated.' );
+
+    return $self->redirect_to( $url );
+  }
 
   # erase existing tokens
-  $u->metadata_clear('activation_token');
+  $u->metadata_clear('password_reset_token');
 
   # generate activiation token
   my $token = create_auth_token;
 
   my $um = Canvas::Store::UserMeta->create({
     user_id     => $u->id,
-    meta_key    => 'activation_token',
+    meta_key    => 'password_reset_token',
     meta_value  => $token,
   });
 
-  my $activation_key = substr( $token, 0, 32 );
-  my $activation_url = 'https://kororaproject.org/activate/' . $u->username . '?token=' . url_escape substr( $token, 32 );
+  my $activation_url = 'https://kororaproject.org/profile/' . $u->username . '/reset?token=' . url_escape $token;
 
   my $message = "" .
     "G'day,\n\n" .
     "We've temporarily deactivated your account to prevent unauthorised activity.\n\n".
-    "Your activiation key is: " . $activation_key . "\n\n" .
     "In order to activate your Korora Prime account, copy your activation key and follow the prompts at: " . $activation_url . "\n\n" .
     "Please note that you must re-activate your account within 24 hours.\n\n" .
 #      "If you have any questions regarding his process, click 'Reply' in your email client and we'll be only too happy to help.\n\n" .
@@ -606,7 +609,7 @@ sub forgot_post {
     data    => $message,
   );
 
-  $self->flash( page_info => 'A re-activation email has been sent to your account.' );
+  $self->flash( page_info => 'A password reset email has been sent to your account.' );
   $self->redirect_to( $url );
 }
 
@@ -741,57 +744,6 @@ sub register_post {
   }
 
   $self->redirect_to('/registered');
-}
-
-
-
-sub profile_get {
-  my $self = shift;
-
-  return $self->redirect_to('/') unless $self->is_user_authenticated;
-
-  my $u = Canvas::Store::User->search({
-    username  => $self->param('name'),
-  })->first;
-
-  return $self->redirect_to('/') unless defined $u;
-
-  $self->stash( user => $u );
-  $self->render('profile');
-}
-
-sub profile_status_post {
-  my $self = shift;
-
-  my $username = $self->param('name')   // '';
-  my $email    = $self->param('email')  // '';
-
-  my $result = {};
-
-  if( length $username ) {
-    my $u = Canvas::Store::User->search({
-      username  => $username,
-    })->first;
-
-    $result->{username} = {
-      key     => $username,
-      status  => defined $u ? 1 : 0,
-    };
-  }
-
-  if( length $email ) {
-    my $e = Canvas::Store::User->search({
-      email  => $email,
-    })->first;
-
-    $result->{email} = {
-      key     => $email,
-      status  => defined $e ? 1 : 0,
-    }
-  }
-
-
-  $self->render( json => $result );
 }
 
 
