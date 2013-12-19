@@ -590,10 +590,10 @@ sub forgot_post {
 
   my $message = "" .
     "G'day,\n\n" .
-    "We've temporarily deactivated your account to prevent unauthorised activity.\n\n".
+    "We've requested a password reset for your account.\n\n".
     "Your activiation key is: " . $activation_key . "\n\n" .
     "In order to activate your Korora Prime account, copy your activation key and follow the prompts at: " . $activation_url . "\n\n" .
-    "Please note that you must re-activate your account within 24 hours.\n\n" .
+    "Please note that this activation key must be used to reset your password within 24 hours.\n\n" .
 #      "If you have any questions regarding his process, click 'Reply' in your email client and we'll be only too happy to help.\n\n" .
     "Regards,\n" .
     "The Korora Team.\n";
@@ -606,7 +606,7 @@ sub forgot_post {
     data    => $message,
   );
 
-  $self->flash( page_info => 'A re-activation email has been sent to your account.' );
+  $self->flash( page_info => 'A password reset email has been sent to your account.' );
   $self->redirect_to( $url );
 }
 
