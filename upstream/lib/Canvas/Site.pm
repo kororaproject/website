@@ -142,7 +142,7 @@ sub authenticate_any {
       # send the activiation email
       $self->mail(
         to      => $u->email,
-        from    => 'accounts@kororaproject.org',
+        from    => 'admin@kororaproject.org',
         subject => 'Korora Project - Prime Registration',
         data    => $message,
       );
@@ -278,16 +278,16 @@ sub forgot_post {
 
   my $u = Canvas::Store::User->search({ email => $email })->first;
 
-  # validate email is available
+  # validate email is available, don't reveal email account information
   unless( defined $u ) {
-    $self->flash( page_errors => 'Your email is not registered.' );
+    $self->flash( page_info => 'An email with further instructions has been sent to: ' . $email );
 
     return $self->redirect_to( $url );
   }
 
-  # validate account is active
+  # validate account is active, don't reveal email account information
   unless( $u->is_active_account ) {
-    $self->flash( page_errors => 'Your account has not been activated.' );
+    $self->flash( page_info => 'An email with further instructions has been sent to: ' . $email );
 
     return $self->redirect_to( $url );
   }
@@ -308,22 +308,20 @@ sub forgot_post {
 
   my $message = "" .
     "G'day,\n\n" .
-    "We've temporarily deactivated your account to prevent unauthorised activity.\n\n".
-    "In order to activate your Korora Prime account, copy your activation key and follow the prompts at: " . $activation_url . "\n\n" .
-    "Please note that you must re-activate your account within 24 hours.\n\n" .
-#      "If you have any questions regarding his process, click 'Reply' in your email client and we'll be only too happy to help.\n\n" .
+    "You (or someone else) entered this email address when trying to change the password of a Korora Prime account.\n\n".
+    "In order to reset the password for your Korora Prime account, continue on and follow the prompts at: " . $activation_url . "\n\n" .
     "Regards,\n" .
     "The Korora Team.\n";
 
   # send the activiation email
   $self->mail(
     to      => $email,
-    from    => 'accounts@kororaproject.org',
+    from    => 'admin@kororaproject.org',
     subject => 'Korora Project - Prime Re-activation / Lost Password',
     data    => $message,
   );
 
-  $self->flash( page_info => 'A password reset email has been sent to your account.' );
+  $self->flash( page_info => 'An email with further instructions has been sent to: ' . $email );
   $self->redirect_to( $url );
 }
 
@@ -451,7 +449,7 @@ sub register_post {
     # send the activiation email
     $self->mail(
       to      => $email,
-      from    => 'accounts@kororaproject.org',
+      from    => 'admin@kororaproject.org',
       subject => 'Korora Project - Prime Registration',
       data    => $message,
     );

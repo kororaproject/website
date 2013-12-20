@@ -270,8 +270,6 @@ sub news_post_delete_any {
   $self->redirect_to('/news');
 }
 
-
-
 sub news_admin_get {
   my $self = shift;
 
