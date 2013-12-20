@@ -140,8 +140,11 @@
                 </span>
                 <input type="hidden" name="type" value="<%= param('type') %>">
                 <input type="hidden" name="status" value="<%= param('status') %>">
-                <input type="text" name="tags" class="form-control" placeholder="find tags">
+                <input type="text" name="tags" class="form-control" placeholder="find tags" value="<%= param('tags') // '' %>">
                 <span class="input-group-btn">
+% if( param('tags') ) {
+                  <a href="<%= url_with->query([tags => undef]) %>" class="btn btn-default"><i class="fa fa-fw fa-times"></i></a>
+% }
                   <button class="btn btn-default" type="submit"><i class="fa fa-fw fa-search"></i></button>
                 </span>
               </div><!-- /input-group -->
