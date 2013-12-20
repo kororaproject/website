@@ -206,6 +206,8 @@ sub register {
 
     return 1 if $self->auth_user->is_engage_moderator;
 
+    return 1 if $self->auth_user->id == $post->author_id->id;
+
     return 0;
   });
 
@@ -221,6 +223,8 @@ sub register {
     return 0 unless $self->auth_user->is_active_account;
 
     return 1 if $self->auth_user->is_engage_moderator;
+
+    return 1 if $self->auth_user->id == $post->author_id->id;
 
     return 0;
   });
