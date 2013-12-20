@@ -98,8 +98,8 @@
                   <h4 class="step">Step&nbsp;3</h4>
                 </div>
                 <div class="col-sm-9">
-                  <div class="text-center form-control form-control-generic">
-                    <div id="desktops" class="img-well" ng-repeat="d in version.desktops" ng-class="{'img-well-selected': isSelected(d.name)}" ng-click="selectDesktop(d)">
+                  <div id="desktops" class="text-center form-control form-control-generic">
+                    <div class="img-well" ng-repeat="d in version.desktops" ng-class="{'img-well-selected': isSelected(d.name)}" ng-click="selectDesktop(d)">
                       <img class="img-desktop-logo img-bumper" ng-src="/img/ico-logo-{{d.name}}.png" bs-tooltip="d.label"></img>
                     </div>
                   </div>
