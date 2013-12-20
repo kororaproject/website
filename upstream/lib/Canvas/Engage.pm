@@ -230,7 +230,7 @@ sub engage_post_add_post {
     return $self->redirect_to( 'supportengagetypeadd', type => $type );
   }
 
-  my %tags = map { sanitise_with_dashes( trim $_ ) => 1 } split /,/, $tag_list;
+  my %tags = map { sanitise_with_dashes( trim $_ ) => 1 } split /[ ,]+/, $tag_list;
 
   # ensure we have some at least one tag
   unless( keys %tags ) {
@@ -416,7 +416,7 @@ sub engage_post_edit_post {
 
     # find tags to add and remove
     my @tags_old = $p->tag_list_array;
-    my @tags_new = map { sanitise_with_dashes( trim $_ ) } split( ',', $self->param('tags') );
+    my @tags_new = map { sanitise_with_dashes( trim $_ ) } split /[ ,]+/, $self->param('tags');
 
     my %to = map { $_ => 1 } @tags_old;
     my %tn = map { $_ => 1 } @tags_new;

@@ -175,19 +175,19 @@ sub search_type_status_and_tags {
 
   # filter on tags
   if( length $params{tags} > 0 ) {
-    push @filter, 'pt.tag_id=t.id AND (t.name IN (' . join( ',', map { $dbh->quote( $_ ) } split(/[ ,]/, $params{tags})) . ')) AND p.id=pt.post_id';
+    my @tags = split /[ ,]+/, $params{tags};
+
+    foreach my $t ( @tags ) {
+      my $lt = $dbh->quote( '%' . $t . '%' );
+      push @filter, '(p.title LIKE ' . $lt . ' OR p.content LIKE ' . $lt . ' OR t.name LIKE ' . $lt . ' OR r.content LIKE ' . $lt . ')';
+    }
   }
 
-  # filter on full text
-  if( length $params{text} > 0 ) {
-    push @filter, 'p.title LIKE %% OR p.content LIKE %%';
-  };
-
   # build total count query
-  my $raw_count_sql = 'SELECT COUNT(DISTINCT(p.id)) FROM canvas_post_tag pt, canvas_post p, canvas_tag t WHERE (' . join( ') AND (', @filter ) . ')' ;
+  my $raw_count_sql = 'SELECT COUNT(DISTINCT(p.id)) FROM canvas_post_tag pt JOIN canvas_post p ON (p.id=pt.post_id) JOIN canvas_tag t ON (t.id=pt.tag_id) JOIN canvas_post r ON (r.parent_id=p.id) WHERE (' . join( ') AND (', @filter ) . ')' ;
 
   # build paginated query
-  my $raw_sql = 'SELECT p.id FROM canvas_post_tag pt, canvas_post p, canvas_tag t WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id ORDER BY updated DESC' ;
+  my $raw_sql = 'SELECT p.id FROM canvas_post_tag pt JOIN canvas_post p ON (p.id=pt.post_id) JOIN canvas_tag t ON (t.id=pt.tag_id) JOIN canvas_post r ON (r.parent_id=p.id) WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id ORDER BY p.updated DESC' ;
 
   $raw_sql .= ' LIMIT ' . $page_size . ' OFFSET ' . ( $page_size * ( $page - 1 ) );
 
