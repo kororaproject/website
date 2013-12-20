@@ -351,6 +351,9 @@ CREATE TABLE canvas_post (
   /* primary content of post */
   content       TEXT                  NOT NULL  DEFAULT '',
 
+  /* provides an selectable prioritisation for post order */
+  menu_order    INTEGER UNSIGNED      NOT NULL  DEFAULT 0,
+
   /*
   ** open - replies are enabled
   ** closed - post is closed from replies
