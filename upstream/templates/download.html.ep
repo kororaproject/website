@@ -34,24 +34,24 @@
             <li><i class="fa-li fa fa-check-square-o"></i>1GB memory (RAM)</li>
             <li><i class="fa-li fa fa-check-square-o"></i>10GB disk space / storage</li>
           </ul>
-% foreach my $r ( @{ $map } ) {
+% foreach my $r ( @{ $map->{releases} } ) {
           <div class="row callout callout-<%= $r->{isStable} ? 'info' : 'warning'%>" ng-hide="pageLoaded">
             <h2><%= $r->{name} %> (<%= $r->{codename} %>)</h2>
             <h4>Released: <span><%= $r->{released} %></span></h4>
             <div class="container">
-%   foreach my $a ( keys %{ $r->{isos} } ) {
-%     foreach my $d ( keys %{ $r->{isos}{ $a } } ) {
+%   foreach my $d ( keys %{ $r->{isos} } ) {
               <div class="row">
                 <div class="col-sm-2">
                   <img class="img-desktop-logo" src="/img/ico-logo-<%= lc $d %>.png"></img>
                 </div>
                 <div class="col-sm-10">
-%       foreach my $l ( keys %{ $r->{isos}{ $a }{ $d }{url} } ) {
-                  <a href="<%= $r->{isos}{ $a }{ $d }{url} %>" class="btn btn-success"><%= $a %> Download via <%= uc $l %></a>
+%     foreach my $a ( keys %{ $r->{isos}{ $d } } ) {
+%       foreach my $l ( keys %{ $r->{isos}{ $d }{ $a }{url} } ) {
+                  <a href="<%= $r->{isos}{ $d }{ $a }{url} %>" class="btn btn-success"><%= $a %> (<%= $l %>)</a>
 %       }
+%     }
                 </div>
               </div>
-%     }
 %   }
             </div>
           </div>

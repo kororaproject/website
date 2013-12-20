@@ -152,7 +152,7 @@ sub startup {
   $r->any('/support/engage/:type/:stub/reply/:id/unaccept')->to('engage#engage_reply_unaccept_any');
 
   # download pages
-  $r->get('/download')->to('site#download');
+  $r->get('/download')->to('download#index');
 
   # news pages
   $r->get('/news')->to('news#index');
