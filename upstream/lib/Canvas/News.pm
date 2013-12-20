@@ -221,31 +221,32 @@ sub news_post {
         $p->created( $t );
       }
 
-
       $p->update;
     }
     else {
-      return $self->redirect_to('/');
+      return $self->redirect_to('/news/admin');
     }
   }
   # otherwise create a new entry
   elsif( $self->news_post_can_add ) {
-    $stub = sanitise_with_dashes( $self->param('post_title') );
+    $stub = sanitise_with_dashes( $self->param('title') );
 
     my $now = gmtime;
 
     my $p = Canvas::Store::Post->create({
       name         => $stub,
-      title        => $self->param('post_title'),
-      content      => $self->param('post_content'),
-      excerpt      => $self->param('post_excerpt'),
-      author       => $self->auth_user->id,
+      type         => 'news',
+      status       => $self->param('status'),
+      title        => $self->param('title'),
+      content      => $self->param('content'),
+      excerpt      => $self->param('excerpt'),
+      author_id    => $self->auth_user->id,
       created      => $now,
       updated      => $now,
     });
   }
   else {
-    return $self->redirect_to('/');
+    return $self->redirect_to( '/news/admin');
   }
 
   $self->redirect_to( 'newsid', id => $stub );
