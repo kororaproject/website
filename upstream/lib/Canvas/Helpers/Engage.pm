@@ -162,11 +162,11 @@ sub register {
     }
 
     if( $self->engage_post_can_accept( $post ) ) {
-      push @caps, sprintf '<li><a href="%s/accept" class="text-left"><i class="fa fa-fwl fa-check-square-o"></i> Accept</a></li>', $url;
+      push @caps, sprintf '<li><a href="%s/accept" class="text-left"><i class="fa fa-fwl fa-check"></i> Accept</a></li>', $url;
     }
 
     if( $self->engage_post_can_unaccept( $post ) ) {
-      push @caps, sprintf '<li><a href="%s/unaccept" class="text-left"><i class="fa fa-fwl fa-square-o"></i> Unaccept</a></li>', $url;
+      push @caps, sprintf '<li><a href="%s/unaccept" class="text-left"><i class="fa fa-fwl fa-times"></i> Unaccept</a></li>', $url;
     }
 
     if( $self->engage_post_can_edit( $post ) ) {
