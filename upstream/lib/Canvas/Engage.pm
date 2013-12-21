@@ -254,7 +254,7 @@ sub engage_post_add_post {
   my $p = Canvas::Store::Post->create({
     name         => $stub,
     type         => $type,
-    status       => '',
+    status       => ( $type eq 'question' ) ? 'need-answer' : '',
     title        => $title,
     content      => $content,
     author_id    => $self->auth_user->id,

@@ -53,8 +53,8 @@
                     <li><a href="<%= url_with->query([type => 'problem', status => 'in-progress', tags => undef, page => undef]) %>">Problems - In Progress</a></li>
                     <li class="divider"></li>
                     <li><a href="<%= url_with->query([type => 'question', status => undef, tags => undef, page => undef]) %>">All Questions</a></li>
-                    <li><a href="<%= url_with->query([type => 'question', status => 'answered', tags => undef, page => undef]) %>">Answers - In Progress</a></li>
-                    <li><a href="<%= url_with->query([type => 'question', status => 'answered', tags => undef, page => undef]) %>">Answers - Need Answer</a></li>
+                    <li><a href="<%= url_with->query([type => 'question', status => 'answered', tags => undef, page => undef]) %>">Answers - Answered</a></li>
+                    <li><a href="<%= url_with->query([type => 'question', status => 'unanswered', tags => undef, page => undef]) %>">Answers - Need Answer</a></li>
                     <li class="divider"></li>
                     <li><a href="<%= url_with->query([type => 'thank', status => undef, tags => undef, page => undef]) %>">All Thanks</a></li>
                     <li><a href="<%= url_with->query([type => 'thank', status => 'noted', tags => undef, page => undef]) %>">Thanks - Noted</a></li>

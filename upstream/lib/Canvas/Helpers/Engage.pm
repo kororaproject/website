@@ -45,7 +45,6 @@ use constant TYPE_STATUS_MAP => {
     [ 'In Progress'   => 'in-progress'  ],
   ],
   question => [
-    [ ''            => ''           ],
     [ 'Answered'    => 'answered'   ],
     [ 'Need Answer' => 'need-answer'],
   ],
