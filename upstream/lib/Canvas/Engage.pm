@@ -272,6 +272,11 @@ sub engage_post_add_post {
     });
   }
 
+  # undo our flash since we succeeded
+  $self->flash(
+    content => '',
+  );
+
   # auto-subscribe the creator (engage_subscriptions)
   Canvas::Store::UserMeta->find_or_create({
     user_id     => $self->auth_user->id,

@@ -193,6 +193,19 @@ sub register {
     return $template;
   });
 
+
+  $app->helper(engage_post_last_update => sub {
+    my( $self, $post ) = @_;
+
+    return 0 unless ref $post eq 'Canvas::Store::Post';
+
+    my $t = ( $post->created > $post->updated ) ? $post->created : $post->updated;
+
+    return $t unless $post->latest_reply;
+
+    return ( $t > $post->latest_reply->updated ) ? $t : $post->latest_reply->updated;
+  });
+
   $app->helper(engage_post_can_accept => sub {
     my( $self, $post ) = @_;
 

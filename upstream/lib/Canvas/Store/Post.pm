@@ -190,8 +190,6 @@ sub search_type_status_and_tags {
   # build paginated query
   my $raw_sql = 'SELECT p.id FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id ORDER BY p.updated DESC' ;
 
-  print Dumper $raw_sql;
-
   $raw_sql .= ' LIMIT ' . $page_size . ' OFFSET ' . ( $page_size * ( $page - 1 ) );
 
   # fetch the total item count

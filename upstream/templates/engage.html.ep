@@ -159,7 +159,7 @@
               <div class="callout engage-summary engage-<%= $r->type %>">
                 <div class="pull-right reply-meta">
                   <div class="engage-detail-footer-metadata">
-                    <p class="text-right">updated <%= distance_of_time_in_words( $r->latest_reply->updated ) %></p>
+                    <p class="text-right">updated <%= distance_of_time_in_words( engage_post_last_update( $r ) ) %></p>
                     <p class="text-right">by <%= $r->latest_reply->author_id->username %></p>
                     <p class="text-right"><%= pluralise( $r->reply_count, 'reply' ) %></p>
                   </div>
