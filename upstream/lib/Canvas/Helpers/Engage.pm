@@ -276,6 +276,26 @@ sub register {
 
     return 0;
   });
+
+  $app->helper(engage_post_can_edit_status => sub {
+    my( $self, $post ) = @_;
+
+    return 0 unless ref $post eq 'Canvas::Store::Post';
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    return 1 if $self->auth_user->is_engage_moderator;
+
+    # only allow OP's to change status of questions
+    return 1 if(
+      $post->type eq 'question' &&
+      $self->auth_user->id == $post->author_id->id
+    );
+
+    return 0;
+  });
 }
 
 1;
