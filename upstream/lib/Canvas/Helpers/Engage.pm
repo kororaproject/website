@@ -73,6 +73,14 @@ use constant TYPE_ICON_COLOUR_MAP => {
   },
 };
 
+sub _is_engage_post($) {
+  my $post = shift;
+
+  return 0 unless ref $post eq 'Canvas::Store::Post';
+
+  return grep { $_ eq $post->type } qw(reply idea thank problem question);
+}
+
 
 sub register {
   my( $self, $app ) = @_;
@@ -106,7 +114,7 @@ sub register {
   $app->helper(engage_status => sub {
     my( $self, $post ) = @_;
 
-    return 'unknown' unless ref $post eq 'Canvas::Store::Post';
+    return 'unknown' unless _is_engage_post $post;
 
     # it's new if no replies and no modified status
     return 'new' if $post->status eq '' && $post->reply_count == 0;
@@ -125,7 +133,7 @@ sub register {
   $app->helper(engage_status_list => sub {
     my( $self, $post ) = @_;
 
-    return [] unless ref $post eq 'Canvas::Store::Post';
+    return [] unless _is_engage_post $post;
 
     my $status = [];
 
@@ -172,6 +180,10 @@ sub register {
       push @caps, sprintf '<li><a href="%s/edit" class="text-left"><i class="fa fa-fwl fa-edit"></i> Edit</a></li>', $url;
     }
 
+    if( $self->engage_post_can_delete( $post ) ) {
+      push @caps, sprintf '<li><a href="%s/delete" class="text-left"><i class="fa fa-fwl fa-trash-o"></i> Delete</a></li>', $url;
+    }
+
     my $template = '';
 
     if( @caps ) {
@@ -196,7 +208,7 @@ sub register {
   $app->helper(engage_post_last_update => sub {
     my( $self, $post ) = @_;
 
-    return 0 unless ref $post eq 'Canvas::Store::Post';
+    return 0 unless _is_engage_post $post;
 
     my $t = ( $post->created > $post->updated ) ? $post->created : $post->updated;
 
@@ -208,7 +220,7 @@ sub register {
   $app->helper(engage_post_can_accept => sub {
     my( $self, $post ) = @_;
 
-    return 0 unless ref $post eq 'Canvas::Store::Post';
+    return 0 unless _is_engage_post $post;
 
     return 0 unless $post->type eq 'reply' && $post->status ne 'accepted';
 
@@ -226,7 +238,7 @@ sub register {
   $app->helper(engage_post_can_unaccept => sub {
     my( $self, $post ) = @_;
 
-    return 0 unless ref $post eq 'Canvas::Store::Post';
+    return 0 unless _is_engage_post $post;
 
     return 0 unless $post->type eq 'reply' && $post->status eq 'accepted';
 
@@ -244,7 +256,7 @@ sub register {
   $app->helper(engage_post_can_subscribe => sub {
     my( $self, $post ) = @_;
 
-    return 0 unless ref $post eq 'Canvas::Store::Post';
+    return 0 unless _is_engage_post $post;
 
     return 0 unless defined $self->auth_user;
 
@@ -263,7 +275,7 @@ sub register {
   $app->helper(engage_post_can_edit => sub {
     my( $self, $post ) = @_;
 
-    return 0 unless ref $post eq 'Canvas::Store::Post';
+    return 0 unless _is_engage_post $post;
 
     return 0 unless defined $self->auth_user;
 
@@ -279,7 +291,7 @@ sub register {
   $app->helper(engage_post_can_edit_status => sub {
     my( $self, $post ) = @_;
 
-    return 0 unless ref $post eq 'Canvas::Store::Post';
+    return 0 unless _is_engage_post $post;
 
     return 0 unless defined $self->auth_user;
 
@@ -295,6 +307,22 @@ sub register {
 
     return 0;
   });
+
+  $app->helper(engage_post_can_delete => sub {
+    my( $self, $post ) = @_;
+
+    return 0 unless _is_engage_post $post;
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    return 1 if $self->auth_user->is_engage_moderator;
+
+    return 0;
+  });
+
+
 }
 
 1;

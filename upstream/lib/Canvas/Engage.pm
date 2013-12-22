@@ -468,7 +468,7 @@ sub engage_post_subscribe_any {
     meta_value  => $p->id,
   });
 
-  return $self->redirect_to( $url );
+  $self->redirect_to( $url );
 }
 
 sub engage_post_unsubscribe_any {
@@ -505,7 +505,7 @@ sub engage_post_unsubscribe_any {
 
   $um->delete if defined $um;
 
-  return $self->redirect_to( $url );
+  $self->redirect_to( $url );
 }
 
 
@@ -695,25 +695,44 @@ sub engage_reply_edit_post {
   $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
 }
 
-sub engage_delete {
+sub engage_post_delete_any {
   my $self = shift;
 
+  my $type = $self->param('type');
+  my $stub = $self->param('stub');
+
+  my $p = Canvas::Store::Post->search({
+    type => $type,
+    name => $stub
+  })->first;
+
   # only allow authenticated and authorised users
-  $self->redirect_to('/') unless (
-    $self->is_user_authenticated() &&
-    $self->auth_user->is_admin
-  );
+  return $self->redirect_to('/support/engage') unless $self->engage_post_can_delete( $p );
 
-  my $stub = $self->param('id');
+  $p->delete;
 
-  my $p = Canvas::Store::Post->search({ name => $stub })->first;
+  $self->redirect_to('/support/engage');
+}
 
-  # check we found the post
-  if( $p ) {
-    $p->delete;
-  }
+sub engage_reply_delete_any {
+  my $self = shift;
 
-  $self->redirect_to('support');
+  my $type = $self->param('type');
+  my $stub = $self->param('stub');
+  my $id   = $self->param('id');
+
+  my $r = Canvas::Store::Post->search({
+    type  => 'reply',
+    id    => $id,
+  })->first;
+
+  # only allow authenticated and authorised users
+  return $self->redirect_to('/support/engage') unless $self->engage_post_can_delete( $r );
+
+  $r->delete;
+
+  # redirect to the detail
+  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
 }
 
 1;

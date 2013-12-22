@@ -143,6 +143,7 @@ sub startup {
   $r->get('/support/engage/:type/:stub')->to('engage#engage_post_detail_get');
   $r->get('/support/engage/:type/:stub/edit')->to('engage#engage_post_edit_get');
   $r->post('/support/engage/:type/:stub/edit')->to('engage#engage_post_edit_post');
+  $r->any('/support/engage/:type/:stub/delete')->to('engage#engage_post_delete_any');
   $r->any('/support/engage/:type/:stub/subscribe')->to('engage#engage_post_subscribe_any');
   $r->any('/support/engage/:type/:stub/unsubscribe')->to('engage#engage_post_unsubscribe_any');
   $r->post('/support/engage/:type/:stub/reply')->to('engage#engage_reply_post');
@@ -150,6 +151,7 @@ sub startup {
   $r->post('/support/engage/:type/:stub/reply/:id/edit')->to('engage#engage_reply_edit_post');
   $r->any('/support/engage/:type/:stub/reply/:id/accept')->to('engage#engage_reply_accept_any');
   $r->any('/support/engage/:type/:stub/reply/:id/unaccept')->to('engage#engage_reply_unaccept_any');
+  $r->any('/support/engage/:type/:stub/reply/:id/delete')->to('engage#engage_reply_delete_any');
 
   # download pages
   $r->get('/download')->to('download#index');

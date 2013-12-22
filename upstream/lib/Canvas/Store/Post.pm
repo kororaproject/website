@@ -44,7 +44,7 @@ __PACKAGE__->has_a( author_id => 'Canvas::Store::User' );
 #
 __PACKAGE__->has_many(post_tags => 'Canvas::Store::PostTag'   => 'post_id');
 __PACKAGE__->has_many(tags      => [ 'Canvas::Store::PostTag' => 'tag_id' ] );
-__PACKAGE__->has_many(meta      => 'Canvas::Store::PostMeta'  => 'user_id');
+__PACKAGE__->has_many(meta      => 'Canvas::Store::PostMeta'  => 'post_id');
 
 #
 # INFLATOR/DEFLATORS
