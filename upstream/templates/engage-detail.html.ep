@@ -120,7 +120,7 @@
 % } else {
         <div class="row">
           <div class="col-sm-12">
-            <p class="text-center">Please <a data-toggle="modal" href="#loginModal" class="btn btn btn-default">Log In</a> to particpate with the community.</p>
+            <p class="text-center">Please <a data-toggle="modal" href="#loginModal" class="btn btn btn-default">Log In</a> to participate with the community.</p>
           </div>
         </div>
 % }

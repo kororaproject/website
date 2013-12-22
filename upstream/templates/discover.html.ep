@@ -25,7 +25,7 @@
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <p>Korora currently comes with the choice of two desktops, both available in 64-bit (x86_64) and 32-bit (i686):</p>
+            <p>Korora currently comes with the choice of five desktops, all available in 64 and 32 bit versions:</p>
           </div>
         </div>
         <div class="row">
@@ -75,28 +75,28 @@
         <div class="hr"></div>
         <div class="row">
           <div class="col-sm-12">
-            <p>Both versions are similarly focused, being aimed at making Linux easier to use and pre-configuring the system for end users. As such, they both include:</p>
+            <p>Each desktop version is similarly focused, being aimed at making Linux easier to use and pre-configuring the system for end users. As such, they include:</p>
             <ul class="fa-ul">
               <li><i class="fa fa-li fa-check-square-o"></i>Tweaked desktops (enabled GNOME extensions and desktop, cleaned KDE menus, desktop cache files under ramfs, alerts when commands complete and much more..)</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>Third party repositories such as Adobe, Chrome, RPMFusion<a href="#footnote"><sup>1</sup></a> and VirtualBox</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>Firefox as the default web browser (with integration theme for KDE)</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>Third party repositories such as Adobe Flash, Dropbox, Google Chrome, RPMFusion<a href="#footnote"><sup>1</sup></a>, VirtualBox and more</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>Firefox as the default web browser</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Firefox extensions included (Adblock Plus, DownThemAll, Flashblock, Xclear)</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>Microblogging client (Choqok for KDE, Gwibber for GNOME)</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>Full multimedia support, including Adobe Flash plugin</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>Jockey device manager to handle drivers such as NVIDIA and wireless</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>Video editor (Kdenlive for KDE, OpenShot for GNOME)</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>Microblogging client</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>Full multimedia support, including Adobe Flash</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>Pharlap device manager to handle drivers such as NVIDIA and wireless</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>Video editor</li>
               <li><i class="fa fa-li fa-check-square-o"></i>VLC as the default media player</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>SELinux enabled (particularly worthwhile for Flash)</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>SELinux enabled</li>
               <li><i class="fa fa-li fa-check-square-o"></i>and more..</li>
             </ul>
-            <p>The Korora system includes applications for many common desktop computing tasks. As such is much larger than a regular live CD and should be booted using DVD disks or USB drives for installation.</p>
+            <p>The Korora system includes applications for many common desktop computing tasks. As such it is much larger than other distributions and requires a DVD disk to boot from, however we <em>highly</em> recommend using a USB drive as they are much faster.</p>
           </div>
         </div>
         <div class="hr"></div>
         <div class="row">
           <div class="col-sm-12">
             <div class="callout callout-warning">
-              <p><a name="footnote" href=""></a><sup>1</sup> RPMFusion provides software that the Fedora Project doesn’t want to ship, such as support for MP3s and proprietary video drivers.</p>
+              <p><a name="footnote" href=""></a><sup>1</sup> RPMFusion provides software that the Fedora Project doesn't want to ship, such as support for MP3s and proprietary video drivers.</p>
             </div>
           </div>
         </div>

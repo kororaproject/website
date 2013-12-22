@@ -20,13 +20,13 @@
         <div class="row">
           <div class="col-sm-6">
             <h2>Benefits of Korora Prime</h2>
-            <p>The Korora Project is aspiring to provide the best out of box experience for new users through to power users and experts.</p>
-            <p>Right now, a Korora Prime account provides access to particpate with the entire community via <a href="/support/engage">Engage</a>.</p>
-            <p>Down the road, a Korora Prime account will provide single sign on access to other Korora Project services that you choose to be part of.</p>
+            <p>The Korora Project is aspiring to provide the best out of the box experience for new users through to power users and experts.</p>
+            <p>Right now, a Korora Prime account provides access to participate with the community via <a href="/support/engage">Engage</a>.</p>
+            <p>Down the road, a Korora Prime account will provide single sign-on access to other Korora Project services that you choose to be part of.</p>
           </div>
           <div class="col-sm-6 callout callout-nfo">
             <h2>Almost done ...</h2>
-            <p>Copy and paste the activation key you received in your email below. Click "Activate" to finalise your account creation.</p>
+            <p>Copy and paste the activation key you received in your email into the field below, then click <em>Activate</em> to finalise your account creation.</p>
             <form action="<%= url_with('current')%>" method="post" role="form">
 % if( $error->{code} ) {
               <div class="alert alert-danger">

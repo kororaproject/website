@@ -21,7 +21,7 @@
               <li><a href="/about">About</a></li>
               <li class="active">The Team</li>
             </ol>
-            <h1 class="text-center"><strong>About.</strong> Meet  The Team</h1>
+            <h1 class="text-center"><strong>About.</strong> Meet The Team</h1>
           </div>
         </div>
         <div class="row">
@@ -35,7 +35,8 @@
               </ul>
               <p>We would like to recognise the following community members for their continued contributions to the Korora Project:</p>
               <ul>
-                <li>Jim Dean (ozjd) – tester and forum executive extraordinaire</li>
+                <li>Jim Dean (ozjd) – tester and forum administrator</li>
+                <li>Maik Adamietz (DarkEra) – Xfce desktop maintainer</li>
               </ul>
             </div>
           </div>

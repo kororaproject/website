@@ -24,7 +24,7 @@
             <h1 class="page-title"><strong>Engage.</strong> The Community</h1>
           </div>
           <div class="col-sm-12">
-            <p>Engage is your portal to the entire Korora Community. From here you can search through the available questions, problems, ideas and thanks that other members have posted. Alternatively, submit your own and let the community help you.</p>
+            <p>Engage is your official portal to the Korora Community. Here you can search through the available questions, problems, ideas and thanks that other members have posted. Alternatively, submit your own and let the community help you.</p>
             <p> Ensure you have read the <a href="" data-toggle="modal" data-target="#modalEngageGuidelines"> Engage Guidelines</a> before posting.</p>
           </div>
         </div>
@@ -149,7 +149,7 @@
 % } else {
         <div class="row">
           <div class="col-sm-12">
-            <p class="text-center">Please <a data-toggle="modal" href="#loginModal" class="btn btn btn-default">Log In</a> to particpate with the community.</p>
+            <p class="text-center">Please <a data-toggle="modal" href="#loginModal" class="btn btn btn-default">Log In</a> to participate with the community.</p>
           </div>
         </div>
 % }

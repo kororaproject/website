@@ -20,16 +20,16 @@
         <div class="row">
           <div class="col-sm-6">
             <h2>Your Korora Prime account is almost ready.</h2>
-            <p>A message has been sent to the email address you provided with further instructions to finalise the activitation of your account.</p>
+            <p>A message has been sent to the email address you provided with further instructions on how to finalise the activation of your account.</p>
             <a href="<%= $redirect_to %>" class="btn btn-success">Return</a>
             <a href="/" class="btn btn-success">Home</a>
           </div>
 
           <div class="col-sm-6 callout">
             <h2>Benefits of Korora Prime.</h2>
-            <p>The Korora Project are aspiring to provide the best out of box experience for new users through to power users and experts.</p>
-            <p>Right now, your Korora Prime account provides access to particpate with the entire community via <a href="/support/engage">Engage</a>.</p>
-            <p>Down the road, your Korora Prime account will provide single sign on access to other Korora Project services that you choose to be part of.</p>
+            <p>The Korora Project are aspiring to provide the best out of the box experience for new users through to power users and experts.</p>
+            <p>Right now, your Korora Prime account provides access to participate with the community via <a href="/support/engage">Engage</a>.</p>
+            <p>Down the road, your Korora Prime account will provide single sign-on access to other Korora Project services that you choose to be part of.</p>
           </div>
         </div>
       </div>

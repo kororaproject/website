@@ -43,7 +43,7 @@
             <p><a name="package" href=""></a></p>
             <h2>Package Management</h2>
             <p>Yum (and RPM) have made leaps and bounds over the last few years and you might actually enjoy using it now (and it's quite fast!). Having said that, most package commands are run through PackageKit these days thanks to graphical package managers. As for RPMs themselves, they're just a binary package format like Debs – it's the package manager that makes the difference.</p>
-            <p>Download an RPM from the net and you can install it with Yum (or via the GUI using PackageKit), which will automatically pull in any dependencies for you. You rarely use the <em>rpm</em>command, just like in Debian and Ubuntu you rarely use <em>dpkg</em>. The days of <em>"RPM hell"</em> are long gone.</p>
+            <p>Download an RPM from the net and you can install it with Yum (or via the GUI using PackageKit), which will automatically pull in any dependencies for you. You rarely use the <em>rpm</em> command, just like in Debian and Ubuntu you rarely use <em>dpkg</em>. The days of <em>"RPM hell"</em> are long gone.</p>
             <p>Fedora also has a wonderful addition, called groups. After some educational software, office programs, or support for your language? It's easy, just install the group you need, like so:</p>
             <pre><code class="bash">$ sudo yum groupinstall "Educational Software"</code></pre>
             <p>If you're a developer, getting started with Fedora is easy. Just install the development group you need, such as GNOME, KDE, Java, Kernel, Perl, or even the Web.</p>
@@ -55,10 +55,10 @@
             <p><a name="updates" href=""></a></p>
             <h3>Updates</h3>
             <p>Similar to other non-rolling release distros, Fedora <a href="http://fedoraproject.org/wiki/Updates_Policy#Stable_Releases">generally only applies bug fixes</a> to a stable release, rather than introducing new features with later versions.</p>
-            <p>Having said that though, Fedora does often provide major updates to some specific programs, including KDE. In general, often packages like Firefox, LibreOffice and the Linux kernel itself get major updates. So, with Fedora you are not left behind quite as much, nor having to add repositories for unofficial builds. We like that.<br>
+            <p>Having said that though, Fedora does often provide major updates to some specific software. In general, packages like Firefox, LibreOffice, KDE, and the Linux kernel itself get major updates. So, with Fedora you are not left behind quite as much, nor having to add repositories for unofficial builds. We like that.<br>
             <p><a name="innovation" href=""></a></p>
             <h3>Innovation</h3>
-            <p>With every new release, Fedora is often leading the charge to implement new free software technologies. In fact, Fedora's primary sponsor Red Hat is responsible for <a href="http://fedoraproject.org/wiki/RedHatContributions#Desktop_Software">some of the greatest desktop enhancements ever</a>, including
+            <p>With every new release, Fedora is often leading the charge to implement new free software technologies. In fact, Fedora's primary sponsor Red Hat is responsible for <a href="http://fedoraproject.org/wiki/RedHatContributions#Desktop_Software">some great desktop enhancements</a>, including
             AIGLX (Accelerated Indirect GLX), D-Bus, DeviceKit, HAL, NetworkManager, Ogg Theora, and PolicyKit. Even the <a href="http://wayland.freedesktop.org/">Wayland display server</a> was started by Kristian Høgsberg when he was working for Red Hat (he's now at Intel).</p>
             <p>Not to mention that out of all the vendors, Red Hat <a href="http://www.press.redhat.com/2008/04/08/red-hat-leads-open-source-contributions-to-kernel/">contributes the most to the Linux kernel</a> and to <a href="http://www.phoronix.com/scan.php?page=article&amp;item=x_server_contributors&amp;num=1">X.Org</a>. Red Hat is also the <a href="http://blogs.gnome.org/bolsh/2010/07/28/gnome-census/">biggest contributor to GNOME</a> (including GNOME Shell) and they also provide infrastructure, hosting and bandwidth for
             the project.</p>
@@ -66,16 +66,17 @@
             <p><a name="upstream" href=""></a></p>
             <h3>Upstream</h3>
             <p>Fedora works as <a href="http://fedoraproject.org/wiki/Staying_close_to_upstream_projects">closely to upstream as possible</a>. They don't often go off on their own tangent with disregard for upstream projects. If they want to have something changed, they work with upstream to create fixes and
-            introduce new features.</p>
+            introduce new features which benefits everyone.</p>
             <p>Take the Chromium web browser for example. It's not included in Fedora <a href="http://spot.livejournal.com/312320.html">for several reasons</a>, but Fedora people are <a href="http://code.google.com/p/chromium/issues/detail?id=28287"
              >working with Google</a> to fix these issues, so that it <em>can</em> be included nicely. By doing this, other distros will benefit!</p>
-            <p>Having said that, there are Chromium builds available too. Just add <a href="http://repos.fedorapeople.org/repos/spot/chromium/">the repository</a> and away you go!<br>
+           <p>Having said that, there are Chromium builds available too. Just add <a href="http://repos.fedorapeople.org/repos/spot/chromium/">the repository</a> and away you go!</p>
+           <p>Working upstream provides <a href="http://fedoraproject.org/wiki/Staying_close_to_upstream_projects#Why_push_changes_upstream.3F">many great benefits to Fedora</a> and ultimately makes it a more stable system because the fixes are shared with everyone.<br>
             <p><a name="security" href=""></a></p>
             <h3>Security</h3>
-            <p>Many used to wonder at the usefulness of SELinux (Security Enhanced Linux). Afterall, this is Linux right? It's secure enough.</p>
+            <p>Many used to wonder at the usefulness of SELinux (Security Enhanced Linux). After all, this is Linux right? It's secure enough.</p>
             <p>That might be true, but SELinux is still extremely useful (and even Debian is now <a href="http://wiki.debian.org/SELinux">busy implementing SELinux</a>).</p>
             <p>SELinux works by protecting your system, even if there is an exploit available in an application which gives users root access. Take Apache for example. In a non-SELinux enabled system, if a user gains root through an exploit in Apache they will have full access to your machine. Not so with SELinux. Even if someone gains root access, there are rules around what Apache can and can't do. For example, these might be restricting
-            it to only read the directory which holds websites. Your system is compromised, but the damage is limited.</p>
+            it to only reading the directory which holds websites. Your system is compromised, but the damage is limited.</p>
             <p>SELinux is not just useful for servers. It's also valuable to your desktop system, especially if you use Adobe's proprietary flash player (which is known to have lots of security holes). When Fedora first implemented SELinux, there were lots of issues because it would block the system from doing what were considered normal tasks. These growing pains are now over, and SELinux rarely gets in the way. Even if it does,
             the graphical tool which pops up will tell you how to change that particular behaviour (if you really want to).</p>
             <p>Of course, at the end of the day you can still turn SELinux off (or just to warning mode). Korora leaves it enabled as it's a great way to add extra security to your system, especially as a major part of our lives are now lived on the Internet.<br>
@@ -97,8 +98,8 @@
             <p>In the last few years we've been solely using Fedora and have been super impressed with its reliability. Things just work, as you would expect them to. No weirdness. Even though Fedora provides major updates to many packages, it's still more reliable than other popular distributions we've used. Perhaps this is due to sticking close to upstream.<br>
             <p><a name="summary" href=""></a></p>
             <h3>Summary</h3>
-            <p>Fedora is truly a great, free operating system. Its core principles are ones that we fully support, but which we recognise might restrict or turn away some users. This is why we chose to re-launch Korora as it is, so that users don't give up on Fedora before they have a chance to love it. We see great potential in Fedora, and great benefit to those who are using it.</p>
-            <p>Thanks to their wonderful <a href="http://fedoraproject.org/wiki/How_to_create_and_use_a_Live_CD#How_the_livecd-creator_Works">build tools like livecd-creator</a>, we are able to build a powerful operating system that includes all those tweaks and extras that users want.</p>
+            <p>Fedora is truly a great, free operating system. Its core principles are ones that we fully support, but which we recognise might restrict or turn away some users. This is why we chose to re-launch Korora in its new form, so that users don't give up on Fedora before they have a chance to love it. We see great potential in Fedora and great benefit to those who are using it.</p>
+            <p>Thanks to their wonderful <a href="http://fedoraproject.org/wiki/How_to_create_and_use_a_Live_CD#How_the_livecd-creator_Works">build tools like livecd-creator</a>, we are able to create a powerful operating system that includes all the tweaks and extras that users want out of the box.</p>
           </div>
         </div>
       </div>

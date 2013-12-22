@@ -23,7 +23,7 @@ def somefunc(param1='', param2=0):
 ```
 </pre>
 <p>Fenced code blocks will also automatically be highlighted via highlight.js</p>
-<p>To force the langauage selection for highlighting you can specify the language immediately after the first fence.</p>
+<p>To force the language selection for highlighting you can specify it immediately after the first fence.</p>
 <pre>```python
 @requires_authorization
 def somefunc(param1='', param2=0):

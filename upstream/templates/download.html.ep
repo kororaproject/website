@@ -27,7 +27,7 @@
         <div ng-hide="pageLoaded">
           <p>Listed below are all supported versions of the Korora Linux operating system.</p>
           <p>It's everything you need to try out Korora &mdash; you don't have to erase anything on your current system and it won't put your files at risk.</p>
-          <p>Simply take Korora for a test drive on a DVD or USB stick and if you like what you see, you can install Korora directly to your hard drive straight from the Live Media desktop.</p>
+          <p>Simply take Korora for a test drive on a DVD or USB stick and if you like what you see, you can install Korora directly to your hard drive straight from the live desktop.</p>
           <p>The minimum installation requirements for Korora are:</p>
           <ul class="fa-ul">
             <li><i class="fa-li fa fa-check-square-o"></i>32-bit Intel-compatible PC</li>
@@ -65,7 +65,7 @@
             <h4>Released: <span>{{version.released}}</span></h4>
             <p>This is {{getStabilityString()}} of the Korora Linux operating system.</p>
             <p>It's everything you need to try out Korora &mdash; you don't have to erase anything on your current system and it won't put your files at risk.</p>
-            <p>Simply take Korora for a test drive on a DVD or USB stick and if you like what you see, you can install Korora directly to your hard drive straight from the Live Media desktop.</p>
+            <p>Simply take Korora for a test drive on a DVD or USB stick and if you like what you see, you can install Korora directly to your hard drive straight from the live desktop.</p>
             <p>The minimum installation requirements for Korora are:</p>
             <ul class="fa-ul">
               <li><i class="fa-li fa fa-check-square-o"></i>32-bit Intel-compatible PC</li>
@@ -129,20 +129,17 @@
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <p>Korora comes in a <a href="<%= url_for_path(-1, 'discover') %>">few different versions</a> and is available for download <a href="https://sourceforge.net/projects/kororaproject/files/">via direct mirror</a> (thanks to SourceForge). It includes all system updates available at the time of release.</p>
             <h2>Try it out!</h2>
-            <p>Burn the <a href="http://docs.fedoraproject.org/en-US/Fedora/19/html/Installation_Guide/sn-making-media.html#sn-making-disc-media">ISO image to disk</a> (CD/DVD), turn it into a <a href="http://docs.fedoraproject.org/en-US/Fedora/19/html/Installation_Guide/Making_USB_Media.html">Live USB</a>, or just kick it off inside a virtual machine.  If you're already running a Linux distro, you can easily turn the ISO into a bootable USB stick with the <em>dd</em> command.</p>
-            <p>Using the example below, replace the path to the ISO with a real one and change the device (sdX) to your 2GB+ USB stick device (not a partition on it).</p>
+            <p>Burn the <a href="http://docs.fedoraproject.org/en-US/Fedora/20/html/Installation_Guide/sn-making-media.html#sn-making-disc-media">ISO image to a DVD disk</a>, turn it into a <a href="http://docs.fedoraproject.org/en-US/Fedora/20/html/Installation_Guide/Making_USB_Media.html">Live USB</a>, or just kick it off inside a virtual machine. If you're already running a Linux distro, you can easily turn the ISO into a bootable USB stick with the <em>dd</em> command.</p>
+            <p>Using the example below, replace the path to the ISO with the location you downloaded it to (where we've used "/path/to/korora.iso") and change the device (where we've used "sdX") to be your 2GB+ USB stick device (<em>not a partition</em> on it which would be followed by a number, like sdX1). You can usually find out your USB stick device by running the <em>dmesg</em> command after plugging it in.</p>
             <div class="callout callout-danger">
-              <p>Note that this action will wipe the entire contents of the memory stick! Ensure you back up anything you want to keep on it.</p>
+              <p>Note that this action will wipe the entire contents of the memory stick! Ensure you back up anything you want to keep on it and don't specify the wrong device.</p>
             </div>
             <pre><code class="bash">$ sudo dd if=/path/to/korora.iso of=/dev/sdX bs=4M &amp;&amp; sync</code></pre>
             <p>Make sure that the drive has finished writing before you unplug it!</p>
-            <h2>Known Issues</h2>
-            <p>The following is a list of known issues with this release.</p>
-            <ul>
-              <li>Installer will crash if Live CD/DVD is using swap from system drive - reboot the Live CD/DVD and try to install again.</li>
-            </ul>
+            <div class="callout callout-danger">
+              <p>We highly recommend that you test the media on your first boot by selecting the <em>Test this media and boot Korora</em> option from the <em>Troubleshooting</em> menu. This will help to catch any problems due to corrupt download or burn, before they happen.</p>
+            </div>
             <h2>Source</h2>
             <p>Feel free to grab the source that was used to build Korora. All the source for:</p>
             <ul>
