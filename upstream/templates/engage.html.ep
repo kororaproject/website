@@ -25,6 +25,7 @@
           </div>
           <div class="col-sm-12">
             <p>Engage is your portal to the entire Korora Community. From here you can search through the available questions, problems, ideas and thanks that other members have posted. Alternatively, submit your own and let the community help you.</p>
+            <p> Ensure you have read the <a href="" data-toggle="modal" data-target="#modalEngageGuidelines"> Engage Guidelines</a> before posting.</p>
           </div>
         </div>
         <div class="hr"></div>
@@ -206,6 +207,23 @@
 
   <!-- MODALS -->
   %= include 'authenticate.inc'
+
+  <div class="modal fade" id="modalEngageGuidelines" tabindex="-1" role="dialog" aria-labelledby="modalEngageGuidelinesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-responsive">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="modalEngageGuidelinesLabel">Engage Guidelines</h4>
+        </div>
+        <div class="modal-body">
+          %= include 'engage-guidelines.inc'
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 
   <!-- SCRIPTS -->
   %= include 'scripts.inc'

@@ -170,7 +170,7 @@ sub register {
     $size   //= 32;
     $class  //= '';
 
-    return '<img src="http://www.gravatar.com/avatar/' . md5_sum( $user->email // '' ) . '.jpg?s=' . $size . '&d=retro' .  '" class="' . $class . '"></img>';
+    return '<img src="//www.gravatar.com/avatar/' . md5_sum( $user->email // '' ) . '.jpg?s=' . $size . '&d=retro' .  '" class="' . $class . '"></img>';
   });
 
   $app->helper(post_gravatar => sub {
@@ -181,7 +181,7 @@ sub register {
     $size   //= 32;
     $class  //= '';
 
-    return '<img src="http://www.gravatar.com/avatar/' . md5_sum( $post->author_id->email // '' ) . '.jpg?s=' . $size . '&d=retro' .  '" class="' . $class . '"></img>';
+    return '<img src="//www.gravatar.com/avatar/' . md5_sum( $post->author_id->email // '' ) . '.jpg?s=' . $size . '&d=retro' .  '" class="' . $class . '"></img>';
   });
 
   $app->helper(pluralise => sub {
