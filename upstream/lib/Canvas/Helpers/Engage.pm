@@ -166,6 +166,11 @@ sub register {
     }
     else {
       $url .= '/reply/' . $post->id;
+
+      if( $self->auth_user && $self->auth_user->is_active_account ) {
+        # add quote button
+        push @caps, sprintf '<li><a id="quote-%d" href="" class="text-left"><i class="fa fa-fwl fa-quote-left"></i> Quote</a></li>', $post->id;
+      }
     }
 
     if( $self->engage_post_can_accept( $post ) ) {
