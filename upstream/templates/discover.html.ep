@@ -77,7 +77,7 @@
           <div class="col-sm-12">
             <p>Each desktop version is similarly focused, being aimed at making Linux easier to use and pre-configuring the system for end users. As such, they include:</p>
             <ul class="fa-ul">
-              <li><i class="fa fa-li fa-check-square-o"></i>Tweaked desktops (enabled GNOME extensions and desktop, cleaned KDE menus, desktop cache files under ramfs, alerts when commands complete and much more..)</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>Tweaked desktops with custom extensions and configuration</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Third party repositories such as Adobe Flash, Dropbox, Google Chrome, RPMFusion<a href="#footnote"><sup>1</sup></a>, VirtualBox and more</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Firefox as the default web browser</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Firefox extensions included (Adblock Plus, DownThemAll, Flashblock, Xclear)</li>
