@@ -214,19 +214,18 @@ sub engage_post_add_post {
 
   # ensure it's a valid type
   unless( grep { $_ eq $type } qw(idea problem question thank) ) {
-    $self->flash( page_errors => 'Your title lacks a little description. Pleast use at least least 16 characters.' );
     return $self->redirect_to('/support/engage')
   }
 
   # ensure we have some sane title (at least 16 characters)
-  unless( length $title > 16 ) {
+  unless( length $title >= 16 ) {
     $self->flash( page_errors => 'Your title lacks a little description. Pleast use at least least 16 characters.' );
     return $self->redirect_to( 'supportengagetypeadd', type => $type );
   }
 
-  # ensure we have some sane content (at least 32 characters)
-  unless( length $content > 32 ) {
-    $self->flash( page_errors => 'Your content lacks a little description. Pleast use at least least 32 characters to convey something meaningful.' );
+  # ensure we have some sane content (at least 16 characters)
+  unless( length $content >= 16 ) {
+    $self->flash( page_errors => 'Your content lacks a little description. Pleast use at least least 16 characters to convey something meaningful.' );
     return $self->redirect_to( 'supportengagetypeadd', type => $type );
   }
 
@@ -523,10 +522,10 @@ sub engage_reply_post {
   my $content = $self->param('content') // '';
 
   # ensure we have content
-  unless( length( trim $content ) > 32 ) {
+  unless( length( trim $content ) >= 16 ) {
     $self->flash( content => $content );
 
-    $self->flash( page_errors => 'Your reply lacks a little description. Pleast use at least least 32 characters to convey something meaningful.' );
+    $self->flash( page_errors => 'Your reply lacks a little description. Pleast use at least least 16 characters to convey something meaningful.' );
     return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
   }
 
@@ -674,9 +673,9 @@ sub engage_reply_edit_post {
 
 
   # ensure edits maintain some context
-  unless( length( trim $content ) > 32 ) {
+  unless( length( trim $content ) >= 16 ) {
     $self->flash( content => $content,);
-    $self->flash( page_errors => 'Your editted reply lacks a little description. Pleast use at least least 32 characters to convey something meaningful.' );
+    $self->flash( page_errors => 'Your editted reply lacks a little description. Pleast use at least least 16 characters to convey something meaningful.' );
     return $self->redirect_to( $self->url_with('current') );
   }
 
