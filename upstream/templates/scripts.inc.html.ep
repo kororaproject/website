@@ -11,7 +11,7 @@
 
 <script>
   $(document).ready( function() {
-    // configure korobar
+    /* configure korobar */
     var fixed   = true;
     var korobar = $('#korobar');
     var page    = $('.page-container');
@@ -33,10 +33,10 @@
         fixed = false;
       }
 
-      // from page-content minimum height to consume immediate window
+      /* frob page-content minimum height to consume immediate window */
       $('.page-content').css('min-height', ( $(window).height() - 64 )  + 'px');
 
-      // frob page-container minimum height to at least the footer top
+      /* frob page-container minimum height to at least the footer top */
       page.css({
         'min-height': ($(window).height()-footer.outerHeight()) + 'px',
         'margin-bottom': footer.outerHeight() + 'px'
@@ -45,7 +45,7 @@
 
     resizeHelper();
 
-    // pin korobar to top when it passes
+    /* pin korobar to top when it passes */
     $(window).on('scroll', function() {
       if( !fixed && (korobar.offset().top - $(window).scrollTop() <= 0) ) {
         korobar.css({ position: 'fixed', top: 0, });
@@ -59,7 +59,19 @@
 
     $(window).on('resize', resizeHelper);
 
-    // initialise highlight blocks
+    /* smooth scroll targets */
+    $('a[href*=#]:not([href=#])').click(function() {
+      if( location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') || location.hostname == this.hostname ) {
+        var target = $(this.hash);
+        target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+        if( target.length ) {
+          $('html,body').animate({ scrollTop: target.offset().top - korobar.height() - 16 }, 1000);
+          return false;
+        }
+      }
+    });
+
+    /* initialise highlight blocks */
     hljs.initHighlightingOnLoad();
   });
 </script>
