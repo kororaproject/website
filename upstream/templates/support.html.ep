@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="canvas">
 <head>
-  %= include 'header.inc', title => 'KororaProject'
+  %= include 'header.inc', title => 'Korora Project'
 </head>
 <body>
   <div class="page-container">
@@ -32,9 +32,9 @@
             <p>The core development team plus a few lurkers can usually be found on our IRC channel, #korora on the chat.freenode.net servers.</p>
 
             <h2>Social</h2>
-            <p>We are also ready and waiting on <a href="https://plus.google.com/+KororaProjectOrg">Google+</a></li>, <a href="http://facebook.com/kororaproject">Facebook</a></li>, <a href="http://twitter.com/#!/kororaproject">Twitter</a> and <a href="http://identi.ca/kororaproject">Identi.ca</a></p>
+            <p>We are also ready and waiting on <a href="https://plus.google.com/communities/110597892180797592370">Google+</a></li>, <a href="http://facebook.com/kororaproject">Facebook</a></li>, <a href="http://twitter.com/#!/kororaproject">Twitter</a> and <a href="http://identi.ca/kororaproject">Identi.ca</a></p>
             <div class="callout callout-info">
-              <p>If you're after assistance specifically for Fedora, perhaps try the <a href="https://fedoraforum.org">community forums</a>, <a href="https://admin.fedoraproject.org/mailman/listinfo/users">official user mailing list</a>, or the #fedora IRC channel on chat.freenode.net.</p>
+              <p>If you're after assistance specifically for Fedora, perhaps try the <a href="http://www.forums.fedoraforum.org/">community forums</a>, <a href="https://admin.fedoraproject.org/mailman/listinfo/users">official user mailing list</a>, or the #fedora IRC channel on chat.freenode.net.</p>
             </div>
 
           </div>

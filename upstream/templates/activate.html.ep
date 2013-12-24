@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="canvas">
 <head>
-  %= include 'header.inc', title => 'KororaProject'
+  %= include 'header.inc', title => 'Korora Project'
 </head>
 <body>
   <div class="page-container">

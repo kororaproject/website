@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="canvas">
 <head>
-  %= include 'header.inc', title => 'KororaProject'
+  %= include 'header.inc', title => 'Korora Project'
 </head>
 <body>
   %= include 'noscript.inc'
@@ -36,7 +36,7 @@
             <p>Korora is a Fedora Remix, meaning it ships packages from the default Fedora repositories but also a number of other packages (often ones that Fedora cannot ship directly). We also make changes to the default system, whereas Fedora generally sticks to upstream. For new users, Fedora can be tricky because it doesn't include many of the extras that users often need, things like media codecs and some proprietary software. This is
             one area where Korora can help.</p>
             <p>Ultimately, we want people just like you to become useful members of the Fedora community and we hope that trying Korora will be a catalyst for this.</p>
-            <p>For a detailed look at how Korora differs to Fedora, see <a href="about/whats-inside" data-toggle="tab">What's Inside</a>.</p>
+            <p>For a detailed look at how Korora differs to Fedora, see <a href="about/whats-inside">What's Inside</a>.</p>
           </div>
         </div>
         <div class="row">

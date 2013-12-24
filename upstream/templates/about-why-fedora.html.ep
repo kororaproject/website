@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="canvas">
 <head>
-  %= include 'header.inc', title => 'KororaProject'
+  %= include 'header.inc', title => 'Korora Project'
 </head>
 <body>
   %= include 'noscript.inc'
@@ -60,7 +60,7 @@
             <h3>Innovation</h3>
             <p>With every new release, Fedora is often leading the charge to implement new free software technologies. In fact, Fedora's primary sponsor Red Hat is responsible for <a href="http://fedoraproject.org/wiki/RedHatContributions#Desktop_Software">some great desktop enhancements</a>, including
             AIGLX (Accelerated Indirect GLX), D-Bus, DeviceKit, HAL, NetworkManager, Ogg Theora, and PolicyKit. Even the <a href="http://wayland.freedesktop.org/">Wayland display server</a> was started by Kristian Høgsberg when he was working for Red Hat (he's now at Intel).</p>
-            <p>Not to mention that out of all the vendors, Red Hat <a href="http://www.press.redhat.com/2008/04/08/red-hat-leads-open-source-contributions-to-kernel/">contributes the most to the Linux kernel</a> and to <a href="http://www.phoronix.com/scan.php?page=article&amp;item=x_server_contributors&amp;num=1">X.Org</a>. Red Hat is also the <a href="http://blogs.gnome.org/bolsh/2010/07/28/gnome-census/">biggest contributor to GNOME</a> (including GNOME Shell) and they also provide infrastructure, hosting and bandwidth for
+            <p>Not to mention that out of all the vendors, Red Hat <a href="http://www.redhat.com/about/news/archive/2008/4/red-hat-leads-open-source-contributions-to-kernel">contributes the most to the Linux kernel</a> and to <a href="http://www.phoronix.com/scan.php?page=article&amp;item=x_server_contributors&amp;num=1">X.Org</a>. Red Hat is also the <a href="http://blogs.gnome.org/bolsh/2010/07/28/gnome-census/">biggest contributor to GNOME</a> (including GNOME Shell) and they also provide infrastructure, hosting and bandwidth for
             the project.</p>
             <p>Kudos.<br>
             <p><a name="upstream" href=""></a></p>
