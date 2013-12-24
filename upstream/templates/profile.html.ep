@@ -16,6 +16,10 @@
       <div id="page-discover" class="container">
         <div class="row">
           <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li class="active">Profile</li>
+            </ol>
             <h1 class="text-center"><strong>Profile.</strong> Your Korora</h1>
           </div>
           <div class="col-sm-12">
