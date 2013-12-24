@@ -269,17 +269,24 @@ function RegisterController($scope, $http) {
 
   $scope.usernameIsValid = function() {
     if( $scope.username.length > 0 ) {
-      if( $scope.usernames.hasOwnProperty( $scope.username ) ) {
-        if( $scope.usernames[ $scope.username ] ) {
-          $scope.error.username = '';
-          return true;
+      var re = /^[A-Za-z0-9_]+$/;
+      if( re.test($scope.username) ) {
+        if( $scope.usernames.hasOwnProperty( $scope.username ) ) {
+
+          if( $scope.usernames[ $scope.username ] ) {
+            $scope.error.username = '';
+            return true;
+          }
+          else {
+            $scope.error.username = 'Username is already taken.';
+          }
         }
         else {
-          $scope.error.username = 'Username is already taken.';
+          $scope.error.username = 'Username can\'t be checked.';
         }
       }
       else {
-        $scope.error.username = 'Username can\'t be checked.';
+        $scope.error.username = 'Usernames can only cotain alphanumeric characters and underscores only.';
       }
     }
 
