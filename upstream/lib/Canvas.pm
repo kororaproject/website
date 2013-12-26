@@ -104,6 +104,7 @@ sub startup {
   $self->plugin('Canvas::Helpers');
   $self->plugin('Canvas::Helpers::Engage');
   $self->plugin('Canvas::Helpers::News');
+  $self->plugin('Canvas::Helpers::Profile');
 
   #
   # ROUTES

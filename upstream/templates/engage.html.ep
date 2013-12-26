@@ -208,6 +208,7 @@
   <!-- MODALS -->
   %= include 'authenticate.inc'
 
+  <!-- engage guidelines modal -->
   <div class="modal fade" id="modalEngageGuidelines" tabindex="-1" role="dialog" aria-labelledby="modalEngageGuidelinesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-responsive">
       <div class="modal-content">

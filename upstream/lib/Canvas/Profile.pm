@@ -90,13 +90,20 @@ sub profile_reset_password_post {
 
   # lookup the requested account for activation
   my $u = Canvas::Store::User->search({ username => $user })->first;
-  my $token = $u->metadata('password_reset_token');
 
-  # redirect unless account and activation token prefix/suffix exists
-  return $self->redirect_to( $url ) unless(
-    defined $u &&
-    defined $token
-  );
+  # check for token for if we're not logged on
+  # indicates a "forgot password" invocation
+  my $token;
+
+  unless( $self->profile_can_change_password( $u ) ) {
+    $token = $u->metadata('password_reset_token');
+
+    # redirect unless account and activation token prefix/suffix exists
+    return $self->redirect_to( $url ) unless(
+      defined $u &&
+      defined $token
+    );
+  }
 
   # build the supplied token and fetch the stored token
   my $token_supplied = $self->param('token') // '';
@@ -105,31 +112,33 @@ sub profile_reset_password_post {
   unless( $token eq $token_supplied ) {
     $self->flash( page_errors => 'Your token is invalid.' );
 
-    return $self->redirect_to( $self->url_with('current') );
+    return $self->redirect_to( $self->url_with );
   };
 
   # validate passwords have sufficient length
   if( length $pass < 8 ) {
     $self->flash( page_errors => 'Your password must be at least 8 characters long.');
 
-    return $self->redirect_to( $self->url_with('current') );
+    return $self->redirect_to( $self->url_with );
   }
 
   # validate passwords match
   if( $pass ne $pass_confirm ) {
     $self->flash( page_errors => 'Your passwords don\'t match.' );
 
-    return $self->redirect_to( $self->url_with('current') );
+    return $self->redirect_to( $self->url_with );
   };
 
   # update the password
   $u->password( $u->hash_password( $pass ) );
   $u->update;
 
+  # clear token if it exists
   $u->metadata_clear('password_reset_token');
 
   $self->flash( page_success => 'Your password has been reset.' );
-  $self->redirect_to('/');
+
+  $self->redirect_to( $url );
 }
 
 sub profile_status_post {

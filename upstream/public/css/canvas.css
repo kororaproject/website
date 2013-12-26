@@ -171,8 +171,7 @@ strong {
 }
 
 .subtitle {
-  font-size: 12px;
-  margin: 0 0 16px;
+  margin-top: 0;
 }
 
 blockquote > *:first-child {
@@ -956,6 +955,15 @@ blockquote p {
 
   margin-left: 4px;
   margin-top: 4px;
+}
+
+/*
+** FOOTER
+*/
+
+.profile-subtitle-metadata p {
+  font-size: 12px;
+  line-height: 16px;
 }
 
 /*
