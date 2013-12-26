@@ -147,6 +147,18 @@ sub authenticate_any {
         data    => $message,
       );
 
+      # subscribed "new registration event" notifications
+      $self->notify_users(
+        'user_notify_on_register',
+        'admin@kororaproject.org',
+        'Korora Project - New Prime Registration/Transfer',
+        "The following Prime account has just been registered and converted from the existing WordPress database:\n" .
+        " - username: " . $u->username . "\n" .
+        " - email:    " . $u->email . "\n\n" .
+        "Regards,\n" .
+        "The Korora Team.\n"
+      );
+
       $self->flash( redirect_to => $url );
 
       return $self->redirect_to('/registered');
@@ -243,8 +255,21 @@ sub activate_post {
   if( ($now - $u->updated) > 86400 ) {
     $self->flash( page_errors => 'Activation of this account has been over 24 hours.' );
 
-    $u->metadata_clear('activiation_token');
+    $u->metadata_clear('activation_token');
     $u->delete;
+
+    # subscribed "registration event" notifications
+    $self->notify_users(
+      'user_notify_on_activate',
+      'admin@kororaproject.org',
+      'Korora Project - Prime Activation - Time Expiry',
+      "The following Prime account has exceeded it's activation time limit:\n" .
+      " - username: " . $u->username . "\n" .
+      " - email:    " . $u->email . "\n\n" .
+      "The account has been deleted.\n\n" .
+      "Regards,\n" .
+      "The Korora Team.\n"
+    );
 
     return $self->redirect_to( $url );
   }
@@ -255,6 +280,18 @@ sub activate_post {
   $u->update;
 
   $u->metadata_clear('activation_token');
+
+  # subscribed "registration event" notifications
+  $self->notify_users(
+    'user_notify_on_activate',
+    'admin@kororaproject.org',
+    'Korora Project - Prime Activation - Success',
+    "The following Prime account has successfully been activated:\n" .
+    " - username: " . $u->username . "\n" .
+    " - email:    " . $u->email . "\n\n" .
+    "Regards,\n" .
+    "The Korora Team.\n"
+  );
 
   $self->flash( username => $username );
 
@@ -319,6 +356,18 @@ sub forgot_post {
     from    => 'admin@kororaproject.org',
     subject => 'Korora Project - Prime Re-activation / Lost Password',
     data    => $message,
+  );
+
+  # subscribed "new registration event" notifications
+  $self->notify_users(
+    'user_notify_on_lostpass',
+    'admin@kororaproject.org',
+    'Korora Project - Prime Account - Lost Password',
+    "The following Prime account has just been requested lost password re-activation:\n" .
+    " - username: " . $u->username . "\n" .
+    " - email:    " . $u->email . "\n\n" .
+    "Regards,\n" .
+    "The Korora Team.\n"
   );
 
   $self->flash( page_info => 'An email with further instructions has been sent to: ' . $email );
@@ -434,8 +483,6 @@ sub register_post {
     my $activation_key = substr( $token, 0, 32 );
     my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 32 );
 
-    say Dumper $token;
-
     my $message = "" .
       "G'day,\n\n" .
       "Thank you for registering to be part of our Korora community.\n\n".
@@ -453,6 +500,18 @@ sub register_post {
       subject => 'Korora Project - Prime Registration',
       data    => $message,
     );
+
+    # subscribed "new registration event" notifications
+    $self->notify_users(
+      'user_notify_on_register',
+      'admin@kororaproject.org',
+      'Korora Project - New Prime Registration',
+      "The following Prime account has just been registered:\n" .
+      " - username: " . $u->username . "\n" .
+      " - email:    " . $u->email . "\n\n" .
+      "Regards,\n" .
+      "The Korora Team.\n"
+    );
   }
 
   $self->redirect_to('/registered');
@@ -469,7 +528,5 @@ sub trap {
   # HTML5 mode forwarding based on valid paths
   $self->redirect_to('/');
 };
-
-
 
 1;

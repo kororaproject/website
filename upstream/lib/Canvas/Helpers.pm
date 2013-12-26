@@ -24,7 +24,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 #
 use Data::Dumper;
 use List::MoreUtils qw(any);
-use Mojo::Util qw(md5_sum url_escape);
+use Mojo::Util qw(md5_sum trim url_escape);
 use POSIX qw(floor);
 use Time::Piece;
 
@@ -32,6 +32,12 @@ use Time::Piece;
 # LOCAL INCLUDES
 #
 use Canvas::Util::MultiMarkdown;
+use Canvas::Store::User;
+use Canvas::Store::UserMeta;
+
+#
+# CONSTANTS
+#
 
 use constant DISTANCE_TIME_FORMAT => {
   less_than_x_seconds => {
@@ -290,6 +296,29 @@ sub register {
       else {
         return $self->locale_time('almost_x_years', $distance_in_years + 1);
       }
+    }
+  });
+
+  # notify users on key
+  $app->helper(notify_users => sub {
+    my( $self, $channel, $from, $subject, $message ) = @_;
+
+    return unless length trim $channel;
+
+    # mail all admins with "notify new engage items" checked
+    my @um = Canvas::Store::UserMeta->search({
+      meta_key   => $channel,
+      meta_value => 1,
+    });
+
+    foreach my $_um ( @um ) {
+      # send the message
+      $self->mail(
+        from    => $from,
+        to      => $_um->user_id->email,
+        subject => $subject,
+        data    => $message,
+      );
     }
   });
 }
