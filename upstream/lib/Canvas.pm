@@ -180,6 +180,9 @@ sub startup {
   $r->get('/activated')->to('site#activated');
   $r->post('/forgot')->to('site#forgot_post');
 
+
+  # profile pages
+  $r->get('/profile/admin')->to('profile#profile_admin_get');
   $r->post('/profile/status')->to('profile#profile_status_post');
   $r->get('/profile/:name')->to('profile#profile_get');
   $r->get('/profile/:name/reset')->to('profile#profile_reset_password_get');

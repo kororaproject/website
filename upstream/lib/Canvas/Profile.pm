@@ -26,6 +26,7 @@ use Mojo::Base 'Mojolicious::Controller';
 # PERL INCLUDES
 #
 use Data::Dumper;
+use POSIX qw(ceil);
 
 
 #
@@ -174,5 +175,34 @@ sub profile_status_post {
 
   $self->render( json => $result );
 }
+
+sub profile_admin_get {
+  my $self = shift;
+
+  # only allow authenticated and authorised users
+  return $self->redirect_to('/') unless (
+    $self->profile_user_can_add ||
+    $self->profile_user_can_delete
+  );
+
+  my $pager = Canvas::Store::User->pager(
+    order_by          => 'created DESC',
+    entries_per_page  => 20,
+    current_page      => ( $self->param('page') // 1 ) - 1,
+  );
+
+  my $profiles = {
+    items       => [ $pager->search_where ],
+    item_count  => $pager->total_entries,
+    page_size   => $pager->entries_per_page,
+    page        => $pager->current_page + 1,
+    page_last   => ceil($pager->total_entries / $pager->entries_per_page),
+  };
+
+  $self->stash( profiles => $profiles );
+
+  $self->render('profiles-admin');
+}
+
 
 1;

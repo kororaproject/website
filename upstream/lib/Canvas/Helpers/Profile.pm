@@ -35,6 +35,42 @@ sub register {
 
     return 0;
   });
+
+  $app->helper(profile_user_can_add => sub {
+    my( $self, $user ) = @_;
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    return 1 if $self->auth_user->is_admin;
+
+    return 0;
+  });
+
+  $app->helper(profile_user_can_edit => sub {
+    my( $self, $user ) = @_;
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    return 1 if $self->auth_user->is_admin;
+
+    return 0;
+  });
+
+  $app->helper(profile_user_can_delete => sub {
+    my( $self, $user ) = @_;
+
+    return 0 unless defined $self->auth_user;
+
+    return 0 unless $self->auth_user->is_active_account;
+
+    return 1 if $self->auth_user->is_admin;
+
+    return 0;
+  });
 }
 
 1;
