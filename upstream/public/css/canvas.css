@@ -421,6 +421,23 @@ blockquote p {
 ** LIGHTBOX
 */
 
+.lightbox .modal-dialog {
+  padding: 16px;
+}
+
+.lightbox-close {
+  background-image: url('/img/btn-lightbox-close.png');
+  background-color: transparent;
+  padding: 0;
+  border: 0;
+  width: 38px;
+  height: 38px;
+  position: absolute;
+  right: -16px;
+  top: -16px;
+  z-index: 200;
+}
+
 .lightbox-container {
   position:relative;
 }

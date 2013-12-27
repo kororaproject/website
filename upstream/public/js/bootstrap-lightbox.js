@@ -16,48 +16,56 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       _this = this;
     this.options = $.extend({
       gallery_parent_selector: '*:not(.row)',
-      title: null,
+      title:  null,
       footer: null,
       remote: null,
-      left_arrow_class: '.fa .fa-fw .fa-chevron-left',
-      right_arrow_class: '.fa .fa-fw .fa-chevron-right',
+      left_arrow_class:   '.fa .fa-fw .fa-chevron-left',
+      right_arrow_class:  '.fa .fa-fw .fa-chevron-right',
       directional_arrows: true,
-      onShow: function() {},
-      onShown: function() {},
-      onHide: function() {},
+      onShow:   function() {},
+      onShown:  function() {},
+      onHide:   function() {},
       onHidden: function() {},
       id: false
     }, options || {});
+
     this.$element = $(element);
     content = '';
     this.modal_id = this.options.modal_id ? this.options.modal_id : 'lightbox-' + Math.floor((Math.random() * 1000) + 1);
+
     header = '<div class="modal-header"' + (this.options.title ? '' : ' style="display:none"') + '><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">' + this.options.title + '</h4></div>';
     footer = '<div class="modal-footer"' + (this.options.footer ? '' : ' style="display:none"') + '>' + this.options.footer + '</div>';
-    $(document.body).append('<div id="' + this.modal_id + '" class="lightbox modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content">' + header + '<div class="modal-body"><div class="lightbox-container"><div></div></div></div>' + footer + '</div></div></div>');
+    $(document.body).append('<div id="' + this.modal_id + '" class="lightbox modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content">' + header + '<div class="modal-body"><button type="button" class="lightbox-close" data-dismiss="modal" aria-hidden="true"></button><div class="lightbox-container"><div></div></div></div>' + footer + '</div></div></div>');
+
     this.modal = $('#' + this.modal_id);
     this.modal_body = this.modal.find('.modal-body').first();
     this.lightbox_container = this.modal_body.find('.lightbox-container').first();
     this.lightbox_body = this.lightbox_container.find('> div:first-child').first();
     this.modal_arrows = null;
+
+    // TODO: include modal
     this.padding = {
-      left: parseFloat(this.modal_body.css('padding-left'), 10),
-      right: parseFloat(this.modal_body.css('padding-right'), 10),
+      left:   parseFloat(this.modal_body.css('padding-left'),   10),
+      right:  parseFloat(this.modal_body.css('padding-right'),  10),
       bottom: parseFloat(this.modal_body.css('padding-bottom'), 10),
-      top: parseFloat(this.modal_body.css('padding-top'), 10)
+      top:    parseFloat(this.modal_body.css('padding-top'),    10)
     };
-    if (!this.options.remote) {
+
+    if( !this.options.remote ) {
       this.error('No remote target given');
-    } else {
+    }
+    else {
       this.gallery = this.$element.data('gallery');
-      if (this.gallery) {
-        if (this.options.gallery_parent_selector === 'document.body' || this.options.gallery_parent_selector === '') {
+      if( this.gallery ) {
+        if( this.options.gallery_parent_selector === 'document.body' || this.options.gallery_parent_selector === '' ) {
           this.gallery_items = $(document.body).find('*[data-toggle="lightbox"][data-gallery="' + this.gallery + '"]');
-        } else {
+        }
+        else {
           this.gallery_items = this.$element.parents(this.options.gallery_parent_selector).first().find('*[data-toggle="lightbox"][data-gallery="' + this.gallery + '"]');
         }
         this.gallery_index = this.gallery_items.index(this.$element);
         $(document).on('keydown.lightbox', this.navigate.bind(this));
-        if (this.options.directional_arrows) {
+        if( this.options.directional_arrows ) {
           this.lightbox_container.prepend('<div class="lightbox-nav-overlay"><a href="#" class="' + this.strip_stops(this.options.left_arrow_class) + '"></a><a href="#" class="' + this.strip_stops(this.options.right_arrow_class) + '"></a></div>');
           this.modal_arrows = this.lightbox_container.find('div.lightbox-nav-overlay').first();
           this.lightbox_container.find('a' + this.strip_spaces(this.options.left_arrow_class)).on('click', function(event) {
@@ -77,17 +85,18 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       }
     }
     this.modal.on('show.bs.modal', this.options.onShow.bind(this)).on('shown.bs.modal', function() {
-      if (_this.modal_arrows) {
+      if( _this.modal_arrows ) {
         _this.resize(_this.lightbox_body.width());
       }
       return _this.options.onShown.call(_this);
     }).on('hide.bs.modal', this.options.onHide.bind(this)).on('hidden.bs.modal', function() {
-      if (_this.gallery) {
+      if( _this.gallery ) {
         $(document).off('keydown.lightbox');
       }
       _this.modal.remove();
       return _this.options.onHidden.call(_this);
     }).modal('show', options);
+
     return this.modal;
   };
 
@@ -115,10 +124,11 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
     },
     navigate: function(event) {
       event = event || window.event;
-      if (event.keyCode === 39 || event.keyCode === 37) {
-        if (event.keyCode === 39) {
+      if( event.keyCode === 39 || event.keyCode === 37 ) {
+        if( event.keyCode === 39 ) {
           return this.navigate_right();
-        } else if (event.keyCode === 37) {
+        }
+        else if( event.keyCode === 37 ) {
           return this.navigate_left();
         }
       }
@@ -127,7 +137,8 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       var src, youtube;
       if (this.gallery_index === 0) {
         this.gallery_index = this.gallery_items.length - 1;
-      } else {
+      }
+      else {
         this.gallery_index--;
       }
       this.$element = $(this.gallery_items.get(this.gallery_index));
@@ -135,7 +146,8 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       src = this.$element.attr('data-source') || this.$element.attr('href');
       if (this.isImage(src)) {
         return this.preloadImage(src, true);
-      } else if (youtube = this.getYoutubeId(src)) {
+      }
+      else if (youtube = this.getYoutubeId(src)) {
         return this.showYoutubeVideo(youtube);
       }
     },
@@ -151,7 +163,8 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       this.updateTitleAndFooter();
       if (this.isImage(src)) {
         this.preloadImage(src, true);
-      } else if (youtube = this.getYoutubeId(src)) {
+      }
+      else if (youtube = this.getYoutubeId(src)) {
         this.showYoutubeVideo(youtube);
       }
       if (this.gallery_index + 1 < this.gallery_items.length) {
@@ -219,11 +232,11 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       img.src = src;
       return img;
     },
-    resize: function(width) {
+    resize: function( width ) {
       var width_inc_padding;
       width_inc_padding = width + this.padding.left + this.padding.right;
       this.modal.find('.modal-content').css('width', width_inc_padding);
-      this.modal.find('.modal-dialog').css('width', width_inc_padding + 20);
+      this.modal.find('.modal-dialog').css('width', width_inc_padding + 32);
       this.lightbox_container.find('a').css('padding-top', function() {
         return $(this).parent().height() / 2;
       });
@@ -233,8 +246,8 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       var w, width;
       w = $(window);
       width = max_width;
-      if ((max_width + (this.padding.left + this.padding.right + 20)) > w.width()) {
-        width = w.width() - (this.padding.left + this.padding.right + 20);
+      if( (max_width + (this.padding.left + this.padding.right + 72)) > w.width() ) {
+        width = w.width() - (this.padding.left + this.padding.right + 72);
       }
       return width;
     },
@@ -263,11 +276,6 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
     return $this.Lightbox({
       remote: $this.attr('data-source') || $this.attr('href'),
       gallery_parent_selector: $this.attr('data-parent'),
-      onShown: function() {
-        if (window.console) {
-          return console.log('Checking our the events huh?');
-        }
-      }
     }).one('hide', function() {
       return $this.is(':visible') && $this.focus();
     });
