@@ -1,7 +1,7 @@
 <title><%= title %></title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4/styles/github.min.css" rel="stylesheet" media="screen">
 <link href="/css/canvas.css" rel="stylesheet" media="screen">
