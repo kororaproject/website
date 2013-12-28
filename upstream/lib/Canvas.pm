@@ -131,6 +131,7 @@ sub startup {
   $r->get('/support')->to('support#index');
   $r->get('/support/irc')->to('support#irc');
   $r->get('/support/howto')->to('support#howto');
+  $r->get('/support/contribute')->to('support#contribute_get');
 
   $r->get('/support/forums')->to('forum#forums');
   $r->get('/forum/:name')->to('forum#forum_name');

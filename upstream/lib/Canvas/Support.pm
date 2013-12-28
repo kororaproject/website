@@ -49,5 +49,11 @@ sub howto {
   $self->render('support-howto');
 }
 
+sub contribute_get {
+  my $self = shift;
+
+  $self->render('support-contribute');
+}
+
 
 1;

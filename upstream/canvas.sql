@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS canvas_vote;
 DROP TABLE IF EXISTS canvas_tag;
 DROP TABLE IF EXISTS canvas_post_tag;
 
+DROP TABLE IF EXISTS canvas_donation;
 
 
 CREATE TABLE canvas_user (
@@ -413,5 +414,21 @@ CREATE TABLE canvas_postview (
   user_agent    VARCHAR(256),
   created       DATETIME      NOT NULL
 );
+
+
+CREATE TABLE canvas_donation (
+  id            BIGINT(20)    NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  name          VARCHAR(64)             DEFAULT  NULL,
+  email         VARCHAR(128)            DEFAULT  NULL,
+
+  amount        VARCHAR(16)             DEFAULT  NULL,
+  currency      VARCHAR(8)              DEFAULT  NULL,
+  amount_real   vARCHAR(16)             DEFAULT  NULL,
+
+  paypal_raw    TEXT                    DEFAULT  NULL,
+
+  created       DATETIME      NOT NULL
+);
+
 
 COMMIT;

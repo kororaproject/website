@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'support'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li><a href="/support">Support</a></li>
+              <li class="active">Contribute</li>
+            </ol>
+            <h1 class="text-center"><strong>Contribute.</strong> Securing our Future</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="row contribute-banner">
+              <div class="col-sm-6">
+                <div class="text-center">
+                  <button type="button" class="btn btn-success btn-lg">I want to Donate</button>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="text-center">
+                  <button type="button" class="btn btn-success btn-lg">I want to Sponsor</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Why donate or sponsor?</h2>
+            <p>Korora is free of cost and doesn't generate any direct income. Financially supported by it's core developers, Korora's ambition through dedicated sponsorship and donations is to continue to build on its unique offering and introduction of new services.</p>
+            <h2>How is the money used?</h2>
+            <p>The money is used to finance the needs of the distribution, to pay for hosting, to purchase equipment and to fund the work of the people behind it.</p>
+            <h2>How much should you give?</h2>
+            <p>The donations we receive range from a single dollar to a couple of hundreds. The important thing for people is to give something, and for us it's to generate the income that will let us work and succeed on this project, month after month. If you want to help, and if you can do so, please make a donation to the project and encourage others to do so.</p>
+            <h2>What is the long-term funding plan of Korora?</h2>
+            <p>We believe Korora can gather the momentum and the community necessary to fund itself entirely through donations, sponsoring and advertisement without the need to engage in commercial activities and without focusing our attention on anything else than improving the distribution itself. Our goal is to make Korora our livelihood, a full-time paid job to work soley on Korora and not just a side project to be tinkered with in our spare time.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>

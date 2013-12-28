@@ -44,6 +44,7 @@
             <li class="hide"><a href="/support/forums">Forums</a></li>
             <li><a href="/support/engage">Engage</a></li>
             <li><a href="/support/documentation">Documentation</a></li>
+            <li><a href="/support/contribute">Contribute</a></li>
           </ul>
         </li>
         <li class="<%= 'active' if ( $active eq 'news' ) %>"><a href="/news">News</a></li>
