@@ -754,7 +754,7 @@ blockquote p {
 
 .page-content {
   min-height: 100%;
-  max-width: 1000px;
+  max-width: 1170px;
 
   margin: 0 auto;
   padding-top: 64px; /* match bottom padding of page-container */
