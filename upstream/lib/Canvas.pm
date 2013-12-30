@@ -43,6 +43,7 @@ use Canvas::Helpers;
 use Canvas::Helpers::Engage;
 use Canvas::Site;
 use Canvas::Store::User;
+use Canvas::Util::PayPal::API;
 
 #
 # CONSTANTS
@@ -59,6 +60,11 @@ sub startup {
   my $self = shift;
 
   $self->secret('canvas');
+
+  my $pp = Canvas::Util::PayPal::API->new(
+  );
+
+  $pp->dump;
 
   #
   # AUTHENTICATION

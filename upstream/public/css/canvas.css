@@ -97,6 +97,7 @@ body.modal-open,
 */
 body {
   font-family:'Open Sans';
+  font-weight: 300;
   font-size: 16px;
   line-height: 24px;
 }
@@ -155,6 +156,17 @@ blockquote.title p {
   font-size: 16px;
 }
 
+p.no-space {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.center {
+  text-align: center;
+  vertical-align: middle;
+}
+
+b,
 strong {
   font-weight: 600;
 }
@@ -183,6 +195,42 @@ blockquote p {
 }
 
 /*
+** BUTTONS
+*/
+
+.btn {
+  border-radius: 2px;
+}
+
+.btn-dark {
+  color: #fff;
+  background-color: #202020;
+  border-color: #404040;
+}
+
+.btn-dark:hover,
+.btn-dark:focus,
+.btn-dark:active,
+.btn-dark.active,
+.open .dropdown-toggle.btn-dark {
+  color: #fff;
+  background-color: #171717;
+  border-color: #373737;
+}
+
+.btn-showcase {
+  padding: 0 8px;
+}
+
+.btn-showcase h4 {
+  text-align: center;
+}
+
+.btn-showcase .btn {
+  line-height: 32px;
+}
+
+/*
 ** LISTS
 */
 .fa-ul > li {
@@ -192,7 +240,6 @@ blockquote p {
 .fa-li {
   top: .36em;
 }
-
 
 /*
 ** HIGHLIGHTS
@@ -222,7 +269,6 @@ blockquote p {
 
 .modal-footer {
 }
-
 
 .modal-tab-content {
   padding: 16px 0 0 0 !important;
@@ -256,7 +302,7 @@ blockquote p {
 }
 
 .kp-logo span {
-  color: #777;
+  color: #bbb;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, .3);
 }
 
@@ -577,6 +623,11 @@ blockquote p {
 ** KOROBAR / NAVIGATION BAR
 */
 
+#korobar {
+  position: absolute;
+  width: 100%;
+}
+
 .navbar {
   border-radius: 0;
   z-index: 1039;
@@ -585,22 +636,6 @@ blockquote p {
 .navbar-container {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.nav-tab-danger>a:hover {
-  background-color: #fdf7f7;
-  border-color: #eed3d7;
-  color: #b94a48;
-}
-.nav-tab-warning>a:hover {
-  background-color: #faf8f0;
-  border-color: #faebcc;
-  color: #c09853;
-}
-.nav-tab-info>a:hover {
-  background-color: #f4f8fa;
-  border-color: #bce8f1;
-  color: #3a87ad;
 }
 
 .nav-tabs>li.active>a,
@@ -978,7 +1013,7 @@ blockquote p {
 ** SUPPORT PAGES
 */
 .contribute-banner {
-  margin: 32px 0;
+  margin: 16px 0;
 }
 
 .contribute-banner button {
@@ -987,7 +1022,7 @@ blockquote p {
 }
 
 /*
-** FOOTER
+** PROFILE PAGES
 */
 
 .profile-subtitle-metadata p {
