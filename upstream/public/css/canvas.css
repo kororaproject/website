@@ -1070,7 +1070,7 @@ footer a:visited {
 }
 
 .alert-footnote a {
-  font-style; italic;
+  font-style: italic;
 }
 
 /*
@@ -1287,5 +1287,4 @@ h4.step {
   margin-left: 2px;
   font-size: 10px;
   cursor: pointer;
-  cursor: hand;
 }
