@@ -27,7 +27,7 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="text-center">
-              <img class="img-responsive img-showcase" src="https://kororaproject.org/img/screenshots/korora-kde-desktop-apps-small.jpg" alt="KDE Desktop">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-kde-desktop-apps-small.jpg" alt="KDE Desktop">
             </div>
           </div>
         </div>
@@ -41,22 +41,22 @@
         <div class="row">
           <div class="col-sm-3">
             <div class="center">
-              <img class="img-responsive img-showcase" src="https://kororaproject.org/img/screenshots/korora-kde-menu.jpg" alt="KDE Desktop">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-kde-menu.jpg" alt="KDE Desktop">
             </div>
           </div>
           <div class="col-sm-3">
             <div class="center">
-              <img class="img-responsive img-showcase" src="https://kororaproject.org/img/screenshots/korora-kde-notification-menu.jpg" alt="KDE Notifications">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-kde-notification-menu.jpg" alt="KDE Notifications">
             </div>
           </div>
           <div class="col-sm-3">
             <div class="center">
-              <img class="img-responsive img-showcase" src="https://kororaproject.org/img/screenshots/korora-kde-activities-menu.jpg" alt="KDE Activities">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-kde-activities-menu.jpg" alt="KDE Activities">
             </div>
           </div>
           <div class="col-sm-3">
             <div class="center">
-              <img class="img-responsive img-showcase" src="https://kororaproject.org/img/screenshots/korora-kde-search-menu.jpg" alt="KDE Search">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-kde-search-menu.jpg" alt="KDE Search">
             </div>
           </div>
         </div>
@@ -64,7 +64,7 @@
         <div class="row">
           <div class="col-sm-6">
             <div class="center">
-              <img class="img-responsive img-showcase" src="https://kororaproject.org/img/screenshots/korora-kde-overview-small.jpg" alt="KDE Overview">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-kde-overview-small.jpg" alt="KDE Overview">
             </div>
           </div>
           <div class="col-sm-6">
@@ -82,7 +82,7 @@
           </div>
           <div class="col-sm-6">
             <div class="center">
-              <img class="img-responsive img-showcase" src="https://kororaproject.org/img/screenshots/korora-kde-apps-small.jpg" alt="KDE Applications">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-kde-apps-small.jpg" alt="KDE Applications">
             </div>
           </div>
         </div>
@@ -90,7 +90,7 @@
         <div class="row">
           <div class="col-sm-6">
             <div class="center">
-              <img class="img-responsive img-showcase" src="https://kororaproject.org/img/screenshots/korora-kde-desktop-netbook-small.jpg" alt="KDE Netbook">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-kde-desktop-netbook-small.jpg" alt="KDE Netbook">
             </div>
           </div>
           <div class="col-sm-6">
