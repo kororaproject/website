@@ -30,6 +30,14 @@
         </div>
         <div class="row">
           <div class="col-sm-4">
+            <h3><a href="/discover/cinnamon">Cinnamon</a></h3>
+            <div class="text-center">
+              <a href="/img/screenshots/korora-cinnamon-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
+                <img src="/img/screenshots/korora-cinnamon-desktop-thumb.jpg" class="img-responsive">
+              </a>
+            </div>
+          </div>
+          <div class="col-sm-4">
             <h3><a href="/discover/gnome">GNOME</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-gnome-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
@@ -42,14 +50,6 @@
             <div class="text-center">
               <a href="/img/screenshots/korora-kde-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
                 <img src="/img/screenshots/korora-kde-desktop-thumb.jpg" class="img-responsive">
-              </a>
-            </div>
-          </div>
-          <div class="col-sm-4">
-            <h3><a href="/discover/cinnamon">Cinnamon</a></h3>
-            <div class="text-center">
-              <a href="/img/screenshots/korora-cinnamon-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
-                <img src="/img/screenshots/korora-cinnamon-desktop-thumb.jpg" class="img-responsive">
               </a>
             </div>
           </div>
