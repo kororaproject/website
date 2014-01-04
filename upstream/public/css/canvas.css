@@ -40,6 +40,7 @@ noscript h1 {
 }
 
 
+/* border radius correction */
 .alert,
 .breadcrumb,
 .btn,
@@ -255,10 +256,32 @@ blockquote p {
 /*
 ** INPUT
 */
+
+.form-control {
+  padding: 4px 8px;
+}
+
 .form-control-generic {
   height: inherit;
 }
 
+.form-control-cc-expiry {
+  display: inline;
+  width: 78px;
+}
+
+.help-block {
+  font-size: 12px;
+  line-height: 14px;
+}
+
+.radio-inline {
+  margin-right: 10px;
+}
+
+.radio-inline+.radio-inline {
+  margin-left: 0;
+}
 /*
 ** MODALS
 */
@@ -1016,9 +1039,27 @@ blockquote p {
   margin: 16px 0;
 }
 
-.contribute-banner button {
+.contribute-banner .btn {
   width: 192px;
   margin: 16px;
+}
+
+
+/*
+** CONTRIBUTE PAGES
+*/
+
+.cc-payment-type .radio-inline {
+  padding-top: 4px;
+  padding-bottom: 2px;
+}
+.cc-payment-icon {
+  margin-top: -4px;
+}
+
+.cc-expiry-separator {
+  font-size: 16px;
+  padding: 0 2px;
 }
 
 /*

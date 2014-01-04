@@ -417,19 +417,18 @@ CREATE TABLE canvas_postview (
 
 
 CREATE TABLE canvas_donation (
-  id            BIGINT(20)    NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-  payment_id    VARCHAR(64)             DEFAULT  NULL,
+  id              BIGINT(20)    NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  payment_id      VARCHAR(64)   NOT NULL,
+  transaction_id  VARCHAR(64)   NOT NULL,
 
-  name          VARCHAR(64)             DEFAULT  NULL,
-  email         VARCHAR(128)            DEFAULT  NULL,
+  name            VARCHAR(64)             DEFAULT  NULL,
+  email           VARCHAR(128)            DEFAULT  NULL,
 
-  amount        VARCHAR(16)             DEFAULT  NULL,
-  currency      VARCHAR(8)              DEFAULT  NULL,
-  amount_real   vARCHAR(16)             DEFAULT  NULL,
+  amount          VARCHAR(16)             DEFAULT  NULL,
 
-  paypal_raw    TEXT                    DEFAULT  NULL,
+  paypal_raw      TEXT                    DEFAULT  NULL,
 
-  created       DATETIME      NOT NULL
+  created         DATETIME      NOT NULL
 );
 
 

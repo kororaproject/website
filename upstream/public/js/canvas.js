@@ -300,7 +300,11 @@ function RegisterController($scope, $http) {
           var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
           $scope.error.email = '';
-          return re.test($scope.email);
+          if( re.test($scope.email) ) {
+            return true;
+          }
+
+          $scope.error.email = 'Please enter a valid email address.';
         }
         else {
           $scope.error.email = 'Email address is already taken.';
@@ -1049,6 +1053,114 @@ function DownloadController($scope) {
 
   $scope.pageLoaded = true;
 };
+
+
+function DonateController($scope, $http) {
+  $scope.donor_name;
+  $scope.donor_email;
+  $scope.donor_amount;
+
+  $scope.cc_name;
+  $scope.cc_number;
+  $scope.cc_expirty_month;
+  $scope.cc_expirty_year;
+  $scope.cc_security_code;
+
+  $scope.error = {
+    email: 'Invalid email address specified.',
+    password: 'Password must be at least 8 characters.',
+    verify: 'Passwords must match.'
+  };
+
+  $scope.donorNameIsValid = function() {
+    return $scope.donor_name && $scope.donor_name.length > 0;
+  };
+
+  $scope.donorEmailIsValid = function() {
+    if( $scope.donor_email && $scope.donor_email.length > 0 ) {
+      var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+      if( re.test($scope.donor_email) ) {
+        return true;
+      }
+
+      $scope.error.email = 'Please enter a valid email address.';
+    }
+    else {
+      $scope.error.email = 'Email address is already taken.';
+    }
+
+    return false;
+  };
+
+  $scope.donorAmountIsValid = function() {
+    return( ( $scope.donor_amount && $scope.donor_amount.length > 0 ) &&
+            ( ! isNaN( parseFloat($scope.donor_amount) ) ) &&
+            ( parseFloat($scope.donor_amount) > 0 ) );
+  };
+
+
+  $scope.donorNameValidity = function() {
+    if( $scope.donor_name && $scope.donor_name.length > 0 ) {
+      return $scope.donorNameIsValid() ? 'has-success' : 'has-error';
+    }
+
+    return '';
+  };
+
+  $scope.donorEmailValidity = function(state) {
+    if( $scope.donor_email && $scope.donor_email.length > 0 ) {
+      return $scope.donorEmailIsValid() ? 'has-success' : 'has-error';;
+    }
+
+    return '';
+  };
+
+  $scope.donorAmountValidity = function(state) {
+    if( $scope.donor_amount && $scope.donor_amount.length > 0 ) {
+      return $scope.donorAmountIsValid() ? 'has-success' : 'has-error';;
+    }
+
+    return '';
+  };
+
+  $scope.ccNameIsValid = function() {
+    return $scope.cc_name && $scope.cc_name.length > 0;
+  };
+
+  $scope.canDonate = function() {
+    return $scope.donorNameIsValid() &&
+           $scope.donorEmailIsValid() &&
+           $scope.donorAmountIsValid();
+  };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function CanvasController($scope) {
   $scope.data = {};

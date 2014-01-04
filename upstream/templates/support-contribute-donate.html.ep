@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'discover'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container" ng-controller="DonateController">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li><a href="/support">Support</a></li>
+              <li><a href="/support/contribute">Contribute</a></li>
+              <li class="active">Donate</li>
+            </ol>
+            <h1 class="text-center"><strong>Donate.</strong> Save a Developer</h1>
+          </div>
+        </div>
+        <div class="hr hr-lg"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h3>Why donate or sponsor?</h3>
+            <p>Korora is free of cost and doesn't generate any direct income. Financially supported by it's core developers, Korora's ambition through dedicated sponsorship and donations is to continue to build on its unique offering and introduction of new services.</p>
+            <h3>How is the money used?</h3>
+            <p>The money is used to finance the needs of the distribution, to pay for hosting, to purchase equipment and to fund the work of the people behind it.</p>
+            <h3>How much should you give?</h3>
+            <p>The donations we receive range from a single dollar to a couple of hundreds. The important thing for people is to give something, and for us it's to generate the income that will let us work and succeed on this project, month after month. If you want to help, and if you can do so, please make a donation to the project and encourage others to do so.</p>
+            <h3>What is the long-term funding plan of Korora?</h3>
+            <p>We believe Korora can gather the momentum and the community necessary to fund itself entirely through donations, sponsoring and advertisement without the need to engage in commercial activities and without focusing our attention on anything else than improving the distribution itself. Our goal is to make Korora our livelihood, a full-time paid job to work soley on Korora and not just a side project to be tinkered with in our spare time.</p>
+          </div>
+        </div>
+        <div class="hr hr-lg"></div>
+        <div class="row">
+          <form role="form" action="<%= url_with %>" method="post">
+            <div class="col-sm-6">
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group" ng-class="donorNameValidity()">
+                    <label class="sr-only" for="donor_name">Your name</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+                      <input type="text" class="form-control" name="donor_name" data-rule-required="true" placeholder="Joe Bloggs III" ng-model="donor_name" value="<%= $v->{donor_name} %>" ng-init="donor_name='<%= $v->{donor_name} %>'"></input>
+                    </div>
+                    <span class="help-block">We use this name for reference on our public donor list.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group" ng-class="donorEmailValidity()">
+                    <label class="sr-only" for="donor_email">Email Address</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
+                      <input type="text" class="form-control" name="donor_email" data-rule-required="true" placeholder="unique@example.org" ng-model="donor_email" value="<%= $v->{donor_email} %>" ng-init="donor_email='<%= $v->{donor_email} %>'"></input>
+                    </div>
+                    <span class="help-block">We use this email address to correlate multiple donations to the same person.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group" ng-class="donorAmountValidity()">
+                    <label class="sr-only" for="donor_amount">Amount</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-usd"></i></span>
+                      <input type="text" class="form-control" name="donor_amount" value="25.00" ng-model="donor_amount" value="<%= $v->{donor_amount} %>" ng-init="donor_amount='<%= $v->{donor_amount} %>'"></input>
+                      <span class="input-group-addon">USD</span>
+                    </div>
+                    <span class="help-block">How much would you like to donate to Korora?</span>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group cc-payment-type">
+                    <label class="radio-inline">
+                      <input type="radio" name="payment_type" value="card" checked>
+                      <img class="cc-payment-icon" src="/img/ico-card-visa.png"></img>
+                      <img class="cc-payment-icon" src="/img/ico-card-mastercard.png"></img>
+                      <img class="cc-payment-icon" src="/img/ico-card-discover.png"></img>
+                      <img class="cc-payment-icon" src="/img/ico-card-amex.png"></img>
+                    </label>
+                    <label class="radio-inline">
+                      <input type="radio" name="payment_type" value="paypal">
+                      <img class="cc-payment-icon" src="/img/ico-card-paypal.png"></img>
+                    </label>
+                    <span class="help-block">How would you like to pay?</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label class="sr-only" for="cc_name">Name on Card</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+                      <input type="text" class="form-control" name="cc_name" data-rule-required="true" placeholder="Joe Bloggs" ng-model="cc_name" value="<%= $v->{cc_name} %>" ng-init="cc_name='<%= $v->{cc_name} %>'">
+                    </div>
+                    <span class="help-block">Your name as it appears on the card.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label class="sr-only" for="cc_number">Card Number</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-credit-card"></i></span>
+                      <input type="text" class="form-control" name="cc_number" data-rule-required="true" placeholder="Card Number" ng-model="cc_number" value="<%= $v->{cc_number} %>" ng-init="cc_number='<%= $v->{cc_number} %>'"></input>
+                    </div>
+                    <span class="help-block">Up to 16 digits on the front of your credit card.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-7 col-sm-8">
+                  <div class="form-group">
+                    <label class="sr-only" for="cc_expiry_month">Expiry Month</label>
+                    <label class="sr-only" for="cc_expiry_year">Expiry Year</label>
+                    <%= select_field cc_expiry_month => [qw(01 02 03 04 05 06 07 08 09 10 11 12)], class => 'form-control form-control-cc-expiry text-right', 'data-rule-required' => 'true', 'ng-model' => 'cc_expiry_month' %>
+                    <span class="cc-expiry-separator">/</span>
+                    <%= select_field cc_expiry_year => [(2014..2024)], class => 'form-control form-control-cc-expiry text-right', 'data-rule-required' => 'true', 'ng-model' => 'cc_expiry_year' %>
+                    <span class="help-block">Your credit card expiry month and year.</span>
+                  </div>
+                </div>
+                <div class="col-xs-5 col-sm-4">
+                  <div class="form-group">
+                    <label class="sr-only" for="cc_security_code">Security Code</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
+                      <input type="text" class="form-control text-center" name="cc_security_code" data-rule-required="true" placeholder="CVC" ng-model="cc_security_code"></input>
+                    </div>
+                    <span class="help-block">Security code for your credit card.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <button class="btn btn-large btn-success pull-right" ng-class="{disabled: !canDonate()}" type="submit">Donate Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>

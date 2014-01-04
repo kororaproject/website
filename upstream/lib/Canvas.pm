@@ -27,10 +27,11 @@ use Mojo::Base 'Mojolicious';
 # PERL INCLUDES
 #
 use Data::Dumper;
+
 use Mojo::ByteStream;
 use Mojo::JSON;
-
 use Mojolicious::Plugin::Authentication;
+use Mojolicious::Plugin::JSONConfig;
 
 use POSIX qw(floor);
 use Time::Piece;
@@ -44,6 +45,7 @@ use Canvas::Helpers::Engage;
 use Canvas::Site;
 use Canvas::Store::User;
 use Canvas::Util::PayPal::API;
+use Canvas::Util::PayPal::Payment;
 
 #
 # CONSTANTS
@@ -61,10 +63,11 @@ sub startup {
 
   $self->secret('canvas');
 
-  my $pp = Canvas::Util::PayPal::API->new(
-  );
-
-  $pp->dump;
+  #
+  # CONFIGURATION
+  $self->plugin('JSONConfig' => {
+    file => './canvas.conf',
+  });
 
   #
   # AUTHENTICATION
@@ -90,6 +93,8 @@ sub startup {
     },
   });
 
+  #
+  # MAIL
   if( ( $ENV{'CANVAS_MODE'} // '' ) ne 'production' ) {
     $self->app->log->info('Loading dummy mail handler for non-production testing.');
 
@@ -138,6 +143,10 @@ sub startup {
   $r->get('/support/irc')->to('support#irc');
   $r->get('/support/howto')->to('support#howto');
   $r->get('/support/contribute')->to('support#contribute_get');
+  $r->get('/support/contribute/donate')->to('support#donate_get');
+  $r->post('/support/contribute/donate')->to('support#donate_post');
+  $r->get('/support/contribute/sponsor')->to('support#sponsor_get');
+  $r->post('/support/contribute/sponsor')->to('support#sponsor_post');
 
   $r->get('/support/forums')->to('forum#forums');
   $r->get('/forum/:name')->to('forum#forum_name');

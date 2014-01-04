@@ -23,7 +23,7 @@ use Mojo::Base -base;
 # PERL INCLUDES
 #
 use Data::Dumper;
-use Mojo::JSON;
+use Mojo::JSON qw(j);
 use Mojo::URL;
 use Mojo::Util qw(b64_encode decode encode);
 use Mojo::UserAgent;
@@ -62,7 +62,6 @@ sub config {
   $self->{token_endpoint} = Mojo::URL->new( $args->{token_endpoint} // $self->{endpoint} );
 
   $self->{ua} = Mojo::UserAgent->new;
-  $self->{j} = Mojo::JSON->new;
 
   return $self;
 }
@@ -71,7 +70,7 @@ sub basic_auth {
   my $self = shift;
   my $credentials = sprintf "%s:%s", $self->client_id, $self->client_secret;
 
-  return decode( b64_encode( encode( $credentials )) );
+  return b64_encode( $credentials, '' );
 }
 
 sub get_token_hash {
@@ -82,16 +81,20 @@ sub get_token_hash {
   unless( $self->{token_hash} ) {
     $self->{token_request_at} = gmtime();
 
-
-    $self->{token_hash} =
-    my $tx = $self->{ua}->post( $self->{token_endpoing}->path('/v1/oauth2/token') => {
-        Authorization   => sprintf( "Basic %s", $self->basic_auth),
-        'Content-Type'  => 'application/x-www-form-urlencoded',
-        Accept          => 'application/json'
-      } => form => {
-        grant_type      => 'client_credentials'
+    my $tx = $self->{ua}->post( $self->{token_endpoint}->path('/v1/oauth2/token') => {
+        Accept            => 'application/json',
+        'Accept-Language' => 'en_US',
+        Authorization     => sprintf 'Basic %s', $self->basic_auth,
+      } => form =>  {
+        grant_type        => 'client_credentials'
       }
     );
+
+    $self->{token_hash} = j( $tx->res->body );
+
+    if( $self->{token_hash}{error} ) {
+      $self->{token_hash} = undef;
+    }
   }
 
   return $self->{token_hash}
@@ -109,54 +112,59 @@ sub validate_token_hash {
 }
 
 sub get_token {
-  my $h = shift->get_token_hash();
-
-  return $h->{access_token};
+  my $h = shift->get_token_hash;
+  return $h->{access_token} // '';
 }
 
 sub get_token_type {
-  my $h = shift->get_token_hash();
-  return $h->{token_type};
+  my $h = shift->get_token_hash;
+  return $h->{token_type} // '';
 }
 
 sub request {
   my( $self, $url, $method, $params, $headers ) = @_;
 
-  my $http_headers = { %{ $self->_headers }, %{ $headers // {} } };
-
-  if( $http_headers->{'PayPal-Request-Id'} ) {
-    #  logging.info('PayPal-Request-Id: %s' % (http_headers['PayPal-Request-Id']))
-  }
-
   my $tx;
-  given( $method ) {
-    when('GET') {
-      $tx = $self->{ua}->get( $url => $http_headers );
+  my $code = 0;
+
+  while( $code != 200 ) {
+    my $http_headers = { %{ $self->_headers }, %{ $headers // {} } };
+
+    if( $http_headers->{'PayPal-Request-Id'} ) {
+#      say sprintf 'PayPal-Request-Id: %s', $http_headers->{'PayPal-Request-Id'};
     }
-    when('POST') {
-      $tx = $self->{ua}->post( $url => $http_headers => form => $params );
+
+    given( $method ) {
+      when('GET') {
+        $tx = $self->{ua}->get( $url => $http_headers );
+      }
+      when('POST') {
+        $tx = $self->{ua}->post( $url => $http_headers => json => $params );
+      }
+      when('DELETE') {
+        $tx = $self->{ua}->delete( $url => $http_headers );
+      }
     }
-    when('DELETE') {
-      $tx = $self->{ua}->delete( $url => $http_headers );
+
+    $code = $tx->res->code;
+
+    # format Error message for bad request
+    if( $code == 400 ) {
+      return {
+        error => j( $tx->res->body )
+      };
+    }
+    # handle Exipre token
+    elsif( $code == 401 ) {
+      if($self->{token_hash} && $self->client_id ) {
+        $self->{token_hash} = undef;
+
+        say 'reattempting ...';
+      }
     }
   }
 
-  # format Error message for bad request
-  if( $tx->res->code == 400 ) {
-    return {
-      error => $self->{j}->decode( $tx->res->body )
-    };
-  }
-  # handle Exipre token
-  elsif( $tx->res->code == 401 ) {
-    if($self->{token_hash} && $self->client_id ) {
-      $self->{token_hash} = undef;
-
-      return $self->request( $url, $method, $params, $headers );
-    }
-  }
-
-  return $self->{j}->decode( $tx->res->body );
+  return j( $tx->res->body );
 }
 
 
@@ -185,10 +193,6 @@ sub delete {
   my( $self, $action, $headers ) = @_;
 
   return $self->request( $self->{endpoint}->path( $action ), 'GET', undef, $headers );
-}
-
-sub dump {
-  say Dumper shift;
 }
 
 #
