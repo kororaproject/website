@@ -231,11 +231,20 @@ sub donate_post {
       return $self->redirect_to('supportcontributedonate');
     }
 
-    # prepare the PayPal transaction information
-    my $pp_context = Canvas::Util::PayPal::API->new(
-      client_id     => $self->config->{paypal}{client_id},
-      client_secret => $self->config->{paypal}{client_secret},
-    );
+    # retrieve the PayPal transaction information from the cache
+    # and rebuild as required
+    my $pp_context = $self->cache->get('pp_context');
+
+    unless( ref $pp_context eq 'Canvas::Util::PayPal::API' ) {
+      $self->app->log->debug('Rebuilding PayPal API context ...');
+      $pp_context = Canvas::Util::PayPal::API->new(
+        client_id     => $self->config->{paypal}{client_id},
+        client_secret => $self->config->{paypal}{client_secret},
+      );
+
+      $self->cache->set(pp_context => $pp_context);
+    };
+
 
     # create our payment object
     my $pp_payment = Canvas::Util::PayPal::Payment->new;

@@ -1072,6 +1072,17 @@ function DonateController($scope, $http) {
     verify: 'Passwords must match.'
   };
 
+  $scope.paymentViewUpdate = function(mode) {
+    var _mode = mode || 'cc';
+
+    if( _mode === 'cc' ) {
+      $('#cc_payment').show();
+    }
+    else {
+      $('#cc_payment').hide();
+    }
+  }
+
   $scope.donorNameIsValid = function() {
     return $scope.donor_name && $scope.donor_name.length > 0;
   };

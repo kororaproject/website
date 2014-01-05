@@ -31,7 +31,9 @@ use Data::Dumper;
 use Mojo::ByteStream;
 use Mojo::JSON;
 use Mojolicious::Plugin::Authentication;
+use Mojolicious::Plugin::Cache;
 use Mojolicious::Plugin::JSONConfig;
+use Mojolicious::Plugin::Mail;
 
 use POSIX qw(floor);
 use Time::Piece;
@@ -65,22 +67,26 @@ sub startup {
 
   #
   # CONFIGURATION
-  $self->plugin('JSONConfig' => {
+  my $config = $self->plugin('JSONConfig' => {
     file => './canvas.conf',
   });
+
+  #
+  # CACHE
+  $self->plugin('Cache' => $config->{cache} // {} );
 
   #
   # AUTHENTICATION
   $self->app->log->info('Loading authentication handler.');
   $self->plugin('authentication' => {
-    autoload_user => 0,
+    autoload_user   => 0,
     current_user_fn => 'auth_user',
-    load_user => sub {
+    load_user       => sub {
       my( $app, $uid ) = @_;
 
       return Canvas::Store::User->search( username => $uid )->first;
     },
-    validate_user => sub {
+    validate_user   => sub {
       my( $app, $user, $pass, $extra ) = @_;
 
       my $u = Canvas::Store::User->search( username => $user )->first;
@@ -116,6 +122,17 @@ sub startup {
   $self->plugin('Canvas::Helpers::Engage');
   $self->plugin('Canvas::Helpers::News');
   $self->plugin('Canvas::Helpers::Profile');
+
+  #
+  # PAYPAL
+
+  # prepare the PayPal transaction information
+  my $pp_context = Canvas::Util::PayPal::API->new(
+    client_id     => $config->{paypal}{client_id},
+    client_secret => $config->{paypal}{client_secret},
+  );
+
+  $self->cache->set(pp_context => $pp_context);
 
   #
   # ROUTES
