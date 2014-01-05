@@ -27,7 +27,7 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="text-center">
-              <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-desktop-apps-small.jpg" alt="GNOME Desktop">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-desktop-apps.jpg" alt="GNOME Desktop">
             </div>
           </div>
         </div>
@@ -55,7 +55,7 @@
         <div class="hr"></div>
         <div class="row">
           <div class="col-sm-6">
-            <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-overview-small.jpg" alt="GNOME Overview">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-overview.jpg" alt="GNOME Overview">
           </div>
           <div class="col-sm-6">
             <h2>Overview at a glance</h2>
@@ -70,7 +70,7 @@
             <p>Search is central to the GNOME desktop. Applications, windows, documents and even settings can all be quickly and easily searched for from one place. Accessing GNOME's desktop search is as simple as pressing the super key and starting to type. This is a great feature for people who like things to happen <em>fast</em>.</p>
           </div>
           <div class="col-sm-6">
-            <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-apps-small.jpg" alt="GNOME Applications">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-apps.jpg" alt="GNOME Applications">
           </div>
         </div>
       </div>
