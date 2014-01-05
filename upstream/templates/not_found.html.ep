@@ -20,7 +20,7 @@
               <li><a href="/">Home</a></li>
               <li class="active">No Idea?</li>
             </ol>
-            <h1 class="text-center"><strong>*</strong></h1>
+            <h1 class="text-center exception-title">:(</h1>
             <div class="hr hr-lg"></div>
             <h3 class="text-center">Hmmmm ... That's not right.</h3>
             <div class="hr hr-lg"></div>

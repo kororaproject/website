@@ -195,6 +195,11 @@ blockquote p {
   font-size: inherit;
 }
 
+.exception-title {
+  font-size: 144px;
+  line-height: 144px;
+  font-weight: 600;
+}
 /*
 ** BUTTONS
 */
