@@ -44,14 +44,14 @@
             <img class="img-responsive img-showcase" src="/img/screenshots/korora-mate-desktop.jpg" alt="MATE Applications Menu">
           </div>
           <div class="col-sm-6">
-            <h2>The Familiar Desktop</h2>
-            <p>The desktop still uses the much loved Applications, Places, System menus, so users familiar with that system will feel right at home!</p>
+            <h2>The familiar desktop</h2>
+            <p>The desktop still uses the much loved <em>Applications</em>, <em>Places</em> and <em>System</em> menus, so users familiar with that will feel right at home!</p>
           </div>
         </div>
         <div class="hr"></div>
         <div class="row">
           <div class="col-sm-6">
-            <h2>New Features</h2>
+            <h2>New features</h2>
             <p>MATE is bringing the GNOME 2 desktop into the modern era with new functions and features, like the system control center overhaul.</p>
           </div>
           <div class="col-sm-6">

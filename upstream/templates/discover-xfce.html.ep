@@ -35,7 +35,7 @@
         <div class="row">
           <div class="col-sm-12">
             <h2 class="center">Lightweight desktop with speed and function</h2>
-            <p>Xfce focuses on lightweight and full function for its popular desktop.</p>
+            <p>Xfce focuses on being a lightweight, yet fully functional desktop. It aims to be fast and low on system resources, while still being visually appealing and user friendly.</p>
           </div>
         </div>
         <div class="hr"></div>
@@ -44,7 +44,7 @@
             <img class="img-responsive img-showcase" src="/img/screenshots/korora-xfce-apps.jpg" alt="Xfce Applications Menu">
           </div>
           <div class="col-sm-6">
-            <h2>The Fast, Modern Desktop</h2>
+            <h2>The fast, modern desktop</h2>
             <p>The desktop has a traditional menu for accessing your applications, but also a handy dock for quick access to running programs as well as your favourites.</p>
           </div>
         </div>
