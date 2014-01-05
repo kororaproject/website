@@ -46,7 +46,7 @@
                     <label class="sr-only" for="donor_name">Your name</label>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                      <input type="text" class="form-control" name="donor_name" data-rule-required="true" placeholder="Joe Bloggs III" ng-model="donor_name" value="<%= $v->{donor_name} %>" ng-init="donor_name='<%= $v->{donor_name} %>'"></input>
+                      <input type="text" class="form-control" name="donor_name" data-rule-required="true" placeholder="" ng-model="donor_name" value="<%= $v->{donor_name} %>" ng-init="donor_name='<%= $v->{donor_name} %>'"></input>
                     </div>
                     <span class="help-block">We use this name for reference on our public donor list.</span>
                   </div>
@@ -58,7 +58,7 @@
                     <label class="sr-only" for="donor_email">Email Address</label>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
-                      <input type="text" class="form-control" name="donor_email" data-rule-required="true" placeholder="unique@example.org" ng-model="donor_email" value="<%= $v->{donor_email} %>" ng-init="donor_email='<%= $v->{donor_email} %>'"></input>
+                      <input type="text" class="form-control" name="donor_email" data-rule-required="true" placeholder="" ng-model="donor_email" value="<%= $v->{donor_email} %>" ng-init="donor_email='<%= $v->{donor_email} %>'"></input>
                     </div>
                     <span class="help-block">We use this email address to correlate multiple donations to the same person.</span>
                   </div>
@@ -85,7 +85,7 @@
                       <img class="cc-payment-icon" src="/img/ico-card-discover.png"></img>
                       <img class="cc-payment-icon" src="/img/ico-card-amex.png"></img>
                     </label>
-                    <label class="radio-inline">
+                    <label class="radio-inline hide">
                       <input type="radio" name="payment_type" value="paypal" ng-click="paymentViewUpdate('paypal')">
                       <img class="cc-payment-icon" src="/img/ico-card-paypal.png"></img>
                     </label>
@@ -100,7 +100,7 @@
                       <label class="sr-only" for="cc_name">Name on Card</label>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                        <input type="text" class="form-control" name="cc_name" data-rule-required="true" placeholder="Joe Bloggs" ng-model="cc_name" value="<%= $v->{cc_name} %>" ng-init="cc_name='<%= $v->{cc_name} %>'">
+                        <input type="text" class="form-control" name="cc_name" data-rule-required="true" placeholder="" ng-model="cc_name" value="<%= $v->{cc_name} %>" ng-init="cc_name='<%= $v->{cc_name} %>'">
                       </div>
                       <span class="help-block">Your name as it appears on the card.</span>
                     </div>
@@ -112,7 +112,7 @@
                       <label class="sr-only" for="cc_number">Card Number</label>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-fw fa-credit-card"></i></span>
-                        <input type="text" class="form-control" name="cc_number" data-rule-required="true" placeholder="Card Number" ng-model="cc_number" value="<%= $v->{cc_number} %>" ng-init="cc_number='<%= $v->{cc_number} %>'"></input>
+                        <input type="text" class="form-control" name="cc_number" data-rule-required="true" placeholder="" ng-model="cc_number" value="<%= $v->{cc_number} %>" ng-init="cc_number='<%= $v->{cc_number} %>'"></input>
                       </div>
                       <span class="help-block">Up to 16 digits on the front of your credit card.</span>
                     </div>
@@ -134,7 +134,7 @@
                       <label class="sr-only" for="cc_security_code">Security Code</label>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-                        <input type="text" class="form-control text-center" name="cc_security_code" data-rule-required="true" placeholder="CVC" ng-model="cc_security_code"></input>
+                        <input type="text" class="form-control text-center" name="cc_security_code" data-rule-required="true" placeholder="" ng-model="cc_security_code"></input>
                       </div>
                       <span class="help-block">Security code for your credit card.</span>
                     </div>

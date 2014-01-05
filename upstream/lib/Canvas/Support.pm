@@ -144,7 +144,7 @@ sub donate_get {
   my $v = $self->flash('values') // {
     donor_name => '',
     donor_email => '',
-    donor_amount => '',
+    donor_amount => 25,
     cc_name => '',
     cc_number => '',
     cc_expirty_year => '',
@@ -163,7 +163,7 @@ sub donate_post {
   my $v = {
     donor_name        => $self->param('donor_name')        // 'Anonymous',
     donor_email       => $self->param('donor_email')       // '',
-    donor_amount      => $self->param('donor_amount')      // 0,
+    donor_amount      => $self->param('donor_amount')      // '25.00',
     payment_type      => $self->param('payment_type')      // 'card',
     cc_name           => $self->param('cc_name')           // '',
     cc_number         => $self->param('cc_number')         // '',
