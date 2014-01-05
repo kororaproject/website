@@ -41,7 +41,7 @@
         <div class="hr"></div>
         <div class="row">
           <div class="col-sm-6">
-            <img class="img-responsive img-showcase" src="/img/screenshots/korora-mate-apps.jpg" alt="MATE Applications Menu">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-mate-desktop.jpg" alt="MATE Applications Menu">
           </div>
           <div class="col-sm-6">
             <h2>The Familiar Desktop</h2>
@@ -51,11 +51,11 @@
         <div class="hr"></div>
         <div class="row">
           <div class="col-sm-6">
-            <img class="img-responsive img-showcase" src="/img/screenshots/korora-mate-control-center.jpg" alt="MATE Control Center">
-          </div>
-          <div class="col-sm-6">
             <h2>New Features</h2>
             <p>MATE is bringing the GNOME 2 desktop into the modern era with new functions and features, like the system control center overhaul.</p>
+          </div>
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-mate-control-center.jpg" alt="MATE Control Center">
           </div>
         </div>
       </div>
