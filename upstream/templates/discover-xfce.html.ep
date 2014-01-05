@@ -24,6 +24,40 @@
             <h1 class="text-center"><strong>Discover.</strong> The Xfce Desktop</h1>
           </div>
         </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="text-center">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-xfce-desktop-apps.jpg" alt="Xfce Desktop">
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 class="center">Lightweight desktop with speed and function</h2>
+            <p>Xfce focuses on lightweight and full function for its popular desktop.</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-xfce-apps.jpg" alt="Xfce Applications Menu">
+          </div>
+          <div class="col-sm-6">
+            <h2>The Fast, Modern Desktop</h2>
+            <p>The desktop has a traditional menu for accessing your applications, but also a handy dock for quick access to running programs as well as your favourites.</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-xfce-settings.jpg" alt="Xfce Settings">
+          </div>
+          <div class="col-sm-6">
+            <h2>Configuration</h2>
+            <p>Xfce has a great configuration manager, letting you tweak many aspects of the desktop.</p>
+          </div>
+        </div>
       </div>
 
       <!-- END CONTENT -->
