@@ -24,6 +24,40 @@
             <h1 class="text-center"><strong>Discover.</strong> The MATE Desktop</h1>
           </div>
         </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="text-center">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-mate-desktop-apps.jpg" alt="MATE Desktop">
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 class="center">Traditional desktop with modern improvements</h2>
+            <p>MATE is a fork of GNOME 2 which was deprecated to make way for GNOME 3 development. It continues that long tradition of providing an intuitive and attractive desktop environment, but brings a much needed overhaul in both back and front-end functionality.</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-mate-apps.jpg" alt="MATE Applications Menu">
+          </div>
+          <div class="col-sm-6">
+            <h2>The Familiar Desktop</h2>
+            <p>The desktop still uses the much loved Applications, Places, System menus, so users familiar with that system will feel right at home!</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-mate-control-center.jpg" alt="MATE Control Center">
+          </div>
+          <div class="col-sm-6">
+            <h2>New Features</h2>
+            <p>MATE is bringing the GNOME 2 desktop into the modern era with new functions and features, like the system control center overhaul.</p>
+          </div>
+        </div>
       </div>
 
       <!-- END CONTENT -->
