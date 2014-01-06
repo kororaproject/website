@@ -29,15 +29,15 @@
         <div class="row">
           <div class="col-sm-6">
             <h2>Why donate?</h2>
-            <p>Korora, directly funded by its core developers, is free of cost and doesn't generate any direct income. Through dedicated sponsorship and donations, Korora's ambition is to continue to build on its unique offering with the research, development and introduction of new technologies.</p>
+            <p>We build Korora because we love it and there is absolutely no pressure to make a donation, however the facility is here to do so if you want to. The work we do on Korora is personally funded by our core developers and we welcome any contributions to help us with that. Any donations are processed securely online and we do not keep your credit card details.</p>
             <h2>How is the money used?</h2>
-            <p>The money is used to finance the needs of the distribution, to pay for hosting, to purchase equipment and to fund the work of the people behind it.</p>
+            <p>We promise to put any donation to good use like helping to cover hosting costs and purchasing new equipment to make Korora even better.</p>
             <h2>How much should you give?</h2>
-            <p>How long is a piece of string? The important thing for people is to give something, and for us it's to generate the income that will let us work and succeed on this project, month after month. If you want to help, and if you can do so, please make a donation to the project and encourage others to do so.</p>
+            <p>That's entirely up to you! We gratefully receive anything you can spare.</p>
           </div>
           <form role="form" action="<%= url_with %>" method="post">
             <div class="col-sm-6 callout">
-              <h2>Please Complete ...</h2>
+              <h2>Please complete ...</h2>
               <div class="row">
                 <div class="col-sm-12">
                   <div class="form-group" ng-class="donorNameValidity()">
@@ -46,14 +46,14 @@
                       <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
                       <input type="text" class="form-control" name="donor_name" data-rule-required="true" placeholder="" ng-model="donor_name" value="<%= $v->{donor_name} %>" ng-init="donor_name='<%= $v->{donor_name} %>'"></input>
                     </div>
-                    <span class="help-block">We use this name for reference on our public donor list.</span>
+                    <span class="help-block">We use this name for reference on our public donor list (leave blank if you'd prefer to be anonymous).</span>
                   </div>
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-12">
                   <div class="form-group" ng-class="donorEmailValidity()">
-                    <label class="sr-only" for="donor_email">Email Address</label>
+                    <label class="sr-only" for="donor_email">Email address</label>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
                       <input type="text" class="form-control" name="donor_email" data-rule-required="true" placeholder="" ng-model="donor_email" value="<%= $v->{donor_email} %>" ng-init="donor_email='<%= $v->{donor_email} %>'"></input>
@@ -68,7 +68,7 @@
                     <label class="sr-only" for="donor_amount">Amount</label>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-fw fa-usd"></i></span>
-                      <input type="text" class="form-control" name="donor_amount" value="25.00" ng-model="donor_amount" value="<%= $v->{donor_amount} %>" ng-init="donor_amount='<%= $v->{donor_amount} %>'"></input>
+                      <input type="text" class="form-control" name="donor_amount" value="00" ng-model="donor_amount" value="<%= $v->{donor_amount} %>" ng-init="donor_amount='<%= $v->{donor_amount} %>'"></input>
                       <span class="input-group-addon">USD</span>
                     </div>
                     <span class="help-block">How much would you like to donate to Korora?</span>
@@ -95,19 +95,19 @@
                 <div class="row">
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label class="sr-only" for="cc_name">Name on Card</label>
+                      <label class="sr-only" for="cc_name">Name on card</label>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
                         <input type="text" class="form-control" name="cc_name" data-rule-required="true" placeholder="" ng-model="cc_name" value="<%= $v->{cc_name} %>" ng-init="cc_name='<%= $v->{cc_name} %>'">
                       </div>
-                      <span class="help-block">Your name as it appears on the card.</span>
+                      <span class="help-block">Your name as it appears on your card.</span>
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-sm-12">
                     <div class="form-group">
-                      <label class="sr-only" for="cc_number">Card Number</label>
+                      <label class="sr-only" for="cc_number">Card number</label>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-fw fa-credit-card"></i></span>
                         <input type="text" class="form-control" name="cc_number" data-rule-required="true" placeholder="" ng-model="cc_number" value="<%= $v->{cc_number} %>" ng-init="cc_number='<%= $v->{cc_number} %>'"></input>
@@ -119,8 +119,8 @@
                 <div class="row">
                   <div class="col-xs-7 col-sm-8">
                     <div class="form-group">
-                      <label class="sr-only" for="cc_expiry_month">Expiry Month</label>
-                      <label class="sr-only" for="cc_expiry_year">Expiry Year</label>
+                      <label class="sr-only" for="cc_expiry_month">Expiry month</label>
+                      <label class="sr-only" for="cc_expiry_year">Expiry year</label>
                       <%= select_field cc_expiry_month => [qw(01 02 03 04 05 06 07 08 09 10 11 12)], class => 'form-control form-control-cc-expiry text-right', 'data-rule-required' => 'true', 'ng-model' => 'cc_expiry_month' %>
                       <span class="cc-expiry-separator">/</span>
                       <%= select_field cc_expiry_year => [(2014..2024)], class => 'form-control form-control-cc-expiry text-right', 'data-rule-required' => 'true', 'ng-model' => 'cc_expiry_year' %>
@@ -129,7 +129,7 @@
                   </div>
                   <div class="col-xs-5 col-sm-4">
                     <div class="form-group">
-                      <label class="sr-only" for="cc_security_code">Security Code</label>
+                      <label class="sr-only" for="cc_security_code">Security code</label>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
                         <input type="text" class="form-control text-center" name="cc_security_code" data-rule-required="true" placeholder="" ng-model="cc_security_code"></input>
@@ -142,7 +142,7 @@
               <div class="row">
                 <div class="col-sm-12">
                   <div class="form-group">
-                    <button class="btn btn-large btn-success pull-right" ng-class="{disabled: !canDonate()}" type="submit">Donate Now</button>
+                    <button class="btn btn-large btn-success pull-right" ng-class="{disabled: !canDonate()}" type="submit">Donate now</button>
                   </div>
                 </div>
               </div>

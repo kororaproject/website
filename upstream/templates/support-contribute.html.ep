@@ -62,11 +62,11 @@
           <div class="col-sm-12">
             <h2>Financial Support</h2>
             <h3>Donations</h3>
-            <p>You can help by making a financial contribution to the Korora Project. Revenue from your donations allows the Korora Project to afford new hardware and equipment, maintain the server hosting costs, and to provide an income for the development team.</p>
+            <p>If it is your desire, you can help by making a financial contribution to the Korora Project. Any revenue from your donations allows the Korora Project to afford new hardware and equipment, maintain the server hosting infrastructure and to provide an income for the development team.</p>
             <a href="/support/contribute/donate" class="btn btn-success">I want to Donate</a>
             <div class="hide">
               <h3>Sponsorships</h3>
-              <p>By sponsoring the Korora Project, you will be contributing to Korora by giving the development team a regular and predictable income. Sponsorships are the best way to help Korora's developers get to the point where they are able to work full-time on Korora-related projects.</p>
+              <p>By financially sponsoring the Korora Project, you will be contributing to Korora by giving the development team a regular and predictable income. Sponsorships are the best way to help Korora's developers get to the point where they are able to work full-time on Korora-related projects.</p>
             </div>
           </div>
         </div>
