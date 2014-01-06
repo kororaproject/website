@@ -47,7 +47,7 @@
                       <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
                       <input type="text" class="form-control" name="donor_name" placeholder="" value="<%= $v->{donor_name} %>"></input>
                     </div>
-                    <span class="help-block">We use this name for reference on our public donor list (leave blank if you'd prefer to be anonymous).</span>
+                    <span class="help-block">We use this name on our public donor list (leave blank if you'd prefer to be anonymous).</span>
                   </div>
                 </div>
               </div>
@@ -113,7 +113,7 @@
                         <span class="input-group-addon"><i class="fa fa-fw fa-credit-card"></i></span>
                         <input type="text" class="form-control" name="cc_number" data-rule-required="true" placeholder="" ng-model="cc_number" value="<%= $v->{cc_number} %>" ng-init="cc_number='<%= $v->{cc_number} %>'"></input>
                       </div>
-                      <span class="help-block">Up to 16 digits on the front of your credit card.</span>
+                      <span class="help-block">Up to 16 digits on the front of your card.</span>
                     </div>
                   </div>
                 </div>
@@ -125,7 +125,7 @@
                       <%= select_field cc_expiry_month => [qw(01 02 03 04 05 06 07 08 09 10 11 12)], class => 'form-control form-control-cc-expiry text-right', 'data-rule-required' => 'true', 'ng-model' => 'cc_expiry_month' %>
                       <span class="cc-expiry-separator">/</span>
                       <%= select_field cc_expiry_year => [(2014..2024)], class => 'form-control form-control-cc-expiry text-right', 'data-rule-required' => 'true', 'ng-model' => 'cc_expiry_year' %>
-                      <span class="help-block">Your credit card expiry month and year.</span>
+                      <span class="help-block">Your card's expiry month and year.</span>
                     </div>
                   </div>
                   <div class="col-xs-5 col-sm-4">
@@ -135,7 +135,7 @@
                         <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
                         <input type="text" class="form-control text-center" name="cc_security_code" data-rule-required="true" placeholder="" ng-model="cc_security_code"></input>
                       </div>
-                      <span class="help-block">Security code for your credit card.</span>
+                      <span class="help-block">Security code for your card.</span>
                     </div>
                   </div>
                 </div>
