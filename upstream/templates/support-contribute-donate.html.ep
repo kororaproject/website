@@ -144,6 +144,9 @@
               <div class="row">
                 <div class="col-sm-12">
                   <div class="form-group">
+                    <a href="https://www.paypal.com/au/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open('https://www.paypal.com/au/webapps/mpp/paypal-popup','WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, width=600, height=500'); return false;">
+                      <img src="https://www.paypalobjects.com/webstatic/mktg/logo/bdg_secured_by_pp_2line.png" border="0" height="34" alt="PayPal Logo">
+                    </a>
                     <button class="btn btn-large btn-success pull-right" ng-class="{disabled: !canDonate()}" type="submit">Donate now</button>
                   </div>
                 </div>
