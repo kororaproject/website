@@ -126,8 +126,9 @@ sub request {
 
   my $tx;
   my $code = 0;
+  my $attempts = 5;
 
-  while( $code != 200 ) {
+  while( $code != 200 && $attempts-- > 0 ) {
     my $http_headers = { %{ $self->_headers }, %{ $headers // {} } };
 
     if( $http_headers->{'PayPal-Request-Id'} ) {
@@ -146,7 +147,7 @@ sub request {
       }
     }
 
-    $code = $tx->res->code;
+    $code = $tx->res->code // 0;
 
     # format Error message for bad request
     if( $code == 400 ) {
