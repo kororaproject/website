@@ -284,11 +284,8 @@ sub donate_post {
       }]
     });
 
-    # TODO: remove
-    say Dumper $ret;
-
     # check payment state
-    if( $ret->{state} eq 'approved' ) {
+    if( $ret && $ret->{state} eq 'approved' ) {
       # reset flash values
       #$self->flash( values => {} );
       $self->flash(page_success => "Thank you for your donation. Korora will only get better with your contribution.");
@@ -307,6 +304,9 @@ sub donate_post {
     }
     else {
       $self->flash(page_errors => "Your transaction could not be completed. Nothing has been charged to your card.");
+
+      # TODO: remove
+      say Dumper $ret;
     }
   }
 
