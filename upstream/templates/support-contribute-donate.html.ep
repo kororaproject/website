@@ -45,7 +45,7 @@
                     <label class="sr-only" for="donor_name">Your name</label>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                      <input type="text" class="form-control" name="donor_name" data-rule-required="true" placeholder="" ng-model="donor_name" value="<%= $v->{donor_name} %>" ng-init="donor_name='<%= $v->{donor_name} %>'"></input>
+                      <input type="text" class="form-control" name="donor_name" placeholder="" value="<%= $v->{donor_name} %>"></input>
                     </div>
                     <span class="help-block">We use this name for reference on our public donor list (leave blank if you'd prefer to be anonymous).</span>
                   </div>
@@ -95,7 +95,7 @@
               <div id="cc_payment">
                 <div class="row">
                   <div class="col-sm-12">
-                    <div class="form-group">
+                    <div class="form-group" ng-class="ccNameValidity()">
                       <label class="sr-only" for="cc_name">Name on card</label>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
@@ -107,7 +107,7 @@
                 </div>
                 <div class="row">
                   <div class="col-sm-12">
-                    <div class="form-group">
+                    <div class="form-group" ng-class="ccNumberValidity()">
                       <label class="sr-only" for="cc_number">Card number</label>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-fw fa-credit-card"></i></span>
@@ -129,7 +129,7 @@
                     </div>
                   </div>
                   <div class="col-xs-5 col-sm-4">
-                    <div class="form-group">
+                    <div class="form-group" ng-class="ccSecurityCodeValidity()">
                       <label class="sr-only" for="cc_security_code">Security code</label>
                       <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>

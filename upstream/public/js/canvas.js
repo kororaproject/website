@@ -1083,10 +1083,6 @@ function DonateController($scope, $http) {
     }
   }
 
-  $scope.donorNameIsValid = function() {
-    return $scope.donor_name && $scope.donor_name.length > 0;
-  };
-
   $scope.donorEmailIsValid = function() {
     if( $scope.donor_email && $scope.donor_email.length > 0 ) {
       var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -1111,14 +1107,6 @@ function DonateController($scope, $http) {
   };
 
 
-  $scope.donorNameValidity = function() {
-    if( $scope.donor_name && $scope.donor_name.length > 0 ) {
-      return $scope.donorNameIsValid() ? 'has-success' : 'has-error';
-    }
-
-    return '';
-  };
-
   $scope.donorEmailValidity = function(state) {
     if( $scope.donor_email && $scope.donor_email.length > 0 ) {
       return $scope.donorEmailIsValid() ? 'has-success' : 'has-error';;
@@ -1139,10 +1127,43 @@ function DonateController($scope, $http) {
     return $scope.cc_name && $scope.cc_name.length > 0;
   };
 
+  $scope.ccNameValidity = function(state) {
+    if( $scope.cc_name && $scope.cc_name.length > 0 ) {
+      return $scope.ccNameIsValid() ? 'has-success' : 'has-error';;
+    }
+
+    return '';
+  };
+
+  $scope.ccNumberIsValid = function() {
+    return $scope.cc_number && $scope.cc_number.length >= 15;
+  };
+
+  $scope.ccNumberValidity = function(state) {
+    if( $scope.cc_number && $scope.cc_number.length > 0 ) {
+      return $scope.ccNumberIsValid() ? 'has-success' : 'has-error';;
+    }
+
+    return '';
+  };
+
+  $scope.ccSecurityCodeIsValid = function() {
+    return $scope.cc_security_code && $scope.cc_security_code.length >= 3;
+  };
+
+  $scope.ccSecurityCodeValidity = function(state) {
+    if( $scope.cc_security_code && $scope.cc_security_code.length > 0 ) {
+      return $scope.ccSecurityCodeIsValid() ? 'has-success' : 'has-error';;
+    }
+
+    return '';
+  };
+
   $scope.canDonate = function() {
-    return $scope.donorNameIsValid() &&
-           $scope.donorEmailIsValid() &&
-           $scope.donorAmountIsValid();
+    return $scope.donorEmailIsValid() &&
+           $scope.donorAmountIsValid() &&
+           $scope.ccNameIsValid() &&
+           $scope.ccNumberIsValid();
   };
 };
 

@@ -144,7 +144,7 @@ sub donate_get {
   my $v = $self->flash('values') // {
     donor_name => '',
     donor_email => '',
-    donor_amount => 25,
+    donor_amount => '',
     cc_name => '',
     cc_number => '',
     cc_expirty_year => '',
@@ -163,7 +163,7 @@ sub donate_post {
   my $v = {
     donor_name        => $self->param('donor_name')        // 'Anonymous',
     donor_email       => $self->param('donor_email')       // '',
-    donor_amount      => $self->param('donor_amount')      // '25.00',
+    donor_amount      => $self->param('donor_amount')      // '0.00',
     payment_type      => $self->param('payment_type')      // 'card',
     cc_name           => $self->param('cc_name')           // '',
     cc_number         => $self->param('cc_number')         // '',
@@ -177,12 +177,6 @@ sub donate_post {
 
   my @names = split / /, $v->{cc_name};
   my( $first_name, $last_name ) = ( shift @names, join ' ', @names );
-
-  # validate the donor name
-  unless( length trim $v->{donor_name} ) {
-    $self->flash(page_errors => "Please enter a name to attribute your donation to. Anonymous works too if you wish.");
-    return $self->redirect_to('supportcontributedonate');
-  }
 
   # validate the donor email
   unless( $v->{donor_email} =~ m/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/ ) {
