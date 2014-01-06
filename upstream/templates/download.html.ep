@@ -126,7 +126,7 @@
         <div class="row">
           <div class="col-sm-12">
             <h2>Try it out!</h2>
-            <div class="callout callout-danger">
+            <div class="callout callout-info">
               <p>We recommend loading Korora from a USB stick!</p>
             </div>
             <p>Our recommended and supported method of loading Korora is via a <a href="http://docs.fedoraproject.org/en-US/Fedora/20/html/Installation_Guide/Making_USB_Media.html">USB stick</a>. If you prefer, you can also burn the image to a <a href="http://docs.fedoraproject.org/en-US/Fedora/20/html/Installation_Guide/sn-making-media.html#sn-making-disc-media">DVD disk</a>, however this may be very slow and your milage may vary. Of course you can also just kick it off inside a virtual machine.</p>
