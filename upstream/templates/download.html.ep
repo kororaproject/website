@@ -126,7 +126,11 @@
         <div class="row">
           <div class="col-sm-12">
             <h2>Try it out!</h2>
-            <p>Burn the <a href="http://docs.fedoraproject.org/en-US/Fedora/20/html/Installation_Guide/sn-making-media.html#sn-making-disc-media">ISO image to a DVD disk</a>, turn it into a <a href="http://docs.fedoraproject.org/en-US/Fedora/20/html/Installation_Guide/Making_USB_Media.html">Live USB</a>, or just kick it off inside a virtual machine. If you're already running a Linux distro, you can easily turn the ISO into a bootable USB stick with the <em>dd</em> command.</p>
+            <div class="callout callout-danger">
+              <p>We recommend running Korora from a USB stick!</p>
+            </div>
+            <p>While you can burn the <a href="http://docs.fedoraproject.org/en-US/Fedora/20/html/Installation_Guide/sn-making-media.html#sn-making-disc-media">ISO image to a DVD disk</a>, our recommended and supported method is via a <a href="http://docs.fedoraproject.org/en-US/Fedora/20/html/Installation_Guide/Making_USB_Media.html">USB stick</a>. Of course you can also just kick it off inside a virtual machine.</p>
+            <p>If you're already running a Linux distro, you can easily turn the ISO into a bootable USB stick with the <em>dd</em> command.</p>
             <p>Using the example below, replace the path to the ISO with the location you downloaded it to (where we've used "/path/to/korora.iso") and change the device (where we've used "sdX") to be your 2GB+ USB stick device (<em>not a partition</em> on it which would be followed by a number, like sdX1). You can usually find out your USB stick device by running the <em>dmesg</em> command after plugging it in.</p>
             <div class="callout callout-danger">
               <p>Please be aware that this action will wipe the entire contents of the USB stick! Ensure you back up anything you want to keep on it and don't specify the wrong device.</p>
@@ -137,7 +141,7 @@
               <p>We highly recommend that you test the media on your first boot by selecting the <em>Test this media and boot Korora</em> option from the <em>Troubleshooting</em> menu. This will help to catch any problems due to corrupt download or burn, before they happen.</p>
             </div>
             <h2>Source</h2>
-            <p>Feel free to grab the source that was used to build Korora. All the source for:</p>
+            <p>Feel free to grab the source that was used to build Korora. All the sources for:</p>
             <ul>
               <li>Korora scripts (including kickstart) and files are <a href="https://github.com/kororaproject">available on GitHub</a>.</li>
               <li>Installed packages are available via the <a href="http://linux.die.net/man/1/yumdownloader">yumdownloader</a> command.</li>
