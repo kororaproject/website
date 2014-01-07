@@ -118,7 +118,7 @@
                   <div ng-repeat="cs in version.checksums | filter:arch.name | filter:desktop.name">
                     <div ng-repeat="c in cs.checksum" class="checksum">
                       <span class="label label-default pull-left">{{c.type}}</span>
-                      <div class="hash">{{formatShortHash(c.hash)}}</div>
+                      <div class="hash" title="{{c.hash}}">{{formatShortHash(c.hash)}}</div>
                     </div>
                   </div>
                 </div>
