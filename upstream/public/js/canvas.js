@@ -369,8 +369,8 @@ function DownloadController($scope) {
       isCurrent: true,
       released: '29 November 2013',
       archs: [
-        { name: 'x86_64', label: '64-bit' },
-        { name: 'i686',   label: '32-bit' }
+        { name: 'x86_64', label: '64 bit' },
+        { name: 'i686',   label: '32 bit' }
       ],
       desktops: [
         { name: 'cinnamon', label: 'CINNAMON' },
@@ -555,11 +555,11 @@ function DownloadController($scope) {
       archs: [
         {
           name: 'x86_64',
-          label: '64-bit'
+          label: '64 bit'
         },
         {
           name: 'i686',
-          label: '32-bit'
+          label: '32 bit'
         }
       ],
       desktops: [
@@ -732,11 +732,11 @@ function DownloadController($scope) {
       archs: [
         {
           name: 'x86_64',
-          label: '64-bit'
+          label: '64 bit'
         },
         {
           name: 'i686',
-          label: '32-bit'
+          label: '32 bit'
         }
       ],
       desktops: [
@@ -829,11 +829,11 @@ function DownloadController($scope) {
       archs: [
         {
           name: 'x86_64',
-          label: '64-bit (x86_64)'
+          label: '64 bit (x86_64)'
         },
         {
           name: 'i686',
-          label: '32-bit (i686)'
+          label: '32 bit (i686)'
         }
       ],
       desktops: [
