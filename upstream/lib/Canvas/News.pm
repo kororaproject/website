@@ -177,7 +177,7 @@ sub news_post_edit_get {
 
   my $stub = $self->param('id');
 
-  my $p = Canvas::Store::Post->search({ name => $stub })->first;
+  my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
 
   # only allow those who are authorised to edit posts
   return $self->redirect_to('/news') unless $self->news_post_can_edit( $p );
@@ -196,7 +196,7 @@ sub news_post {
   my $stub = $self->param('post_id');
 
   if( $stub ne '' ) {
-    my $p = Canvas::Store::Post->search({ name => $stub })->first;
+    my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
 
     # update if we found the object
     if( $self->news_post_can_edit( $p ) ) {
@@ -257,7 +257,7 @@ sub news_post_delete_any {
 
   my $stub = $self->param('id');
 
-  my $p = Canvas::Store::Post->search({ name => $stub })->first;
+  my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
 
   # only allow authenticated users
   return $self->redirect_to('/news') unless $self->news_post_can_delete( $p );
