@@ -147,7 +147,7 @@
             <h3>Create USB media on Windows</h3>
             <p>Windows users can download and install the <a href="https://fedorahosted.org/liveusb-creator/">LiveUSB creator tool</a> to easily make the bootable USB stick.</p>
             <h2>Source</h2>
-            <p>Feel free to grab the source that was used to build Korora. All the sources for:</p>
+            <p>Feel free to grab the source that was used to build Korora:</p>
             <ul>
               <li>Korora scripts (including kickstarts) and files are <a href="https://github.com/kororaproject">available on GitHub</a>.</li>
               <li>Installed packages are available via the <a href="http://linux.die.net/man/1/yumdownloader">yumdownloader</a> command.</li>

@@ -28,15 +28,29 @@
           <div class="col-sm-12">
             <div class="col-sm-12">
               <p>The Korora Project is small, but we have a dedicated team and community.</p>
-              <p>We would like to recognise the following developers:</p>
+              <p>We appreciate everyone who has come along and been a part of it, from our contributors, helpers and testers to IRC lurkers. Thank you to everyone who has downloaded Korora and helped to spread the word, you make it all worthwhile!</p>
+              <h2>Core development team</h2>
+                <p>Without our dedicated core team which work very hard, Korora would not exist. Thank you!</p>
               <ul>
-                <li>Chris Smart (csmart) – founder and lead developer</li>
-                <li>Ian Firns (firnsy) – lead developer</li>
+                <li>Chris Smart (csmart) – founder and lead developer (2005)</li>
+                <li>Ian Firns (firnsy) – lead developer (2010)</li>
+                <li>Jim Dean (ozjd) – tester and support administrator (2011)</li>
               </ul>
-              <p>We would like to recognise the following community members for their continued contributions to the Korora Project:</p>
+              <h2>Active contributors</h2>
+              <p>We would like to specifically recognise the following developers and community members for their contributions to the Korora Project.</p>
               <ul>
-                <li>Jim Dean (ozjd) – tester and forum administrator</li>
-                <li>Maik Adamietz (DarkEra) – Xfce desktop maintainer</li>
+                <li>Maik Adamietz (DarkEra) – Xfce desktop (2013)</li>
+              </ul>
+              <h2>Former contributors</h2>
+              <p>Some have stopped by only briefly but have made significant contributions and we would like to recognise them also.</p>
+              <ul>
+                <li>Dan Marshal (dan408) – MATE desktop (2013)</li>
+                <li>Jeremiah Summers (jmiahman) – KDE desktop (2013)</li>
+              </ul>
+              <h2>Padawan contributors</h2>
+              <p>In the community there is great hope for the future...</p>
+              <ul>
+                <li>Matthew Weaver (tthu) (2013)</li>
               </ul>
             </div>
           </div>
