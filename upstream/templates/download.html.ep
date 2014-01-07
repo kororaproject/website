@@ -63,7 +63,7 @@
             <h4>Released: <span>{{version.released}}</span></h4>
             <p>This is {{getStabilityString()}} of the Korora Linux operating system.</p>
             <p>It's everything you need to try out Korora &mdash; you don't have to erase anything on your current system and it won't put your files at risk.</p>
-            <p>Simply take Korora for a test drive on a DVD or USB stick and if you like what you see, you can install Korora directly to your hard drive straight from the live desktop.</p>
+            <p>Simply take Korora for a test drive on a USB stick and if you like what you see, you can install Korora directly to your hard drive straight from the live desktop.</p>
             <p>The minimum installation requirements for Korora are:</p>
             <ul class="fa-ul">
               <li><i class="fa-li fa fa-check-square-o"></i>32 bit Intel-compatible CPU</li>
@@ -150,7 +150,7 @@
             <h3>Create USB media on Windows</h3>
             <p>Windows users can download and install the <a href="https://fedorahosted.org/liveusb-creator/">LiveUSB creator tool</a> to easily make the bootable USB stick.</p>
             <h2>Source</h2>
-            <p>Feel free to grab the source that was used to build Korora:</p>
+            <p>Feel free to grab the source that was used to build Korora.</p>
             <ul>
               <li>Korora scripts (including kickstarts) and files are <a href="https://github.com/kororaproject">available on GitHub</a>.</li>
               <li>Installed packages are available via the <a href="http://linux.die.net/man/1/yumdownloader">yumdownloader</a> command.</li>
