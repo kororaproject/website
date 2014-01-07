@@ -114,9 +114,12 @@
                     <div class="hr hr-xs"></div>
                   </div>
                 </div>
-                <div class="pull-right checksums">
+                <div class="checksums">
                   <div ng-repeat="cs in version.checksums | filter:arch.name | filter:desktop.name">
-                    <span ng-repeat="c in cs.checksum" class="label label-default" title="{{c.hash}}">{{c.type}}</span>
+                    <div ng-repeat="c in cs.checksum" class="checksum">
+                      <span class="label label-default pull-left">{{c.type}}</span>
+                      <div class="hash">{{formatShortHash(c.hash)}}</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -167,5 +170,16 @@
 
   <!-- SCRIPTS -->
   %= include 'scripts.inc'
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/zeroclipboard/1.2.3/ZeroClipboard.min.js"></script>
+  <script>
+    $(document).ready( function() {
+      /*
+      var clip = new ZeroClipboard($(".checksums button"), {
+        moviePath: "//cdnjs.cloudflare.com/ajax/libs/zeroclipboard/1.2.3/ZeroClipboard.swf"
+      });
+      */
+    });
+  </script>
 </body>
 </html>

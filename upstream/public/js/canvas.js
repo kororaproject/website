@@ -1033,6 +1033,14 @@ function DownloadController($scope) {
     return ( ( $scope.desktop !== null ) && ( $scope.desktop.name === d ) );
   };
 
+  $scope.formatShortHash = function(hash) {
+    if( hash.length > 16 ) {
+      return hash.substr(0,8) + '...' + hash.substr(-8);
+    }
+
+    return hash;
+  }
+
   //
   // INIT
   //

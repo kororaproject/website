@@ -80,6 +80,14 @@ pre {
 }
 
 /*
+** TOOLTIPS
+*/
+.tooltip-inner {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/*
 ** MODALS
 */
 body.modal-open,
@@ -1364,8 +1372,21 @@ h4.step {
   text-align: center;
 }
 
+.checksums .hash {
+  font-family: monospace;
+  font-size: 12px;
+  margin: 4px;
+  text-align: center;
+}
+
+.checksums .checksum {
+  vertical-align: middle;
+}
+
 .checksums span.label {
-  margin-left: 2px;
+  margin: 4px 0;
   font-size: 10px;
   cursor: pointer;
+  width: 48px;
+  display: inline-block;
 }
