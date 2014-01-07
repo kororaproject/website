@@ -26,33 +26,51 @@
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <div class="col-sm-12">
-              <p>The Korora Project is small, but we have a dedicated team and community.</p>
-              <p>We appreciate everyone who has come along and been a part of it, from our contributors, helpers and testers to IRC lurkers. Thank you to everyone who has downloaded Korora and helped to spread the word, you make it all worthwhile!</p>
-              <h2>Core development team</h2>
-                <p>Without our dedicated core team which work very hard, Korora would not exist. Thank you!</p>
-              <ul>
-                <li>Chris Smart (csmart) – founder and lead developer (2005)</li>
-                <li>Ian Firns (firnsy) – lead developer (2010)</li>
-                <li>Jim Dean (ozjd) – tester and support administrator (2011)</li>
-              </ul>
-              <h2>Active contributors</h2>
-              <p>We would like to specifically recognise the following developers and community members for their contributions to the Korora Project.</p>
-              <ul>
-                <li>Maik Adamietz (DarkEra) – Xfce desktop (2013)</li>
-              </ul>
-              <h2>Former contributors</h2>
-              <p>Some have stopped by only briefly but have made significant contributions and we would like to recognise them also.</p>
-              <ul>
-                <li>Dan Marshal (dan408) – MATE desktop (2013)</li>
-                <li>Jeremiah Summers (jmiahman) – KDE desktop (2013)</li>
-              </ul>
-              <h2>Padawan contributors</h2>
-              <p>In the community there is great hope for the future...</p>
-              <ul>
-                <li>Matthew Weaver (tthu) (2013)</li>
-              </ul>
+            <p>The Korora Project is small, but we have a dedicated team and community.</p>
+            <p>We appreciate everyone who has come along and been a part of it, from our contributors, helpers and testers to IRC lurkers. Thank you to everyone who has downloaded Korora and helped to spread the word, you make it all worthwhile!</p>
+            <h2>Core development team</h2>
+            <p>Without our dedicated core team which work very hard, Korora would not exist. Thank you!</p>
+
+            <div class="row">
+              <div class="col-sm-4 team-profile">
+                <img src="/img/avatars/csmart.jpg" class="avatar"></img>
+                <h1 class="realname">Chris Smart</h1>
+                <h2 class="username">csmart</h2>
+                <p class="description">Founder and lead developer</p>
+                <p class="year">2005</p>
+              </div>
+              <div class="col-sm-4 team-profile">
+                <img src="/img/avatars/firnsy.jpg" class="avatar"></img>
+                <h1 class="realname">Ian Firns</h1>
+                <h2 class="username">firnsy</h2>
+                <p class="description">Lead developer</p>
+                <p class="year">2010</p>
+              </div>
+              <div class="col-sm-4 team-profile">
+                <img src="/img/avatars/ozjd.jpg" class="avatar"></img>
+                <h1 class="realname">Jim Dean</h1>
+                <h2 class="username">ozjd</h2>
+                <p class="description">Tester and support administrator</p>
+                <p class="year">2011</p>
+              </div>
+            </ul>
             </div>
+            <h2>Active contributors</h2>
+            <p>We would like to specifically recognise the following developers and community members for their contributions to the Korora Project.</p>
+            <ul>
+              <li>Maik Adamietz (DarkEra) – Xfce desktop (2013)</li>
+            </ul>
+            <h2>Former contributors</h2>
+            <p>Some have stopped by only briefly but have made significant contributions and we would like to recognise them also.</p>
+            <ul>
+              <li>Dan Marshal (dan408) – MATE desktop (2013)</li>
+              <li>Jeremiah Summers (jmiahman) – KDE desktop (2013)</li>
+            </ul>
+            <h2>Padawan contributors</h2>
+            <p>In the community there is great hope for the future...</p>
+            <ul>
+              <li>Matthew Weaver (tthu) (2013)</li>
+            </ul>
           </div>
         </div>
       </div>

@@ -849,11 +849,47 @@ blockquote p {
   height: 32px!important;
 }
 
-
-
 .icons-ul {
   padding-left: 0;
 }
+
+/*
+** DOWNLOAD PAGE SPECIFICS
+*/
+
+.team-profile {
+  text-align: center;
+}
+
+.team-profile .avatar {
+  width: 192px;
+}
+
+.team-profile .realname {
+  margin: 0;
+  font-size: 20px;
+  text-align: center;
+}
+
+.team-profile .username {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.team-profile .description {
+  margin: 0;
+  font-size: 16px;
+  text-align: center;
+}
+
+.team-profile .year {
+  font-size: 12px;
+  text-align: center;
+}
+
+
 
 /*
 ** NEWS PAGES
