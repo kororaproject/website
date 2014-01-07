@@ -150,7 +150,7 @@ sub news_post_get {
   my $self = shift;
   my $stub = $self->param('id');
 
-  my $p = Canvas::Store::Post->search({ name => $stub })->first;
+  my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
 
   # check we found the post
   return $self->redirect_to('news') unless $self->news_post_can_view( $p );
