@@ -101,6 +101,10 @@ body.modal-open,
   min-width: 600px;
 }
 
+.modal-footer {
+  margin-top: 0;
+}
+
 /*
 ** FONTS
 */

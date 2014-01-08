@@ -18,7 +18,7 @@
           <input type="hidden" name="post_id" value="<%= $post->name %>">
           <div class="row">
             <div class="col-sm-12">
-              <h1 class="text-center">Edit News Post</h1>
+              <h1 class="page-title"><strong>Edit.</strong> News Post</h1>
             </div>
           </div>
           <div class="row">
@@ -65,7 +65,10 @@
           <div class="row">
             <div class="col-sm-12">
               <div class="text-right">
-                <a class="btn btn-danger" href="/news/admin">Cancel</a>
+                <a class="btn btn-default" href="/news/admin">Cancel</a>
+% if( news_post_can_delete( $post ) ) {
+                <a href="" class="btn btn-danger" data-toggle="modal" data-target="#modalNewsDelete">Delete</i></a>
+% }
                 <button type="submit" class="btn btn-success">Save</button>
               </div>
             </div>
@@ -82,6 +85,26 @@
 
   <!-- MODALS -->
   %= include 'authenticate.inc'
+
+% if( news_post_can_delete( $post ) ) {
+  <div class="modal fade" id="modalNewsDelete" tabindex="-1" role="dialog" aria-labelledby="modalNewsDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-responsive">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="modalNewsDeleteLabel">Confirm delete ...</h4>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete the "<%= $post->title %>" post?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Ummm, No.</button>
+          <a class="btn btn-danger" href="<%= url_for_path(-1, 'delete') %>">Yes, I'm sure.</a>
+        </div>
+      </div>
+    </div>
+  </div>
+% }
 
   <!-- SCRIPTS -->
   %= include 'scripts.inc'
