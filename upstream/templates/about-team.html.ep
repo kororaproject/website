@@ -73,6 +73,14 @@
             </ul>
           </div>
         </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="callout callout-info">
+              <p>Korora avatars were created using Janina Himmen's avatar creator at <a href="http://www.sp-studio.de">SP Studio</a>.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- END CONTENT -->
