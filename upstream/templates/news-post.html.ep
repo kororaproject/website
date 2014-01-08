@@ -56,7 +56,7 @@
           <div class="col-sm-12">
             <div class="text-right">
 % if( news_post_can_edit( $post ) ) {
-              <a class="btn btn-default" href="<%= url_for_path(0, '/edit') %>">Edit</a>
+              <a class="btn btn-default" href="<%= url_for_path(0, 'edit') %>">Edit</a>
 % }
             </div>
           </div>
