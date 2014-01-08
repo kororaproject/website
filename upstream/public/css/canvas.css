@@ -617,6 +617,9 @@ blockquote p {
   margin-bottom: 0;
 }
 
+.callout-default {
+  background-color: #fdfdfd;
+}
 .callout-problem,
 .callout-danger {
   background-color: #fdf7f7;

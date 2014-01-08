@@ -63,7 +63,7 @@
 %   for my $r ( @{ $replies->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
-            <div id="reply-<%= $r->id %>" class="callout engage-reply <%= ( $r->status eq 'accepted' ) ? 'engage-reply-accepted' : '' %>">
+            <div id="reply-<%= $r->id %>" class="callout callout-default engage-reply <%= ( $r->status eq 'accepted' ) ? 'engage-reply-accepted' : '' %>">
               <%== render_markdown( $r->content ) %>
 
 %     if( $r->status eq 'accepted' ) {
