@@ -1045,7 +1045,7 @@ blockquote p {
 
 .engage-reply-accepted,
 .engage-reply-accepted:hover {
-  border-left: 3px solid #666;
+  border-left: 3px solid #aaa;
   background-color: #fafafa;
 }
 
