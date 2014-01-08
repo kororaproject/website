@@ -18,6 +18,12 @@
           <input type="hidden" name="post_id" value="<%= $post->name %>">
           <div class="row">
             <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li><a href="/news">News</a></li>
+              <li><a href="/news/admin">Admin</a></li>
+              <li class="active"><%= $post->title %></li>
+            </ol>
               <h1 class="page-title"><strong>Edit.</strong> News Post</h1>
             </div>
           </div>
