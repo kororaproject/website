@@ -727,7 +727,7 @@ function DownloadController($scope) {
       version: '18',
       codename: 'Flo',
       isStable: true,
-      isCurrent: true,
+      isCurrent: false,
       released: '01 May 2013',
       archs: [
         {
@@ -1021,7 +1021,7 @@ function DownloadController($scope) {
 
   $scope.getStabilityString = function() {
 
-    return ( $scope.version.isCurrent ? "the latest " : "an older " ) +
+    return ( $scope.version.isCurrent ? "the latest " : "the previous " ) +
            ( $scope.version.isStable  ? "stable " : "beta " ) + "version";
   };
 
