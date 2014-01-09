@@ -19,7 +19,7 @@
         <div class="row">
           <div class="col-sm-6 col-md-offset-1 col-md-5 col-lg-offset-2 col-lg-4">
             <div class="hr hr-lg"></div>
-            <img class="img-responsive" src="/img/laptop-korora.jpg" alt="">
+            <img class="img-responsive" src="/img/laptop-korora.jpg" alt="Korora on laptop">
             <div class="hr hr-lg"></div>
           </div>
           <div class="col-sm-6 col-md-5">
@@ -34,7 +34,7 @@
         <div class="row">
           <div class="col-sm-4">
             <div class="text-center">
-              <img class="img-title" src="/img/ico-innovation.png" alt="">
+              <img class="img-title" src="/img/ico-innovation.png" alt="Innovation">
             </div>
             <h2 class="text-center">Innovation</h2>
             <p class="feature-block">Innovation and invention are key precepts of Korora. Efficiency, elegance and empowerment drive our development processes.</p>
@@ -42,7 +42,7 @@
           </div>
           <div class="col-sm-4">
             <div class="text-center">
-              <img class="img-title" src="/img/ico-community.png" alt="">
+              <img class="img-title" src="/img/ico-community.png" alt="Community">
             </div>
             <h2 class="text-center">Community</h2>
             <p class="feature-block">The Korora community is a tight-knit group of users and contributors providing testing, development, support and feedback. All are welcome.</p>
@@ -50,7 +50,7 @@
           </div>
           <div class="col-sm-4">
             <div class="text-center">
-              <img class="img-title" src="/img/ico-security.png" alt="">
+              <img class="img-title" src="/img/ico-security.png" alt="Security">
             </div>
             <h2 class="text-center">Security</h2>
             <p class="feature-block">Security is essential. Korora is hardened with mandatory access control, stack smash protection, buffer overflow detection, variable reordering and much, much more.</p>
@@ -60,7 +60,7 @@
         <div class="row">
           <div class="col-sm-offset-2 col-sm-4">
             <div class="text-center">
-              <img class="img-title" src="/img/ico-choice.png" alt="">
+              <img class="img-title" src="/img/ico-choice.png" alt="Choice">
             </div>
             <h2 class="text-center">Choice</h2>
             <p class="feature-block">With a robust collection of software repositories, there are well over 30,000 unique packages for you to choose from.</p>
@@ -68,7 +68,7 @@
           </div>
           <div class="col-sm-4">
             <div class="text-center">
-              <img class="img-title" src="/img/ico-open-source.png" alt="">
+              <img class="img-title" src="/img/ico-open-source.png" alt="Open Source">
             </div>
             <h2 class="text-center">Free</h2>
             <p class="feature-block">Korora is 100% free. Copy and distribute as you see fit. In fact, we encourage it. The full sources to all of our packages are available on <a href="https://github.com/kororaproject">GitHub</a>.</p>
