@@ -142,10 +142,10 @@ sub startup {
 
   # about pages
   $r->get('/about')->to('about#index');
-  $r->get('/about/why-fedora')->to('about#why_fedora');
-  $r->get('/about/whats-inside')->to('about#whats_inside');
-  $r->get('/about/team')->to('about#team');
   $r->get('/about/roadmap')->to('about#roadmap');
+  $r->get('/about/team')->to('about#team');
+  $r->get('/about/whats-inside')->to('about#whats_inside');
+  $r->get('/about/why-fedora')->to('about#why_fedora');
 
   # about-news pages
   $r->get('/about/news')->to('news#index');
@@ -166,9 +166,8 @@ sub startup {
   $r->get('/discover/xfce')->to('discover#xfce');
 
   # support pages
-  $r->get('/support')->to('support#index');
-  $r->get('/support/irc')->to('support#irc');
-  $r->get('/support/howto')->to('support#howto');
+  $r->get('/support')->to('support#index_get');
+  $r->get('/support/documentation')->to('support#documentation_get');
 
   $r->get('/support/forums')->to('forum#forums');
   $r->get('/forum/:name')->to('forum#forum_name');

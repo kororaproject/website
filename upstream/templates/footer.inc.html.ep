@@ -6,7 +6,7 @@
         <a href="/about"><h4>About</h4></a>
         <ul>
           <li><a href="/about/news">News</a></li>
-          <li class="hide"><a href="/about/roadmap">Roadmap</a></li>
+          <li><a href="/about/roadmap">Roadmap</a></li>
           <li><a href="/about/team">Team</a></li>
           <li><a href="/about/why-fedora">Why Fedora?</a></li>
           <li><a href="/about/whats-inside">What's Inside</a></li>
@@ -37,9 +37,9 @@
       <div class="col-xs-6 col-sm-2">
         <h4><a href="/support">Support</a></h4>
         <ul>
-          <li class="hide"><a href="/support/forums">Forum</a></li>
-          <li class="hide"><a href="/support/documentation">Documentation</a></li>
+          <li><a href="/support/documentation">Documentation</a></li>
           <li><a href="/support/engage">Engage</a></li>
+          <li class="hide"><a href="/support/forums">Forum</a></li>
         </ul>
       </div>
       <div class="col-sm-2">

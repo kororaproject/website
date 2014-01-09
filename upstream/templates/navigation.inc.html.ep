@@ -21,7 +21,7 @@
           <ul class="dropdown-menu" role="menu">
             <li><a href="/about">Overview</a></li>
             <li><a href="/about/news">News</a></li>
-            <li class="hide"><a href="/about/roadmap">Roadmap</a></li>
+            <li><a href="/about/roadmap">Roadmap</a></li>
             <li><a href="/about/team">Team</a></li>
             <li><a href="/about/whats-inside">What's Inside</a></li>
             <li><a href="/about/why-fedora">Why Fedora?</a></li>
@@ -44,7 +44,7 @@
           <a href="/support" class="dropdown-toggle" data-toggle="dropdown">Support <b class="caret"></b></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="/support">Overview</a></li>
-            <li class="hide"><a href="/support/documentation">Documentation</a></li>
+            <li><a href="/support/documentation">Documentation</a></li>
             <li><a href="/support/engage">Engage</a></li>
             <li class="hide"><a href="/support/forums">Forums</a></li>
           </ul>

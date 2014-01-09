@@ -8,7 +8,7 @@
 
   <div class="page-container">
 
-    %= include 'navigation.inc', active => 'about'
+    %= include 'navigation.inc', active => 'support'
 
     <div class="page-content">
       <!-- CONTENT -->
@@ -18,15 +18,15 @@
           <div class="col-sm-12">
             <ol class="breadcrumb">
               <li><a href="/">Home</a></li>
-              <li><a href="/about">About</a></li>
-              <li class="active">Roadmap</li>
+              <li><a href="/support">Support</a></li>
+              <li class="active">Documentation</li>
             </ol>
-            <h1 class="page-title">Roadmap</h1>
+            <h1 class="page-title">Documentation</h1>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <p>Goals for future releases... Coming soon!</p>
+            <p>Korora documentation... Coming soon!</p>
           </div>
         </div>
       </div>

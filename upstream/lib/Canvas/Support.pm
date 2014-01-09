@@ -33,22 +33,16 @@ use Time::Piece;
 #
 # CONTROLLER HANDLERS
 #
-sub index {
+sub index_get {
   my $self = shift;
 
   $self->render('support');
 }
 
-sub irc {
+sub documentation_get {
   my $self = shift;
 
-  $self->render('support-irc');
-}
-
-sub howto {
-  my $self = shift;
-
-  $self->render('support-howto');
+  $self->render('support-documentation');
 }
 
 1;
