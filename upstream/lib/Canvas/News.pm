@@ -130,12 +130,12 @@ sub rss_get {
 
   my $rss = '<?xml version="1.0" ?><rss version="2.0"><channel>';
   $rss .= '<title>Korora Project - News</title>';
-  $rss .= '<link>http://kororaproject.org/news</link>';
+  $rss .= '<link>http://kororaproject.org/about/news</link>';
 
   foreach my $n ( $pager->search_where ) {
     $rss .= '<item>';
     $rss .= '<title>' . $n->title . '</title>';
-    $rss .= '<link>http://kororaproject.org/news/' . $n->name . '</link>';
+    $rss .= '<link>http://kororaproject.org/about/news/' . $n->name . '</link>';
     $rss .= '<description>' . $n->excerpt . '</description>';
     $rss .= '<pubDate>' . $n->created->strftime('%a, %d %b %Y %H:%M:%S GMT') . '</pubDate>';
     $rss .= '</item>';
@@ -153,7 +153,7 @@ sub news_post_get {
   my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
 
   # check we found the post
-  return $self->redirect_to('news') unless $self->news_post_can_view( $p );
+  return $self->redirect_to('aboutnews') unless $self->news_post_can_view( $p );
 
   $self->stash( post => $p );
 
@@ -180,7 +180,7 @@ sub news_post_edit_get {
   my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
 
   # only allow those who are authorised to edit posts
-  return $self->redirect_to('/news') unless $self->news_post_can_edit( $p );
+  return $self->redirect_to('aboutnews') unless $self->news_post_can_edit( $p );
 
   $self->stash(
     post      => $p,
@@ -224,7 +224,7 @@ sub news_post {
       $p->update;
     }
     else {
-      return $self->redirect_to('/news/admin');
+      return $self->redirect_to('aboutnewsadmin');
     }
   }
   # otherwise create a new entry
@@ -246,10 +246,10 @@ sub news_post {
     });
   }
   else {
-    return $self->redirect_to( '/news/admin');
+    return $self->redirect_to('aboutnewsadmin');
   }
 
-  $self->redirect_to( 'newsid', id => $stub );
+  $self->redirect_to( 'aboutnewsid', id => $stub );
 }
 
 sub news_post_delete_any {
@@ -260,21 +260,21 @@ sub news_post_delete_any {
   my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
 
   # only allow authenticated users
-  return $self->redirect_to('/news') unless $self->news_post_can_delete( $p );
+  return $self->redirect_to('aboutnews') unless $self->news_post_can_delete( $p );
 
   # check we found the post
   if( $self->news_post_can_delete( $p ) ) {
     $p->delete;
   }
 
-  $self->redirect_to('/news');
+  $self->redirect_to('aboutnews');
 }
 
 sub news_admin_get {
   my $self = shift;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/news') unless (
+  return $self->redirect_to('aboutnews') unless (
     $self->news_post_can_add ||
     $self->news_post_can_delete
   );

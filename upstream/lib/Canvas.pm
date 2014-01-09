@@ -147,6 +147,16 @@ sub startup {
   $r->get('/about/team')->to('about#team');
   $r->get('/about/roadmap')->to('about#roadmap');
 
+  # about-news pages
+  $r->get('/about/news')->to('news#index');
+  $r->post('/about/news')->to('news#news_post');
+  $r->get('/about/news/admin')->to('news#news_admin_get');
+  $r->get('/about/news/add')->to('news#news_add_get');
+  $r->get('/about/news/rss')->to('news#rss_get');
+  $r->get('/about/news/:id')->to('news#news_post_get');
+  $r->get('/about/news/:id/edit')->to('news#news_post_edit_get');
+  $r->any('/about/news/:id/delete')->to('news#news_post_delete_any');
+
   # discover pages
   $r->get('/discover')->to('discover#index');
   $r->get('/discover/gnome')->to('discover#gnome');
@@ -159,11 +169,6 @@ sub startup {
   $r->get('/support')->to('support#index');
   $r->get('/support/irc')->to('support#irc');
   $r->get('/support/howto')->to('support#howto');
-  $r->get('/support/contribute')->to('support#contribute_get');
-  $r->get('/support/contribute/donate')->to('support#donate_get');
-  $r->post('/support/contribute/donate')->to('support#donate_post');
-  $r->get('/support/contribute/sponsor')->to('support#sponsor_get');
-  $r->post('/support/contribute/sponsor')->to('support#sponsor_post');
 
   $r->get('/support/forums')->to('forum#forums');
   $r->get('/forum/:name')->to('forum#forum_name');
@@ -187,18 +192,15 @@ sub startup {
   $r->any('/support/engage/:type/:stub/reply/:id/unaccept')->to('engage#engage_reply_unaccept_any');
   $r->any('/support/engage/:type/:stub/reply/:id/delete')->to('engage#engage_reply_delete_any');
 
+  # contribute pages
+  $r->get('/contribute')->to('contribute#index_get');
+  $r->get('/contribute/donate')->to('contribute#donate_get');
+  $r->post('/contribute/donate')->to('contribute#donate_post');
+#  $r->get('/contribute/sponsor')->to('contribute#sponsor_get');
+#  $r->post('/contribute/sponsor')->to('contribute#sponsor_post');
+
   # download pages
   $r->get('/download')->to('download#index');
-
-  # news pages
-  $r->get('/news')->to('news#index');
-  $r->post('/news')->to('news#news_post');
-  $r->get('/news/admin')->to('news#news_admin_get');
-  $r->get('/news/add')->to('news#news_add_get');
-  $r->get('/news/rss')->to('news#rss_get');
-  $r->get('/news/:id')->to('news#news_post_get');
-  $r->get('/news/:id/edit')->to('news#news_post_edit_get');
-  $r->any('/news/:id/delete')->to('news#news_post_delete_any');
 
 
 

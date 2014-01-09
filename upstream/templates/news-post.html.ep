@@ -21,10 +21,11 @@
           <div class="col-sm-12">
             <ol class="breadcrumb">
               <div class="pull-right">
-                <a href="/news/rss" class="btn btn-xs btn-default rss"><i class="fa fa-fw fa-rss"></i></a>
+                <a href="/about/news/rss" class="btn btn-xs btn-default rss"><i class="fa fa-fw fa-rss"></i></a>
               </div>
               <li><a href="/">Home</a></li>
-              <li><a href="/news">News</a></li>
+              <li><a href="/about">About</a></li>
+              <li><a href="/about/news">News</a></li>
               <li class="active"><%= $post->title %></li>
             </ol>
             <h1><%= $post->title %></h1>

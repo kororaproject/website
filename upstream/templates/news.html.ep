@@ -21,9 +21,10 @@
           <div class="col-sm-12">
             <ol class="breadcrumb">
               <div class="pull-right">
-                <a href="/news/rss" class="btn btn-xs btn-default rss"><i class="fa fa-fw fa-rss"></i></a>
+                <a href="/about/news/rss" class="btn btn-xs btn-default rss"><i class="fa fa-fw fa-rss"></i></a>
               </div>
               <li><a href="/">Home</a></li>
+              <li><a href="/about">About</a></li>
               <li class="active">News</li>
             </ol>
             <h1 class="page-title"><strong>News.</strong> Latest Updates</h1>
@@ -33,7 +34,7 @@
 % foreach my $n ( @{ $news->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
-            <a href="/news/<%= $n->name %>"><h2><%= $n->title %></h2></a>
+            <a href="<%= url_for_path(0, $n->name) %>"><h2><%= $n->title %></h2></a>
 
             <div class="news-summary-subtitle">
               <div class="news-detail-subtitle-metadata">
@@ -50,7 +51,7 @@
 
             </div>
             <div>
-              <a class="btn btn-default" href="/news/<%= $n->name %>">Read more ... </a>
+              <a class="btn btn-default" href="<%= url_for_path(0, $n->name) %>">Read more ... </a>
             </div>
 
           </div>
