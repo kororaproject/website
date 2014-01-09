@@ -1,4 +1,4 @@
-<div class="modal modal-login fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+<div class="modal modal-login fade" id="loginModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
 
@@ -14,7 +14,7 @@
           <!-- TAB - LOGIN -->
           <div id="login" class="tab-pane active">
             <form action="/authenticate" method="post" class="form-signin" role="form">
-              <input type="hidden" name="redirect_to" value="<%= url_for('current') %>"></input>
+              <input type="hidden" name="redirect_to" value="<%= url_for('current') %>">
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
@@ -36,10 +36,10 @@
           <!-- TAB - FORGOT -->
           <div id="forgot" class="tab-pane">
             <form action="/forgot" method="post" class="form-signin" role="form">
-              <input type="hidden" name="redirect_to" value="<%= url_for('current') %>"></input>
+              <input type="hidden" name="redirect_to" value="<%= url_for('current') %>">
               <div class="form-group">
                 <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></span></i>
+                  <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
                   <input type="email" name="email" class="form-control" placeholder="you@example.org">
                 </div>
               </div>
