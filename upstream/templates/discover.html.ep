@@ -33,7 +33,7 @@
             <h3><a href="/discover/cinnamon">Cinnamon</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-cinnamon-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
-                <img src="/img/screenshots/korora-cinnamon-desktop-thumb.jpg" class="img-responsive">
+                <img src="/img/screenshots/korora-cinnamon-desktop-thumb.jpg" class="img-responsive" alt="Korora Cinnamon">
               </a>
             </div>
           </div>
@@ -41,7 +41,7 @@
             <h3><a href="/discover/gnome">GNOME</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-gnome-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
-                <img src="/img/screenshots/korora-gnome-desktop-thumb.jpg" class="img-responsive">
+                <img src="/img/screenshots/korora-gnome-desktop-thumb.jpg" class="img-responsive" alt="Korora GNOME">
               </a>
             </div>
           </div>
@@ -49,7 +49,7 @@
             <h3><a href="/discover/kde">KDE</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-kde-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
-                <img src="/img/screenshots/korora-kde-desktop-thumb.jpg" class="img-responsive">
+                <img src="/img/screenshots/korora-kde-desktop-thumb.jpg" class="img-responsive" alt="Korora KDE">
               </a>
             </div>
           </div>
@@ -59,7 +59,7 @@
             <h3><a href="/discover/mate">MATE</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-mate-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
-                <img src="/img/screenshots/korora-mate-desktop-thumb.jpg" class="img-responsive">
+                <img src="/img/screenshots/korora-mate-desktop-thumb.jpg" class="img-responsive" alt="Korora MATE">
               </a>
             </div>
           </div>
@@ -67,7 +67,7 @@
             <h3><a href="/discover/xfce">Xfce</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-xfce-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
-                <img src="/img/screenshots/korora-xfce-desktop-thumb.jpg" class="img-responsive">
+                <img src="/img/screenshots/korora-xfce-desktop-thumb.jpg" class="img-responsive" alt="Korora Xfce">
               </a>
             </div>
           </div>
@@ -96,7 +96,7 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="callout callout-warning">
-              <p><a name="footnote" href=""></a><sup>1</sup> RPMFusion provides software that the Fedora Project doesn't want to ship, such as support for MP3s and proprietary video drivers.</p>
+              <p id="footnote"><sup>1</sup> RPMFusion provides software that the Fedora Project doesn't want to ship, such as support for MP3s and proprietary video drivers.</p>
             </div>
           </div>
         </div>
