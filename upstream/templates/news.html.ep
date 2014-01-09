@@ -11,7 +11,7 @@
 
   <div class="page-container">
 
-    %= include 'navigation.inc', active => 'news'
+    %= include 'navigation.inc', active => 'about'
 
     <div class="page-content">
       <!-- CONTENT -->

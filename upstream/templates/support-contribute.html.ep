@@ -8,7 +8,7 @@
 
   <div class="page-container">
 
-    %= include 'navigation.inc', active => 'support'
+    %= include 'navigation.inc', active => 'contribute'
 
     <div class="page-content">
       <!-- CONTENT -->
