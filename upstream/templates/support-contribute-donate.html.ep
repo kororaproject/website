@@ -80,14 +80,14 @@
                   <div class="form-group cc-payment-type">
                     <label class="radio-inline">
                       <input type="radio" name="payment_type" value="card" ng-click="paymentViewUpdate('cc')" checked>
-                      <img class="cc-payment-icon" src="/img/ico-card-visa.png"></img>
-                      <img class="cc-payment-icon" src="/img/ico-card-mastercard.png"></img>
-                      <img class="cc-payment-icon" src="/img/ico-card-discover.png"></img>
-                      <img class="cc-payment-icon" src="/img/ico-card-amex.png"></img>
+                      <img class="cc-payment-icon" src="/img/ico-card-visa.png" alt="Icon Visa">
+                      <img class="cc-payment-icon" src="/img/ico-card-mastercard.png" alt="Icon Mastercard">
+                      <img class="cc-payment-icon" src="/img/ico-card-discover.png" alt="Icon Discover">
+                      <img class="cc-payment-icon" src="/img/ico-card-amex.png" alt="Icon AMEX">
                     </label>
                     <label class="radio-inline hide">
                       <input type="radio" name="payment_type" value="paypal" ng-click="paymentViewUpdate('paypal')">
-                      <img class="cc-payment-icon" src="/img/ico-card-paypal.png"></img>
+                      <img class="cc-payment-icon" src="/img/ico-card-paypal.png" alt="Icon Paypal">
                     </label>
                     <span class="help-block">How would you like to pay?</span>
                   </div>
