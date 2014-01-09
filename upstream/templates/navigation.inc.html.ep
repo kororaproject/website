@@ -4,11 +4,13 @@
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-primary-collapse">
         <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
+        <span class="fa fa-fw fa-caret-down"></span>
       </button>
-      <div class="navbar-brand kp-logo-48"></div>
+      <a href="/" class="navbar-brand">
+        <div class="kp-logo-48">
+          <h1 class="title">KORORA<span class="title-dark">PROJECT</span></h1>
+        </div>
+      </a>
     </div>
 
     <!-- navigation content for toggling -->

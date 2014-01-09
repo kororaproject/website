@@ -341,8 +341,31 @@ blockquote p {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, .6);
 }
 
-.kp-logo span {
-  color: #bbb;
+.navbar-brand {
+  padding: 0;
+  height: 50px;
+}
+
+.navbar-toggle {
+  padding: 4px 8px;
+  border-radius: 2px;
+  color: #fff;
+}
+
+.navbar-toggle:hover {
+  color: #666;
+}
+
+.navbar-brand .title {
+  display: inline-block;
+  margin: 12px 0;
+  font-size: 24px;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, .3);
+}
+
+.navbar-brand .title-dark {
+  color: #ccc;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, .3);
 }
 
@@ -375,13 +398,15 @@ blockquote p {
 }
 
 .kp-logo-48 {
+  display: inline-block;
   height: 48px;
-  width: 48px;
+  min-width: 48px;
+  padding-left: 48px;
 
   background-image: url('/img/kp-logo.png');
   background-size: 40px 40px;
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: 4px center;
 }
 
 .canvas-logo {
@@ -1090,6 +1115,34 @@ blockquote p {
 }
 
 /*
+** DOWNLOAD PAGE SPECIFICS
+*/
+h4.step {
+  margin: 8px 0;
+  line-height: 20px;
+  text-align: center;
+}
+
+.checksums .hash {
+  font-family: monospace;
+  font-size: 12px;
+  margin: 4px;
+  text-align: center;
+}
+
+.checksums .checksum {
+  vertical-align: middle;
+}
+
+.checksums span.label {
+  margin: 4px 0;
+  font-size: 10px;
+  cursor: pointer;
+  width: 48px;
+  display: inline-block;
+}
+
+/*
 ** SUPPORT PAGES
 */
 .contribute-banner {
@@ -1311,6 +1364,10 @@ footer a:visited {
     font-size: 56px;
   }
 
+  .navbar-brand .title {
+    display: none;
+  }
+
   #register {
     margin: 12px 0 0 0;
   }
@@ -1407,30 +1464,3 @@ footer a:visited {
 
 
 
-/*
-** DOWNLOAD PAGE SPECIFICS
-*/
-h4.step {
-  margin: 8px 0;
-  line-height: 20px;
-  text-align: center;
-}
-
-.checksums .hash {
-  font-family: monospace;
-  font-size: 12px;
-  margin: 4px;
-  text-align: center;
-}
-
-.checksums .checksum {
-  vertical-align: middle;
-}
-
-.checksums span.label {
-  margin: 4px 0;
-  font-size: 10px;
-  cursor: pointer;
-  width: 48px;
-  display: inline-block;
-}
