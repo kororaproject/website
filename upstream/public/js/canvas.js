@@ -365,7 +365,7 @@ function DownloadController($scope) {
     name: 'Korora 20',
       version: '20',
       codename: 'Peach',
-      isStable: false,
+      isStable: true,
       isCurrent: true,
       released: '10 January 2014',
       archs: [
@@ -550,7 +550,7 @@ function DownloadController($scope) {
       version: '19.1',
       codename: 'Bruce',
       isStable: true,
-      isCurrent: true,
+      isCurrent: false,
       released: '07 October 2013',
       archs: [
         {
@@ -817,7 +817,7 @@ function DownloadController($scope) {
           ],
         },
       ],
-      available: true,
+      available: false,
     },
     {
       name: 'Kororaa 17',
