@@ -72,6 +72,10 @@ sub startup {
   });
 
   #
+  # HYPNOTOAD
+  $self->app->config(hypnotoad => $config->{hypnotoad} // {} );
+
+  #
   # CACHE
   $self->plugin('Cache' => $config->{cache} // {} );
 
