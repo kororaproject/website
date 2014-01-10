@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="canvas">
+<html lang="en" data-ng-app="canvas">
 <head>
   %= include 'header.inc', title => 'Korora Project'
   <link href="/css/layerslider.css" rel="stylesheet" media="screen">
