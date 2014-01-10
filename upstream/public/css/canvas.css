@@ -533,6 +533,9 @@ blockquote p {
   top: -4px;
 }
 
+.laptop {
+  margin: 32px auto;
+}
 
 /*
 ** PAGINATION BUTTON SIZE
@@ -1387,6 +1390,10 @@ footer a:visited {
     display: none;
   }
 
+  .laptop {
+    margin: 16px 0;
+  }
+
   #register {
     margin: 12px 0 0 0;
   }
@@ -1415,6 +1422,10 @@ footer a:visited {
     background-position: 16px center;
   }
 
+  .laptop {
+    margin: 8px 0;
+  }
+
   .hr {
     height: 24px;
   }
@@ -1426,6 +1437,10 @@ footer a:visited {
 }
 /* lg */
 @media all and (min-width: 1200px) {
+  .laptop {
+    margin-top: -8px;
+  }
+
   .hr {
     height: 32px;
   }
