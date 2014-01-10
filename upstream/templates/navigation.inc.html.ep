@@ -19,7 +19,7 @@
         <li class="dropdown <%= 'active' if ( $active eq 'about' ) %>">
           <a href="/about" class="dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="/about">Overview</a></li>
+            <li class="overview"><a href="/about">Overview</a></li>
             <li><a href="/about/news">News</a></li>
             <li><a href="/about/roadmap">Roadmap</a></li>
             <li><a href="/about/team">Team</a></li>
@@ -31,7 +31,7 @@
         <li class="dropdown <%= 'active' if ( $active eq 'discover' ) %>">
           <a href="/discover" class="dropdown-toggle" data-toggle="dropdown">Discover <b class="caret"></b></a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="/discover">Overview</a></li>
+            <li class="overview"><a href="/discover">Overview</a></li>
             <li><a href="/discover/cinnamon">Cinnamon Desktop</a></li>
             <li><a href="/discover/gnome">GNOME Desktop</a></li>
             <li><a href="/discover/kde">KDE Desktop</a></li>
@@ -43,7 +43,7 @@
         <li class="dropdown <%= 'active' if ( $active eq 'support' ) %>">
           <a href="/support" class="dropdown-toggle" data-toggle="dropdown">Support <b class="caret"></b></a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="/support">Overview</a></li>
+            <li class="overview"><a href="/support">Overview</a></li>
             <li><a href="/support/documentation">Documentation</a></li>
             <li><a href="/support/engage">Engage</a></li>
             <li class="hide"><a href="/support/forums">Forums</a></li>
