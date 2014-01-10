@@ -101,7 +101,7 @@ sub startup {
 
   #
   # MAIL
-  if( ( $ENV{'CANVAS_MODE'} // '' ) ne 'production' ) {
+  unless( $config->{mail} && ( $config->{mail}{mode} // '') eq 'production' ) {
     $self->app->log->info('Loading dummy mail handler for non-production testing.');
 
     $self->helper('mail' => sub {
