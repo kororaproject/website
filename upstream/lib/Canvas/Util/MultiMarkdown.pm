@@ -52,7 +52,10 @@ sub new {
     my ($class, %p) = @_;
 
     $p{use_attributes} = ( $p{use_attributes} // 0 ) ? 1 : 0;
-    $p{use_metadata} = ( $p{use_metadata} // 1 )? 1 : 0;
+
+    # default off
+    $p{use_metadata} = ( $p{use_metadata} // 0 ) ? 1 : 0;
+
     $p{use_metadata_newline} //= {
       default   => "\n",
       keywords  => ',',
@@ -174,8 +177,12 @@ sub _Markdown {
   # contorted like /[ \t]*\n+/ .
   $text =~ s/^[ \t]+$//mg;
 
+  say Dumper "PRE: $text";
+
   # Strip out MetaData
   $text = $self->_ParseMetaData($text) if $self->{params}{use_metadata};
+
+  say Dumper "POST: $text";
 
   # And recheck for leading blank lines
   $text =~ s/^\n+//s;
