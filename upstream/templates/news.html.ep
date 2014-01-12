@@ -34,6 +34,15 @@
           </div>
         </div>
 
+% if( $news->{item_count} > $news->{page_size} ) {
+        <!-- PAGINATION -->
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <%== paginate( $news ) %>
+          </div>
+        </div>
+% }
+
 % foreach my $n ( @{ $news->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
@@ -63,6 +72,7 @@
 % }
 
 % if( $news->{item_count} > $news->{page_size} ) {
+        <!-- PAGINATION -->
         <div class="row">
           <div class="col-sm-12 text-center">
             <%== paginate( $news ) %>

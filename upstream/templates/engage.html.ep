@@ -163,6 +163,17 @@
 
         <div class="hr"></div>
 
+% if( $responses->{item_count} > $responses->{page_size} ) {
+        <!-- PAGINATION -->
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <%== paginate( $responses ) %>
+          </div>
+        </div>
+% }
+
+        <div class="hr"></div>
+
 % foreach my $r ( @{ $responses->{items} } ) {
           <div class="row">
             <div class="col-sm-12">
@@ -198,6 +209,7 @@
         <div class="hr"></div>
 
 % if( $responses->{item_count} > $responses->{page_size} ) {
+        <!-- PAGINATION -->
         <div class="row">
           <div class="col-sm-12 text-center">
             <%== paginate( $responses ) %>
