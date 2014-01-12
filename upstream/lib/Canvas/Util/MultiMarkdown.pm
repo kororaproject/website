@@ -177,12 +177,8 @@ sub _Markdown {
   # contorted like /[ \t]*\n+/ .
   $text =~ s/^[ \t]+$//mg;
 
-  say Dumper "PRE: $text";
-
   # Strip out MetaData
   $text = $self->_ParseMetaData($text) if $self->{params}{use_metadata};
-
-  say Dumper "POST: $text";
 
   # And recheck for leading blank lines
   $text =~ s/^\n+//s;
