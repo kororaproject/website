@@ -176,15 +176,17 @@ Rule #3
 </pre>
 
 <h2 id="link-simple-blockquotes">Simple blockquotes</h2>
-<p>Add a <code>&gt;</code> to the beginning of any line to create a <code>blockquote</code>.</p>
+<p>Add a <code>&gt;</code> to the beginning of any line to create a <code>blockquote</code>. Ensure that after any quoteing you leave a blank line to resume normal paragraph text.</p>
 <pre><span class="hi">&gt;</span> The syntax is based on the way email programs
 <span class="hi">&gt;</span> usually do quotations. You don't need to hard-wrap
 <span class="hi">&gt;</span> the paragraphs in your blockquotes, but it looks much nicer if you do. Depends how lazy you feel.
+
+New paragraphs start after a blank line.
 </pre>
 
 <h2 id="link-advanced-blockquotes" data-title="Advanced blockquotes">Advanced blockquotes: Nesting</h2>
 <p class="col-summary only" style="display: none;"> To put other Markdown blocks in a <code>blockquote</code>, just add a <code>&gt;</code> followed by a space.</p>
-<p>To put other Markdown blocks in a <code>bq</code>, just add a <code>&gt;</code> followed by a space:</p>
+<p>To put other Markdown blocks in a <code>blockquote</code>, just add a <code>&gt;</code> followed by a space:</p>
 <pre><span class="hi">&gt;</span> The &gt; on the blank lines is optional.
 <span class="hi">&gt;</span> Include it or don't; Markdown doesn't care.
 <span class="hi">&gt;</span><span class="spaces">&nbsp;</span>

@@ -1262,19 +1262,19 @@ sub _DoBlockQuotes {
   my $text = shift;
 
   $text =~ s{
-      (               # Wrap whole match in $1
-      (
-        ^[ \t]*>[ \t]?      # '>' at the start of a line
+      (                 # Wrap whole match in $1
+       (
+        ^[ \t]*>[ \t]?  # '>' at the start of a line
           .+\n          # rest of the first line
         (.+\n)*         # subsequent consecutive lines
-        \n*           # blanks
-      )+
+        \n*             # blanks
+       )+
       )
     }{
       my $bq = $1;
-      $bq =~ s/^[ \t]*>[ \t]?//gm;  # trim one level of quoting
-      $bq =~ s/^[ \t]+$//mg;      # trim whitespace-only lines
-      $bq = $self->_RunBlockGamut($bq);    # recurse
+      $bq =~ s/^[ \t]*>[ \t]?//gm;      # trim one level of quoting
+      $bq =~ s/^[ \t]+$//mg;            # trim whitespace-only lines
+      $bq = $self->_RunBlockGamut($bq); # recurse
 
       $bq =~ s/^/  /g;
       # These leading spaces screw with <pre> content, so we need to fix that:
