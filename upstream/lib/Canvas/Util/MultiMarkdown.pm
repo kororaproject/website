@@ -8,7 +8,7 @@ use Mojo::Base -base;
 use Carp            qw(croak);
 use Data::Dumper;
 use Digest::MD5     qw(md5_hex);
-use Encode          qw();
+use Encode          qw(encode_utf8);
 use Text::Balanced  qw(gen_extract_tagged);
 
 my $VERSION   = '2.0.b6-c1';
@@ -335,7 +335,7 @@ sub _HashHTMLBlocks {
 
       my ($tag, $remainder) = $extract_block->($cur_line . $text);
       if ($tag) {
-        my $key = md5_hex($tag);
+        my $key = md5_hex( encode_utf8 $tag );
         $self->{_html_blocks}{$key} = $tag;
         push @chunks, "\n\n" . $key . "\n\n";
         $text = $remainder;
@@ -375,7 +375,7 @@ sub _HashHTMLBlocks {
           (?=\n{2,}|\Z)   # followed by a blank line or end of document
         )
       }{
-        my $key = md5_hex($1);
+        my $key = md5_hex( encode_utf8 $1 );
         $self->{_html_blocks}{$key} = $1;
         "\n\n" . $key . "\n\n";
       }egx;
@@ -398,7 +398,7 @@ sub _HashHTMLBlocks {
           (?=\n{2,}|\Z)   # followed by a blank line or end of document
         )
       }{
-        my $key = md5_hex($1);
+        my $key = md5_hex( encode_utf8 $1 );
         $self->{_html_blocks}{$key} = $1;
         "\n\n" . $key . "\n\n";
       }egx;
@@ -421,7 +421,7 @@ sub _HashHTMLBlocks {
           (?=\n{2,}|\Z)   # followed by a blank line or end of document
         )
       }{
-        my $key = md5_hex($1);
+        my $key = md5_hex( encode_utf8 $1 );
         $self->{_html_blocks}{$key} = $1;
         "\n\n" . $key . "\n\n";
       }egx;
