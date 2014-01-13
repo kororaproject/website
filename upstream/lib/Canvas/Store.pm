@@ -33,7 +33,7 @@ Canvas::Store->set_db(
   $dsn,
   $username,
   $password,
-  { AutoCommit => 1 },
+  { AutoCommit => 1, mysql_enable_utf8 => 1 },
 );
 
 sub getConfig {
