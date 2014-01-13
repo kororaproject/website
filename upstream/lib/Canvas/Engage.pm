@@ -334,6 +334,9 @@ sub engage_post_detail_get {
   # check we found the post
   return $self->redirect_to('/support/engage') unless defined $p;
 
+  # allow path to get back here
+  $self->flash( redirect_url => $self->url_with );
+
   $self->stash( response => $p, replies => $r, content => $content );
   $self->render('engage-detail');
 }
@@ -357,38 +360,6 @@ sub engage_post_edit_get {
   $self->stash( post => $p, replies => \@r );
 
   $self->render('engage-edit');
-}
-
-sub engagage_post_edit_get {
-  my $self = shift;
-
-  # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless (
-    $self->is_user_authenticated() &&
-    $self->auth_user->is_admin
-  );
-
-  my $stub = $self->param('stub');
-
-  my $p = Canvas::Store::WPPost->search({ post_name => $stub })->first;
-
-  # check we found the post
-  return $self->redirect_to('/support/engage') unless defined $p;
-
-  my $cache = {
-    id            => $p->ID,
-    created       => $p->post_date_gmt->strftime('%e %B, %Y at %H:%M'),
-    updated       => $p->post_modified_gmt->strftime('%e %B, %Y at %H:%M'),
-    title         => $p->post_title,
-    content       => $p->post_content,
-    excerpt       => $p->post_excerpt,
-    stub          => $p->post_name,
-    author        => $p->post_author->user_nicename,
-  };
-
-  # build the cancel path
-  $self->stash( mode => 'edit', post => $cache );
-  $self->render('news-post-new');
 }
 
 sub engage_post_edit_post {
@@ -511,13 +482,15 @@ sub engage_post_unsubscribe_any {
 sub engage_reply_post {
   my $self = shift;
 
+  my $type = $self->param('type');
+  my $stub = $self->param('stub');
+  my $redirect_url = $self->param('redirect_url') // $self->url_for('supportengagetypestub', type => $type, stub => $stub);
+
   # only allow authenticated and authorised users
   return $self->redirect_to('/support/engage') unless(
     $self->is_user_authenticated && defined $self->auth_user
   );
 
-  my $type = $self->param('type');
-  my $stub = $self->param('stub');
   my $subscribe = $self->param('subscribe') // 0;
   my $content = $self->param('content') // '';
 
@@ -526,7 +499,7 @@ sub engage_reply_post {
     $self->flash( content => $content );
 
     $self->flash( page_errors => 'Your reply lacks a little description. Pleast use at least least 16 characters to convey something meaningful.' );
-    return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+    return $self->redirect_to( $redirect_url );
   }
 
   my $p = Canvas::Store::Post->search({ name => $stub })->first;
@@ -592,7 +565,7 @@ sub engage_reply_post {
   }
 
   # redirect to the detail
-  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+  $self->redirect_to( $redirect_url );
 }
 
 sub engage_reply_accept_any {
@@ -644,21 +617,22 @@ sub engage_reply_unaccept_any {
 sub engage_reply_edit_get {
   my $self = shift;
 
+  my $id = $self->param('id');
   my $type = $self->param('type');
   my $stub = $self->param('stub');
+  my $redirect_url = $self->flash('redirect_url') // $self->url_for('supportengagetypestub', type => $type, stub => $stub);
 
-  my $id = $self->param('id');
 
   my $r = Canvas::Store::Post->search({
     type  => 'reply',
     id    => $id,
   })->first;
 
-  return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless $self->engage_post_can_edit( $r );
+  return $self->redirect_to( $redirect_url ) unless $self->engage_post_can_edit( $r );
 
   my $content = $self->flash('content') // $r->content;
 
-  $self->stash( reply => $r, content => $content );
+  $self->stash( reply => $r, content => $content, redirect_url => $redirect_url );
 
   $self->render('engage-reply-edit');
 }
@@ -666,17 +640,19 @@ sub engage_reply_edit_get {
 sub engage_reply_edit_post {
   my $self = shift;
 
+  my $content = $self->param('content');
+  my $id      = $self->param('id');
   my $type    = $self->param('type');
   my $stub    = $self->param('stub');
-  my $id      = $self->param('id');
-  my $content = $self->param('content');
+
+  my $redirect_url = $self->param('redirect_url') // $self->url_for('supportengagetypestub', type => $type, stub => $stub);
 
 
   # ensure edits maintain some context
   unless( length( trim $content ) >= 16 ) {
     $self->flash( content => $content,);
     $self->flash( page_errors => 'Your editted reply lacks a little description. Pleast use at least least 16 characters to convey something meaningful.' );
-    return $self->redirect_to( $self->url_with('current') );
+    return $self->redirect_to( $self->url_with );
   }
 
   my $r = Canvas::Store::Post->search({
@@ -685,13 +661,13 @@ sub engage_reply_edit_post {
   })->first;
 
   # ensure we have edit capabilities
-  return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless $self->engage_post_can_edit( $r );
+  return $self->redirect_to( $redirect_url ) unless $self->engage_post_can_edit( $r );
 
   $r->content( $content );
   $r->update;
 
   # redirect to the detail
-  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+  $self->redirect_to( $redirect_url );
 }
 
 sub engage_post_delete_any {
