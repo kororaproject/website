@@ -189,11 +189,13 @@ sub startup {
   $r->any('/support/engage/:type/:stub/subscribe')->to('engage#engage_post_subscribe_any');
   $r->any('/support/engage/:type/:stub/unsubscribe')->to('engage#engage_post_unsubscribe_any');
   $r->post('/support/engage/:type/:stub/reply')->to('engage#engage_reply_post');
+  $r->any('/support/engage/:type/:stub/reply/:id')->to('engage#engage_reply_any');
   $r->get('/support/engage/:type/:stub/reply/:id/edit')->to('engage#engage_reply_edit_get');
   $r->post('/support/engage/:type/:stub/reply/:id/edit')->to('engage#engage_reply_edit_post');
   $r->any('/support/engage/:type/:stub/reply/:id/accept')->to('engage#engage_reply_accept_any');
-  $r->any('/support/engage/:type/:stub/reply/:id/unaccept')->to('engage#engage_reply_unaccept_any');
   $r->any('/support/engage/:type/:stub/reply/:id/delete')->to('engage#engage_reply_delete_any');
+  $r->any('/support/engage/:type/:stub/reply/:id/unaccept')->to('engage#engage_reply_unaccept_any');
+
 
   # contribute pages
   $r->get('/contribute')->to('contribute#index_get');

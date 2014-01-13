@@ -172,24 +172,33 @@
   <!-- SCRIPTS -->
   %= include 'scripts.inc'
 
+% if( is_user_authenticated ) {
   <script>
     $(document).ready( function() {
       /* activate quote buttons if exists */
       $("[id^=quote-]").each( function( i ) {
         $(this).on('click', function() {
           var id = '#reply-' + $(this).attr('id').substr(6);
+          var url = $(location).attr('href') + '/reply/' + $(this).attr('id').substr(6);
 
-          var quote_lines = $.trim( $(id).text() ).split('\n');
-          var quote = '';
+          $.get(url, function(data) {
+            if( data.hasOwnProperty('content') &&
+                data.hasOwnProperty('author') ) {
+              var box = $('#reply-box');
+              var quote_lines = data.content.split(/\r?\n/);
+              var quote = '> ' + ( data.author || 'unknown' ) + ' wrote:  \n';
 
-          $.each(quote_lines, function() {
-            quote += '> ' + this + '\n';
+              $.each(quote_lines, function() {
+                quote += '> ' + this + '  \n';
+              });
+
+              box.val( box.val() + quote + '\n' );
+            }
           });
-
-          $('#reply-box').append( quote );
         });
       });
     });
   </script>
+% }
 </body>
 </html>

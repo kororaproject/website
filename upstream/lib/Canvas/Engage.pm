@@ -66,7 +66,7 @@ use constant TYPE_MAP => {
       ''              => 'All Problems',
       'known-problem' => 'Problems - Known Problem',
       'declined'      => 'Problems - Declined',
-      'planned'       => 'Problems - Solved',
+      'solved'        => 'Problems - Solved',
       'in-progress'   => 'Problems - In Progress',
     },
   },
@@ -712,6 +712,33 @@ sub engage_post_delete_any {
 
   $self->redirect_to('/support/engage');
 }
+
+sub engage_reply_any {
+  my $self = shift;
+
+  my $quote = {};
+
+  if( $self->is_user_authenticated ) {
+    my $type = $self->param('type');
+    my $stub = $self->param('stub');
+    my $id   = $self->param('id');
+
+    my $r = Canvas::Store::Post->search({
+      type  => 'reply',
+      id    => $id,
+    })->first;
+
+    if( $r ) {
+      $quote = {
+        author  => $r->author_id->username,
+        content => $r->content,
+      };
+    }
+  }
+
+  $self->render( json => $quote );
+}
+
 
 sub engage_reply_delete_any {
   my $self = shift;
