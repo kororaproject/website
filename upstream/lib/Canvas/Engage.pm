@@ -242,10 +242,7 @@ sub engage_post_add_post {
   my $stub = sanitise_with_dashes( $title );
 
   # check for existing stubs and append the ID + 1 of the last
-  my( @e ) = Canvas::Store::Post->search({
-    name => $stub,
-    type => $type,
-  });
+  my( @e ) = Canvas::Store::Post->search({ type => $type, name => $stub });
 
   $stub .= '-' . ( $e[-1]->id + 1 ) if @e;
 
@@ -321,11 +318,12 @@ sub engage_post_add_post {
 sub engage_post_detail_get {
   my $self = shift;
   my $stub = $self->param('stub');
+  my $type = $self->param('type');
 
   # could have flashed 'content' from an attempted reply
   my $content = $self->flash('content') // '';
 
-  my $p = Canvas::Store::Post->search({ name => $stub })->first;
+  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
   my $r = $p->search_replies(
     page_size => 20,
     page      => $self->param('page'),
@@ -345,7 +343,8 @@ sub engage_post_edit_get {
   my $self = shift;
 
   my $stub = $self->param('stub');
-  my $p = Canvas::Store::Post->search({ name => $stub })->first;
+  my $type = $self->param('type');
+  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
 
   # check we found the post
   return $self->redirect_to('/support/engage') unless defined $p;
@@ -367,7 +366,7 @@ sub engage_post_edit_post {
 
   my $stub = $self->param('stub');
   my $type = $self->param('type');
-  my $p = Canvas::Store::Post->search({ name => $stub })->first;
+  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
 
   # check we found the post
   return $self->redirect_to('/support/engage') unless defined $p;
@@ -423,10 +422,7 @@ sub engage_post_subscribe_any {
   # redirect unless we're actively auth'd
   return $self->redirect_to( $url ) unless $self->is_active_auth;
 
-  my $p = Canvas::Store::Post->search({
-    type => $type,
-    name => $stub
-  })->first;
+  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
 
   # check we found the post
   return $self->redirect_to('/support/engage') unless defined $p;
@@ -453,10 +449,7 @@ sub engage_post_unsubscribe_any {
   # redirect unless we're actively auth'd
   return $self->redirect_to( $url ) unless $self->is_active_auth;
 
-  my $p = Canvas::Store::Post->search({
-    type => $type,
-    name => $stub
-  })->first;
+  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
 
   # check we found the post
   return $self->redirect_to('/support/engage') unless defined $p;
@@ -502,7 +495,7 @@ sub engage_reply_post {
     return $self->redirect_to( $redirect_url );
   }
 
-  my $p = Canvas::Store::Post->search({ name => $stub })->first;
+  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
 
   # check we found the post
   return $self->redirect_to('/support/engage') unless defined $p;
@@ -676,10 +669,7 @@ sub engage_post_delete_any {
   my $type = $self->param('type');
   my $stub = $self->param('stub');
 
-  my $p = Canvas::Store::Post->search({
-    type => $type,
-    name => $stub
-  })->first;
+  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
 
   # only allow authenticated and authorised users
   return $self->redirect_to('/support/engage') unless $self->engage_post_can_delete( $p );
@@ -699,10 +689,7 @@ sub engage_reply_any {
     my $stub = $self->param('stub');
     my $id   = $self->param('id');
 
-    my $r = Canvas::Store::Post->search({
-      type  => 'reply',
-      id    => $id,
-    })->first;
+    my $r = Canvas::Store::Post->search({ type => 'reply', id => $id, })->first;
 
     if( $r ) {
       $quote = {
@@ -723,10 +710,7 @@ sub engage_reply_delete_any {
   my $stub = $self->param('stub');
   my $id   = $self->param('id');
 
-  my $r = Canvas::Store::Post->search({
-    type  => 'reply',
-    id    => $id,
-  })->first;
+  my $r = Canvas::Store::Post->search({ type => 'reply', id => $id, })->first;
 
   # only allow authenticated and authorised users
   return $self->redirect_to('/support/engage') unless $self->engage_post_can_delete( $r );
