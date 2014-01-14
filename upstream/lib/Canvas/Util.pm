@@ -16,6 +16,38 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 package Canvas::Util;
+
 use Mojo::Base 'Exporter';
+
+#
+# PERL INCLUDES
+#
+use Carp qw(croak);
+
+our @EXPORT_OK = (
+  qw(get_random_bytes)
+);
+
+sub get_random_bytes($) {
+  my $count = shift // 8;
+  my $bytes = undef;
+
+  # extract randomness from /dev/urandom
+  if( open( DEV, '/dev/urandom' ) ) {
+    read( DEV, $bytes, $count );
+    close( DEV );
+  }
+  # otherwise seed from the sha512 sum of the current time
+  # including microseconds
+  elsif( $count <= 64 ) {
+    my( $t, $u ) = gettimeofday();
+    $bytes = substr sha512( $t . '.' . $u ), 0, $count;
+  }
+  else {
+    croak '/dev/urandom could not be opened and your count exceeds the entropy afforded by the fallback.';
+  }
+
+  return $bytes;
+}
 
 1;

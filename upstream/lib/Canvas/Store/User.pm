@@ -26,6 +26,11 @@ use Mojo::Base 'Canvas::Store';
 use Digest::MD5 qw(md5);
 
 #
+# LOCAL INCLUDES
+#
+use Canvas::Util qw(get_random_bytes);
+
+#
 # MODEL DEFINITION
 #
 __PACKAGE__->table('canvas_user');
@@ -78,14 +83,10 @@ sub validate_password($$) {
   return _crypt_private( $pass, $setting ) eq $self->password;
 }
 
-sub _get_random_bytes {
-  return "abcdef";
-}
-
 sub hash_password($$) {
   my( $self, $pass ) = @_;
 
-  my $random = _get_random_bytes(6);
+  my $random = get_random_bytes(6);
   my $hash = _crypt_private($pass, _gensalt_private($random));
 
   return length( $hash ) == 34 ? $hash : undef;

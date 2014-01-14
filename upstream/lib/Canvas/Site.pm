@@ -37,6 +37,7 @@ use Digest::SHA qw(sha512 sha256_hex);
 use Canvas::Store::User;
 use Canvas::Store::UserMeta;
 use Canvas::Store::WPUser;
+use Canvas::Util qw(get_random_bytes);
 
 #
 # INTERNAL HELPERS
@@ -46,19 +47,7 @@ use Canvas::Store::WPUser;
 # create_auth_token()
 #
 sub create_auth_token {
-  my $bytes;
-
-  # extract randomness from /dev/urandom
-  if( open( DEV, "/dev/urandom" ) ) {
-    read( DEV, $bytes, 48 );
-    close( DEV );
-  }
-  # otherwise seed from the sha512 sum of the current time
-  # including microseconds
-  else {
-    my( $t, $u ) = gettimeofday();
-    $bytes = substr sha512( $t . '.' . $u ), 0, 48;
-  }
+  my $bytes = get_random_bytes(48);
 
   return sha256_hex( $bytes );
 }
