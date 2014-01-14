@@ -86,6 +86,54 @@ use constant DISTANCE_TIME_FORMAT => {
 sub register {
   my( $self, $app ) = @_;
 
+  $app->helper(exception_reaper => sub {
+    my( $self, $exception, $req ) = @_;
+
+    my $message = "WHOA!!! Shit's getting real!\n\n";
+
+    # exception
+    $message .= Dumper $exception;
+
+    # request
+    $message .= Dumper $req;
+
+    # mojo version
+    $message .= Dumper $Mojolicious::VERSION;
+    $message .= Dumper $Mojolicious::CODENAME;
+
+    # home
+    $message .= Dumper $app->home;
+
+    # include
+    $message .= Dumper \@INC;
+
+    # PID
+    $message .= Dumper $$;
+
+    # name
+    $message .= Dumper $0;
+
+    # executable
+    $message .= Dumper $^X;
+
+    # time
+    $message .= Dumper scalar localtime(time);
+
+    # footer
+    $message .= "\n" .
+                "Good Luck!";
+
+    unless( $exception->{message} eq 'render_only' ) {
+      $self->mail(
+        from    => 'matrix@kororaproject.org',
+        to      => 'webmaster@kororaproject.org',
+        subject => 'Core Exception!',
+        data    => $message,
+      );
+    }
+
+  });
+
   $app->helper(url_for_path => sub {
     my( $self, $modifier ) = ( shift, shift );
 

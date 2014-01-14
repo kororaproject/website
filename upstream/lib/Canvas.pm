@@ -144,6 +144,11 @@ sub startup {
 
   $r->get('/')->to('site#index');
 
+  #
+  # exception/not_found
+  $r->get('/404')->to('site#not_found_get');
+  $r->get('/500')->to('site#exception_get');
+
   # about pages
   $r->get('/about')->to('about#index');
   $r->get('/about/roadmap')->to('about#roadmap');
@@ -173,9 +178,10 @@ sub startup {
   $r->get('/support')->to('support#index_get');
   $r->get('/support/documentation')->to('support#documentation_get');
 
-  $r->get('/support/forums')->to('forum#forums');
-  $r->get('/forum/:name')->to('forum#forum_name');
-  $r->get('/topic/:name')->to('forum#topic_name');
+# depracated
+  $r->get('/support/forums')->to('site#forums_get');
+#  $r->get('/forum/:name')->to('forum#forum_name');
+#  $r->get('/topic/:name')->to('forum#topic_name');
 
   $r->get('/support/engage')->to('engage#index');
   $r->get('/support/engage/syntax')->to('engage#engage_syntax_get');

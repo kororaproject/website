@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+% exception_reaper( $exception, $self->req );
+
 <html lang="en">
 <head>
   <title>KororaProject :: 500</title>
@@ -212,7 +215,7 @@
           <div class="col-sm-12">
             <ol class="breadcrumb">
               <li><a href="/">Home</a></li>
-              <li class="active">404</li>
+              <li class="active">500</li>
             </ol>
 
             <div class="wrapper">
@@ -249,12 +252,14 @@
               </div>
             </div>
 
-            <h3 class="text-center">Hmmmm ... That's not right.</h3>
+            <h3 class="text-center">Damn! ... Things just got real.</h3>
             <div class="hr hr-lg"></div>
-            <p class="text-center">Please check the URL for any errors and try again, or <a href="mailto:webmaster@kororaproject.org">let us know</a>.</p>
+            <p class="text-center">We track these errors automatically, but if the problem persists feel free to <a href="mailto:webmaster@kororaproject.org">let us know</a>.</p>
+            <p class="text-center">In the meantime, try refreshing.</p>
             <div class="text-center">
               <a href="/" class="btn btn-success">Return Home</a>
             </div>
+
           </div>
         </div>
       </div>
@@ -272,7 +277,6 @@
   <script type="text/javascript" src="/js/jquery-2.0.3.js"></script>
   <script type="text/javascript" src="/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="/js/plax.js"></script>
-  <script type="text/javascript" src="/js/canvas.js"></script>
 
   <script>
     $(document).ready( function() {

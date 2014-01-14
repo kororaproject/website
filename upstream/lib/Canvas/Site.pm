@@ -64,6 +64,18 @@ sub index {
   $self->render('index');
 }
 
+sub exception_get {
+  return shift->render_exception('render_only');
+}
+
+sub not_found_get {
+  return shift->render_not_found;
+}
+
+sub forums_get {
+  shift->redirect_to('/support/engage');
+}
+
 sub discover {
   my $self = shift;
 
