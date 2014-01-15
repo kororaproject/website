@@ -175,6 +175,10 @@ p.no-space {
   vertical-align: middle;
 }
 
+.uppercase {
+  text-transform: uppercase;
+}
+
 b,
 strong {
   font-weight: 600;

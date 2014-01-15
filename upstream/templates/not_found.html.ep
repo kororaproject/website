@@ -202,7 +202,7 @@
 
   <div class="page-container">
 
-    %= include 'navigation.inc', active => 'discover'
+    %= include 'navigation.inc', active => ''
 
     <div class="page-content">
       <!-- CONTENT -->

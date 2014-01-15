@@ -26,11 +26,16 @@ use Mojo::Base 'Mojolicious::Controller';
 # PERL INCLUDES
 #
 use Data::Dumper;
+use Mojo::JSON qw(j);
 
 #
 # CONSTANTS
 #
 use constant DOWNLOAD_MAP => {
+  archs => {
+    i386    => '32 bit',
+    x86_64  => '64 bit',
+  },
   desktops => {
     cinnamon  => 'Cinnamon',
     gnome     => 'GNOME',
@@ -43,118 +48,118 @@ use constant DOWNLOAD_MAP => {
       name      => 'Korora 20',
       version   => '20',
       codename  => 'Peach',
-      isStable  => 0,
+      isStable  => 1,
       isCurrent => 1,
-      released  => '29 November 2013',
+      released  => '10 January 2014',
       available => 1,
       isos => {
         cinnamon => {
-          i686 => {
+          i386 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-i386-cinnamon-live.iso/download',
+              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-cinnamon-live.iso/download',
             },
             checksum => {
-              md5     => '6d9e5953effe741298c037a1ba66e4a7',
-              sha     => '5063a350fc966f37d1959c2f309eddc717d46fae',
-              sha256  => '76f4c38387388ac695f68dd0333a90dcd897317f793a3fdf4998260c84c45f13',
+              md5     => '629ebb67dba64f0a17bb6e8fe2721ef9',
+              sha     => '7842a2b06ad3223bed67eea632f537fff0ea0819',
+              sha256  => 'fe8d8013a09754e18fb523e56068e199c7e58aaea8e3ad29ad72d003d8207149',
             },
           },
           x86_64 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-x86_64-cinnamon-live.iso/download',
+              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-cinnamon-live.iso/download',
             },
             checksum => {
-              md5    => 'cdaad5f13b3ab0de50496ee4842d04cf',
-              sha    => 'c1fc7ce6056835a7ee1ab2132536a7e531ca63e5',
-              sha256 => '54f5de26b90bfa67ba54f988c30c1a9c2382f7f03766e4630960ccf6f3577ff0'
+              md5    => 'e5d5593751f2e323759499b62b8e1680',
+              sha    => '5270a13b19fbd24c9db89e3df921d1aeda476374',
+              sha256 => '487a450d1d19df16de4c21d421c50dfdb4483092ee5a27ca7d4945238b34fd63'
             },
           },
         },
         gnome => {
-          i686 => {
+          i386 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-i386-gnome-live.iso/download',
+              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-gnome-live.iso/download',
             },
             checksum => {
-              md5     => 'c6ef9ec1c56197d13bdc6f54f58c2c18',
-              sha     => 'ae37750b48bd5849b6806626bcad32d625c51d1c',
-              sha256  => '88958873bd396a5470255c747cb35dec568df4048b2fb95d1383698c461ab6ad',
+              md5     => '7ce7a1307597eb2e102b287a7f5b2c95',
+              sha     => 'fcc10b785ffce8a9d7f7cd3fca38e8cde62ae2a8',
+              sha256  => '7982750d08b2597a76880ac4e6b09c61cf710c5251a9738e15b7d06e4ade39c0',
             },
           },
           x86_64 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-x86_64-gnome-live.iso/download',
+              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-gnome-live.iso/download',
             },
             checksum => {
-              md5     => 'eb1633dbc2a4ddc5a2bfde813847c512',
-              sha     => '479a917cb267d76b0300e23b64f3b34e06867f8e',
-              sha256  => 'bbc023c7612acfa9b5a77e899de93128d235e055ef9f5c923ea0367132cb9ae3'
+              md5     => '17ecf28bad63b02d088877c33f1f2fb2',
+              sha     => '78117aa2d7ade29321ec74be37246bb670def82e',
+              sha256  => '7c751d6b5207ccdfefb28e477d7a5d7e8a3df77823cbbed9b1484866f8668dac'
             },
           },
         },
         kde => {
-          i686 => {
+          i386 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-i386-kde-live.iso/download',
+              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-kde-live.iso/download',
             },
             checksum => {
-              md5     => '233c1522c9f53f2be2de1498fa2157ee',
-              sha     => 'a541c4938f919aa477bb04b3b90ca1432619f0ac',
-              sha256  => 'e45936c17a5d8f8d508492d1e295ea64e99051daaf560dcbeb69a703781966bc',
+              md5     => 'b9fa2dfcdc906af12212a923dd8110c2',
+              sha     => 'a5c757c2796bc4f9d1a3d6b515400c73981354f8',
+              sha256  => '894943bff0c7fc456c5e2a93636f747e0cffaf1bcbf630bf1eee3588c9e454e0',
             },
           },
           x86_64 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-x86_64-kde-live.iso/download',
+              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-kde-live.iso/download',
             },
             checksum => {
-              md5     => '6901173323dfed0c90e425796ca06fa9',
-              sha     => '59aa81bb6cd1aa93418b2a16849bc6eeac54e8c9',
-              sha256  => '10e1df39ab20f3d8d15c960323983b76e9c4d760889b384f7e6bccf4657c383f'
+              md5     => 'a9eb84fdf71a2e1590f4d4bee7534336',
+              sha     => 'ec724f5f4f0e9c77e9c95fc2311a8190dc3ec461',
+              sha256  => '0877cf6913c35da37656c0a316fafe5d27c7b151182deb031f0bc002d040d08c'
             },
           },
         },
         mate => {
-          i686 => {
+          i386 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-i386-mate-live.iso/download',
+              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-mate-live.iso/download',
             },
             checksum => {
-              md5     => '14b7594011a078d4fac7d848dcca06c8',
-              sha     => '72f98c04f1ba791e8180279ab9e220f38c5be198',
-              sha256  => '4d25d654a1db2295c2de6e6819f168c92e65f44b35141be7e75cb36c082822d3',
+              md5     => '78f0f56f113fadaaa0edf75deb53c3a3',
+              sha     => '3e388144c29fa4cd9b6dd0da045e71eeaff20e08',
+              sha256  => 'e874dc7baa22d201b65124586398e49ba73879a4c3146e5d70bb733f991f0e35',
             },
           },
           x86_64 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-x86_64-mate-live.iso/download',
+              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-mate-live.iso/download',
             },
             checksum => {
-              md5     => 'bdc2cec74aa727ad5f4e75ec8b5c6ced',
-              sha     => 'f528f10dbeed766a58c3147ea4c398bbf53e3615',
-              sha256  => '2156a75507a1007016fa74a8d225e2a4224c1ec1fd61beb9c7ecbc15f7d610af',
+              md5     => '00c5e82f42f6b598be1b493d5ad9c3ae',
+              sha     => '58fd2c99f3e16d3b6027dacad4d8a6aa7b21425f',
+              sha256  => '1d2384c765744a9513bde216c3f7a47b674faa8988ac86610a118529004aec36',
             },
           },
         },
         xfce => {
-          i686 => {
+          i386 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-i386-xfce-live.iso/download',
+              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-xfce-live.iso/download',
             },
             checksum => {
-              md5     => '012e5a512db1b787e41ebe34868be671',
-              sha     => 'f3d3737ceed52d326aacf44a0b38386422434aa2',
-              sha256  => '01bef27250f2e9452855f2be8dffb6a465453ae4382802b7ea062b25c6ad229f'
+              md5     => '8edffc090daabd20d7c4961cc003b4b2',
+              sha     => 'fd53f50932c87721effb2fef5839192003652c5c',
+              sha256  => '5071423a24d689327eec2866ef6f90488a655a1fd399ab1df256260c98d0368c'
             },
           },
           x86_64 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-beta-x86_64-xfce-live.iso/download',
+              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-xfce-live.iso/download',
             },
             checksum => {
-              md5     => '7fb43e9624b2799a37a9ae843d32f872',
-              sha     => '2cc3ccf04dd6656761b55437e94325401300c62f',
-              sha256  => '0ed3d599c1992663de65af4dc716adb38d3e1ddc36994061c635562c436c4eb6',
+              md5     => 'e1adedb1a623716b653a2b270116c585',
+              sha     => '2dbbe24f70e5f939f96fa33a99bfd732de265c5a',
+              sha256  => 'b7e051652b693d053e644d7ce572b37700e7f1298d8ec50cfdd6f8386b189177',
             },
           },
         },
@@ -165,12 +170,12 @@ use constant DOWNLOAD_MAP => {
       version   => '19.1',
       codename  => 'Bruce',
       isStable  => 1,
-      isCurrent => 1,
+      isCurrent => 0,
       released  => '07 October 2013',
       available => 1,
       isos => {
         cinnamon => {
-          i686 => {
+          i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/19/korora-19.1-i386-cinnamon-live.iso/download',
               torrent => 'http://burnbit.com/download/258852/korora_19_1_i386_cinnamon_live_iso',
@@ -194,7 +199,7 @@ use constant DOWNLOAD_MAP => {
           },
         },
         gnome => {
-          i686 => {
+          i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/19/korora-19.1-i386-gnome-live.iso/download',
               torrent => 'http://burnbit.com/download/258850/korora_19_1_i386_gnome_live_iso',
@@ -218,7 +223,7 @@ use constant DOWNLOAD_MAP => {
           },
         },
         kde => {
-          i686 => {
+          i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/19/korora-19.1-i386-kde-live.iso/download',
               torrent => 'http://burnbit.com/download/258849/korora_19_1_i386_kde_live_iso',
@@ -242,7 +247,7 @@ use constant DOWNLOAD_MAP => {
           },
         },
         mate  => {
-          i686 => {
+          i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/19/korora-19.1-i386-mate-live.iso/download',
               torrent => 'http://burnbit.com/download/258851/korora_19_1_i386_mate_live_iso',
@@ -267,61 +272,7 @@ use constant DOWNLOAD_MAP => {
         },
       },
     },
-    {
-      name      => 'Korora 18',
-      version   => '18',
-      codename  => 'Flo',
-      isStable  => 1,
-      isCurrent => 1,
-      released  => '01 May 2013',
-      available => 1,
-      isos => {
-        gnome => {
-          i686 => {
-            url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/18/korora-18-i386-gnome-live.iso/download',
-            },
-            checksum => {
-              md5     => '6b2937fc76599c82b4f1bf5eb87fc2ed',
-              sha     => '91528703cbd314ca32b42df5b064dab526199ac8',
-              sha256  => '5cf1f3192cef63c8eba{bfb3f6634d15aac8b7662c1a9bc913b528f88770fa25'
-            },
-          },
-          x86_64 => {
-            url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/18/korora-18-x86_64-gnome-live.iso/download',
-            },
-            checksum => {
-              md5     => '35720eed9123f973d9b3590cf29670de',
-              sha     => '240fef106e8da4fd932d646ee337f2a7d37bd436',
-              sha256  => '226d1c7c0af6262a906dacf88cee09efb62b7f25ff47357dff9da95ef7d6d0b9',
-            },
-          },
-        },
-        kde => {
-          i686 => {
-            url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/18/korora-18-i386-kde-live.iso/download',
-            },
-            checksum => {
-              md5     => 'e6f31d4ff03c1c6cc79123ec1bec3107',
-              sha     => '4421274f16068f5194f3e9f5b5459a9ad86efbcb',
-              sha256  => 'c359d3142157d3a0c15689d9e7e00f29b7d90681474d8b5d58125475ff6470ba'
-            },
-          },
-          x86_64 => {
-            url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/18/korora-18-x86_64-kde-live.iso/download',
-            },
-            checksum => {
-              md5     => 'ad140e9aaa19bdf5b5d4fd369b02705a',
-              sha     => '4c6df0e8e6d32aa40789e63598e41a0fc7cfbd24',
-              sha256  => 'ed1caa59d2bf1f120c6392e79937b2db23fe21935ff4a6f9503760cd52979213'
-            },
-          },
-        },
-      },
-    }],
+  ]
 };
 
 #
@@ -330,7 +281,7 @@ use constant DOWNLOAD_MAP => {
 sub index {
   my $self = shift;
 
-  $self->stash( map => DOWNLOAD_MAP );
+  $self->stash( map => DOWNLOAD_MAP, static_map => j(DOWNLOAD_MAP) );
 
   $self->render('download');
 }
