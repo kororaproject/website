@@ -60,7 +60,7 @@ use constant DOWNLOAD_MAP => {
             },
             checksum => {
               md5     => '629ebb67dba64f0a17bb6e8fe2721ef9',
-              sha     => '7842a2b06ad3223bed67eea632f537fff0ea0819',
+              sha1    => '7842a2b06ad3223bed67eea632f537fff0ea0819',
               sha256  => 'fe8d8013a09754e18fb523e56068e199c7e58aaea8e3ad29ad72d003d8207149',
             },
           },
@@ -70,7 +70,7 @@ use constant DOWNLOAD_MAP => {
             },
             checksum => {
               md5    => 'e5d5593751f2e323759499b62b8e1680',
-              sha    => '5270a13b19fbd24c9db89e3df921d1aeda476374',
+              sha1   => '5270a13b19fbd24c9db89e3df921d1aeda476374',
               sha256 => '487a450d1d19df16de4c21d421c50dfdb4483092ee5a27ca7d4945238b34fd63'
             },
           },
@@ -82,7 +82,7 @@ use constant DOWNLOAD_MAP => {
             },
             checksum => {
               md5     => '7ce7a1307597eb2e102b287a7f5b2c95',
-              sha     => 'fcc10b785ffce8a9d7f7cd3fca38e8cde62ae2a8',
+              sha1    => 'fcc10b785ffce8a9d7f7cd3fca38e8cde62ae2a8',
               sha256  => '7982750d08b2597a76880ac4e6b09c61cf710c5251a9738e15b7d06e4ade39c0',
             },
           },
@@ -92,7 +92,7 @@ use constant DOWNLOAD_MAP => {
             },
             checksum => {
               md5     => '17ecf28bad63b02d088877c33f1f2fb2',
-              sha     => '78117aa2d7ade29321ec74be37246bb670def82e',
+              sha1    => '78117aa2d7ade29321ec74be37246bb670def82e',
               sha256  => '7c751d6b5207ccdfefb28e477d7a5d7e8a3df77823cbbed9b1484866f8668dac'
             },
           },
@@ -104,7 +104,7 @@ use constant DOWNLOAD_MAP => {
             },
             checksum => {
               md5     => 'b9fa2dfcdc906af12212a923dd8110c2',
-              sha     => 'a5c757c2796bc4f9d1a3d6b515400c73981354f8',
+              sha1    => 'a5c757c2796bc4f9d1a3d6b515400c73981354f8',
               sha256  => '894943bff0c7fc456c5e2a93636f747e0cffaf1bcbf630bf1eee3588c9e454e0',
             },
           },
@@ -114,7 +114,7 @@ use constant DOWNLOAD_MAP => {
             },
             checksum => {
               md5     => 'a9eb84fdf71a2e1590f4d4bee7534336',
-              sha     => 'ec724f5f4f0e9c77e9c95fc2311a8190dc3ec461',
+              sha1    => 'ec724f5f4f0e9c77e9c95fc2311a8190dc3ec461',
               sha256  => '0877cf6913c35da37656c0a316fafe5d27c7b151182deb031f0bc002d040d08c'
             },
           },
@@ -126,7 +126,7 @@ use constant DOWNLOAD_MAP => {
             },
             checksum => {
               md5     => '78f0f56f113fadaaa0edf75deb53c3a3',
-              sha     => '3e388144c29fa4cd9b6dd0da045e71eeaff20e08',
+              sha1    => '3e388144c29fa4cd9b6dd0da045e71eeaff20e08',
               sha256  => 'e874dc7baa22d201b65124586398e49ba73879a4c3146e5d70bb733f991f0e35',
             },
           },
@@ -136,7 +136,7 @@ use constant DOWNLOAD_MAP => {
             },
             checksum => {
               md5     => '00c5e82f42f6b598be1b493d5ad9c3ae',
-              sha     => '58fd2c99f3e16d3b6027dacad4d8a6aa7b21425f',
+              sha1    => '58fd2c99f3e16d3b6027dacad4d8a6aa7b21425f',
               sha256  => '1d2384c765744a9513bde216c3f7a47b674faa8988ac86610a118529004aec36',
             },
           },
@@ -148,7 +148,7 @@ use constant DOWNLOAD_MAP => {
             },
             checksum => {
               md5     => '8edffc090daabd20d7c4961cc003b4b2',
-              sha     => 'fd53f50932c87721effb2fef5839192003652c5c',
+              sha1    => 'fd53f50932c87721effb2fef5839192003652c5c',
               sha256  => '5071423a24d689327eec2866ef6f90488a655a1fd399ab1df256260c98d0368c'
             },
           },
@@ -158,7 +158,7 @@ use constant DOWNLOAD_MAP => {
             },
             checksum => {
               md5     => 'e1adedb1a623716b653a2b270116c585',
-              sha     => '2dbbe24f70e5f939f96fa33a99bfd732de265c5a',
+              sha1    => '2dbbe24f70e5f939f96fa33a99bfd732de265c5a',
               sha256  => 'b7e051652b693d053e644d7ce572b37700e7f1298d8ec50cfdd6f8386b189177',
             },
           },
