@@ -56,7 +56,8 @@ use constant DOWNLOAD_MAP => {
         cinnamon => {
           i386 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-cinnamon-live.iso/download',
+              http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-cinnamon-live.iso/download',
+              torrent => 'http://burnbit.com/download/271362/korora_20_i386_cinnamon_live_iso',
             },
             checksum => {
               md5     => '629ebb67dba64f0a17bb6e8fe2721ef9',
@@ -66,7 +67,8 @@ use constant DOWNLOAD_MAP => {
           },
           x86_64 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-cinnamon-live.iso/download',
+              http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-cinnamon-live.iso/download',
+              torrent => 'http://burnbit.com/download/271361/korora_20_x86_64_cinnamon_live_iso',
             },
             checksum => {
               md5    => 'e5d5593751f2e323759499b62b8e1680',
@@ -78,7 +80,8 @@ use constant DOWNLOAD_MAP => {
         gnome => {
           i386 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-gnome-live.iso/download',
+              http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-gnome-live.iso/download',
+              torrent => 'http://burnbit.com/download/271366/korora_20_i386_gnome_live_iso',
             },
             checksum => {
               md5     => '7ce7a1307597eb2e102b287a7f5b2c95',
@@ -88,7 +91,8 @@ use constant DOWNLOAD_MAP => {
           },
           x86_64 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-gnome-live.iso/download',
+              http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-gnome-live.iso/download',
+              torrent => 'http://burnbit.com/download/271380/korora_20_x86_64_gnome_live_iso',
             },
             checksum => {
               md5     => '17ecf28bad63b02d088877c33f1f2fb2',
@@ -100,7 +104,8 @@ use constant DOWNLOAD_MAP => {
         kde => {
           i386 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-kde-live.iso/download',
+              http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-kde-live.iso/download',
+              torrent => 'http://burnbit.com/download/271365/korora_20_i386_kde_live_iso',
             },
             checksum => {
               md5     => 'b9fa2dfcdc906af12212a923dd8110c2',
@@ -110,7 +115,8 @@ use constant DOWNLOAD_MAP => {
           },
           x86_64 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-kde-live.iso/download',
+              http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-kde-live.iso/download',
+              torrent => 'http://burnbit.com/download/271148/korora_20_x86_64_kde_live_iso',
             },
             checksum => {
               md5     => 'a9eb84fdf71a2e1590f4d4bee7534336',
@@ -122,7 +128,8 @@ use constant DOWNLOAD_MAP => {
         mate => {
           i386 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-mate-live.iso/download',
+              http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-mate-live.iso/download',
+              torrent => 'http://burnbit.com/download/271363/korora_20_i386_mate_live_iso',
             },
             checksum => {
               md5     => '78f0f56f113fadaaa0edf75deb53c3a3',
@@ -132,7 +139,8 @@ use constant DOWNLOAD_MAP => {
           },
           x86_64 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-mate-live.iso/download',
+              http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-mate-live.iso/download',
+              torrent => 'http://burnbit.com/download/271376/korora_20_x86_64_mate_live_iso',
             },
             checksum => {
               md5     => '00c5e82f42f6b598be1b493d5ad9c3ae',
@@ -144,7 +152,8 @@ use constant DOWNLOAD_MAP => {
         xfce => {
           i386 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-xfce-live.iso/download',
+              http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-xfce-live.iso/download',
+              torrent => 'http://burnbit.com/download/270736/korora_20_i386_xfce_live_iso',
             },
             checksum => {
               md5     => '8edffc090daabd20d7c4961cc003b4b2',
@@ -154,7 +163,8 @@ use constant DOWNLOAD_MAP => {
           },
           x86_64 => {
             url => {
-              http => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-xfce-live.iso/download',
+              http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-x86_64-xfce-live.iso/download',
+              torrent => 'http://burnbit.com/download/270883/korora_20_x86_64_xfce_live_iso',
             },
             checksum => {
               md5     => 'e1adedb1a623716b653a2b270116c585',
