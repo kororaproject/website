@@ -256,6 +256,10 @@ sub activate_post {
   if( ($now - $u->updated) > 86400 ) {
     $self->flash( page_errors => 'Activation of this account has been over 24 hours.' );
 
+    # store username and email for notification before we delete
+    my $username = $u->username;
+    my $email = $u->email;
+
     $u->metadata_clear('activation_token');
     $u->delete;
 
@@ -265,8 +269,8 @@ sub activate_post {
       'admin@kororaproject.org',
       'Korora Project - Prime Activation - Time Expiry',
       "The following Prime account has exceeded it's activation time limit:\n" .
-      " - username: " . $u->username . "\n" .
-      " - email:    " . $u->email . "\n\n" .
+      " - username: " . $username . "\n" .
+      " - email:    " . $email . "\n\n" .
       "The account has been deleted.\n\n" .
       "Regards,\n" .
       "The Korora Team.\n"
