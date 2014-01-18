@@ -241,6 +241,9 @@ sub engage_post_add_post {
   my $now = gmtime;
   my $stub = sanitise_with_dashes( $title );
 
+  # enforce max stub size
+  $stub = substr $stub, 0, 128 if length( $stub ) > 128;
+
   # check for existing stubs and append the ID + 1 of the last
   my( @e ) = Canvas::Store::Post->search({ type => $type, name => $stub });
 
