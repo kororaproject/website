@@ -324,13 +324,14 @@ sub engage_post_detail_get {
   my $content = $self->flash('content') // '';
 
   my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
+
+  # check we found the post
+  return $self->redirect_to('/support/engage') unless defined $p;
+
   my $r = $p->search_replies(
     page_size => 20,
     page      => $self->param('page'),
   );
-
-  # check we found the post
-  return $self->redirect_to('/support/engage') unless defined $p;
 
   # allow path to get back here
   $self->flash( redirect_url => $self->url_with );
