@@ -92,36 +92,84 @@ sub register {
     my $message = "WHOA!!! Shit's getting real!\n\n";
 
     # exception
-    $message .= Dumper $exception;
+    $message .= "ERROR:\n";
+    $message .= sprintf "%s\n", $exception->message;
+
+    $message .= "\nCONTEXT:\n";
+    foreach my $line ( @{$exception->lines_before} ) {
+      $message .= sprintf "%-8d =>    %s\n", $line->[0], $line->[1];
+    }
+
+    if( defined $exception->line->[1] ) {
+      $message .= sprintf "\n%-8d =>    %s\n\n", $exception->line->[0], $exception->line->[1];
+    }
+
+    foreach my $line (@{$exception->lines_after}) {
+      $message .= sprintf "%-8d =>    %s\n", $line->[0], $line->[1];
+    }
+
+    if( defined $exception->line->[2] ) {
+      $message .= "\n\nINSIGHT:\n";
+      foreach my $line (@{$exception->lines_before}) {
+        $message .= sprintf "%-8d =>    %s\n", $line->[0], $line->[2];
+      }
+
+      $message .= sprintf "\n%-8d =>    %s\n", $exception->line->[0], $exception->line->[2];
+    }
+
+    if (@{$exception->frames}) {
+      $message .= "\nFRAMES:\n";
+      foreach my $frame (@{$exception->frames}) {
+        $message .= sprintf "%s:%d\n", $frame->[1], $frame->[2];
+      }
+    }
 
     # request
-    $message .= Dumper $req;
+    $message .= "\nREQUEST:\n";
 
-    # mojo version
-    $message .= Dumper $Mojolicious::VERSION;
-    $message .= Dumper $Mojolicious::CODENAME;
+    $message .= sprintf "Method     => %s\n", $req->method;
+    $message .= sprintf "URL        => %s\n", $req->url->to_string;
+    $message .= sprintf "Base URL   => %s\n", $req->url->base->to_string;
+    $message .= sprintf "Parameters => %s\n", Dumper $req->params->to_hash;
+    $message .= sprintf "Session    => %s\n", Dumper $self->session;
+    $message .= sprintf "Version    => %s\n", $req->version;
+
+    $message .= "Headers => \n";
+    foreach my $name ( @{$self->req->headers->names} ) {
+      my $value = $self->req->headers->header($name);
+      $message .= sprintf "  - %s: %s\n", $name, $value;
+    }
+
+    # versions
+    $message .= sprintf "\nPERL VERSION:\n%s (%s)\n", $^V, $^O;
+    $message .= sprintf "\nMOJO VERSION:\nv%s (%s)\n", $Mojolicious::VERSION, $Mojolicious::CODENAME;
 
     # home
-    $message .= Dumper $app->home;
+    $message .= sprintf "\nHOME: %s\n", $app->home->to_string;
 
     # include
-    $message .= Dumper \@INC;
+    $message .= "\nINCLUDES:\n";
+    foreach my $inc ( @INC ) {
+      $message .= sprintf "  - %s\n", $inc;
+    }
 
     # PID
-    $message .= Dumper $$;
+    $message .= sprintf "\nPID: %d\n", $$;
 
     # name
-    $message .= Dumper $0;
+    $message .= sprintf "\nNAME: %s\n", $0;
 
     # executable
-    $message .= Dumper $^X;
+    $message .= sprintf "\nEXECUTABLE: %s\n", $^X;
 
     # time
-    $message .= Dumper scalar localtime(time);
+    $message .= sprintf "\nTIME: %s\n", gmtime->datetime;
 
     # footer
     $message .= "\n" .
-                "Good Luck!";
+                "Good Luck!\n" .
+                "--\n" .
+                "Canvas CoreBOT";
 
     unless( $exception->{message} eq 'render_only' ) {
       $self->mail(
