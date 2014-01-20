@@ -192,7 +192,7 @@ sub is_active_account($) {
 #      6 = reserved
 #      5 = reserved
 #      4 = reserved
-#      3 = can_documentation_moderate
+#      3 = can_document_moderate
 #      2 = can_news_moderate
 #      1 = can_engage_moderate
 #      0 = can_engage

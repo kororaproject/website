@@ -31,7 +31,7 @@ use POSIX qw(ceil);
 # MODEL DEFINITION
 #
 __PACKAGE__->table('canvas_post');
-__PACKAGE__->columns(All => qw/id author_id parent_id password type status name title excerpt content reply_status reply_count created updated/);
+__PACKAGE__->columns(All => qw/id author_id parent_id password type status name title excerpt content reply_status reply_count menu_order created updated/);
 
 #
 # 1:N MAPPINGS

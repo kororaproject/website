@@ -525,13 +525,12 @@ sub register_post {
 
 #
 # CATCH ALL
-sub trap {
+sub archive_forward_any {
   my $self = shift;
 
-  my $path = $self->param('trap');
+  my $path = $self->url_for->host('archive.kororaproject.org');
 
-  # HTML5 mode forwarding based on valid paths
-  $self->redirect_to('/');
+  $self->redirect_to( $path );
 };
 
 1;

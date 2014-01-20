@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'news'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div class="container">
+        <form action="<%= url_for_path(-1) %>" method="post">
+          <div class="row">
+            <div class="col-sm-12">
+              <ol class="breadcrumb">
+                <li><a href="/">Home</a></li>
+                <li><a href="/support">Support</a></li>
+                <li><a href="/support/documentation">Documentation</a></li>
+                <li><a href="/support/documentation/admin">Admin</a></li>
+                <li class="active">Add</li>
+              </ol>
+              <h1 class="text-center">Document. Add to the Knowledge</h1>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8">
+              <h2>Title</h2>
+              <input type="text" name="title" class="form-control" value="">
+            </div>
+            <div class="col-sm-4">
+              <h2>Status</h2>
+              %= select_field status => $statuses, class => "form-control"
+              <div class="hr-sm"></div>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div class="col-sm-12">
+              <h2>Introduction</h2>
+              <textarea name="excerpt" class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div class="col-sm-12">
+              <h2>Body</h2>
+              <textarea name="content" class="form-control" rows="20"></textarea>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div class="col-sm-8">
+              <h2>Tags</h2>
+              <input type="text" name="tags" class="form-control" value="">
+            </div>
+            <div class="col-sm-4">
+              <h2>Date</h2>
+              <input type="datetime" name="created" class="form-control" value="">
+            </div>
+          </div>
+          <div class="hr hr-sm"></div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="text-right">
+                <a class="btn btn-default" href="/support/documentation/admin">Cancel</a>
+                <button type="submit" class="btn btn-success">Save</button>
+              </div>
+            </div>
+          </div>
+          <div class="hr"></div>
+        </form>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+</body>
+</html>
