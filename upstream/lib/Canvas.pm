@@ -79,6 +79,9 @@ sub startup {
   # CACHE
   $self->plugin('Cache' => $config->{cache} // {} );
 
+  # set default session expiration to 4 hours
+  $self->sessions->default_expiration(14400);
+
   #
   # AUTHENTICATION
   $self->app->log->info('Loading authentication handler.');
