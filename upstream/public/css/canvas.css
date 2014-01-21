@@ -721,6 +721,10 @@ blockquote p {
   z-index: 1039;
 }
 
+.navbar-collapse {
+  max-height: inherit;
+}
+
 .navbar-container {
   max-width: 1200px;
   margin: 0 auto;
