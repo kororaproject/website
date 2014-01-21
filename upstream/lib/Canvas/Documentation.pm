@@ -187,6 +187,7 @@ sub document_add_post {
     menu_order => 0,
     status     => $self->param('status'),
     title      => $self->param('title'),
+    excerpt    => $self->param('excerpt'),
     content    => $self->param('content'),
     author_id  => $self->auth_user->id,
     created    => $now,
@@ -201,6 +202,7 @@ sub document_edit_post {
 
   my $stub = $self->param('id');
 
+  # find the post
   my $p = Canvas::Store::Post->search({ name => $stub, type => 'document' })->first;
 
   # ensure we can edit
@@ -208,6 +210,7 @@ sub document_edit_post {
     return $self->redirect_to( 'supportdocumentation' );
   }
 
+  # update the fields
   $p->title( $self->param('title') );
   $p->content( $self->param('content') );
   $p->excerpt( $self->param('excerpt') );
@@ -229,6 +232,7 @@ sub document_edit_post {
     $p->created( $t );
   }
 
+  # commit the updates
   $p->update;
 
   $self->redirect_to( 'supportdocumentationid', id => $stub );
