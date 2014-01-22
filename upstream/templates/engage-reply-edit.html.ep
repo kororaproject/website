@@ -38,7 +38,7 @@
               <input type="hidden" name="redirect_url" value="<%= $redirect_url %>"></input>
               <div class="row">
                 <div class="col-sm-12">
-                  <h3>Reply</h3>
+                  <h3>Reply <a href="" class="btn pull-right" data-toggle="modal" data-target="#modalEngageSyntax"><i class="fa fa-fw fa-question"></i></a> </h3>
                   <textarea name="content" class="form-control" rows="10"><%= $content %></textarea>
                   <div class="hr-sm"></div>
                 </div>
@@ -64,6 +64,23 @@
 
   <!-- MODALS -->
   %= include 'authenticate.inc'
+
+  <div class="modal fade" id="modalEngageSyntax" tabindex="-1" role="dialog" aria-labelledby="modalEngageSyntaxLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-responsive">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="modalEngageSyntaxLabel">Engage Markdown Syntax</h4>
+        </div>
+        <div class="modal-body">
+          %= include 'engage-syntax.inc'
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- SCRIPTS -->
   %= include 'scripts.inc'
