@@ -232,6 +232,13 @@ New paragraphs start after a blank line.
 </pre>
 <p>URLs can be relative or full.</p>
 
+<h2 id="youtube">YouTube & Vimeo</h2>
+<p>You can embed YouTube or Vimeo videos that can be useful for demonstrating artefacts or desired behaviours. To embed a YouTube or Vimeo video, use the <code>youtube!</code> and <code>vimeo!</code> prefixes respectively, followed by the YouTube/Vimeo ID.</p>
+<pre>Below are two videos highlighting the artefacts in question
+youtube!ZEH9k3eXZCs
+vimeo!68400837
+</pre>
+
 <h2 id="link-html">Inline HTML</h2>
 <p>If you need to do something that Markdown can't handle, use HTML. Note that <a href="http://meta.stackoverflow.com/questions/1777/what-html-tags-are-allowed">we only support a very strict subset of HTML!</a></p>
 <pre>To reboot your computer, press <span class="hi">&lt;kbd&gt;</span>ctrl<span class="hi">&lt;/kbd&gt;</span>+&lt;kbd&gt;alt&lt;/kbd&gt;+&lt;kbd&gt;del&lt;/kbd&gt;.

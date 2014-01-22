@@ -168,6 +168,9 @@ sub _Markdown {
   # Make sure $text ends with a couple of newlines:
   $text .= "\n\n";
 
+  # sanitise our input from unsafe tags
+  $text = $self->_SanitiseHTML( $text );
+
   # Convert all tabs to spaces.
   $text = $self->_Detab($text);
 
@@ -212,6 +215,8 @@ sub _Markdown {
   $text .= $self->_PrintMarkdownBibliography();
 
   $text = $self->_ConvertCopyright($text);
+
+  $text = $self->_DoVideoEmbeds($text);
 
   return $text . "\n";
 }
@@ -270,6 +275,29 @@ sub _StripLinkDefinitions {
     }
     # /addition
   }
+
+  return $text;
+}
+
+sub _DoVideoEmbeds {
+  my $self = shift;
+
+  # Strip unsupported (X)HTML code from string
+  my $text = shift;
+
+  $text =~ s/youtube!([a-zA-Z0-9_-]{11})/<div class="video-container"><iframe width="560" height="315" src="\/\/www.youtube.com\/embed\/$1" frameborder="0" allowfullscreen><\/iframe><\/div>/g;
+  $text =~ s/vimeo!([0-9]+)/<div class="video-container"><iframe width="560" height="315" src="\/\/player.vimeo.com\/video\/$1" frameborder="0" allowfullscreen><\/iframe><\/div>/g;
+
+  return $text;
+}
+
+sub _SanitiseHTML {
+  my $self = shift;
+
+  # Strip unsupported (X)HTML code from string
+  my $text = shift;
+
+  $text =~ s/<(\/?((?!a|b|blockquote|div|h[1-6]|i|img|ol|p|span|ul|\/)[^>]*)|(\/?(iframe|ins)[^>]*))>/&lt;$1&gt;/g;
 
   return $text;
 }
