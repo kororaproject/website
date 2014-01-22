@@ -39,6 +39,10 @@ noscript h1 {
   font-size: 64px;
 }
 
+img,
+object {
+  max-width: 100%;
+}
 
 /* border radius correction */
 .alert,
