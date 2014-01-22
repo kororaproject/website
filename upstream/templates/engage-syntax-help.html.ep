@@ -16,7 +16,18 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="page-title"><strong><a href="/support/engage">Engage.</a></strong> Our Syntax</h1>
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/support">Support</a></li>
+              <li><a href="/support/engage">Engage</a></li>
+              <li class="active">Syntax</li>
+            </ol>
+            <h1 class="page-title"><strong><a href="/support/engage">Syntax.</a></strong> The Engage Markdown</h1>
           </div>
         </div>
         <div class="row">

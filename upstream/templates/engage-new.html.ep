@@ -27,23 +27,21 @@
                 <div class="col-sm-12">
                   <h3>Title</h3>
                   <input type="text" name="title" class="form-control" value="<%= $title %>"></input>
-                  <div class="hr hr-sm"></div>
+                  <span class="help-block">The title is a brief, short sentence, summary of your item.</span>
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-12">
-                  <a href="" class="btn pull-right" data-toggle="modal" data-target="#modalEngageSyntax"><i class="fa fa-fw fa-question"></i></a>
-                  <h3>Description</h3>
+                  <h3>Description <a href="" class="btn pull-right" data-toggle="modal" data-target="#modalEngageSyntax"><i class="fa fa-fw fa-question"></i></a></h3>
                   <textarea name="content" class="form-control" rows="10"><%= $content %></textarea>
-                  <div class="hr hr-sm"></div>
-                  <p>Engage content interprets a superset of the original <a href="http://daringfireball.net/projects/markdown/">Markdown</a> syntax that we refer to as <a href="/support/engage/syntax">Engage Markdown</a>. If you are already familiar with Markdown from other sites such as GitHub and StackOverflow then you should feel right at home.</p>
+                  <span class="help-block">Engage content interprets a superset of the original <a href="http://daringfireball.net/projects/markdown/">Markdown</a> syntax that we refer to as <a href="/support/engage/syntax">Engage Markdown</a>. If you are already familiar with Markdown from other sites such as GitHub and StackOverflow then you should feel right at home.</span>
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-12">
                   <h3>Tags</h3>
                   <input type="text" name="tags" class="form-control" value="<%= $tags %>"></input>
-                  <div class="hr-sm"></div>
+                  <span class="help-block">Tags allow you to nonimate the keywords of your item (e.g. "gnome, k19, boot, black, screen"). Multiple tags can be specified by using a space or comma as a separator.</span>
                 </div>
               </div>
               <div class="row">
@@ -80,9 +78,9 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
+      </div>
+    </div>
+  </div>
 
   <!-- SCRIPTS -->
   %= include 'scripts.inc'

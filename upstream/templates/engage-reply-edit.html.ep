@@ -16,6 +16,19 @@
       <div id="page-about" class="container">
         <div class="row">
           <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/support">Support</a></li>
+              <li><a href="/support/engage">Engage</a></li>
+              <li><a href="<%= url_with('/support/engage')->query([ type => $reply->parent_id->type]) %>"><%= ucfirst $reply->parent_id->type %>s</a></li>
+              <li><a href="<%= $redirect_url %>"><%= $reply->parent_id->title %></a></li>
+              <li class="active">Edit Reply</li>
+            </ol>
             <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Edit Reply<%== engage_icon( $reply->parent_id->type )%></h1>
           </div>
         </div>

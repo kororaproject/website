@@ -32,7 +32,7 @@
         <div class="row">
           <div class="col-sm-12">
             <p>Engage is your official portal to the Korora Community. Here you can search through the available questions, problems, ideas and thanks that other members have posted. Alternatively, submit your own and let the community help you.</p>
-            <p> Ensure you have read the <a href="" data-toggle="modal" data-target="#modalEngageGuidelines"> Engage Guidelines</a> before posting.</p>
+            <p> Ensure you have read the <a href="" data-toggle="modal" data-target="#modalEngageGuidelines"> Engage Guidelines</a> before posting. You can also checkout the <a href="/support/engage/syntax">Engage Syntax</a> for the supported Markdown in Engage items.</p>
           </div>
         </div>
         <div class="hr"></div>
