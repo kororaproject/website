@@ -91,6 +91,18 @@ sub latest_reply {
   return $self;
 }
 
+sub accepted_reply {
+  my $self = shift;
+
+  my $dbh = $self->db_Main();
+  my $sth = $dbh->prepare_cached("SELECT * FROM canvas_post WHERE parent_id=? AND status='accepted'");
+
+  $sth->execute( $self->id );
+  my( $reply ) = $self->sth_to_objects($sth);
+
+  return $reply;
+}
+
 sub search_replies {
   my $self = shift;
   my %params = @_ > 1 ? @_ : ref $_[0] eq 'HASH' ? %{ $_[0] } : ();
@@ -109,7 +121,7 @@ sub search_replies {
 
   my $count_sql = sprintf "SELECT COUNT(id) FROM canvas_post WHERE parent_id=? ORDER BY created DESC";
 
-  my $sql = sprintf "SELECT * FROM canvas_post WHERE parent_id=? ORDER BY status DESC, created %s LIMIT %d OFFSET %d", $order, $page_size, $offset;
+  my $sql = sprintf "SELECT * FROM canvas_post WHERE parent_id=? ORDER BY created %s LIMIT %d OFFSET %d", $order, $page_size, $offset;
 
   # fetch the item count
   my $sth = $dbh->prepare_cached($count_sql);

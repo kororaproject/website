@@ -331,6 +331,8 @@ sub engage_post_detail_get {
   # check we found the post
   return $self->redirect_to('/support/engage') unless defined $p;
 
+  my $a = $p->accepted_reply;
+
   my $r = $p->search_replies(
     page_size => 20,
     page      => $self->param('page'),
@@ -339,7 +341,7 @@ sub engage_post_detail_get {
   # allow path to get back here
   $self->flash( redirect_url => $self->url_with );
 
-  $self->stash( response => $p, replies => $r, content => $content );
+  $self->stash( response => $p, accepted => $a, replies => $r, content => $content );
   $self->render('engage-detail');
 }
 

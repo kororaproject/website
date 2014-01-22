@@ -893,6 +893,10 @@ blockquote p {
   padding-top: 64px; /* match bottom padding of page-container */
 }
 
+.separator-bottom {
+  border-bottom: 1px dashed #ccc;
+}
+
 .hr {
   display: block;
   content: "&nbsp;";

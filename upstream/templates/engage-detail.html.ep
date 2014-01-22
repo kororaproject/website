@@ -64,6 +64,32 @@
         </div>
         <div class="hr"></div>
 
+% if( $accepted ) {
+        <div class="row separator-bottom">
+          <div class="col-sm-12">
+            <div id="accepted-reply" class="callout callout-default engage-reply engage-reply-accepted">
+              <%== render_markdown( $accepted->content ) %>
+
+              <div class="engage-detail-tags">
+                <span class="label label-default">accepted</span>
+              </div>
+            </div>
+            <div class="engage-detail-footer">
+              <div class="engage-detail-footer-metadata">
+                <p class="text-right">replied <%= distance_of_time_in_words( $accepted->created ) %></p>
+                <p class="text-right">by <%= $accepted->author_id->username %></p>
+              </div>
+              <div class="engage-detail-footer-metadata">
+                <%== post_gravatar( $accepted, 32 ) %>
+              </div>
+
+              <%== engage_post_admin_template( $accepted ) %>
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+% }
+
 % if( $replies->{item_count} > $replies->{page_size} ) {
         <!-- PAGINATION -->
         <div class="row">
