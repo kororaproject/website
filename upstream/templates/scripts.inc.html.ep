@@ -59,6 +59,9 @@
 
     $(window).on('resize', resizeHelper);
 
+    /* turn on tooltips */
+    $("[data-toggle='tooltip']").tooltip();
+
     /* smooth scroll targets */
     $('a[href*=#]:not([href=#]):not([data-toggle])').click(function() {
       if( location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') || location.hostname == this.hostname ) {

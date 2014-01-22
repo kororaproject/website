@@ -175,36 +175,40 @@
         <div class="hr"></div>
 
 % foreach my $r ( @{ $responses->{items} } ) {
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="callout engage-summary engage-<%= $r->type %>">
-                <div class="pull-right reply-meta">
-                  <div class="engage-detail-footer-metadata">
-                    <p class="text-right">updated <%= distance_of_time_in_words( engage_post_last_update( $r ) ) %></p>
-                    <p class="text-right">by <%= $r->latest_reply->author_id->username %></p>
-                    <p class="text-right"><%= pluralise( $r->reply_count, 'reply' ) %></p>
-                  </div>
-                  <div class="engage-detail-footer-metadata">
-                    <%== post_gravatar( $r->latest_reply, 32 ) %>
-                  </div>
-                </div>
-
-                <div class="engage-summary-content">
-                  <a href="/support/engage/<%= $r->type %>/<%= $r->name %>">
-                    <h4 class="engage-summary-title"><%= $r->title %></h4>
-                  </a>
-                </div>
-                <div class="post-tags">
-                  <%== engage_icon_label( $r->type, 'fa-fw' ) %>
-                  <%== engage_label( $r->type, '',  engage_status( $r ) ) %></span>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="callout engage-summary engage-<%= $r->type %>">
+              <div class="engage-summary-content">
+                <h4 class="engage-summary-title">
+                  <div class="engage-summary-reply-count pull-right" data-toggle="tooltip" data-original-title="<%= pluralise( $r->reply_count, 'reply' )%>"><%= $r->reply_count %></div>
+                  <a href="/support/engage/<%= $r->type %>/<%= $r->name %>"><%= $r->title %> </a>
+                </h4>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="post-tags">
+                    <%== engage_icon_label( $r->type, 'fa-fw' ) %>
+                    <%== engage_label( $r->type, '',  engage_status( $r ) ) %></span>
 % foreach my $t ( $r->tags ) {
-                  <span class="label label-default"><%= $t->name %></span>
+                    <span class="label label-default"><%= $t->name %></span>
 % }
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="pull-right reply-meta">
+                    <div class="engage-detail-footer-metadata">
+                      <p class="text-right">updated <%= distance_of_time_in_words( engage_post_last_update( $r ) ) %></p>
+                      <p class="text-right">by <%= $r->latest_reply->author_id->username %></p>
+                    </div>
+                    <div class="engage-detail-footer-metadata">
+                      <%== post_gravatar( $r->latest_reply, 32 ) %>
+                    </div>
+                  </div>
                 </div>
               </div>
-
             </div>
           </div>
+        </div>
 % }
         <div class="hr"></div>
 

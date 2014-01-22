@@ -1055,9 +1055,36 @@ blockquote p {
 }
 
 .engage-summary-title {
-  display: inline-block;
-
   margin-top: 4px;
+}
+
+.engage-problem .engage-summary-reply-count {
+  background-color: #d9534f;
+}
+.engage-question  .engage-summary-reply-count {
+  background-color: #f0ad4e;
+}
+.engage-idea .engage-summary-reply-count {
+  background-color: #5bc0de;
+}
+.engage-thank .engage-summary-reply-count {
+  background-color: #5cb85c;
+}
+
+.engage-summary-reply-count {
+  margin-top: -4px;
+  padding: 4px;
+  min-width: 32px;
+  border: 1px solid inherit;
+  border-radius: 2px;
+
+  font-size: 14px;
+  line-height: 18px;
+
+  text-align: center;
+  color: #fff;
+
+  cursor: cell;
 }
 
 .engage-summary-content {
@@ -1113,9 +1140,6 @@ blockquote p {
 }
 
 .engage-detail-footer {
-  padding: 0;
-  margin-bottom: 16px;
-
   text-align: right;
 }
 
@@ -1144,8 +1168,8 @@ blockquote p {
   display: inline-block;
   vertical-align: top;
 
-  margin-left: 4px;
-  margin-top: 4px;
+  margin-left: 2px;
+  margin-top: 2px;
 }
 
 /*
