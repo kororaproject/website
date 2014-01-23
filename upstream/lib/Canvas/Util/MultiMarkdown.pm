@@ -297,7 +297,7 @@ sub _SanitiseHTML {
   # Strip unsupported (X)HTML code from string
   my $text = shift;
 
-  $text =~ s/<(\/?((?!a|b|blockquote|div|em|h[1-6]|i|img|ol|p|span|strong|ul|\/)[^>]*)|(\/?(iframe|ins)[^>]*))>/&lt;$1&gt;/g;
+  $text =~ s/<(\/?((?!a|b|blockquote|code|div|em|h[1-6]|i|img|ol|p|span|strong|ul|\/)[^>]*)|(\/?(iframe|ins)[^>]*))>/&lt;$1&gt;/g;
 
   return $text;
 }
