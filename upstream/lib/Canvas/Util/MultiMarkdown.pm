@@ -168,9 +168,6 @@ sub _Markdown {
   # Make sure $text ends with a couple of newlines:
   $text .= "\n\n";
 
-  # sanitise our input from unsafe tags
-  $text = $self->_SanitiseHTML( $text );
-
   # Convert all tabs to spaces.
   $text = $self->_Detab($text);
 
@@ -215,6 +212,9 @@ sub _Markdown {
   $text .= $self->_PrintMarkdownBibliography();
 
   $text = $self->_ConvertCopyright($text);
+
+  # sanitise our input from unsafe tags
+  $text = $self->_SanitiseHTML( $text );
 
   $text = $self->_DoVideoEmbeds($text);
 
