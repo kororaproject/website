@@ -536,12 +536,6 @@ function DonateController($scope, $http) {
   $scope.donor_email;
   $scope.donor_amount;
 
-  $scope.cc_name;
-  $scope.cc_number;
-  $scope.cc_expirty_month;
-  $scope.cc_expirty_year;
-  $scope.cc_security_code;
-
   $scope.error = {
     email: 'Invalid email address specified.',
     password: 'Password must be at least 8 characters.',
@@ -599,47 +593,78 @@ function DonateController($scope, $http) {
     return '';
   };
 
-  $scope.ccNameIsValid = function() {
-    return $scope.cc_name && $scope.cc_name.length > 0;
-  };
-
-  $scope.ccNameValidity = function(state) {
-    if( $scope.cc_name && $scope.cc_name.length > 0 ) {
-      return $scope.ccNameIsValid() ? 'has-success' : 'has-error';;
-    }
-
-    return '';
-  };
-
-  $scope.ccNumberIsValid = function() {
-    return $scope.cc_number && $scope.cc_number.length >= 15;
-  };
-
-  $scope.ccNumberValidity = function(state) {
-    if( $scope.cc_number && $scope.cc_number.length > 0 ) {
-      return $scope.ccNumberIsValid() ? 'has-success' : 'has-error';;
-    }
-
-    return '';
-  };
-
-  $scope.ccSecurityCodeIsValid = function() {
-    return $scope.cc_security_code && $scope.cc_security_code.length >= 3;
-  };
-
-  $scope.ccSecurityCodeValidity = function(state) {
-    if( $scope.cc_security_code && $scope.cc_security_code.length > 0 ) {
-      return $scope.ccSecurityCodeIsValid() ? 'has-success' : 'has-error';;
-    }
-
-    return '';
-  };
-
   $scope.canDonate = function() {
     return $scope.donorEmailIsValid() &&
-           $scope.donorAmountIsValid() &&
-           $scope.ccNameIsValid() &&
-           $scope.ccNumberIsValid();
+           $scope.donorAmountIsValid();
+  };
+};
+
+
+function SponsorController($scope, $http) {
+  $scope.sponsor_name;
+  $scope.sponsor_email;
+  $scope.sponsor_amount;
+
+  $scope.error = {
+    email: 'Invalid email address specified.',
+    password: 'Password must be at least 8 characters.',
+    verify: 'Passwords must match.'
+  };
+
+  $scope.paymentViewUpdate = function(mode) {
+    var _mode = mode || 'cc';
+
+    if( _mode === 'cc' ) {
+      $('#cc_payment').show();
+    }
+    else {
+      $('#cc_payment').hide();
+    }
+  }
+
+  $scope.sponsorEmailIsValid = function() {
+    if( $scope.sponsor_email && $scope.sponsor_email.length > 0 ) {
+      var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+      if( re.test($scope.sponsor_email) ) {
+        return true;
+      }
+
+      $scope.error.email = 'Please enter a valid email address.';
+    }
+    else {
+      $scope.error.email = 'Email address is already taken.';
+    }
+
+    return false;
+  };
+
+  $scope.sponsorAmountIsValid = function() {
+    return( ( $scope.sponsor_amount && $scope.sponsor_amount.length > 0 ) &&
+            ( ! isNaN( parseFloat($scope.sponsor_amount) ) ) &&
+            ( parseFloat($scope.sponsor_amount) >= 10 ) );
+  };
+
+
+  $scope.sponsorEmailValidity = function(state) {
+    if( $scope.sponsor_email && $scope.sponsor_email.length > 0 ) {
+      return $scope.sponsorEmailIsValid() ? 'has-success' : 'has-error';;
+    }
+
+    return '';
+  };
+
+  $scope.sponsorAmountValidity = function(state) {
+    if( $scope.sponsor_amount && $scope.sponsor_amount.length > 0 ) {
+      return $scope.sponsorAmountIsValid() ? 'has-success' : 'has-error';;
+    }
+
+    return '';
+  };
+
+  $scope.canSponsor = function() {
+    return $scope.sponsorEmailIsValid() &&
+           $scope.sponsorAmountIsValid();
   };
 };
 

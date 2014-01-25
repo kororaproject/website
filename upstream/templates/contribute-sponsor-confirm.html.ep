@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'navigation.inc', active => 'discover'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container" ng-controller="SponsorController">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/contribute">Contribute</a></li>
+              <li><a href="/contribute/sponsor">Sponsor</a></li>
+              <li class="active">Confirm</li>
+            </ol>
+            <h1 class="text-center"><strong>Confirm.</strong> Save a Distribution</h1>
+          </div>
+        </div>
+        <div class="hr hr-lg"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h2>Almost there ...</h2>
+            <p>Please check the sponsorship amount is correct. If everything looks in order then you can finalise the sponsorship by clicking confirm.</p>
+          </div>
+          <form role="form" action="<%= url_with %>" method="post">
+            <input type="hidden" name="token" value="<%= $token %>"></input>
+            <input type="hidden" name="payerid" value="<%= $payerid %>"></input>
+            <input type="hidden" name="amount" value="<%= $amount %>"></input>
+            <input type="hidden" name="name" value="<%= $name %>"></input>
+            <input type="hidden" name="email" value="<%= $email %>"></input>
+            <div class="col-sm-6 callout">
+              <h2>Please confirm ...</h2>
+              <p>You are sponsoring the following monthly sum to the Korora Project:</p>
+              <h2 class="text-center">$<%= $amount %><small class="text-muted"><%= uc $currency %>/month<small></h2>
+              <div class="hr"></div>
+              <div class="form-group">
+                <a href="https://www.paypal.com/au/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open('https://www.paypal.com/au/webapps/mpp/paypal-popup','WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, width=600, height=500'); return false;">
+                  <img src="https://www.paypalobjects.com/webstatic/mktg/logo/bdg_secured_by_pp_2line.png" border="0" height="34" alt="PayPal Logo">
+                </a>
+                <a href="/contribute/sponsor" class="btn btn-large btn-default" type="submit">Cancel</a>
+                <button class="btn btn-large btn-success pull-right" type="submit">Confirm</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>

@@ -46,8 +46,7 @@ use Canvas::Helpers;
 use Canvas::Helpers::Engage;
 use Canvas::Site;
 use Canvas::Store::User;
-use Canvas::Util::PayPal::API;
-use Canvas::Util::PayPal::Payment;
+use Canvas::Util::PayPal;
 
 #
 # CONSTANTS
@@ -135,9 +134,11 @@ sub startup {
   # PAYPAL
 
   # prepare the PayPal transaction information
-  my $pp_context = Canvas::Util::PayPal::API->new(
-    client_id     => $config->{paypal}{client_id},
-    client_secret => $config->{paypal}{client_secret},
+  my $pp_context = Canvas::Util::PayPal->new(
+    caller_user      => $config->{paypal}{caller_user},
+    caller_password  => $config->{paypal}{caller_password},
+    caller_signature => $config->{paypal}{caller_signature},
+    mode             => $config->{paypal}{mode},
   );
 
   $self->cache->set(pp_context => $pp_context);
@@ -170,6 +171,17 @@ sub startup {
   $r->get('/about/news/:id/edit')->to('news#news_post_edit_get');
   $r->any('/about/news/:id/delete')->to('news#news_post_delete_any');
 
+  # contribute pages
+  $r->get('/contribute')->to('contribute#index_get');
+  $r->get('/contribute/donate')->to('contribute#donate_get');
+  $r->post('/contribute/donate')->to('contribute#donate_post');
+  $r->get('/contribute/donate/confirm')->to('contribute#donate_confirm_get');
+  $r->post('/contribute/donate/confirm')->to('contribute#donate_confirm_post');
+  $r->get('/contribute/sponsor')->to('contribute#sponsor_get');
+  $r->post('/contribute/sponsor')->to('contribute#sponsor_post');
+  $r->get('/contribute/sponsor/confirm')->to('contribute#sponsor_confirm_get');
+  $r->post('/contribute/sponsor/confirm')->to('contribute#sponsor_confirm_post');
+
   # discover pages
   $r->get('/discover')->to('discover#index');
   $r->get('/discover/gnome')->to('discover#gnome');
@@ -177,6 +189,9 @@ sub startup {
   $r->get('/discover/cinnamon')->to('discover#cinnamon');
   $r->get('/discover/mate')->to('discover#mate');
   $r->get('/discover/xfce')->to('discover#xfce');
+
+  # download pages
+  $r->get('/download')->to('download#index');
 
   # support pages
   $r->get('/support')->to('support#index_get');
@@ -209,16 +224,6 @@ sub startup {
   $r->any('/support/engage/:type/:stub/reply/:id/delete')->to('engage#engage_reply_delete_any');
   $r->any('/support/engage/:type/:stub/reply/:id/unaccept')->to('engage#engage_reply_unaccept_any');
 
-
-  # contribute pages
-  $r->get('/contribute')->to('contribute#index_get');
-  $r->get('/contribute/donate')->to('contribute#donate_get');
-  $r->post('/contribute/donate')->to('contribute#donate_post');
-#  $r->get('/contribute/sponsor')->to('contribute#sponsor_get');
-#  $r->post('/contribute/sponsor')->to('contribute#sponsor_post');
-
-  # download pages
-  $r->get('/download')->to('download#index');
 
 
 

@@ -1235,6 +1235,26 @@ h4.step {
 ** CONTRIBUTE PAGES
 */
 
+.ss-platinum {
+  color: #e5e4e2;
+}
+
+.ss-gold {
+  color: #ffdf00;
+}
+
+.ss-silver {
+  color: #c0c0c0;
+}
+
+.ss-bronze {
+  color: #cd7f32;
+}
+
+.ss-community {
+  color: #a4c639;
+}
+
 .cc-payment-type .radio-inline {
   padding-top: 4px;
   padding-bottom: 2px;

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-package Canvas::Store::Donation;
+package Canvas::Store::Contribution;
 
 use strict;
 use Mojo::Base 'Canvas::Store';
@@ -28,8 +28,8 @@ use Digest::MD5 qw(md5);
 #
 # MODEL DEFINITION
 #
-__PACKAGE__->table('canvas_donation');
-__PACKAGE__->columns(All => qw/id payment_id transaction_id name email amount paypal_raw created/);
+__PACKAGE__->table('canvas_contribution');
+__PACKAGE__->columns(All => qw/id type merchant_id transaction_id name email amount fee paypal_raw created/);
 
 #
 # INFLATOR/DEFLATORS

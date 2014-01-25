@@ -416,15 +416,19 @@ CREATE TABLE canvas_postview (
 );
 
 
-CREATE TABLE canvas_donation (
+CREATE TABLE canvas_contribution (
   id              BIGINT(20)    NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-  payment_id      VARCHAR(64)   NOT NULL,
+  merchant_id     VARCHAR(64)   NOT NULL,
   transaction_id  VARCHAR(64)   NOT NULL,
 
   name            VARCHAR(64)             DEFAULT  NULL,
   email           VARCHAR(128)            DEFAULT  NULL,
 
   amount          VARCHAR(16)             DEFAULT  NULL,
+  fee             VARCHAR(16)             DEFAULT  NULL,
+
+  /* donation or sponsorship */
+  type            VARCHAR(16)   NOT NULL,
 
   paypal_raw      TEXT                    DEFAULT  NULL,
 
