@@ -34,10 +34,10 @@
           <div class="col-sm-6">
             <h2>Why sponsor?</h2>
             <p>We build Korora because we love it and there is no pressure to sponsor, however we do welcome anything that you can spare.</p>
-            <p>By sponsoring Korora you contribute to giving the development team a regular and predictable income to cover hosting, development and hardware testing costs. Sponsors are directly attributed to the continued success of Korora.</p>
+            <p>By sponsoring Korora you contribute by giving the development team a regular and predictable income to cover our hosting, development and hardware testing costs.</p>
             <p>All sponsorships are processed securely online and we do not store any of your payment details.</p>
-            <h2>Sponsorship Levels</h2>
-            <p>There are 5 levels of sponsorships:</p>
+            <h2>Sponsorship levels</h2>
+            <p>There are five levels of sponsorship:</p>
             <table class="table table-responsive table-hover">
               <thead>
                 <tr><th>Sponsorship</th><th>Contribution</th></tr>
@@ -87,7 +87,7 @@
                       <input type="text" class="form-control" name="sponsor_amount" value="00" ng-model="sponsor_amount" value="<%= $v->{sponsor_amount} %>" ng-init="sponsor_amount='<%= $v->{sponsor_amount} %>'"/>
                       <span class="input-group-addon">USD/month</span>
                     </div>
-                    <span class="help-block">How much would you like to sponsor to Korora each month?</span>
+                    <span class="help-block">How much would you like to sponsor to the Korora Project each month?</span>
                   </div>
                 </div>
               </div>

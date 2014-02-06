@@ -37,7 +37,7 @@
             <p>Korora is personally funded by our core developers however and we welcome any contributions to help us with that.</p>
             <p>All donations are processed securely online and we do not store any of your payment details.</p>
             <h2>How is the money used?</h2>
-            <p>We promise to put any donation to good use like helping to cover hosting costs and purchasing new equipment to make Korora even better.</p>
+            <p>Any donation will be put to good use, like helping to cover our hosting costs and purchasing new equipment to make Korora even better.</p>
             <h2>How much should you give?</h2>
             <p>That's entirely up to you! We gratefully accept anything you can spare.</p>
           </div>
@@ -77,7 +77,7 @@
                       <input type="text" class="form-control" name="donor_amount" value="00" ng-model="donor_amount" value="<%= $v->{donor_amount} %>" ng-init="donor_amount='<%= $v->{donor_amount} %>'"></input>
                       <span class="input-group-addon">USD</span>
                     </div>
-                    <span class="help-block">How much would you like to donate to Korora?</span>
+                    <span class="help-block">How much would you like to donate to the Korora Project?</span>
                   </div>
                 </div>
               </div>
