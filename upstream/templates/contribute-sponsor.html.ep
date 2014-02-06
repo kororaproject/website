@@ -26,17 +26,16 @@
               <li><a href="/contribute">Contribute</a></li>
               <li class="active">Sponsor</li>
             </ol>
-            <h1 class="text-center"><strong>Sponsor.</strong> Save a Distribution</h1>
+            <h1 class="text-center"><strong>Sponsor.</strong> Help a Distribution</h1>
           </div>
         </div>
         <div class="hr hr-lg"></div>
         <div class="row">
           <div class="col-sm-6">
             <h2>Why sponsor?</h2>
-            <p>We build Korora because we love it and there is absolutely no pressure to sponsor. However, the facility is here if you would like to.</p>
-            <p>By sponsoring Korora you contribute to giving the development team a regular and predictable income to cover hosting, development and hardward testing costs.</p>
-            <p>Sponsors are directly attributed to the continued success of Korora.</p>
-            <p>All sponsorships are processed securely online and we do not store any of your details.</p>
+            <p>We build Korora because we love it and there is no pressure to sponsor, however we do welcome anything that you can spare.</p>
+            <p>By sponsoring Korora you contribute to giving the development team a regular and predictable income to cover hosting, development and hardware testing costs. Sponsors are directly attributed to the continued success of Korora.</p>
+            <p>All sponsorships are processed securely online and we do not store any of your payment details.</p>
             <h2>Sponsorship Levels</h2>
             <p>There are 5 levels of sponsorships:</p>
             <table class="table table-responsive table-hover">
@@ -44,10 +43,10 @@
                 <tr><th>Sponsorship</th><th>Contribution</th></tr>
               </thead>
               <tbody>
-                <tr><td><i class="fa fa-trophy ss-platinum"></i> Platinum</td><td>$2,000+/month</td></tr>
-                <tr><td><i class="fa fa-trophy ss-gold"></i> Gold</td><td>$1,000+/month</td></tr>
-                <tr><td><i class="fa fa-trophy ss-silver"></i> Silver</td><td>$500+/month</td></tr>
-                <tr><td><i class="fa fa-trophy ss-bronze"></i> Bronze</td><td>$100+/month</td></tr>
+                <tr><td><i class="fa fa-trophy ss-platinum"></i> Platinum</td><td>$500+/month</td></tr>
+                <tr><td><i class="fa fa-trophy ss-gold"></i> Gold</td><td>$100+/month</td></tr>
+                <tr><td><i class="fa fa-trophy ss-silver"></i> Silver</td><td>$50+/month</td></tr>
+                <tr><td><i class="fa fa-trophy ss-bronze"></i> Bronze</td><td>$25+/month</td></tr>
                 <tr><td><i class="fa fa-trophy ss-community"></i> Community</td><td>$10+/month</td></tr>
               </tbody>
             </table>
@@ -75,7 +74,7 @@
                       <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
                       <input type="text" class="form-control" name="sponsor_email" data-rule-required="true" placeholder="" ng-model="sponsor_email" value="<%= $v->{sponsor_email} %>" ng-init="sponsor_email='<%= $v->{sponsor_email} %>'"></input>
                     </div>
-                    <span class="help-block">We use this email address to coordinate any additional sponsor requirements.</span>
+                    <span class="help-block">We use this email address as the identifier for your sponsorship and for any correspondence.</span>
                   </div>
                 </div>
               </div>
@@ -88,7 +87,7 @@
                       <input type="text" class="form-control" name="sponsor_amount" value="00" ng-model="sponsor_amount" value="<%= $v->{sponsor_amount} %>" ng-init="sponsor_amount='<%= $v->{sponsor_amount} %>'"/>
                       <span class="input-group-addon">USD/month</span>
                     </div>
-                    <span class="help-block">How much would you like to sponsor monthly to Korora?</span>
+                    <span class="help-block">How much would you like to sponsor to Korora each month?</span>
                   </div>
                 </div>
               </div>

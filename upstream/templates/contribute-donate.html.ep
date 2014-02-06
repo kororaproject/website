@@ -26,16 +26,16 @@
               <li><a href="/contribute">Contribute</a></li>
               <li class="active">Donate</li>
             </ol>
-            <h1 class="text-center"><strong>Donate.</strong> Save a Developer</h1>
+            <h1 class="text-center"><strong>Donate.</strong> Help a Developer</h1>
           </div>
         </div>
         <div class="hr hr-lg"></div>
         <div class="row">
           <div class="col-sm-6">
             <h2>Why donate?</h2>
-            <p>We build Korora because we love it and there is absolutely no pressure to make a donation. However, the facility is here if you would like to.</p>
+            <p>We build Korora because we love it and there is no pressure to make a donation, however we welcome anything that you can spare.</p>
             <p>Korora is personally funded by our core developers and we welcome any contributions to help us with that.</p>
-            <p>All donations are processed securely online and we do not store any of your details.</p>
+            <p>All donations are processed securely online and we do not store any of your payment details.</p>
             <h2>How is the money used?</h2>
             <p>We promise to put any donation to good use like helping to cover hosting costs and purchasing new equipment to make Korora even better.</p>
             <h2>How much should you give?</h2>
@@ -64,7 +64,7 @@
                       <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
                       <input type="text" class="form-control" name="donor_email" data-rule-required="true" placeholder="" ng-model="donor_email" value="<%= $v->{donor_email} %>" ng-init="donor_email='<%= $v->{donor_email} %>'"></input>
                     </div>
-                    <span class="help-block">We use this email address to correlate multiple donations to the same person.</span>
+                    <span class="help-block">We use this email address to correlate multiple donations made by the same person.</span>
                   </div>
                 </div>
               </div>
