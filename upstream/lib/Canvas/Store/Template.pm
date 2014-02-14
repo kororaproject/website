@@ -20,13 +20,47 @@ package Canvas::Store::Template;
 use strict;
 use base 'Canvas::Store';
 
+#
+# TABLE DEFINITION
+#
 __PACKAGE__->table('canvas_template');
-__PACKAGE__->columns(All => qw/id user_id name description private parent_id/);
+__PACKAGE__->columns(All => qw/id user_id name description private parent_id created updated/);
 
+#
+# N:N MAPPINGS
+#
 __PACKAGE__->has_many(template_packages     => 'Canvas::Store::TemplatePackage'     => 'template_id');
 __PACKAGE__->has_many(template_repositories => 'Canvas::Store::TemplateRepository'  => 'template_id');
 
+#
+# 1:N MAPPINGS
+#
 __PACKAGE__->has_a(user_id    => 'Canvas::Store::User');
 __PACKAGE__->has_a(parent_id  => 'Canvas::Store::Template');
+
+#
+# INFLATOR/DEFLATORS
+#
+__PACKAGE__->has_a(
+  created => 'Time::Piece',
+  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
+  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
+);
+
+__PACKAGE__->has_a(
+  updated => 'Time::Piece',
+  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
+  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
+);
+
+
+#
+# UPDATE HELPER
+#
+__PACKAGE__->set_sql(update => qq{
+ UPDATE __TABLE__
+  SET updated=UTC_TIMESTAMP(), %s
+   WHERE  __IDENTIFIER__
+});
 
 1;

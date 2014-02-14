@@ -47,9 +47,7 @@ class Template(object):
     self._description = None
 
     self._package_list = PackageList()
-    self._package_list_remove = PackageList()
-    self._repo_list = RepoList()
-    self._repo_list_remove = RepoList()
+    self._repo_list = RepositoryList()
 
     self._parse_template( template )
 
@@ -80,12 +78,16 @@ class Template(object):
       if 'r' in template:
         if isinstance(template['r'], list):
           for r in template['r']:
-            self._repo_list.add( Repo( repo=r ) )
+            _r = Repository()
+            _r.fromObject(r)
+            self._repo_list.add( _r )
 
       if 'p' in template:
         if isinstance(template['p'], list):
           for p in template['p']:
-            self._package_list.add( Package( package=p ) )
+            _p = Package()
+            _p.fromObject(p)
+            self._package_list.add( _p )
 
 
   def set(self, template):
@@ -111,92 +113,8 @@ class Template(object):
   def description(self):
     return self._description
 
-  def merge(self, template, clean=False):
-    if not isinstance( template, Template ):
-      TypeError('template is not of template Template')
-
-    if template.name is not None:
-      self._name = template.name
-
-    if template.user is not None:
-      self._user = template.user
-
-    if template.description is not None:
-      self._description = template.description
-
-    pl_install = PackageList()
-    pl_remove = PackageList()
-    rl_enable = RepoList()
-
-    # look for packages in our template and not in the template being merged
-    for op in self._package_list.packages():
-
-      found = False
-
-      for tp in template.getPackageList().packages():
-        # match on name only
-        if op.name != tp.name:
-          continue
-
-        # TODO
-        if tp.isPinned():
-          pl_install.add( tp )
-
-        found = True
-
-      # a package exists in ours but not in the template being merged
-      # remove if we're doing a clean merge
-      if not found and clean:
-        pl_remove.add( tp )
-
-
-    # look for package in the merge template and not in our template
-    for tp in self._package_list.packages():
-
-      found = False
-
-      for op in template.getPackageList().packages():
-        # match on name only
-        if op.name != tp.name:
-          continue
-
-        # TODO
-        if tp.isPinned():
-          pl_install.add( tp )
-
-        found = True
-
-      # package is in the merged template but not in our template so let's add
-      if not found:
-        pl_install.add( tp )
-
-
-    # look for repos in our template and not in the template being merged
-    for tr in template.getRepoList().repos():
-
-      found = False
-
-      for r in self._repo_list.repos():
-        # match on name only
-        if r.name != tr.name:
-          continue
-
-        found = True
-
-      # repo is in the merged template but not in our template so let's add
-      if not found:
-        rl_enable.add( tr )
-
-
-    self._package_list = pl_install
-    self._package_list_remove = pl_remove
-    self._repo_list = rl_enable
-
   def getPackageList(self):
     return self._package_list
-
-  def getPackageListRemove(self):
-    return self._package_list_remove
 
   def setPackageList(self, package_list):
     if not isinstance(package_list, PackageList):
@@ -204,15 +122,12 @@ class Template(object):
 
     self._package_list = package_list
 
-  def getRepoList(self):
+  def getRepositoryList(self):
     return self._repo_list
 
-  def getRepoListRemove(self):
-    return self._repo_list_remove
-
-  def setRepoList(self, repo_list):
-    if not isinstance(repo_list, RepoList):
-      TypeError('list is not of type RepoList')
+  def setRepositoryList(self, repo_list):
+    if not isinstance(repo_list, RepositoryList):
+      TypeError('list is not of type RepositoryList')
 
     self._repo_list = repo_list
 
@@ -230,18 +145,13 @@ class Template(object):
 
 
 class Package(object):
-  def __init__(self, name=None, summary=None, description=None, license=None, url=None, category=None, type=None, tags=None, src_package=None, provides=None, files=None, files_in_provides=False):
+  def __init__(self, name=None, epoch=None, version=None, release=None, arch=None, action=None):
     self.name = name
-
-    self.summary = summary
-    self.description = description
-    self.license = license
-    self.url = url
-    self.category = category
-    self.type = type
-    self.tags = tags
-
-    self.details = []
+    self.epoch = epoch
+    self.version = version
+    self.release = release
+    self.arch = arch
+    self.action = action
 
   def fromObject(self, package):
     if isinstance(package, str):
@@ -264,157 +174,45 @@ class Package(object):
       if 'n' in package:
         self.name = package['n']
 
-      if 's' in package:
-        self.summary = package['s']
+      if 'e' in package:
+        self.epoch = package['e']
 
-      if 'sx' in package:
-        self.description = package['sx']
+      if 'v' in package:
+        self.version = package['v']
 
-      if 'l' in package:
-        self.license = package['l']
+      if 'r' in package:
+        self.release = package['r']
 
-      if 'u' in package:
-        self.url = package['u']
+      if 'a' in package:
+        self.arch = package['a']
 
-      if 'c' in package:
-        self.category = package['c']
-
-      if 't' in package:
-        self.type = package['t']
-
-      if 'tx' in package:
-        self.tags = package['tx']
-
-  def addDetails(self, details):
-    if not isinstance(details, PackageDetails):
-      raise TypeError('Not a PackageDetails object')
-
-    # TODO: check for duplicates before inserting
-
-    self.details.append( details )
-
-  def hasDetails(self):
-    return len( self.details ) > 0
-
-  def pin(self, state=False):
-    self._pin = state
-
-  def isPinned(self):
-    return self._pin
-
-  def setRepoID(self, id):
-    for d in self.details:
-      d.repo_id = id
+      if 'z' in package:
+        self.action = int( package['z'] )
 
   def toObject(self):
-    details = []
-
-    # add all details objects before returning
-    for d in self.details:
-      details.append( d.toObject() )
-
     return {
-      "n":  self.name,
-      "s":  self.summary,
-      "sx": self.description,
-      "l":  self.license,
-      "u":  self.url,
-      "c":  self.category,
-      "t":  self.type,
-      "tx": self.tags,
-
-      "d":  details
+      "n": self.name,
+      "e": self.epoch,
+      "v": self.version,
+      "r": self.release,
+      "a": self.arch,
+      "z": self.action,
     }
+
+  def isPinned(self):
+    return self.action & ( 0x3c );
+
+  def actionInstall(self):
+    return self.action & ( 1 );
+
+  def actionUninstall(self):
+    return self.action & ( 2 );
 
   def toJSON(self):
     return json_encode( self.toObject(), separators=(',',':') )
 
   def __str__(self):
     return 'Package: %s ' % ( json_encode( self.toObject(), separators=(',',':') ) )
-
-
-class PackageDetails(object):
-  def __init__(self, epoch=None, version=None, release=None, arch=None, install_size=None, package_size=None, build_time=None, file_time=None):
-    self.epoch = epoch
-    self.version = version
-    self.release = release
-    self.arch = arch
-
-    self.install_size = install_size
-    self.package_size = package_size
-
-    self.build_time = build_time
-    self.file_time = file_time
-
-    self.repo_id = None
-
-  def fromObject(self, details):
-    if isinstance(details, str):
-      parts = details.split(':')
-
-      if len(parts) == 1:
-        self.name = parts[0]
-
-      elif len(parts) == 2:
-        self.name = parts[0]
-        self.version = parts[1]
-
-      elif len(parts) == 3:
-        self.name = parts[0]
-        self.version = parts[1]
-        self.release = parts[2]
-        self.arch = parts[3]
-
-    if isinstance(details, dict):
-      if 'e' in details:
-        self.epoch = details['e']
-
-      if 'v' in details:
-        self.version = details['v']
-
-      if 'r' in details:
-        self.release = details['r']
-
-      if 'a' in details:
-        self.arch = details['a']
-
-      if 'is' in details:
-        self.install_size = details['is']
-
-      if 'ps' in details:
-        self.pacakge_size = details['ps']
-
-      if 'bt' in details:
-        self.build_time = details['bt']
-
-      if 'ft' in details:
-        self.file_time = details['ft']
-
-      if 'ri' in details:
-        self.repo_id = details['ri']
-
-  def toObject(self):
-    return {
-      "e": self.epoch,
-      "v": self.version,
-      "r": self.release,
-      "a": self.arch,
-
-      "is": self.install_size,
-      "ps": self.package_size,
-      "bt": self.build_time,
-      "ft": self.file_time,
-
-      "ri": self.repo_id,
-    }
-
-  def toJSON(self):
-    return json_encode( self.toObject(), separators=(',',':') )
-
-  def __str__(self):
-    return 'PackageDetails: %s ' % ( json_encode( self.toObject(), separators=(',',':') ) )
-
-
 
 
 class PackageList(object):
@@ -450,10 +248,14 @@ class PackageList(object):
     return 'PackageList: %d package.' % ( len(self._packages) )
 
 class Repository(object):
-  def __init__(self, stub=None, enabled=None, gpg_key=None, gpg_check=None, meta_expired=None, cost=None, exclude=None, id=None):
-    self.stub = stub
+  def __init__(self, name=None, stub=None, baseurl=None, mirrorlist=None, metalink=None, enabled=None, gpg_key=None, gpg_check=None, meta_expired=None, cost=None, exclude=None):
+    self._name = name
+    self._stub = stub
 
-    self.id = id
+    self.baseurl = baseurl
+    self.mirrorlist = mirrorlist
+    self.metalink = metalink
+
     self.gpgkey = gpg_key
     self.enabled = enabled
     self.gpgcheck = gpg_check
@@ -462,25 +264,32 @@ class Repository(object):
     self.meta_expired = meta_expired
     self.exclude = exclude
 
-    # no details indicates a general repo only
-    self.has_details = False
+  @property
+  def name(self):
+    return self._name
 
-    self.details = []
-
-    self.packages = []
+  @property
+  def stub(self):
+    return self._stub
 
   def fromObject(self, repo, clear=False):
     if isinstance(repo, dict):
       self.has_details = False
 
-      if 'id' in repo:
-        self.id = repo['id']
-
       if 's' in repo:
-        self.stub = repo['s']
+        self._stub = repo['s']
+
+      if 'bu' in repo:
+        self.baseurl = repo['bu']
+
+      if 'ml' in repo:
+        self.mirrorlist = repo['ml']
+
+      if 'ma' in repo:
+        self.metalink = repo['ma']
 
       if 'n' in repo:
-        self.name = repo['n']
+        self._name = repo['n']
 
       if 'gk' in repo:
         self.gpgkey = repo['gk']
@@ -497,130 +306,32 @@ class Repository(object):
       if 'c' in repo:
         self.cost = repo['c']
 
-      if 'd' in repo:
-        if isinstance(repo['d'], list):
-          for d in repo['d']:
-            rd = RepositoryDetails()
-            rd.fromObject( d )
-
-            self.details.append( rd )
-
-        else:
-          raise Exception('Object details are not in list form.')
-
-
     else:
       raise Exception("Can't read from %s object" % ( type(repo) ) )
 
-  def addDetails(self, details):
-    if not isinstance(details, RepositoryDetails):
-      raise TypeError('Not a RepositoryDetails object')
-
-    # TODO: check for duplicates before inserting
-
-    self.details.append( details )
-
-
-  def hasDetails(self):
-    return len( self.details ) > 0
-
-  def blessPackage(self, package, arch=None, version=None):
-    if not isinstance(package, Package):
-      raise TypeError('Not a Package object')
-
-    if len( self.details ) == 0:
-      raise Exception('Unable to bless package from a general repo')
-    elif len( self.details ) > 1 and ( arch == None and version == None ):
-      raise Exception('Unable to bless package with multiple details and no filter.')
-
-    for d in self.details:
-      if arch is not None and not d.arch == arch:
-        continue
-
-      if version is not None and not d.version == version:
-        continue
-
-      # set the repo identifier
-      package.setRepoID( d.id )
-
-      # only set the id once
-      break
-
-    return package
-
   def toObject(self):
-    details = []
-
-    # add all details objects before returning
-    for d in self.details:
-      details.append( d.toObject() )
-
     return {
-      'id': self.id,
-      's':  self.stub,
+      's':  self._stub,
+      'n':  self._name,
+      'bu':  self.baseurl,
+      'ml':  self.mirrorlist,
+      'ma':  self.metalink,
       'e':  self.enabled,
       'gc': self.gpgcheck,
       'gk': self.gpgkey,
       'me': self.meta_expired,
       'c':  self.cost,
       'x':  self.exclude,
-      'd':  details
     }
 
   def toJSON(self):
     return json_encode( self.toObject(), separators=(',',':') )
 
   def __str__(self):
-    return self.toJSON()
-
-# TODO: REMOVE
-class Repo(Repository):
-  pass
+    return 'Repository: %s ' % ( json_encode( self.toObject(), separators=(',',':') ) )
 
 
-class RepositoryDetails(object):
-  def __init__(self, name=None, arch=None, version=None, url=None):
-
-    self.id = None
-
-    self.name = name
-    self.arch = arch
-    self.version = version
-    self.url = url
-
-  def fromObject(self, details):
-    if isinstance(details, dict):
-      if 'id' in details:
-        self.id = details['id']
-
-      if 'n' in details:
-        self.name = details['n']
-
-      if 'a' in details:
-        self.arch = details['a']
-
-      if 'v' in details:
-        self.version = details['v']
-
-      if 'u' in details:
-        self.url = details['u']
-
-    else:
-      raise Exception("Can't read from %s object" % ( type(repo) ) )
-
-
-  def toObject(self):
-    return {
-      'id': self.id,
-      'n':  self.name,
-      'a':  self.arch,
-      'v':  self.version,
-      'u':  self.url,
-    }
-
-
-
-class RepoList(object):
+class RepositoryList(object):
   def __init__(self, repos=[]):
     self._repos = []
 
@@ -629,11 +340,11 @@ class RepoList(object):
   def _parse_repos(self, repos ):
     for r in repos:
       if isinstance(r, yum.yumRepo.YumRepository):
-        self._repos.append( Repo( r.id, r.name, r.baseurl, r.mirrorlist, r.enabled, r.gpgcheck, r.gpgkey, r.metadata_expire, r.cost, r.exclude ) )
+        self._repos.append( Repository( r.id, r.name, r.baseurl, r.mirrorlist, r.metalink, r.enabled, r.gpgkey, r.gpgcheck, r.metadata_expire, r.cost, r.exclude ) )
 
   def add(self, repo):
-    if not isinstance( repo, Repo ):
-      raise TypeError('Not a Repo object')
+    if not isinstance( repo, Repository ):
+      raise TypeError('Not a Repository object')
 
     self._repos.append( repo )
 
@@ -844,45 +555,3 @@ class CanvasService(object):
       print e
 
     return None
-
-
-  def repository_create(self, repo):
-
-    if not isinstance(repo, Repository):
-      TypeError('repo is not of type Repository')
-
-    try:
-      r = urllib2.Request('%s/api/repositories.json' % ( self._urlbase ), repo.toJSON())
-      u = self._opener.open(r)
-
-      repo = Repository()
-      repo.fromObject( json_decode( u.read() ) )
-
-      return repo
-
-    except urllib2.URLError, e:
-      print e
-    except urllib2.HTTPError, e:
-      print e
-
-    return None
-
-
-  def package_create(self, package):
-
-    if not isinstance(package, Package):
-      TypeError('package is not of type Package')
-
-    try:
-      r = urllib2.Request('%s/api/packages.json' % ( self._urlbase ), package.toJSON())
-      u = self._opener.open(r)
-      print u.read()
-
-      return True
-
-    except urllib2.URLError, e:
-      print e
-    except urllib2.HTTPError, e:
-      print e
-
-

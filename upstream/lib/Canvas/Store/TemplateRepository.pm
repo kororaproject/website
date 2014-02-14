@@ -21,11 +21,33 @@ use strict;
 use base 'Canvas::Store';
 
 __PACKAGE__->table('canvas_templaterepository');
-__PACKAGE__->columns(All => qw/id template_id repo_id pref_url version enabled cost gpg_check/);
+__PACKAGE__->columns(All => qw/id template_id name stub baseurl mirrorlist metalink version enabled cost exclude gpg_key gpg_check created updated/);
 
 __PACKAGE__->has_a(template_id  => 'Canvas::Store::Template');
-__PACKAGE__->has_a(repo_id      => 'Canvas::Store::Repository');
 
 
+#
+# INFLATOR/DEFLATORS
+#
+__PACKAGE__->has_a(
+  created => 'Time::Piece',
+  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
+  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
+);
+
+__PACKAGE__->has_a(
+  updated => 'Time::Piece',
+  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
+  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
+);
+
+#
+# UPDATE HELPER
+#
+__PACKAGE__->set_sql(update => qq{
+ UPDATE __TABLE__
+  SET updated=UTC_TIMESTAMP(), %s
+   WHERE  __IDENTIFIER__
+});
 
 1;

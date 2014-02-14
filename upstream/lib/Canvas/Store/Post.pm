@@ -254,4 +254,3 @@ __PACKAGE__->set_sql(update => qq{
 });
 
 1;
-

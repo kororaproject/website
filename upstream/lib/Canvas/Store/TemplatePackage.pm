@@ -24,26 +24,41 @@ use base 'Canvas::Store';
 # CONSTANTS
 #
 use constant {
-  # bit 7: 0 = not pinned, 1 = pinned
-  ACTION_PINNED     => 128,
-
-  # bit 1: 0 = removed, 1 = installed
-  ACTION_INSTALLED  =>   1,
+  ACTION_LOCK_UNINSTALL =>  0x80,
+  ACTION_LOCK_INSTALL   =>  0x40,
+  ACTION_PIN_EPOCH      =>  0x20,
+  ACTION_PIN_VERSION    =>  0x10,
+  ACTION_PIN_RELEASE    =>  0x08,
+  ACTION_PIN_ARCH       =>  0x04,
+  ACTION_UNINSTALL      =>  0x02,
+  ACTION_INSTALL        =>  0x01,
 };
 
 #
 # TABLE DEFINITION
 #
 __PACKAGE__->table('canvas_templatepackage');
-__PACKAGE__->columns(All => qw/id template_id package_id arch_id version rel epoch action/);
+__PACKAGE__->columns(All => qw/id template_id repo_name name arch version rel epoch action created updated/);
 
 #
 # 1:N MAPPINGS
 #
 __PACKAGE__->has_a(template_id  => 'Canvas::Store::Template');
-__PACKAGE__->has_a(package_id   => 'Canvas::Store::Package');
-__PACKAGE__->has_a(arch_id      => 'Canvas::Store::Arch');
 
+#
+# INFLATOR/DEFLATORS
+#
+__PACKAGE__->has_a(
+  created => 'Time::Piece',
+  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
+  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
+);
+
+__PACKAGE__->has_a(
+  updated => 'Time::Piece',
+  inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
+  deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
+);
 
 
 #
@@ -51,9 +66,7 @@ __PACKAGE__->has_a(arch_id      => 'Canvas::Store::Arch');
 #
 
 sub is_pinned {
-  my $action = shift->action;
-
-  return( $action & ACTION_PINNED )
+  return( shift->action & ( ACTION_PIN_EPOCH | ACTION_PIN_VERSION | ACTION_PIN_RELEASE | ACTION_PIN_ARCH ) );
 }
 
 #
@@ -62,9 +75,8 @@ sub is_pinned {
 # is the package explicitly installed by the template
 #
 sub is_installed {
-  my $action = shift->action;
 
-  return( $action & ACTION_INSTALLED )
+  return( shift->action & ACTION_INSTALL );
 }
 
 #
@@ -73,11 +85,16 @@ sub is_installed {
 # is the package explicitly removed by the template
 #
 sub is_removed {
-  return not shift->is_installed;
+  return( shift->action & ACTION_INSTALL );
 }
 
-
-
-
+#
+# UPDATE HELPER
+#
+__PACKAGE__->set_sql(update => qq{
+ UPDATE __TABLE__
+  SET updated=UTC_TIMESTAMP(), %s
+   WHERE  __IDENTIFIER__
+});
 
 1;

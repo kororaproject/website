@@ -378,8 +378,8 @@ blockquote p {
 
 .navbar-brand .title {
   display: inline-block;
-  margin: 12px 0;
-  font-size: 24px;
+  margin: 6px 0;
+  font-size: 32px;
   color: #fff;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, .3);
 }
@@ -849,6 +849,11 @@ blockquote p {
 .navbar-default .nav-home {
   border-right: 2px solid #3276b1;
   border-left: 2px solid transparent;
+}
+
+.navbar-text {
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
 .nav a.user-avatar {

@@ -170,7 +170,11 @@ sub authenticate_any {
 
   unless( $self->authenticate($user, $pass) ) {
     $self->flash( page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?' );
+
+    return $self->render( status => 403, json => 'Not Authorised!' ) if $self->stash('format') eq 'json';
   }
+
+  return $self->render( status => 200, json => 'Access Granted!' ) if $self->stash('format') eq 'json';
 
   return $self->redirect_to( $url );
 };
@@ -179,6 +183,8 @@ sub deauthenticate_any {
   my $self = shift;
 
   $self->logout;
+
+  return $self->render( status => 200, json => 'Done!' ) if $self->stash('format') eq 'json';
 
   # extract the redirect url and fall back to the index
   my $url = $self->param('redirect_to') // '/';

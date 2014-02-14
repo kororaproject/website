@@ -23,6 +23,11 @@ use strict;
 use Mojo::Base 'Mojolicious::Controller';
 
 #
+# PERL INCLUDES
+#
+use Time::Piece;
+
+#
 # LOCAL INCLUDES
 #
 use Canvas::Store::Package;
@@ -35,392 +40,7 @@ use Canvas::Store::Template;
 use Canvas::Store::TemplatePackage;
 use Canvas::Store::TemplateMembership;
 use Canvas::Store::TemplateRepository;
-use Canvas::Store::WPUser;
-use Canvas::Store::WPPost;
-#
-#
-# GET /packages
-#
-# Returns all packages available
-#
-# Expected body contents is JSON encoded structure defining the template
-# repositories and packages to be added.
-#
-# Returns:
-#  - 200 on success
-#  - 403 if entity exists and you don't have sufficient privileges to modify
-#  - 500 if template owner doesn't exist or is invalid
-#
-# An overview of the JSON structure is shown below:
-#
-# [
-#   {
-#     id: id,
-#     n:  "name",
-#     s:  "summary",
-#     sx: "description",
-#     l:  "license",
-#     u:  "url"
-#     c:  "category",
-#     t:  "type",
-#     tx: [
-#       "tag_1",
-#       "tag_2",
-#       ...
-#     ]
-#   },
-#   ...
-# ]
-#
-sub packages_get {
-  my $self = shift;
 
-  # construct search query as appropriate
-  my $q = $self->build_query({
-    name      => [ 'n', 'name' ],
-    category  => [ 'c', 'category' ],
-  });
-
-  # build pager for packages
-  my $pager = Canvas::Store::Package->pager(
-    entries_per_page  => $self->param('_ep')  // 100,
-    current_page      => $self->param('_cp')  // 0,
-    order_by          => $self->param('_ob')  // 'name',
-  );
-
-  my @packages = $pager->search_where( $q );
-
-  my $ret = [];
-
-  foreach my $p ( @packages ) {
-    push @$ret, {
-      id  => $p->id+0,
-      n   => $p->name,
-      s   => $p->summary,
-      sx  => $p->description,
-      l   => $p->license,
-      u   => $p->url,
-      c   => $p->category,
-      t   => $p->type,
-      tx  => [ split /,/, $p->tags // '' ],
-      cd  => $p->updated->epoch,
-      ud  => $p->created->epoch,
-    };
-  }
-
-  $self->render( json => {
-    page        => $pager->current_page+0,
-    page_size   => $pager->entries_per_page+0,
-    last_page   => $pager->last_page+0,
-    total_items => $pager->total_entries+0,
-    items       => $ret,
-  });
-}
-
-#
-# POST /packages
-#
-# Add a new pacakge
-#
-# Expected body contents is JSON encoded structure defining the package to be
-# added.
-#
-# Returns:
-#  - 200 on success
-#  - 403 if entity exists and you don't have sufficient privileges to modify
-#  - 500 if package already exists
-#
-# An overview of the JSON structure is shown below:
-#
-# {
-#   n:  "name",
-#   s:  "summary",
-#   sx: "description",
-#   l:  "license",
-#   u:  "url",
-#   c:  "category",
-#   t:  "type",
-#   tx: [
-#     "tag_1",
-#     "tag_2",
-#     ...
-#   ],
-#   d: [
-#     {
-#       e:  "epoch",
-#       v:  "version",
-#       r:  "revision",
-#       a:  "arch",
-#       is: "install_size",
-#       ps: "package_size",
-#       bt: "build_time",
-#       ft: "file_time",
-#       ri: repo_id,
-#     },
-#     ...
-#   ]
-# }
-#
-sub packages_post {
-  my $self = shift;
-  my $json = Mojo::JSON->new;
-  my $data = $json->decode( $self->req->body );
-
-  # TODO: only super admins and package admins can create packages
-
-  # attempt to find existing package
-  my ($p) = Canvas::Store::Package->search({
-    name       => $data->{n},
-  });
-
-  # general package information exists
-  # check if we're submitting a detailed package structure
-  if( defined($p) ) {
-    unless( defined($data->{d}) ) {
-      return $self->render(
-        status  => 500,
-        text    => 'General package information already exists.',
-        json    => { error => 'General package already exists.' },
-      );
-    }
-  }
-  # otherwise create the package
-  else {
-    $p = Canvas::Store::Package->insert({
-      name        => $data->{n},
-      summary     => $data->{s},
-      description => $data->{sx},
-      license     => $data->{l},
-      url         => $data->{u},
-      category    => $data->{c},
-      type        => $data->{t},
-      tags        => $data->{tx},
-    });
-  }
-
-  # cache the arch to reduce DB hits
-  my $arch_cache = {};
-
-  for my $d ( @{ $data->{d} } ) {
-    # cache arch lookups since there are very few
-    unless( defined($arch_cache->{$d->{a}}) ) {
-      $arch_cache->{$d->{a}} = Canvas::Store::Arch->find_or_create({ name => $d->{a} });
-    }
-
-    # attempt to find existing package details
-    my( $pd ) = Canvas::Store::PackageDetails->search({
-      package_id    => $p->id,
-      epoch         => $d->{e},
-      version       => $d->{v},
-      rel           => $d->{r},
-      arch_id       => $arch_cache->{ $d->{a} }->id,
-      repo_id       => $d->{ri},
-    });
-
-    # details don't exist so add
-    unless( defined( $pd ) ) {
-      # create the package details
-      my $pd = Canvas::Store::PackageDetails->insert({
-        package_id    => $p->id,
-        epoch         => $d->{e},
-        version       => $d->{v},
-        rel           => $d->{r},
-        arch_id       => $arch_cache->{ $d->{a} }->id,
-
-        install_size  => $d->{is},
-        package_size  => $d->{ps},
-        build_time    => Time::Piece->new( $d->{bt} ),
-        file_time     => Time::Piece->new( $d->{ft} ),
-
-        repo_id       => $d->{ri},
-      });
-
-      $d->{id} = $pd->id;
-    }
-  }
-
-  # update general id
-  $data->{id} = $p->id;
-
-  $self->render(
-    status  => 200,
-    json    => $data,
-  );
-}
-
-#
-# GET /packages/latest
-#
-# Returns all packages based on latest updated time
-#
-# Returns:
-#  - 200 on success
-#  - 403 if entity exists and you don't have sufficient privileges to modify
-#  - 500 if template owner doesn't exist or is invalid
-#
-# An overview of the JSON structure is shown below:
-#
-# [
-#   {
-#     id: id,
-#     n:  "name",
-#     s:  "summary",
-#     sx: "description",
-#     l:  "license",
-#     u:  "url"
-#     c:  "category",
-#     t:  "type",
-#     tx: [
-#       "tag_1",
-#       "tag_2",
-#       ...
-#     ]
-#   },
-#   ...
-# ]
-#
-sub packages_latest_get {
-  my $self = shift;
-
-  # construct search query as appropriate
-  my $q = $self->build_query({
-    name      => [ 'n', 'name' ],
-    category  => [ 'c', 'category' ],
-  });
-
-  # build pager for packages
-  my @packages = Canvas::Store::Package->search_latest();
-
-  my $ret = [];
-
-  foreach my $p ( @packages ) {
-    push @$ret, {
-      id  => $p->id+0,
-      n   => $p->name,
-      s   => $p->summary,
-      sx  => $p->description,
-      l   => $p->license,
-      u   => $p->url,
-      c   => $p->category,
-      t   => $p->type,
-      tx  => [ split /,/, $p->tags // '' ],
-      cd  => $p->updated->epoch,
-      ud  => $p->created->epoch,
-    };
-  }
-
-  $self->render( json => $ret );
-}
-
-#
-# GET /api/package/:id
-#
-# Returns the package identified by :id
-#
-# Expected body contents is JSON encoded structure defining the template
-# repositories and packages to be added.
-#
-# Returns:
-#  - 200 on success
-#  - 403 if entity exists and you don't have sufficient privileges to modify
-#  - 500 if template owner doesn't exist or is invalid
-#
-# An overview of the JSON structure is shown below:
-#
-# {
-#   n:  "name",
-#   s:  "summary",
-#   sx: "description",
-#   l:  "license",
-#   u:  "url",
-#   c:  "category",
-#   t:  "type",
-#   tx: [
-#     "tag_1",
-#     "tag_2",
-#     ...
-#   ],
-#   d: [
-#     {
-#       e:  "epoch",
-#       v:  "version",
-#       r:  "release",
-#       a:  "arch",
-#       is: "install_size",
-#       ps: "package_size",
-#       bt: "build_time",
-#       ft: "file_time",
-#       ri: repo_id
-#     },
-#     ...
-#   ]
-# }
-#
-sub package_id_get {
-  my $self = shift;
-  my $id = $self->param('id');
-
-  my $p = Canvas::Store::Package->retrieve($id);
-
-  # check we actually received a valid template
-  unless( defined($p) ) {
-    return $self->render(
-      status  => 404,
-      text    => 'not found',
-      json    => { error => 'not found' },
-    );
-  }
-
-  my @template_packages = $p->template_packages;
-
-  my $package = {
-    id  => $p->id+0,
-    n   => $p->name,
-    s   => $p->summary,
-    sx  => $p->description,
-    u   => $p->url,
-    c   => $p->category,
-    t   => $p->type,
-    tx  => [ split /,/, $p->tags // '' ],
-    cx  => scalar @template_packages,
-    cd  => $p->updated->epoch,
-    ud  => $p->created->epoch,
-    d   => [],
-  };
-
-  foreach my $d ( $p->package_details ) {
-    push @{ $package->{d} }, {
-      e   => $d->epoch,
-      v   => $d->version,
-      r   => $d->rel,
-      a   => $d->arch_id->name,
-      is  => $d->install_size,
-      ps  => $d->package_size,
-      bt  => $d->build_time->epoch,
-      ft  => $d->file_time->epoch,
-      ri  => $d->repo_id,
-      cd  => $p->updated->epoch,
-      ud  => $p->created->epoch,
-    }
-  }
-
-  $self->render(
-    status => 200,
-    json => $package,
-  );
-}
-
-sub package_id_put {
-  my $self = shift;
-  my $json = Mojo::JSON->new;
-  my $data = $json->decode( $self->req->body );
-
-  # TODO: only super admins and package admins can modify packages
-
-}
-
-sub package_id_del {
-}
 
 #
 # USERS
@@ -483,12 +103,11 @@ sub user_id_memberships {
   my $self = shift;
   my $id = $self->param('id');
 
-  my $cu = $self->authenticated_user;
   my $p = Canvas::Store::User->retrieve($id);
-  my @member = $p->user_memberships( member_id => $cu->{u}->id );
+  my @member = $p->user_memberships( member_id => $self->auth_user->id );
 
   # abort if private and not ( our user or membership to user )
-  unless( ( $p->id eq $cu->{u}->id ) || ( scalar @member && ( $member[0]->is_owner_admin ) ) ) {
+  unless( ( $p->id eq $self->auth_user->id ) || ( scalar @member && ( $member[0]->is_owner_admin ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',
@@ -510,153 +129,13 @@ sub user_id_memberships {
 }
 
 #
-# REPOSITORIES
+# TEMPLATES
 #
 
 #
-# GET /repositories
+# GET /api/templates
 #
-# Returns all available repositories
-#
-# Returns:
-#  - 200 on success
-#
-# An overview of the JSON structure is shown below:
-#
-# [
-#   {
-#     s: "stub",
-#     n: "name",
-#     gk: "gpg key",
-#   },
-#   ...
-# ]
-#
-sub repositories_get {
-  my $self = shift;
-
-  # construct search query as appropriate
-  my $q = $self->build_query({
-    stub      => [ 's', 'n', 'name' ],
-  });
-
-  # build pager for packages
-  my $pager = Canvas::Store::Repository->pager(
-    entries_per_page  => $self->param('epp')  // 100,
-    current_page      => $self->param('cp')   // 0,
-  );
-
-  my @repos = $pager->search_where( $q );
-
-  my $ret = [];
-
-  foreach my $r ( @repos ) {
-    push @$ret, {
-      id  => $r->id+0,
-      s   => $r->stub,
-      gk  => $r->gpg_key,
-    };
-  }
-
-  $self->render( json => $ret );
-};
-
-#
-# POST /repositories
-#
-# Add a new repository
-#
-# Expected body contents is JSON encoded structure defining the package to be
-# added.
-#
-# Returns:
-#  - 200 on success
-#  - 403 if entity exists and you don't have sufficient privileges to modify
-#  - 500 if package already exists
-#
-# An overview of the JSON structure is shown below:
-#
-# {
-#   s: "stub",
-#   n: "name",
-#   gk: "gpg key",
-#   u: "url"
-# }
-#
-sub repositories_post {
-  my $self = shift;
-  my $json = Mojo::JSON->new;
-  my $data = $json->decode( $self->req->body );
-
-  # TODO: only super admins and package admins can create repositories
-
-  # attempt to find existing general package
-  my( $r ) = Canvas::Store::Repository->search({
-    stub       => $data->{s},
-  });
-
-  # general repository information exists
-  # check if we're submitting a detailed repository structure
-  if( defined($r) ) {
-    unless( defined($data->{d}) ) {
-      return $self->render(
-        status  => 500,
-        text    => 'General repository information already exists.',
-        json    => { error => 'General repository already exists.' },
-      );
-    }
-  }
-  # otherwise create the repository
-  else {
-    $r = Canvas::Store::Repository->insert({
-      stub        => $data->{s},
-      gpg_key     => $data->{gk},
-    });
-  }
-
-  my $arch_cache = {};
-
-  for my $d ( @{ $data->{d} } ) {
-    # attempt to find existing general package
-    my( $rd ) = Canvas::Store::RepositoryDetails->search({
-      base_url => $data->{u},
-    });
-
-    # details don't exist so add
-    unless( defined( $rd ) ) {
-      # cache arch lookups since there are very few
-      unless( defined($arch_cache->{$d->{a}}) ) {
-        $arch_cache->{ $d->{a} } = Canvas::Store::Arch->find_or_create({ name => $d->{a} });
-      }
-
-      # create the package details
-      $rd = Canvas::Store::RepositoryDetails->insert({
-        repo_id     => $r->id,
-        name        => $d->{n},
-        arch_id     => $arch_cache->{ $d->{a} }->id,
-        version     => $d->{v},
-        base_url    => $d->{u},
-      });
-
-      # save the repository id for later
-      $d->{id} = $rd->id;
-    }
-  }
-
-  # update general id
-  $data->{id} = $r->id;
-
-  # return an updated version of the posted object
-  $self->render(
-    status  => 200,
-    json    => $data,
-  );
-}
-
-#
-# GET /api/repository/:id
-#
-# Returns the repository identified by :id
+# Returns all available templates
 #
 # Returns:
 #  - 200 on success
@@ -680,69 +159,6 @@ sub repositories_post {
 #   ]
 # }
 #
-sub repository_id_get {
-  my $self = shift;
-  my $id = $self->param('id');
-
-  my $r = Canvas::Store::Repository->retrieve($id);
-
-  # check we actually received a valid profile
-  unless( defined($r) ) {
-    return $self->render(
-      status  => 404,
-      text    => 'not found',
-      json    => { error => 'not found' },
-    );
-  }
-
-  # build general repository information
-  my $repo = {
-    id  => $r->id+0,
-    s   => $r->stub,
-    gk  => $r->gpg_key,
-    d   => [],
-  };
-
-  # construct search query as appropriate
-  my $q = {
-    repo_id => $r->id,
-  };
-
-  if( defined( $self->param( 'a' ) ) ) {
-    my ($arch) = Canvas::Store::Arch->search( { name => $self->param( 'a' ) } );
-    $q->{arch_id} = $arch->id if defined( $arch );
-  }
-  $q->{version} = $self->param('v') if defined( $self->param( 'v' ) );
-  $q->{base_url} = $self->param('u') if defined( $self->param( 'u' ) );
-
-  # search using our constructed query
-  my @repos = Canvas::Store::RepositoryDetails->search( $q );
-
-  # fill out details as required
-  foreach my $d ( @repos ) {
-    push @{ $repo->{d} }, {
-      id  => $d->id+0,
-      n   => $d->name,
-      a   => $d->arch_id->name,
-      v   => $d->version,
-      u   => $d->base_url,
-    };
-  }
-
-  $self->render(
-    status => 200,
-    json => $repo,
-  );
-}
-
-
-#
-# TEMPLATES
-#
-
-#
-# GET /api/templates
-#
 #
 #
 sub templates_get {
@@ -765,21 +181,21 @@ sub templates_get {
   }
 
   # get auth'd user
-  my $cu = $self->authenticated_user;
+  my $cu = $self->auth_user;
 
   # configure default return
   my $ret = [];
 
   foreach my $t ( @templates ) {
     # skip if private and not ( our user or membership to user )
-    next if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) );
-    next if( defined( $q_user ) && ( $t->user_id->name ne $q_user) );
+    next if( $t->private && ! ( ( $t->user_id eq $cu->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->id ) ) ) );
+    next if( defined( $q_user ) && ( $t->user_id->username ne $q_user) );
 
     # add to available
     push @$ret, {
       id          => $t->id+0,
       name        => $t->name,
-      owner       => $t->user_id->name,
+      owner       => $t->user_id->username,
       description => $t->description,
     };
   }
@@ -838,16 +254,24 @@ sub templates_get {
 #
 sub templates_post {
   my $self = shift;
+
+  unless( $self->is_user_authenticated ) {
+    return $self->render(
+      status  => 403,
+      text    => 'Not authenticated.',
+      json    => { error => 'Not authenticated.' },
+    );
+  };
+
   my $json = Mojo::JSON->new;
   my $data = $json->decode( $self->req->body );
 
   # find the user requested
-  my( $u ) = Canvas::Store::User->search({
-    name => $data->{u},
-  });
+  my $u = Canvas::Store::User->search({ username => $data->{u} })->first;
 
   # bail if the user doesn't exist
   unless( defined($u) ) {
+    say "NO USER";
     return $self->render(
       status  => 500,
       text    => 'No user with that user.',
@@ -855,11 +279,11 @@ sub templates_post {
     );
   }
 
-  my $cu = $self->authenticated_user;
-  my @membership = $u->user_memberships( member_id => $cu->{u}->id );
+  my $cu = $self->auth_user;
+  my @membership = $u->user_memberships( member_id => $cu->id );
 
   # validate the current user has access to write on this user
-  unless( ( $data->{u} eq $cu->{u}->name ) ||
+  unless( ( $data->{u} eq $cu->username ) ||
           ( scalar @membership && $membership[0]->can_create ) ) {
 
     return $self->render(
@@ -870,13 +294,14 @@ sub templates_post {
   }
 
   # find or create new template
-  my( $t ) = Canvas::Store::Template->search({
+  my $t = Canvas::Store::Template->search({
     user_id => $u->id+0,
-    name       => $data->{n},
-  });
+    name    => $data->{n},
+  })->first;
 
   # template already exists
   if( defined($t) ) {
+    say "EXISTS";
     return $self->render(
       status  => 500,
       text    => 'Template already exists with that name for this user.',
@@ -884,64 +309,60 @@ sub templates_post {
     );
   }
 
-  # create the template
-  $t = Canvas::Store::Template->insert({
-    user_id => $u->id+0,
-    name       => $data->{n},
-  });
+  my $now = gmtime;
 
   Canvas::Store->do_transaction( sub {
-    # get all archs to cache
-    my $arch_cache = {};
+    # create the template
+    $t = Canvas::Store::Template->insert({
+      user_id => $u->id+0,
+      name    => $data->{n},
+      created => $now,
+      updated => $now,
+    });
 
     # store repositories
     foreach my $r ( @{ $data->{r} } ) {
       # calculate the base url
-      my $bu = $r->{ml} // '';
-      if( $bu eq '' ) {
-        $bu = $r->{bu}[0] // '';
-      }
-
-      my $pu = $r->{bu}[0] // '';
-
-      my $pr = Canvas::Store::Repository->find_or_create({
-        name      => $r->{n},
-        stub      => $r->{id},
-        base_url  => $bu,
-        gpg_key   => $r->{gk}[0] // '',
-      });
-
-      $t->add_to_template_repositories({
-        repo_id     => $pr->id,
-        pref_url    => $pu,
+      Canvas::Store::TemplateRepository->insert({
+        template_id => $t->id,
+        name        => $r->{n},
+        stub        => $r->{s},
+        baseurl     => join( ',', @{ $r->{bu} // [] } ),
+        mirrorlist  => $r->{ml} // '',
+        metalink    => $r->{ma} // '',
+        gpg_key     => $r->{gk}[0] // '',
         enabled     => $r->{e},
+        exclude     => join( ',', @{ $r->{x} // [] } ),
         cost        => $r->{c}+0,
         gpg_check   => $r->{gc},
+        created     => $now,
+        updated     => $now,
       });
     }
 
     # store pacakges
     foreach my $p ( @{ $data->{p} } ) {
-      my $pp = Canvas::Store::Package->find_or_create({ name => $p->{n} });
-
-      # cache arch lookups since there are very few
-      unless( defined($arch_cache->{$p->{a}}) ) {
-        $arch_cache->{$p->{a}} = Canvas::Store::Arch->find_or_create({ name => $p->{a} });
-      }
-
-      my $pa = $arch_cache->{$p->{a}};
-
-      $t->add_to_template_packages({
-        package_id  => $pp->id+0,
-        arch_id     => $pa->id+0,
+      Canvas::Store::TemplatePackage->insert({
+        template_id => $t->id,
+        name        => $p->{n},
+        arch        => $p->{a},
         epoch       => $p->{e},
         version     => $p->{v},
         rel         => $p->{r},
-        action      => $p->{p}
+        action      => $p->{z},
+        created     => $now,
+        updated     => $now,
       });
     }
-
   });
+
+  unless( defined($t) ) {
+    return $self->render(
+      status  => 500,
+      text    => 'Unable to create template.',
+      json    => { error => 'Unable to create template.' }
+    );
+  }
 
   $self->render(
     status  => 200,
@@ -1001,7 +422,6 @@ sub templates_post {
 sub template_id_get {
   my $self = shift;
   my $id = $self->param('id');
-  my $cu = $self->authenticated_user;
   my $t = Canvas::Store::Template->retrieve($id);
 
   # check we actually received a valid template
@@ -1013,7 +433,7 @@ sub template_id_get {
   }
 
   # skip if private and not ( our user or membership to user )
-  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
+  if( $t->private && ! ( ( $t->user_id eq $self->auth_user->id ) || ( scalar $t->user_id->user_memberships( member_id => $self->auth_user->id ) ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',
@@ -1025,10 +445,15 @@ sub template_id_get {
   my $r = [];
   foreach my $_r ( $t->template_repositories ) {
     push @$r, {
-      n   => $_r->repo_id->name,
+      n   => $_r->name,
+      s   => $_r->stub,
+      bu  => split( /,/, $_r->baseurl ),
+      ml  => split( /,/, $_r->mirrorlist ),
+      ma  => split( /,/, $_r->metalink ),
       v   => $_r->version,
       c   => $_r->cost+0,
       e   => $_r->enabled eq 1 ? Mojo::JSON->true : Mojo::JSON->false,
+      x   => $_r->exclude,
       gc  => $_r->gpg_check,
     }
   }
@@ -1037,12 +462,12 @@ sub template_id_get {
   my $p = [];
   foreach my $_p ( $t->template_packages ) {
     push @$p, {
-      n => $_p->package_id->name,
+      n => $_p->name,
       e => $_p->epoch,
       v => $_p->version,
       r => $_p->rel,
-      a => $_p->arch_id->name,
-      p => $_p->action,
+      a => $_p->arch,
+      z => $_p->action,
     }
   }
 
@@ -1121,7 +546,6 @@ sub template_id_put {
   my $id = $self->param('id');
   my $data = $json->decode( $self->req->body );
 
-  my $cu = $self->authenticated_user;
   my $t = Canvas::Store::Template->retrieve($id);
 
   # check we actually received a valid template
@@ -1133,7 +557,7 @@ sub template_id_put {
   }
 
   # skip if private and not ( our user or membership to user )
-  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
+  if( $t->private && ! ( ( $t->user_id eq $self->auth_user->id ) || ( scalar $t->user_id->user_memberships( member_id => $self->auth_user->id ) ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',
@@ -1287,7 +711,6 @@ sub template_id_del {
 
   my $id = $self->param('id');
 
-  my $cu = $self->authenticated_user;
   my $t = Canvas::Store::Template->retrieve($id);
 
   # check we actually received a valid template
@@ -1300,7 +723,7 @@ sub template_id_del {
   }
 
   # skip if private and not ( our user or membership to user )
-  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
+  if( $t->private && ! ( ( $t->user_id eq $self->auth_user->id ) || ( scalar $t->user_id->user_memberships( member_id => $self->auth_user->id ) ) ) ) {
     return $self->render(
       status  => 403,
       text    => 'denied',

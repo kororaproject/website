@@ -30,8 +30,9 @@ import yum
 from Canvas import CanvasService
 from Canvas import Package
 from Canvas import PackageList
-from Canvas import Repo
-from Canvas import RepoList
+from Canvas import Repository
+from Canvas import RepositoryList
+from Canvas import Template
 
 class CanvasFormatter(argparse.HelpFormatter):
   def _format_action_invocation(self, action):
@@ -181,73 +182,69 @@ def main():
     if args.template_command == 'create':
       if args.inherit:
         i = Template( args.inherit )
-        print 'Inheriting from: ' + str(i)
+        print('Inheriting from: %s' % ( str(i) ))
 
       if args.dryrun:
-        print 'The following template would be created:'
-        print '  - %s' % ( str(t) )
+        print('The following template would be created:')
+        print('  - %s' % ( str(t) ) )
 
       # perform the real action
       else:
         if not cs.authenticate(args.username, password):
-          print 'Unable to authenticate with canvas service.'
+          print('Unable to authenticate with canvas service.')
           sys.exit(1)
 
         cs.template_create( t )
-        cs.deauthenticate()
 
 
     if args.template_command == 'delete':
-      print 'The following template will be deleted:'
-      print '  - %s' % ( str(t) )
+      print('The following template will be deleted:')
+      print('  - %s' % ( str(t) ))
 
       if args.dryrun:
-        print 'No action peformed during this dry-run.'
+        print('No action peformed during this dry-run.')
 
       # perform the real action
       else:
         if not cs.authenticate(args.username, password):
-          print 'Unable to authenticate with canvas service.'
+          print('Unable to authenticate with canvas service.')
           sys.exit(1)
 
         t_delete = cs.template_get( t )
 
         if t_delete is not None:
-          cs.template_delete( t_delete )
-          print 'Template deleted.'
+          cs.template_delete( t_delete.id )
+          print('Template deleted.')
 
         else:
-          print 'Template not found.'
-
-        cs.deauthenticate()
+          print('Template not found.')
 
 
     elif args.template_command == 'list':
         if not cs.authenticate(args.username, password):
-          print 'Unable to authenticate with canvas service.'
+          print('Unable to authenticate with canvas service.')
           sys.exit(1)
 
         tl = cs.template_list()
 
         if len( tl ):
-          print 'Templates:'
+          print('Templates:')
 
           for t in tl:
-            print '  - %s (%s)' % ( t['name'], t['owner'] )
+            print('  - %s (%s)' % ( t['name'], t['owner'] ))
 
           print
-          print '%d template(s) found.' % ( len(tl) )
+          print('%d template(s) found.' % ( len(tl) ))
 
         else:
-          print '0 templates found. \'Tis the dawn of time.'
+          print('0 templates found. \'Tis the dawn of time.')
 
-        cs.deauthenticate()
 
     elif args.template_command == 'add':
       pl = PackageList( args.packages )
 
       if args.system:
-        print 'Adding current system packages to template ...'
+        print('Adding current system packages to template ...')
 
         yb = yum.YumBase()
 
@@ -259,37 +256,37 @@ def main():
             pl.add( Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch) )
 
 
-        rl = RepoList( yb.repos.listEnabled() )
+        rl = RepositoryList( yb.repos.listEnabled() )
 
         t.setPackageList( pl )
-        t.setRepoList( rl )
+        t.setRepositoryList( rl )
 
       if args.dryrun:
-        print 'The following would be added to the template %s:' % ( str(t) )
+        print('The following would be added to the template %s:' % ( str(t) ))
 
         packages = t.getPackageList().packages()
         packages.sort( key=lambda x: x.name )
 
         for p in packages:
-          print '  - ' + str(p)
+          print('  - ' + str(p))
 
-        repos = t.getRepoList().repos()
+        repos = t.getRepositoryList().repos()
         repos.sort( key=lambda x: x.name )
         for r in repos:
-          print '  - ' + str(r)
+          print('  - ' + str(r))
 
         print
-        print 'Summary:'
-        print '  - Packages: %d' % ( len(packages) )
-        print '  - Repos: %d' % ( len(repos) )
+        print('Summary:')
+        print('  - Package(s): %d' % ( len(packages) ))
+        print('  - Repo(s): %d' % ( len(repos) ))
         print
-        print 'No action peformed during this dry-run.'
+        print('No action peformed during this dry-run.')
 
       # perform the real action
       else:
 
         if not cs.authenticate(args.username, password):
-          print 'Unable to authenticate with canvas service.'
+          print('Unable to authenticate with canvas service.')
           sys.exit(1)
 
         t_add = cs.template_get( t )
@@ -302,111 +299,118 @@ def main():
           cs.template_create( t )
 
         else:
-          print 'Template does not exist.'
+          print('Template does not exist.')
           sys.exit(1)
 
-        cs.deauthenticate()
 
     elif args.template_command == 'remove':
-      print 'Removing from template: ' + str(t)
+      print('The following packages will be removed from template:')
 
-      if not args.system and len(args) < 2:
-        parser.error('No packages specified.')
-
-      print 'Removing packages from template:'
-
-      l = PackageList( args[2:] )
-      print l
+      l = PackageList( args.packages )
+      print(l)
 
       for p in l.packages():
-        print "  - " + str(p)
+        print('  - %s ' % ( str(p) ))
 
     elif args.template_command == 'apply':
       if not cs.authenticate(args.username, password):
-        print 'Unable to authenticate with canvas service.'
+        print('Unable to authenticate with canvas service.')
         sys.exit(1)
 
       t_apply = cs.template_get( t )
-      cs.deauthenticate()
 
       # check the template exists
       if t_apply is None:
-        print 'Template does not exist.'
-        sys.exit(1)
+        print('Template does not exist.')
 
-      # calculate existing system specs
-      t_system = Template()
-
-      yb = yum.YumBase()
-      yb.conf.cache = os.geteuid() != 0
-
-      pkgs = yb.rpmdb.returnPackages()
-      pl = PackageList()
-
-      for p in pkgs:
-        _yd = p.yumdb_info
-        if _yd.get('reason') == 'user':
-          pl.add( Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch) )
-
-      rl = RepoList( yb.repos.listEnabled() )
-
-      t_system.setPackageList( pl )
-      t_system.setRepoList( rl )
-
-      t_apply.merge( template=t_system, clean=args.merge_clean )
-
-      print 'The following actions will be applied to this system:'
-
-      pi = t_apply.getPackageList().packages()
-      pi.sort( key=lambda x: x.name )
-
-      for p in pi:
-        print '  - Install ' + str(p)
-
-      pr = t_apply.getPackageListRemove().packages()
-      pr.sort( key=lambda x: x.name )
-
-      for p in pr:
-        print '  - Remove ' + str(p)
-
-      repos = t_apply.getRepoList().repos()
-      repos.sort( key=lambda x: x.name )
-      for r in repos:
-        print '  - Install ' + str(r)
-
-      print
-      print 'Summary:'
-      print '  - Package(s) installed: %d' % ( len(pi) )
-      print '  - Package(s) removed:   %d' % ( len(pr) )
-      print '  - Repo(s) added:        %d' % ( len(repos) )
-      print
-
-      # show actions on
-      if args.dryrun:
-        print 'No action peformed during this dry-run.'
-
-      # perform the real action
       else:
+        # calculate existing system specs
+        t_system = Template()
 
-        for p in pi:
-          if p.isPinned():
-            yb.install( ( p.name, p.epoch, p.version, p.release, p.arch) )
-          else:
-            yb.install( name=p.name )
+        yb = yum.YumBase()
+        yb.conf.cache = os.geteuid() != 0
 
-        for p in pr:
-          yb.remove( name=p.name )
+        pkgs = yb.rpmdb.returnPackages()
+        pl = PackageList()
 
-        # TODO: yum magic here
-        yb.repos.setProgressBar( TextMeter(fo=sys.stdout) )
+        count_package_installs = 0
+        count_package_removals = 0;
 
-        yb.repos.doSetup()
-        yb.buildTransaction()
-        yb.processTransaction()
+        print('The following actions will be applied to this system:')
+
+        # loop through packages on system and compare to template
+        for p in pkgs:
+          _yd = p.yumdb_info
+          if _yd.get('reason') == 'user':
+            # action set to 1 indicating to be installed
+            _p = Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch)
+
+            found = False
+
+            # look for packages in template to apply and on the system
+            for tp in t_apply.getPackageList().packages():
+              if p.name != tp.name:
+                continue
+
+              found = True
+
+              # template indicates explicit removal
+              if tp.actionUninstall():
+                print('  - Remove ' + str(tp))
+                yb.remove( name=tp.name )
+                count_package_removals +=1
+
+            # package on system, installed by user, was not found in template
+            if not found and args.merge_clean:
+              print('  - Remove ' + str(_p))
+              yb.remove( name=p.name )
+              count_package_removals += 1
+
+        # loop through packages in template that are not in the system
+        for tp in t_apply.getPackageList().packages():
+          found = False
+
+          for p in pkgs:
+            if tp.name != p.name:
+              continue
+
+            found = True
+
+          # package not on system and in template requested install
+          if not found and tp.actionInstall():
+            print('  - Install ' + str(tp))
+            yb.install( name=tp.name )
+            count_package_installs += 1
+
+#        rl = RepositoryList( yb.repos.listEnabled() )
+
+        print
+        print('Summary:')
+        if count_package_installs:
+          print('  - Package(s) installed: %d' % ( count_package_installs ))
+        if count_package_removals:
+          print('  - Package(s) removed:   %d' % ( count_package_removals ))
+#        print '  - Repo(s) added:        %d' % ( len(repos) )
+        print
+
+        # show actions on
+        if args.dryrun:
+          print('No action peformed during this dry-run.')
+
+        # perform the real action
+        else:
+          # TODO: yum magic here
+          yb.repos.setProgressBar( TextMeter(fo=sys.stdout) )
+
+          yb.repos.doSetup()
+          yb.buildTransaction()
+          yb.processTransaction()
 
   elif args.command == 'machine':
-    print "Machine"
+    print('Machine')
 
+  if not args.dryrun:
+    cs.deauthenticate()
 
 if __name__ == '__main__':
   main()
