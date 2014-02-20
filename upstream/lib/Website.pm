@@ -61,11 +61,11 @@ sub startup {
   #
   # CONFIGURATION
   my $config = $self->plugin('JSONConfig' => {
-    file => './canvas.conf',
+    file => './website.conf',
   });
 
   # set the secret
-  $self->secret( $config->{secret} // 'canvas');
+  $self->secret( $config->{secret} // 'website');
 
   #
   # HYPNOTOAD

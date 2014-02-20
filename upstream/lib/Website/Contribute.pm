@@ -398,7 +398,8 @@ sub sponsor_confirm_post {
     #$self->flash( values => {} );
     $self->flash(page_success => "Thank you for your sponsorship. Korora will only get better with your contribution. We will follow up with you shortly.");
 
-    my $created = Time::Piece->strptime( $pp_sponsorship->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ' );
+    #my $created = Time::Piece->strptime( $pp_sponsorship->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ' );
+    my $created = gmtime;
 
     my $d = Canvas::Store::Contribution->create({
       type           => 'sponsorship',
@@ -411,8 +412,6 @@ sub sponsor_confirm_post {
       paypal_raw     => j($pp_sponsorship),
       created        => $created,
     });
-
-    
   }
   else {
     $self->flash(page_errors => "Your transaction could not be completed. Nothing has been charged to your account.");
