@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'news'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+             <li><a href="/">Home</a></li>
+              <li><a href="/support">Support</a></li>
+              <li><a href="/support/documentation">Documentation</a></li>
+              <li class="active"><%= $document->title %></li>
+            </ol>
+            <h1><%= $document->title %></h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+
+%== render_markdown( $document->excerpt );
+%== render_markdown( $document->content );
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="text-right">
+% if( document_can_edit( $document ) ) {
+              <a class="btn btn-default" href="<%= url_for_path(0, 'edit') %>">Edit</a>
+% }
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+</body>
+</html>

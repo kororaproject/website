@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Korora Project :: Forums</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="/css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="/css/canvas.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'support'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <h1 class="text-center">Welcome to the Forums!</h1>
+            <p>These forums are where the Korora community can help and assist other people.</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+% foreach my $forum ( @{$forums} ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <a href="<%= url_for('/forum/' . $forum->{name}) %>"><h3><%= $forum->{title} %></h3></a>
+            <p><%= $forum->{content} %></p>
+          </div>
+        </div>
+        <div class="forum-child">
+%   foreach my $subforum ( @{ $forum->{subforums} } ) {
+          <div class="row">
+            <div class="col-sm-12 forum-leader">
+              <a href="<%= url_for('/forum/' . $subforum->{name}) %>"><h4><%= $subforum->{title} %></h4></a>
+              <p><%= $subforum->{content} %></p>
+            </div>
+          </div>
+%   }
+%   foreach my $topic ( @{ $forum->{topics} } ) {
+          <div class="row">
+            <div class="col-sm-12 forum-leader">
+              <a href="<%= url_for('/topic/' . $topic->{name}) %>"><h4><%= $topic->{title} %></h4></a>
+              <p><%= $topic->{content} %></p>
+            </div>
+          </div>
+%   }
+        </div>
+        <div class="hr"></div>
+% }
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+  %= include 'scripts.inc'
+
+</body>
+</html>

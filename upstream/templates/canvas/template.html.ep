@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+  <link href="/css/layerslider.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'canvas/navigation.inc', active => 'templates'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li class="active">Templates</li>
+            </ol>
+            <h1 class="page-title"><strong>Templates.</strong> Building Blocks</h1>
+          </div>
+        </div>
+
+% if( $responses->{item_count} > $responses->{page_size} ) {
+        <!-- PAGINATION -->
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <%== paginate( $responses ) %>
+          </div>
+        </div>
+% }
+
+        <div class="hr"></div>
+
+        <div class="row">
+% foreach my $t ( @{ $responses->{items} } ) {
+          <div class="col-sm-4">
+            <div class="callout callout-default callout-hover">
+              <a href="/template/<%= $t->user_id->username %>/<%= $t->stub %>">
+                <h4 class="title" title="<%= $t->name %>"><%= $t->name %></h4>
+              </a>
+              <p class="subtitle">by <%= $t->user_id->username %></p>
+            </div>
+          </div>
+% }
+        </div>
+        <div class="hr"></div>
+
+% if( $responses->{item_count} > $responses->{page_size} ) {
+        <!-- PAGINATION -->
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <%== paginate( $responses ) %>
+          </div>
+        </div>
+% }
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'canvas/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>

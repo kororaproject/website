@@ -182,6 +182,30 @@ sub register {
 
   });
 
+  $app->helper(sanitise_with_dashes => sub {
+    my( $self, $stub ) = @_;
+
+    # preserve escaped octets
+    $stub =~ s|%([a-fA-F0-9][a-fA-F0-9])|---$1---|g;
+    # remove percent signs that are not part of an octet
+    $stub =~ s/%//g;
+    # restore octets.
+    $stub =~ s|---([a-fA-F0-9][a-fA-F0-9])---|%$1|g;
+
+    $stub = lc $stub;
+
+    # kill entities
+    $stub =~ s/&.+?;//g;
+    $stub =~ s/\./-/g;
+
+    $stub =~ s/[^%a-z0-9 _-]//g;
+    $stub =~ s/\s+/-/g;
+    $stub =~ s|-+|-|g;
+    $stub =~ s/-+$//g;
+
+    return $stub;
+  });
+
   $app->helper(url_for_path => sub {
     my( $self, $modifier ) = ( shift, shift );
 

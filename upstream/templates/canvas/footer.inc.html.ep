@@ -1,0 +1,20 @@
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div id="site-map" class="row">
+    </div>
+    <div class="row">
+      <div class="col-xs-6 col-sm-8">
+        <p class="copyright">A <a href="http://kororaproject.org">Korora Project</a> Intiative | Powered by  <a href="http://en.wiktionary.org/wiki/freedom">Freedom</a>, <a href="http://en.wiktionary.org/wiki/dedication">Dedication</a> and the pursuit of <a href="http://en.wiktionary.org/wiki/perfection">Perfection</a></p>
+      </div>
+      <div class="col-xs-6 col-sm-3 col-sm-offset-1">
+        <div id="social">
+          <a href="https://plus.google.com/+KororaProjectOrg"><img class="img-bumper" src="/img/social-google.png" alt="Google+"></a>
+          <a href="https://www.facebook.com/kororaproject"><img class="img-bumper" src="/img/social-facebook.png" alt="Facebook"></a>
+          <a href="https://twitter.com/kororaproject"><img class="img-bumper" src="/img/social-twitter.png" alt="Twitter"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- END FOOTER -->

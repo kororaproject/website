@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'support'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/support">Support</a></li>
+              <li><a href="/support/engage">Engage</a></li>
+              <li><a href="<%= url_with('/support/engage')->query([ type => $response->type]) %>"><%= ucfirst $response->type %>s</a></li>
+              <li class="active"><%= $response->title %></li>
+            </ol>
+            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Your Community</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="callout engage-detail engage-<%= $response->type %>">
+              <h1 class="engage-detail-title"><%= $response->title %></h1>
+              <div class="engage-detail-content">
+                <%== render_markdown( $response->content ) %>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="engage-detail-tags">
+                    <%== engage_icon_label( $response->type, 'fa-fw' ) %>
+% foreach my $t ( $response->tags ) {
+                    <span class="label label-default"><%= $t->name %></span>
+% }
+                  </div>
+
+                </div>
+                <div class="col-sm-6">
+                  <div class="engage-detail-footer">
+                    <div class="engage-detail-footer-metadata">
+                      <p class="text-right">asked <%= distance_of_time_in_words( $response->created ) %></p>
+                      <p class="text-right">by <%= $response->author_id->username %></p>
+                    </div>
+                    <div class="engage-detail-footer-metadata">
+                      <%== post_gravatar( $response, 32 ) %>
+                    </div>
+
+                    <%== engage_post_admin_template( $response) %>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hr hr-sm"></div>
+
+% if( $accepted ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <div id="accepted-reply" class="callout callout-default engage-reply engage-reply-accepted">
+              <%== render_markdown( $accepted->content ) %>
+
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="engage-detail-tags">
+                    <span class="label label-default">accepted</span>
+                  </div>
+                  <div class="engage-detail-footer">
+                    <div class="engage-detail-footer-metadata">
+                      <p class="text-right">replied <%= distance_of_time_in_words( $accepted->created ) %></p>
+                      <p class="text-right">by <%= $accepted->author_id->username %></p>
+                    </div>
+                    <div class="engage-detail-footer-metadata">
+                      <%== post_gravatar( $accepted, 32 ) %>
+                    </div>
+
+                    <%== engage_post_admin_template( $accepted ) %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hr separator-bottom"></div>
+        <div class="hr"></div>
+% }
+
+% if( $replies->{item_count} > $replies->{page_size} ) {
+        <!-- PAGINATION -->
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <%== paginate( $replies ) %>
+          </div>
+        </div>
+        <div class="hr"></div>
+% }
+
+% if( @{ $replies->{items} } ) {
+%   for my $r ( @{ $replies->{items} } ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <div id="reply-<%= $r->id %>" class="callout callout-default engage-reply <%= ( $r->status eq 'accepted' ) ? 'engage-reply-accepted' : '' %>">
+              <%== render_markdown( $r->content ) %>
+
+              <div class="row">
+                <div class="col-sm-12">
+
+%     if( $r->status eq 'accepted' ) {
+                  <div class="engage-detail-tags">
+                    <span class="label label-default">accepted</span>
+                  </div>
+%     }
+                  <div class="engage-detail-footer">
+                    <div class="engage-detail-footer-metadata">
+                      <p class="text-right">replied <%= distance_of_time_in_words( $r->created ) %></p>
+                      <p class="text-right">by <%= $r->author_id->username %></p>
+                    </div>
+                    <div class="engage-detail-footer-metadata">
+                      <%== post_gravatar( $r, 32 ) %>
+                    </div>
+
+                    <%== engage_post_admin_template( $r ) %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hr hr-sm"></div>
+%   }
+        <div class="hr"></div>
+% }
+
+% if( $replies->{item_count} > $replies->{page_size} ) {
+        <!-- PAGINATION -->
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <%== paginate( $replies ) %>
+          </div>
+        </div>
+        <div class="hr"></div>
+% }
+
+% if( is_user_authenticated ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <form action="<%= url_for('current') . '/reply' %>" method="post">
+              <input type="hidden" name="parent" value="<%= $response->id %>"></input>
+              <input type="hidden" name="redirect_url" value="<%= url_with %>"></input>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h3>Reply <a href="" class="btn pull-right" data-toggle="modal" data-target="#modalEngageSyntax"><i class="fa fa-fw fa-question"></i></a> </h3>
+                  <textarea id="reply-box" name="content" rows="5" class="form-control"><%= $content %></textarea>
+                  <div class="hr-sm"></div>
+                  <div class="text-right">
+                    <button type="submit" class="btn btn-default">Reply</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+% } else {
+        <div class="row">
+          <div class="col-sm-12">
+            <p class="text-center">Please <a data-toggle="modal" href="#loginModal" class="btn btn btn-default">Log In</a> to participate with the community.</p>
+          </div>
+        </div>
+% }
+        <div class="hr"></div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <div class="modal fade" id="modalEngageSyntax" tabindex="-1" role="dialog" aria-labelledby="modalEngageSyntaxLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-responsive">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="modalEngageSyntaxLabel">Engage Markdown Syntax</h4>
+        </div>
+        <div class="modal-body">
+          %= include 'engage-syntax.inc'
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+% if( is_user_authenticated ) {
+  <script>
+    $(document).ready( function() {
+      /* activate quote buttons if exists */
+      $("[id^=quote-]").each( function( i ) {
+        $(this).on('click', function() {
+          var id = '#reply-' + $(this).attr('id').substr(6);
+          var url = $(location).attr('pathname') + '/reply/' + $(this).attr('id').substr(6);
+
+          $.get(url, function(data) {
+            if( data.hasOwnProperty('content') &&
+                data.hasOwnProperty('author') ) {
+              var box = $('#reply-box');
+              var quote_lines = data.content.split(/\r?\n/);
+              var quote = '> ' + ( data.author || 'unknown' ) + ' wrote:  \n';
+
+              $.each(quote_lines, function() {
+                quote += '> ' + this + '  \n';
+              });
+
+              box.val( box.val() + quote + '\n' );
+            }
+          });
+        });
+      });
+    });
+  </script>
+% }
+</body>
+</html>

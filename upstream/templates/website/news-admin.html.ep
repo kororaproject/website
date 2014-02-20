@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'discover'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about">About</a></li>
+              <li><a href="/about/news">News</a></li>
+              <li class="active">Admin</li>
+            </ol>
+            <h1 class="text-center"><strong>News Admin.</strong> Create and Publish</h1>
+          </div>
+        </div>
+
+% if( news_post_can_add ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="text-right">
+              <a class="btn btn-default" href="<%= url_for_path(-1, 'add') %>"><i class="fa fa-plus"></i> Post</a>
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+% }
+
+% if( @{ $news->{items} } ) {
+        <div class="row-table admin-row-table">
+          <div class="row row-header">
+            <div class="col-sm-6">
+              <h1>Title</h1>
+            </div>
+            <div class="col-sm-2">
+              <h1 class="text-center">Status</h1>
+            </div>
+            <div class="col-sm-2">
+              <h1 class="text-center">Author</h1>
+            </div>
+            <div class="col-sm-2">
+              <h1 class="text-center">Created</h1>
+            </div>
+          </div>
+
+%   foreach my $n ( @{ $news->{items} } ) {
+          <div class="row row-entry">
+            <div class="col-sm-6">
+              <a href="<%= url_for_path(-1, $n->name, 'edit') %>"><%= $n->title %></a>
+            </div>
+            <div class="col-sm-2">
+              <p class="text-center"><%= $n->status %></p>
+            </div>
+            <div class="col-sm-2">
+              <p class="text-center"><%= $n->author_id->username %></p>
+            </div>
+            <div class="col-sm-2">
+              <p class="text-center"><%= $n->created->strftime('%d/%m/%Y') %></p>
+            </div>
+          </div>
+%   }
+        </div>
+% }
+
+% if( $news->{item_count} > $news->{page_size} ) {
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <%== paginate( $news ) %>
+          </div>
+        </div>
+% }
+
+        <div class="row">
+          <div class="col-sm-12">
+
+          </div>
+        </div>
+
+
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>

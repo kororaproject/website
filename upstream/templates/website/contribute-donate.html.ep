@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'discover'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container" ng-controller="DonateController">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/contribute">Contribute</a></li>
+              <li class="active">Donate</li>
+            </ol>
+            <h1 class="text-center"><strong>Donate.</strong> Help a Developer</h1>
+          </div>
+        </div>
+        <div class="hr hr-lg"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h2>Why donate?</h2>
+            <p>We build Korora because we love it and there is no pressure to make a donation.</p>
+            <p>Korora is personally funded by our core developers however and we welcome any contributions to help us with that.</p>
+            <p>All donations are processed securely online and we do not store any of your payment details.</p>
+            <h2>How is the money used?</h2>
+            <p>Any donation will be put to good use, like helping to cover our hosting costs and purchasing new equipment to make Korora even better.</p>
+            <h2>How much should you give?</h2>
+            <p>That's entirely up to you! We gratefully accept anything you can spare.</p>
+          </div>
+          <form role="form" action="<%= url_with %>" method="post">
+            <div class="col-sm-6 callout">
+              <h2>Please complete ...</h2>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group" ng-class="donorNameValidity()">
+                    <label class="sr-only" for="donor_name">Your name</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+                      <input type="text" class="form-control" name="donor_name" placeholder="" value="<%= $v->{donor_name} %>"></input>
+                    </div>
+                    <span class="help-block">We use this name on our public donor list (leave blank if you'd prefer to be anonymous).</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group" ng-class="donorEmailValidity()">
+                    <label class="sr-only" for="donor_email">Email address</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
+                      <input type="text" class="form-control" name="donor_email" data-rule-required="true" placeholder="" ng-model="donor_email" value="<%= $v->{donor_email} %>" ng-init="donor_email='<%= $v->{donor_email} %>'"></input>
+                    </div>
+                    <span class="help-block">We use this email address to correlate multiple donations made by the same person.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group" ng-class="donorAmountValidity()">
+                    <label class="sr-only" for="donor_amount">Amount</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-usd"></i></span>
+                      <input type="text" class="form-control" name="donor_amount" value="00" ng-model="donor_amount" value="<%= $v->{donor_amount} %>" ng-init="donor_amount='<%= $v->{donor_amount} %>'"></input>
+                      <span class="input-group-addon">USD</span>
+                    </div>
+                    <span class="help-block">How much would you like to donate to the Korora Project?</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <a href="https://www.paypal.com/au/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open('https://www.paypal.com/au/webapps/mpp/paypal-popup','WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, width=600, height=500'); return false;">
+                      <img src="https://www.paypalobjects.com/webstatic/mktg/logo/bdg_secured_by_pp_2line.png" border="0" height="34" alt="PayPal Logo">
+                    </a>
+                    <button class="btn btn-large btn-success pull-right" ng-class="{disabled: !canDonate()}" type="submit">Donate now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>

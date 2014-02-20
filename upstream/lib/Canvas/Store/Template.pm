@@ -21,10 +21,30 @@ use strict;
 use base 'Canvas::Store';
 
 #
+# PERL INCLUDES
+#
+use Data::Dumper;
+use POSIX qw(ceil);
+
+#
+# LOCAL INCLUDES
+#
+use Canvas::Store::User;
+
+#
+# CONSTANTS
+#
+use constant {
+  SHARE_OWNER    => 0x01,
+  SHARE_MEMBER   => 0x02,
+  SHARE_EVERYONE => 0x04,
+};
+
+#
 # TABLE DEFINITION
 #
 __PACKAGE__->table('canvas_template');
-__PACKAGE__->columns(All => qw/id user_id name description private parent_id created updated/);
+__PACKAGE__->columns(All => qw/id user_id stub name description shared parent_id created updated/);
 
 #
 # N:N MAPPINGS
@@ -52,6 +72,92 @@ __PACKAGE__->has_a(
   inflate => sub { my $t = shift; ( $t eq "0000-00-00 00:00:00" ) ? gmtime(0) : Time::Piece->strptime($t, "%Y-%m-%d %H:%M:%S") },
   deflate => sub { shift->strftime("%Y-%m-%d %H:%M:%S") }
 );
+
+#
+# SHARE HELPERS
+#
+sub isSharable {
+  my $self = shift;
+  my $user_id = shift;
+
+  my $share = $self->shared;
+
+  return ( $share | SHARE_EVERYONE ) ||
+         ( ( $share | SHARE_MEMBER ) && ( $self->user_id->user_memberships( member_id => $user_id ) ) ) ||
+         ( ( $share | SHARE_OWNER ) && ( $self->user_id == $user_id ) );
+}
+
+#
+# SEARCH HELPER
+#
+sub search_paged {
+  my $self = shift;
+  my %params = @_ > 1 ? @_ : ref $_[0] eq 'HASH' ? %{ $_[0] } : ();
+
+  my $dbh = $self->db_Main();
+
+  # pagination
+  my $page_size = $params{page_size}  //= 10;
+  my $page      = $params{page}       //= 1;
+
+  $page = 1 if $page < 1;
+
+#  # filters
+#  my $type_filter    = '';
+#  my $status_filter  = '';
+#  my $tags_filter    = '';
+#  my @filter = ();
+#
+#  # filter on type
+#  if( length $params{type} > 0 ) {
+#    push @filter, ' p.type IN (' . join(',', map { $dbh->quote( $_ )} @{ $params{type} }) . ')';
+#  }
+#
+#  # filter on type
+#  if( length $params{status} > 0 ) {
+#    push @filter, ' p.status=' . $dbh->quote( $params{status} );
+#  }
+#
+#  # filter on tags
+#  if( length $params{tags} > 0 ) {
+#    my @tags = split /[ ,]+/, $params{tags};
+#
+#    foreach my $t ( @tags ) {
+#      my $lt = $dbh->quote( '%' . $t . '%' );
+#      push @filter, '(p.title LIKE ' . $lt . ' OR p.content LIKE ' . $lt . ' OR t.name LIKE ' . $lt . ' OR r.content LIKE ' . $lt . ')';
+#    }
+#  }
+#
+
+  # build total count query
+#  my $raw_count_sql = 'SELECT COUNT(DISTINCT(p.id)) FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) WHERE (' . join( ') AND (', @filter ) . ')' ;
+  my $raw_count_sql = 'SELECT COUNT(DISTINCT(t.id)) FROM canvas_template t';
+
+  # build paginated query
+#  my $raw_sql = 'SELECT p.id FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id ORDER BY p.updated DESC' ;
+  my $raw_sql = 'SELECT t.id FROM canvas_template t GROUP BY t.id' ;
+
+  $raw_sql .= ' LIMIT ' . $page_size . ' OFFSET ' . ( $page_size * ( $page - 1 ) );
+
+  # fetch the total item count
+  my $sth = $dbh->prepare_cached($raw_count_sql);
+  $sth->execute;
+  my( $item_count ) = $sth->fetchrow_array;
+  $sth->finish;
+
+  # fetch the paginated items
+  $sth = $dbh->prepare_cached($raw_sql);
+  $sth->execute;
+  my @results = $self->sth_to_objects($sth);
+
+  return {
+    items       => \@results,
+    item_count  => $item_count,
+    page_size   => $page_size,
+    page        => $page,
+    page_last   => ceil($item_count / $page_size),
+  }
+}
 
 
 #

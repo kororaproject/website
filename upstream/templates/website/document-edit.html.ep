@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'news'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <form action="<%= url_with %>" method="post">
+          <div class="row">
+            <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <li><a href="/">Home</a></li>
+              <li><a href="/support">Support</a></li>
+              <li><a href="/support/documentation">Documentation</a></li>
+              <li><a href="/support/documentation/admin">Admin</a></li>
+              <li class="active"><%= $document->title %></li>
+            </ol>
+            <h1 class="page-title"><strong>Document Edit.</strong> <%= $document->title %></h1>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8">
+              <h2>Title</h2>
+              <input type="text" name="title" class="form-control" value="<%= $document->title %>">
+            </div>
+            <div class="col-sm-4">
+              <h2>Status</h2>
+              %= select_field status => $statuses, class => "form-control"
+              <div class="hr-sm"></div>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div class="col-sm-12">
+              <h2>Introduction</h2>
+              <textarea name="excerpt" class="form-control" rows="3"><%= $document->excerpt %></textarea>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div class="col-sm-12">
+              <h2>Body</h2>
+              <textarea name="content" class="form-control" rows="20"><%= $document->content %></textarea>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div class="col-sm-6">
+              <h2>Tags</h2>
+              <input type="text" name="tags" class="form-control" value="<%= $document->tag_list %>">
+            </div>
+            <div class="col-sm-3">
+              <h2>Author</h2>
+              <input type="text" name="author" class="form-control" value="<%= $document->author_id->username %>">
+            </div>
+            <div class="col-sm-3">
+              <h2>Date</h2>
+              <input type="text" name="created" class="form-control" value="<%= $document->created->strftime('%d/%m/%Y %H:%M:%S') %>">
+            </div>
+          </div>
+          <div class="hr hr-sm"></div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="text-right">
+                <a class="btn btn-default" href="<%= url_for_path(-2, 'admin') %>">Cancel</a>
+% if( document_can_delete( $document ) ) {
+                <a href="" class="btn btn-danger" data-toggle="modal" data-target="#modalDocumentDelete">Delete</i></a>
+% }
+                <button type="submit" class="btn btn-success">Save</button>
+              </div>
+            </div>
+          </div>
+          <div class="hr"></div>
+        </form>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+% if( document_can_delete( $document ) ) {
+  <div class="modal fade" id="modalDocumentDelete" tabindex="-1" role="dialog" aria-labelledby="modalDocumentDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-responsive">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="modalDocumentDeleteLabel">Confirm delete ...</h4>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete the "<%= $document->title %>" document?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Ummm, No.</button>
+          <a class="btn btn-danger" href="<%= url_for_path(-1, 'delete') %>">Yes, I'm sure.</a>
+        </div>
+      </div>
+    </div>
+  </div>
+% }
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+</body>
+</html>

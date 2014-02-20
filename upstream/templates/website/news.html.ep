@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="Korora Project - News" href="/news/rss">
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'about'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="/about/news/rss" class="btn btn-xs btn-default btn-rss"><i class="fa fa-fw fa-rss"></i></a>
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/about">About</a></li>
+              <li class="active">News</li>
+            </ol>
+            <h1 class="page-title"><strong>News.</strong> Latest Updates</h1>
+          </div>
+        </div>
+
+% if( $news->{item_count} > $news->{page_size} ) {
+        <!-- PAGINATION -->
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <%== paginate( $news ) %>
+          </div>
+        </div>
+% }
+
+% foreach my $n ( @{ $news->{items} } ) {
+        <div class="row">
+          <div class="col-sm-12">
+            <a href="<%= url_for_path(0, $n->name) %>"><h2><%= $n->title %></h2></a>
+
+            <div class="news-summary-subtitle">
+              <div class="news-detail-subtitle-metadata">
+                <%== post_gravatar( $n, 32 ) %>
+              </div>
+              <div class="news-detail-subtitle-metadata">
+                <p>written on <%= $n->created->strftime('%e %B %Y') %></p>
+                <p>by <%= $n->author_id->username %></p>
+              </div>
+            </div>
+            <div class="news-excerpt">
+
+%== render_markdown( $n->excerpt );
+
+            </div>
+            <div>
+              <a class="btn btn-default" href="<%= url_for_path(0, $n->name) %>">Read more ... </a>
+            </div>
+
+          </div>
+        </div>
+        <div class="hr hr-lg"></div>
+% }
+
+% if( $news->{item_count} > $news->{page_size} ) {
+        <!-- PAGINATION -->
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <%== paginate( $news ) %>
+          </div>
+        </div>
+% }
+
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+</body>
+</html>

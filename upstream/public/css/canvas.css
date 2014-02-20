@@ -256,14 +256,27 @@ blockquote p {
   color: #ff7f00;
 }
 
+.btn-google-plus:hover {
+  background-color: #dd4b39;
+  color: #fff;
+}
+
 .btn-google-plus {
   color: #dd4b39;
 }
 
+.btn-facebook:hover {
+  background-color: #3b5998;
+  color: #fff;
+}
 .btn-facebook {
   color: #3b5998;
 }
 
+.btn-twitter:hover {
+  background-color: #4099ff;
+  color: #fff;
+}
 .btn-twitter {
   color: #4099ff;
 }
@@ -376,6 +389,20 @@ blockquote p {
   color: #666;
 }
 
+.brand .title {
+  display: inline-block;
+  margin: 6px 0;
+  color: #000;
+  font-size: 32px;
+  text-shadow: 2px 2px 4px rgba(128, 128, 128, .3);
+  text-align: center;
+}
+
+.brand .title-dark {
+  color: #aaa;
+  text-shadow: 2px 2px 4px rgba(128, 128, 128, .3);
+}
+
 .navbar-brand .title {
   display: inline-block;
   margin: 6px 0;
@@ -434,13 +461,15 @@ blockquote p {
 }
 
 .canvas-logo-48 {
+  display: inline-block;
   height: 48px;
-  width: 48px;
+  min-width: 48px;
+  padding-left: 48px;
 
   background-image: url('/img/canvas-logo.png');
   background-size: 40px 40px;
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: 4px center;
 }
 
 .canvas-logo h1 {
@@ -673,6 +702,22 @@ blockquote p {
   -moz-border-radius: 0 2px 2px 0;
   -webkit-border-radius: 0 2px 2px 0;
 }
+.callout .title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.callout .subtitle {
+  margin: 0;
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.callout-hover:hover {
+  background-color: #fafafa;
+}
+
 .callout .code,
 .callout .highlight {
 }
@@ -763,6 +808,17 @@ blockquote p {
   -moz-border-radius: 2px 2px 0 0;
   -webkit-border-radius: 2px 2px 0 0;
   border-radius: 2px 2px 0 0;
+}
+
+.nav-tabs li.secondary-nav {
+  float:right;
+  margin-left:10px;
+  margin-right:0;
+}
+
+.nav-tabs>li.secondary-nav>a {
+  margin-left: 2px;
+  margin-right: 0;
 }
 
 .navbar-default {
@@ -915,6 +971,17 @@ blockquote p {
   padding-top: 64px; /* match bottom padding of page-container */
 }
 
+.error-page-container {
+  min-height: 100%;
+}
+
+.error-page-content {
+  min-height: 100%;
+  max-width: 1170px;
+  margin: 0 auto;
+  padding-top: 64px;
+}
+
 .separator-bottom {
   border-bottom: 1px dashed #ccc;
 }
@@ -940,6 +1007,7 @@ blockquote p {
 .icons-ul {
   padding-left: 0;
 }
+
 
 /*
 ** DOWNLOAD PAGE SPECIFICS
@@ -1301,7 +1369,6 @@ h4.step {
 
 footer {
   width: 100%;
-  min-height: 196px;
 
   padding: 16px 0;
 
@@ -1347,7 +1414,11 @@ footer a:visited {
 }
 
 /*
-** DIV-TABLES
+** CANVAS PAGES - TEMPLATES
+*/
+
+/*
+** ALERTS
 */
 
 .alert-footnote {
@@ -1370,12 +1441,24 @@ footer a:visited {
 }
 
 .row-table > .row-header {
-  background-color: #428bca;
-  color: #fff;
+  vertical-align: bottom;
+  border-bottom: 1px solid #ddd;
+
+  font-size: 16px;
+  font-weight: 600;
 }
 
-.row-table > .row-entry:nth-child(odd) {
+.row-table > .row-entry {
+  vertical-align: top;
+  border-top: 1px solid #ddd;
+}
+
+.row-table-striped > .row-entry:nth-child(odd) {
   background-color: #f4f4f4;
+}
+
+.row-table-hover > .row-entry:hover {
+  background-color: #f0f0f0;
 }
 
 .row-table > .row-entry blockquote {
@@ -1452,6 +1535,13 @@ footer a:visited {
 
 .forum-title {
   margin: 4px 0;
+}
+
+/* xs - explicit */
+@media all and (max-width: 767px) {
+  .xhidden-xs {
+    display: none;
+  }
 }
 
 /* sm */

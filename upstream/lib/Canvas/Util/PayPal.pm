@@ -48,7 +48,7 @@ sub config {
   $self->caller_user( $args->{caller_user} // '' );
   $self->caller_password( $args->{caller_password} // '' );
   $self->caller_signature( $args->{caller_signature} // '' );
-  $self->url_base( Mojo::URL->new($args->{url_base} // 'http://localhost:3000') );
+  $self->url_base( Mojo::URL->new( $args->{url_base} // 'http://localhost:3000') );
 
   $self->{mode}             = $args->{mode} // 'sandbox';
   $self->{ssl_options}      = $args->{ssl_options} // {};

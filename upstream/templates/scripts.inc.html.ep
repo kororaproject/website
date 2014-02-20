@@ -1,7 +1,7 @@
 <!-- CDN sources -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/7.4/highlight.min.js"></script>
 <script src="/js/bootstrap-lightbox.js"></script>
 
@@ -28,12 +28,14 @@
     var footer  = $('footer');
     var start   = 0;
 
+    /* helper function to frob element heights for the layered effect */
     var resizeHelper = function() {
       // banner correction
       if( $('#banner').length ) {
         start = $('#banner').outerHeight();
       }
 
+      /* calculate korobar position and initial pinning state */
       if( start - $(window).scrollTop() <= 0 ) {
         korobar.css({ position: 'fixed', top: 0 });
         fixed = true;
@@ -53,8 +55,6 @@
       });
     }
 
-    resizeHelper();
-
     /* pin korobar to top when it passes */
     $(window).on('scroll', function() {
       if( !fixed && (korobar.offset().top - $(window).scrollTop() <= 0) ) {
@@ -67,6 +67,7 @@
       }
     });
 
+    /* bind to resize events */
     $(window).on('resize', resizeHelper);
 
     /* turn on tooltips */
@@ -86,5 +87,8 @@
 
     /* initialise highlight blocks */
     hljs.initHighlightingOnLoad();
+
+    /* initial call to page resize helper */
+    setTimeout(function() { resizeHelper(); }, 0);
   });
 </script>

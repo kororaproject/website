@@ -42,6 +42,56 @@ use Canvas::Store::TemplateMembership;
 use Canvas::Store::TemplateRepository;
 
 
+sub index {
+  my $self = shift;
+
+  $self->render('canvas/index');
+}
+
+sub exception_get {
+  return shift->render_exception('render_only');
+}
+
+sub not_found_get {
+  return shift->render_not_found;
+}
+
+sub authenticate_any {
+  my $self = shift;
+  my $json = Mojo::JSON->new;
+  my $data = $json->decode($self->req->body);
+
+  # collect first out of the parameters and then json decoded body
+  my $user = $self->param('u') // $data->{u} // '';
+  my $pass = $self->param('p') // $data->{p} // '';
+
+  # extract the redirect url and fall back to the index
+  my $url = $self->param('redirect_to') // $data->{redirect_to} // '/';
+
+  unless( $self->authenticate($user, $pass) ) {
+    $self->flash( page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?' );
+
+    return $self->render( status => 403, json => 'Not Authorised!' ) if $self->stash('format') eq 'json';
+  }
+
+  return $self->render( status => 200, json => 'Access Granted!' ) if $self->stash('format') eq 'json';
+
+  return $self->redirect_to( $url );
+};
+
+sub deauthenticate_any {
+  my $self = shift;
+
+  $self->logout;
+
+  return $self->render( status => 200, json => 'Done!' ) if $self->stash('format') eq 'json';
+
+  # extract the redirect url and fall back to the index
+  my $url = $self->param('redirect_to') // '/';
+
+  return $self->redirect_to( $url );
+};
+
 #
 # USERS
 #
@@ -312,10 +362,17 @@ sub templates_post {
   my $now = gmtime;
 
   Canvas::Store->do_transaction( sub {
+
+    # generate sanitised unique stub based on defined stub or template name
+    my $stub = $self->sanitise_with_dashes( $data->{s} // $data->{n} );
+    my( @te ) = Canvas::Store::Template->search( { user_id => $u->id, stub => $stub } );
+    $stub .= '-' . ( $te[-1]->id + 1 ) if @te;
+
     # create the template
     $t = Canvas::Store::Template->insert({
       user_id => $u->id+0,
       name    => $data->{n},
+      stub    => $stub,
       created => $now,
       updated => $now,
     });

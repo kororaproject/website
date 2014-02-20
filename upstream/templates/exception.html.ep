@@ -42,6 +42,7 @@
 
     .px-shell > img {
       position: absolute;
+      max-width: inherit;
     }
 
     /* backdrop and hills */
@@ -201,22 +202,20 @@
   </style>
 </head>
 <body>
-  %= include 'noscript.inc'
-
-  <div class="page-container">
-
-    %= include 'navigation.inc', active => ''
-
-    <div class="page-content">
+  <div class="error-page-container">
+    <div class="error-page-content">
       <!-- CONTENT -->
 
-      <div id="page-discover" class="container">
+      <div class="container">
         <div class="row">
           <div class="col-sm-12">
-            <ol class="breadcrumb">
-              <li><a href="/">Home</a></li>
-              <li class="active">500</li>
-            </ol>
+            <div class="text-center">
+              <a href="/" class="brand">
+                <div class="kp-logo-48">
+                  <h1 class="title">KORORA<span class="title-dark">PROJECT</span></h1>
+                </div>
+              </a>
+            </div>
 
             <div class="wrapper">
               <div id="shell" class="px-shell">
@@ -252,7 +251,7 @@
               </div>
             </div>
 
-            <h3 class="text-center">Damn! ... Things just got real.</h3>
+            <h3 class="text-center">Damn! A 500! ... Things just got real.</h3>
             <div class="hr hr-lg"></div>
             <p class="text-center">We track these errors automatically, but if the problem persists feel free to <a href="mailto:webmaster@kororaproject.org">let us know</a>.</p>
             <p class="text-center">In the meantime, try refreshing.</p>
@@ -270,9 +269,6 @@
 
   %= include 'footer.inc'
 
-  <!-- MODALS -->
-  %= include 'authenticate.inc'
-
   <!-- SCRIPTS -->
   <script type="text/javascript" src="/js/jquery-2.0.3.js"></script>
   <script type="text/javascript" src="/js/bootstrap.min.js"></script>
@@ -280,66 +276,6 @@
 
   <script>
     $(document).ready( function() {
-      /* configure korobar */
-      var fixed   = true;
-      var korobar = $('#korobar');
-      var page    = $('.page-container');
-      var footer  = $('footer');
-      var start   = 0;
-
-      var resizeHelper = function() {
-        // banner correction
-        if( $('#banner').length ) {
-          start = $('#banner').outerHeight();
-        }
-
-        if( start - $(window).scrollTop() <= 0 ) {
-          korobar.css({ position: 'fixed', top: 0 });
-          fixed = true;
-        }
-        else {
-          korobar.css({ position: 'absolute', top: start + 'px' });
-          fixed = false;
-        }
-
-        /* frob page-content minimum height to consume immediate window */
-        $('.page-content').css('min-height', ( $(window).height() - 64 )  + 'px');
-
-        /* frob page-container minimum height to at least the footer top */
-        page.css({
-          'min-height': ($(window).height()-footer.outerHeight()) + 'px',
-          'margin-bottom': footer.outerHeight() + 'px'
-        });
-      }
-
-      resizeHelper();
-
-      /* pin korobar to top when it passes */
-      $(window).on('scroll', function() {
-        if( !fixed && (korobar.offset().top - $(window).scrollTop() <= 0) ) {
-          korobar.css({ position: 'fixed', top: 0, });
-          fixed = true;
-        }
-        else if( fixed && $(window).scrollTop() <= start ) {
-          korobar.css({ position: 'absolute', top: start + 'px' });
-          fixed = false;
-        }
-      });
-
-      $(window).on('resize', resizeHelper);
-
-      /* smooth scroll targets */
-      $('a[href*=#]:not([href=#]):not([data-toggle])').click(function() {
-        if( location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') || location.hostname == this.hostname ) {
-          var target = $(this.hash);
-          target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
-          if( target.length ) {
-            $('html,body').animate({ scrollTop: target.offset().top - korobar.height() - 16 }, 1000);
-            return false;
-          }
-        }
-      });
-
       /* parralax-ify */
       $('#shell img').plaxify()
       $.plax.enable()

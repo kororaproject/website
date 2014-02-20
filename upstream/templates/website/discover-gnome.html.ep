@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'discover'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/discover">Discover</a></li>
+              <li class="active">GNOME</li>
+            </ol>
+            <h1 class="text-center"><strong>Discover.</strong> The GNOME Desktop</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="text-center">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-desktop-apps.jpg" alt="GNOME Desktop">
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 class="center">Simply beautiful</h2>
+            <p>GNOME's new desktop takes elegance to a new level. We've swept away the clutter and made a simple and easy-to-use desktop that's the most beautiful version ever that includes a new visual theme, a refined new font and carefully crafted animations.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-activities-menu.jpg" alt="GNOME Desktop">
+          </div>
+          <div class="col-sm-3">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-notification-bar.jpg" alt="GNOME Desktop">
+          </div>
+          <div class="col-sm-3">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-notification-menu.jpg" alt="GNOME Desktop">
+          </div>
+          <div class="col-sm-3">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-dock.jpg" alt="GNOME Desktop">
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-overview.jpg" alt="GNOME Overview">
+          </div>
+          <div class="col-sm-6">
+            <h2>Overview at a glance</h2>
+            <p>The Activities Overview is the portal to all your computing activities. Quickly accessible using the top-left hot corner or windows key, it provides a single place to access windows, applications and even messages. The dash allows you to see which applications are currently running and the workspace switcher can be
+            used to group windows.</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h2>Everything at your fingertips</h2>
+            <p>Search is central to the GNOME desktop. Applications, windows, documents and even settings can all be quickly and easily searched for from one place. Accessing GNOME's desktop search is as simple as pressing the super key and starting to type. This is a great feature for people who like things to happen <em>fast</em>.</p>
+          </div>
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-gnome-apps.jpg" alt="GNOME Applications">
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+</body>
+</html>

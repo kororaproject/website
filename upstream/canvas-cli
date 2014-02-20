@@ -253,7 +253,7 @@ def main():
         for p in pkgs:
           _yd = p.yumdb_info
           if _yd.get('reason') == 'user':
-            pl.add( Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch) )
+            pl.add( Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch, action=1) )
 
 
         rl = RepositoryList( yb.repos.listEnabled() )

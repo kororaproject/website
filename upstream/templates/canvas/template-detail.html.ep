@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+  <link href="/css/layerslider.css" rel="stylesheet" media="screen">
+
+  %= tag script => 'window.canvas = ' . $canvas . ';'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'canvas/navigation.inc', active => 'templates'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/templates">Templates</a></li>
+              <li><a href="/template/<%= $details->user_id->username %>"><%= $details->user_id->username %></a></li>
+              <li class="active"><%= $details->name %></li>
+            </ol>
+            <h1 class="page-title"><%= $details->name %></h1>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#software" data-toggle="tab"><i class="fa fa-th-list"></i><span class="xhidden-xs"> Software</span></a></li>
+              <li><a href="#configuration" data-toggle="tab"><i class="fa fa-gears"></i><span class="xhidden-xs"> Configuration</span></a></li>
+              <li><a href="#files" data-toggle="tab"><i class="fa fa-files-o"></i><span class="xhidden-xs"> Files</span></a></li>
+              <li class="secondary-nav"><a href="#build" data-toggle="tab"><i class="fa fa-wrench"></i><span class="xhidden-xs"> Build</span></a></li>
+            </ul>
+
+            <div class="tab-content">
+              <div class="tab-pane fade in active" id="software">
+                <div class="row-table row-table-hover">
+                  <div class="row row-header">
+                    <div class="col-sm-8">
+                      <span>Repository</span>
+                    </div>
+                    <div class="col-sm-2">
+                      <span>Cost</span>
+                    </div>
+                    <div class="col-sm-2">
+                    </div>
+                  </div>
+% foreach my $r ( @{ $repositories } ) {
+                  <div class="row row-entry">
+                    <div class="col-sm-8">
+                      <span><%= $r->name %></span>
+                    </div>
+                    <div class="col-sm-2">
+                      <span><%= $r->cost %></span>
+                    </div>
+                    <div class="col-sm-2">
+                      <button class="btn btn-xs btn-default"><i class="fa fa-fw fa-cog"></i></button>
+                      <button class="btn btn-xs btn-danger"><i class="fa fa-fw fa-trash-o"></i></button>
+                    </div>
+                  </div>
+% }
+                </div>
+
+                <div class="hr hr-lg"></div>
+
+                <div class="row-table row-table-hover">
+                  <div class="row row-header">
+                    <div class="col-sm-4">
+                      <span>Package</span>
+                    </div>
+                    <div class="col-sm-4">
+                      <span>Version</span>
+                    </div>
+                    <div class="col-sm-2">
+                      <span>Arch</span>
+                    </div>
+                    <div class="col-sm-2">
+                      <button class="btn btn-xs btn-default"><i class="fa fa-fw fa-plus"></i></button>
+                    </div>
+                  </div>
+% foreach my $p ( @{ $packages } ) {
+                  <div class="row row-entry">
+                    <div class="col-sm-4">
+                      <span><%= $p->name %></span>
+                    </div>
+                    <div class="col-sm-4">
+                      <span><%= sprintf "%s:%s-%s", $p->epoch, $p->version, $p->rel %></span>
+                    </div>
+                    <div class="col-sm-2">
+                      <span><%= $p->arch %></span>
+                    </div>
+                    <div class="col-sm-2">
+                      <button class="btn btn-xs btn-default"><i class="fa fa-fw fa-cog"></i></button>
+                      <button class="btn btn-xs btn-danger"><i class="fa fa-fw fa-trash-o"></i></button>
+                    </div>
+                  </div>
+% }
+                </div>
+              </div>
+              <div class="tab-pane fade" id="configuration">...</div>
+              <div class="tab-pane fade" id="files">...</div>
+              <div class="tab-pane fade" id="build">...</div>
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'canvas/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>

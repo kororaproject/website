@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'discover'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container" ng-controller="SponsorController">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/contribute">Contribute</a></li>
+              <li class="active">Sponsor</li>
+            </ol>
+            <h1 class="text-center"><strong>Sponsor.</strong> Help a Distribution</h1>
+          </div>
+        </div>
+        <div class="hr hr-lg"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h2>Why sponsor?</h2>
+            <p>We build Korora because we love it and there is no pressure to sponsor, however we do welcome anything that you can spare.</p>
+            <p>By sponsoring Korora you contribute by giving the development team a regular and predictable income to cover our hosting, development and hardware testing costs.</p>
+            <p>All sponsorships are processed securely online and we do not store any of your payment details.</p>
+            <h2>Sponsorship levels</h2>
+            <p>There are five levels of sponsorship:</p>
+            <table class="table table-responsive table-hover">
+              <thead>
+                <tr><th>Sponsorship</th><th>Contribution</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><i class="fa fa-trophy ss-platinum"></i> Platinum</td><td>$500+/month</td></tr>
+                <tr><td><i class="fa fa-trophy ss-gold"></i> Gold</td><td>$100+/month</td></tr>
+                <tr><td><i class="fa fa-trophy ss-silver"></i> Silver</td><td>$50+/month</td></tr>
+                <tr><td><i class="fa fa-trophy ss-bronze"></i> Bronze</td><td>$25+/month</td></tr>
+                <tr><td><i class="fa fa-trophy ss-community"></i> Community</td><td>$10+/month</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <form role="form" action="<%= url_with %>" method="post">
+            <div class="col-sm-6 callout">
+              <h2>Please complete ...</h2>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group" ng-class="sponsorNameValidity()">
+                    <label class="sr-only" for="sponsor_name">Your name</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+                      <input type="text" class="form-control" name="sponsor_name" placeholder="" value="<%= $v->{sponsor_name} %>"></input>
+                    </div>
+                    <span class="help-block">We use this name on our public sponsor list (leave blank if you'd prefer to be anonymous).</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group" ng-class="sponsorEmailValidity()">
+                    <label class="sr-only" for="sponsor_email">Email address</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
+                      <input type="text" class="form-control" name="sponsor_email" data-rule-required="true" placeholder="" ng-model="sponsor_email" value="<%= $v->{sponsor_email} %>" ng-init="sponsor_email='<%= $v->{sponsor_email} %>'"></input>
+                    </div>
+                    <span class="help-block">We use this email address as the identifier for your sponsorship and for any correspondence.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group" ng-class="sponsorAmountValidity()">
+                    <label class="sr-only" for="sponsor_amount">Amount</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-usd"></i></span>
+                      <input type="text" class="form-control" name="sponsor_amount" value="00" ng-model="sponsor_amount" value="<%= $v->{sponsor_amount} %>" ng-init="sponsor_amount='<%= $v->{sponsor_amount} %>'"/>
+                      <span class="input-group-addon">USD/month</span>
+                    </div>
+                    <span class="help-block">How much would you like to sponsor to the Korora Project each month?</span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <a href="https://www.paypal.com/au/webapps/mpp/paypal-popup" title="How PayPal Works" onclick="javascript:window.open('https://www.paypal.com/au/webapps/mpp/paypal-popup','WIPaypal','toolbar=no, location=no, directories=no, status=no, menubar=no, width=600, height=500'); return false;">
+                      <img src="https://www.paypalobjects.com/webstatic/mktg/logo/bdg_secured_by_pp_2line.png" border="0" height="34" alt="PayPal Logo">
+                    </a>
+                    <button class="btn btn-large btn-success pull-right" ng-class="{disabled: !canSponsor()}" type="submit">Sponsor now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>

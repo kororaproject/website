@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'support'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/support">Support</a></li>
+              <li><a href="/support/engage">Engage</a></li>
+              <li><a href="<%= url_with('/support/engage')->query([ type => $reply->parent_id->type]) %>"><%= ucfirst $reply->parent_id->type %>s</a></li>
+              <li><a href="<%= $redirect_url %>"><%= $reply->parent_id->title %></a></li>
+              <li class="active">Edit Reply</li>
+            </ol>
+            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Edit Reply<%== engage_icon( $reply->parent_id->type )%></h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <form action="<%= url_for('current') %>" method="post" enctype="application/x-www-form-urlencoded">
+              <input type="hidden" name="redirect_url" value="<%= $redirect_url %>"></input>
+              <div class="row">
+                <div class="col-sm-12">
+                  <h3>Reply <a href="" class="btn pull-right" data-toggle="modal" data-target="#modalEngageSyntax"><i class="fa fa-fw fa-question"></i></a> </h3>
+                  <textarea name="content" class="form-control" rows="10"><%= $content %></textarea>
+                  <div class="hr-sm"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="text-right">
+                    <a href="<%= $redirect_url %>" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-success">Save</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <div class="modal fade" id="modalEngageSyntax" tabindex="-1" role="dialog" aria-labelledby="modalEngageSyntaxLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-responsive">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="modalEngageSyntaxLabel">Engage Markdown Syntax</h4>
+        </div>
+        <div class="modal-body">
+          %= include 'engage-syntax.inc'
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+  <script>
+    $(document).ready( function() {
+      $('.nav-tabs a').click( function(e) {
+        e.preventDefault()
+        $(this).tab('show')
+      });
+    });
+  </script>
+</body>
+</html>

@@ -123,9 +123,19 @@ CREATE TABLE canvas_template_comments (
 CREATE TABLE canvas_template (
     id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
     user_id       INTEGER       NOT NULL  REFERENCES canvas_user(id),
+
+    stub          VARCHAR(128)  NOT NULL,
     name          VARCHAR(256)  NOT NULL,
     description   TEXT,
-    private       BOOL          NOT NULL  DEFAULT FALSE,
+
+    /*
+    ** default action is set to explicitly install
+    ** bit 0: share with template owner (default)
+    ** bit 1: share with template members
+    ** bit 2: share with everybody
+    */
+    shared        INTEGER       NOT NULL  DEFAULT 1,
+
     parent_id     INTEGER       NOT NULL  DEFAULT 0,
 
     created       DATETIME      NOT NULL,
@@ -187,7 +197,9 @@ CREATE TABLE canvas_templaterepository (
     metalink      VARCHAR(256)  NOT NULL DEFAULT '',
 
     exclude       TEXT          NOT NULL DEFAULT '',
+
     version       VARCHAR(64)   NOT NULL DEFAULT 0,
+
     enabled       BOOL          NOT NULL DEFAULT TRUE,
     cost          INTEGER       NOT NULL DEFAULT 1000,
     gpg_check     BOOL          NOT NULL DEFAULT TRUE,

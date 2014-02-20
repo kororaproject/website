@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="Korora Project - News" href="/news/rss">
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'news'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="pull-right">
+                <a href="/about/news/rss" class="btn btn-xs btn-default rss"><i class="fa fa-fw fa-rss"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/about">About</a></li>
+              <li><a href="/about/news">News</a></li>
+              <li class="active"><%= $post->title %></li>
+            </ol>
+            <h1><%= $post->title %></h1>
+            <div class="news-detail-subtitle">
+              <div class="news-detail-subtitle-metadata">
+                <%== post_gravatar( $post, 32 ) %>
+              </div>
+              <div class="news-detail-subtitle-metadata">
+                <p>written on <%= $post->created->strftime('%e %B %Y') %></p>
+                <p>by <%= $post->author_id->username %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+
+%== render_markdown( $post->excerpt );
+%== render_markdown( $post->content );
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="text-right">
+% if( news_post_can_edit( $post ) ) {
+              <a class="btn btn-default" href="<%= url_for_path(0, 'edit') %>">Edit</a>
+% }
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+</body>
+</html>

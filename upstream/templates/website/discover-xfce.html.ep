@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'discover'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-discover" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/discover">Discover</a></li>
+              <li class="active">Xfce</li>
+            </ol>
+            <h1 class="text-center"><strong>Discover.</strong> The Xfce Desktop</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="text-center">
+              <img class="img-responsive img-showcase" src="/img/screenshots/korora-xfce-desktop-apps.jpg" alt="Xfce Desktop">
+            </div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2 class="center">Lightweight desktop with speed and function</h2>
+            <p>Xfce focuses on being a lightweight, yet fully functional desktop. It aims to be fast and low on system resources, while still being visually appealing and user friendly.</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-xfce-apps.jpg" alt="Xfce Applications Menu">
+          </div>
+          <div class="col-sm-6">
+            <h2>The fast, modern desktop</h2>
+            <p>The desktop has a traditional menu for accessing your applications, but also a handy dock for quick access to running programs as well as your favourites. It also comes with various useful applets that can be added to the panel like Clipman, Mail Watcher, Trash and Weather Update, just to name a few.</p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="row">
+          <div class="col-sm-6">
+            <h2>Configuration</h2>
+            <p>Xfce has a great configuration manager, letting you tweak many aspects of the desktop.</p>
+          </div>
+          <div class="col-sm-6">
+            <img class="img-responsive img-showcase" src="/img/screenshots/korora-xfce-settings.jpg" alt="Xfce Settings">
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+</body>
+</html>
