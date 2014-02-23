@@ -99,7 +99,7 @@
           <h4 class="modal-title" id="modalEngageSyntaxLabel">Engage Markdown Syntax</h4>
         </div>
         <div class="modal-body">
-          %= include 'engage-syntax.inc'
+          %= include 'website/engage-syntax.inc'
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
