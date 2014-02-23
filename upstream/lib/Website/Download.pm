@@ -105,7 +105,7 @@ use constant DOWNLOAD_MAP => {
           i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/20/korora-20-i386-kde-live.iso/download',
-              torrent => 'http://burnbit.com/download/271510/korora_20_i386_kde_live_iso',
+              torrent => 'http://burnbit.com/download/271365/korora_20_i386_kde_live_iso',
             },
             checksum => {
               md5     => 'b9fa2dfcdc906af12212a923dd8110c2',
