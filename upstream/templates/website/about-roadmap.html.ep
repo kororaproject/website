@@ -24,14 +24,66 @@
               </div>
               <li><a href="/">Home</a></li>
               <li><a href="/about">About</a></li>
-              <li class="active">Roadmap</li>
+              <li class="active">Road Map</li>
             </ol>
-            <h1 class="page-title">Roadmap</h1>
+            <h1 class="page-title"><strong>Road Map.</strong> The Path Ahead</h1>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <p>Goals for future releases... Coming soon!</p>
+            <p>Road maps enable road trips, and road trips are about passengers - or, in the case of Korora, our community.  Passengers help plan where they want to go by providing input, directions and periodically asking, "Are we there yet?"</p>
+            <p>Without passengers or goals, a road map is a mythical, meaningless thing - so the main goal we have in producing this road map is to let our users, developers, and those looking for a friendly and powerful distribution know where it is we are currently heading.</p>
+            <h2>Our Development Process</h2>
+            <p>The Korora Project is committed to an open development process. We operate around an approximate six-month, time-based release cycle which generally lags Fedora’s life cycle by two to four weeks.</p>
+            <h3>Planning Phase</h3>
+            <p>Currently our planning phase is ephemeral with major goals outlined early in the cycle which are then iterated over until release day. All development discussions happen in the open via Engage or on IRC.</p>
+            <h2>Goals for Stable +1</h2>
+            <p>For the next release we are focusing on three main elements: User Experience (UX) and Theming, Pharlap and Canvas.</p>
+            <h3>UX and Theming</h3>
+            <p>With the last release, based on strong community requests, we provided five different flavours of desktop in order to provide more choice. Based on constructive community feedback, additional effort will be concentrated to optimising the KDE, Cinnamon and MATE desktops.</p>
+            <h3>Pharlap</h3>
+            <p>We introduce a tech preview of our Proprietary Driver Manager (Pharlap) which is to eventually replace Jockey. Pharlap is largely derived from Ubuntu’s Drivers Common architecture and adapted for the YUM/RPM world.</p>
+            <p>There are significant challenges as a result of different practices between DPKG and RPM packaging and their associated metadata. We plan to engage our upstream repository managers for improving this situation.</p>
+            <h3>Canvas</h3>
+            <p>This feature represents something completely unique for our distribution and one that at times feels all consuming and never ending. It’s a number of concepts and is best considered a spectrum of capability than a single feature in itself.</p>
+            <p>The initial feature set of Canvas will include:</p>
+            <ul>
+              <li>Save a system’s package selection (template) online (associated with a Korora Prime account)</li>
+              <li>Restore a system’s package selection based on its saved templates</li>
+              <li>View and modify a saved template online</li>
+            </ul>
+
+            <p>Future features include but are not limited to:</p>
+            <ul>
+              <li>create and share templates online</li>
+              <li>template inheritance - supporting modular templates</li>
+              <li>link machines (and their templates) to a Korora Prime account</li>
+              <li>receive update notifications of all your machines</li>
+              <li>push updates down to linked machines</li>
+              <li>push template changes down to linked machines</li>
+              <li>export an online template as a kickstart file</li>
+              <li>export an online template as a bootable ISO</li>
+            </ul>
+            <h2>Goals for Stable ++</h2>
+            <p>For some future release we have the following desires:</p>
+            <h3>Anaconda UX / UI</h3>
+            <p>The Anaconda rewrite has left many users confused about installation. The current UI complicates a number of tasks that could be optimised. We want to explore the best way to address these deficiencies, for example:</p>
+            <ul>
+              <li>Patch in place the existing UI and offer upstream</li>
+              <li>Research and test any Anaconda alternatives</li>
+              <li>Replace the Anaconda UI with a custom layout</li>
+            </ul>
+            <h3>Anaconda / First Boot / Welcome / Canvas</h3>
+            <p>As Canvas matures, integrating the ability to set the machine / template to be applied at the time of installation would be ideal. This would allow for streamlining true custom and personalised installations.</p>
+            <h3>Lightweight Desktop-Agnostic SDK</h3>
+            <p>The Korora Welcome utility is an experiment at a desktop-agnostic application that leverages HTML5/CSS/JS for the main UI components and utilises python hooks for interacting with the system from within a WebKit container.</p>
+            <p>The initial version was extremely hacky but this has improved with the latest release by largely removing most of those hacks as well as consolidating a consistent data interchange mechanism.</p>
+            <p>We would like to continue this experiment and attempt to provide a lightweight SDK for Korora specific applications that attempt to blend the offline and online experiences.</p>
+            <h3>Software Center</h3>
+            <p>There are a number of UI’s that sit on top of YUM to aid package installation, the latest work with GNOME Software highlights a number of new technologies that is improving the ability to search, install and modify your OS.</p>
+            <p>We would like to explore a desktop-agnostic mechanism for searching, installing and modifying software on your system. It would be Canvas-aware and leverage the SDK.</p>
+            <h2>Feedback Welcome!</h2>
+            <p>We encourage you to share your feedback about Korora and our road map on <a href="https://plus.google.com/communities/110597892180797592370">Google+</a></li>, <a href="http://facebook.com/kororaproject">Facebook</a></li> and <a href="http://twitter.com/kororaproject">Twitter</a> and IRC. You can also submit your bug reports, ideas and questions via <a href="/support/engage">Engage</a>!</p>
           </div>
         </div>
       </div>
