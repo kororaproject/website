@@ -34,7 +34,7 @@
             <p>Road maps enable road trips, and road trips are about passengers - or, in the case of Korora, our community.  Passengers help plan where they want to go by providing input, directions and periodically asking, "Are we there yet?"</p>
             <p>Without passengers or goals, a road map is a mythical, meaningless thing - so the main goal we have in producing this road map is to let our users, developers, and those looking for a friendly and powerful distribution know where it is we are currently heading.</p>
             <h2>Our Development Process</h2>
-            <p>The Korora Project is committed to an open development process. We operate around an approximate six-month, time-based release cycle which generally lags Fedora’s life cycle by two to four weeks.</p>
+            <p>The Korora Project is committed to an open development process. We operate around an approximate six-month, time-based release cycle which generally lags <a href="https://fedoraproject.org/wiki/Fedora_Release_Life_Cycle">Fedora’s Life Cycle</a> by two to four weeks.</p>
             <h3>Planning Phase</h3>
             <p>Currently our planning phase is ephemeral with major goals outlined early in the cycle which are then iterated over until release day. All development discussions happen in the open via Engage or on IRC.</p>
             <h2>Goals for Stable +1</h2>
