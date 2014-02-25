@@ -699,9 +699,22 @@ function CanvasController($scope) {
   $scope.data = {};
 };
 
+function TemplateController($scope) {
+  $scope.data = window.kp.template;
+
+  $scope.orderByField = 'n';
+  $scope.orderReverse = true;
+  $scope.pageSize = 10;
+  $scope.page = 0;
+  $scope.pages = Math.floor( $scope.data.repositories.length / $scope.pageSize );
+
+
+};
+
 function RepositoryController($scope) {
   $scope.data = [];
 };
+
 
 function PackageController($scope, CanvasNavigation, $http) {
   $scope.data = {};

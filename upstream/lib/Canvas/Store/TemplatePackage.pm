@@ -17,8 +17,10 @@
 #
 package Canvas::Store::TemplatePackage;
 
-use strict;
-use base 'Canvas::Store';
+#
+# PERL INCLUDES
+#
+use Mojo::Base 'Canvas::Store';
 
 #
 # CONSTANTS

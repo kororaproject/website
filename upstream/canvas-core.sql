@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS canvas_comment;
 DROP TABLE IF EXISTS canvas_template_ratings;
 DROP TABLE IF EXISTS canvas_template_comments;
 DROP TABLE IF EXISTS canvas_template;
+DROP TABLE IF EXISTS canvas_template_map;
 DROP TABLE IF EXISTS canvas_templatemembership;
 DROP TABLE IF EXISTS canvas_templatepackage;
 DROP TABLE IF EXISTS canvas_templaterepository;
@@ -110,37 +111,48 @@ CREATE TABLE canvas_template_ratings (
 );
 
 CREATE TABLE canvas_template_comments (
-    id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-    template_id   INTEGER       NOT NULL,
-    comment_id    INTEGER       NOT NULL  REFERENCES canvas_comment (id),
+  id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  template_id   INTEGER       NOT NULL,
+  comment_id    INTEGER       NOT NULL  REFERENCES canvas_comment (id),
 
-    created       DATETIME      NOT NULL,
-    updated       DATETIME      NOT NULL,
+  created       DATETIME      NOT NULL,
+  updated       DATETIME      NOT NULL,
 
-    UNIQUE (template_id, comment_id)
+  UNIQUE (template_id, comment_id)
 );
 
 CREATE TABLE canvas_template (
-    id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
-    user_id       INTEGER       NOT NULL  REFERENCES canvas_user(id),
+  id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,
+  user_id       INTEGER       NOT NULL  REFERENCES canvas_user(id),
 
-    stub          VARCHAR(128)  NOT NULL,
-    name          VARCHAR(256)  NOT NULL,
-    description   TEXT,
+  stub          VARCHAR(128)  NOT NULL,
+  name          VARCHAR(256)  NOT NULL,
+  description   TEXT,
 
-    /*
-    ** default action is set to explicitly install
-    ** bit 0: share with template owner (default)
-    ** bit 1: share with template members
-    ** bit 2: share with everybody
-    */
-    shared        INTEGER       NOT NULL  DEFAULT 1,
+  /*
+  ** default action is set to explicitly install
+  ** bit 0: share with template owner (default)
+  ** bit 1: share with template members
+  ** bit 2: share with everybody
+  */
+  shared        INTEGER       NOT NULL  DEFAULT 1,
 
-    parent_id     INTEGER       NOT NULL  DEFAULT 0,
+  /*
+  ** 0 = stand alone
+  ** 1 = dependency only
+  */
+  build_type    INTEGER       NOT NULL  DEFAULT 0,
 
-    created       DATETIME      NOT NULL,
-    updated       DATETIME      NOT NULL
+  created       DATETIME      NOT NULL,
+  updated       DATETIME      NOT NULL
 );
+
+CREATE TABLE canvas_template_map (
+  parent_id       INTEGER       NOT NULL REFERENCES canvas_template(id),
+  child_id        INTEGER       NOT NULL REFERENCES canvas_template(id),
+
+  priority        INTEGER       NOT NULL DEFAULT 1000,
+};
 
 CREATE TABLE canvas_templatemembership (
     id            INTEGER       NOT NULL  PRIMARY KEY  AUTO_INCREMENT,

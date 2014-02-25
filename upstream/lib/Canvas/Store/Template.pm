@@ -17,13 +17,11 @@
 #
 package Canvas::Store::Template;
 
-use strict;
-use base 'Canvas::Store';
-
 #
 # PERL INCLUDES
 #
 use Data::Dumper;
+use Mojo::Base 'Canvas::Store';
 use POSIX qw(ceil);
 
 #

@@ -1,3 +1,5 @@
 *.pyc
+assets/
 cache/
 canvas.conf
+website.conf

@@ -17,9 +17,6 @@
 #
 package Canvas::Template;
 
-use warnings;
-use strict;
-
 #
 # PERL INCLUDES
 #
@@ -71,26 +68,45 @@ sub detail_get {
 
   # TODO: ensure we have visibility rights
 
+  my $p = [];
+  my $r = [];
+
   my @packages     = $template->template_packages;
   my @repositories = $template->template_repositories;
 
-  my $canvas = j(template => {
-    details      => $template,
-    packages     => \@packages,
-    repositories => \@repositories,
+  foreach my $package    ( $template->template_packages     ) {
+    push @{ $p }, {
+      n => $package->name,
+      e => $package->epoch,
+      v => $package->version,
+      r => $package->rel,
+      a => $package->arch,
+      x => $package->action,
+    };
+  }
+
+  foreach my $repository ( $template->template_repositories ) {
+    push @{ $r }, {
+      n => $repository->name,
+      s => $repository->stub,
+      c => $repository->cost,
+    };
+  }
+
+  my $canvas = j({
+    template => {
+      details      => "",
+      packages     => $p,
+      repositories => $r,
+    }
   });
 
-  say Dumper $canvas;
-
   $self->stash(
-    details      => $template,
-    packages     => \@packages,
-    repositories => \@repositories,
-    canvas       => $canvas,
+    details => $template,
+    canvas  => $canvas,
   );
 
   $self->render('canvas/template-detail');
 }
-
 
 1;

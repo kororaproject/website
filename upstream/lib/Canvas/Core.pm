@@ -74,6 +74,14 @@ sub authenticate_any {
     return $self->render( status => 403, json => 'Not Authorised!' ) if $self->stash('format') eq 'json';
   }
 
+  unless( $self->auth_user->metadata('is_canvas_member') ) {
+    $self->logout;
+
+    $self->flash( page_errors => 'You are not a member of the Canvas alpha test team. Stay tuned for future announcments.' );
+
+    return $self->render( status => 403, json => 'Not Authorised!' ) if $self->stash('format') eq 'json';
+  }
+
   return $self->render( status => 200, json => 'Access Granted!' ) if $self->stash('format') eq 'json';
 
   return $self->redirect_to( $url );
