@@ -1271,23 +1271,57 @@ h4.step {
   text-align: center;
 }
 
-.checksums .hash {
-  font-family: monospace;
-  font-size: 12px;
-  margin: 4px;
-  text-align: center;
-}
-
 .checksums .checksum {
-  vertical-align: middle;
+  margin: 4px 0;
+  vertical-align: top;
 }
 
-.checksums span.label {
-  margin: 4px 0;
-  font-size: 10px;
+.panel-checksum {
+  background-color: inherit;
+  border: 0;
+  box-shadow: none;
+  margin-bottom: 4px;
+}
+
+.panel-checksum .panel-heading {
+  border: 0;
+  padding: 0;
+}
+
+.checksums .checksum .label,
+.panel-checksum .panel-heading .label {
   cursor: pointer;
-  width: 48px;
   display: inline-block;
+  font-size: 10px;
+  padding: 4px 0 4px 0;
+  width: 48px;
+}
+
+.checksums .checksum .label {
+  margin-top: 4px;
+  margin-right: 4px;
+}
+
+.panel-checksum .panel-body {
+  background-color: rgba(255, 255, 255, 0.66);
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 14px;
+  padding: 8px;
+  text-align: center;
+  text-overflow: none;
+  white-space: normal;
+  word-break: break-all;
+}
+
+.checksum .hash {
+  font-family: monospace;
+  font-size: 14px;
+  text-overflow: none;
+  white-space: normal;
+  word-break: break-all;
 }
 
 /*
@@ -1539,6 +1573,10 @@ footer a:visited {
 
 /* xs - explicit */
 @media all and (max-width: 767px) {
+  .checksums .hash-wrapper {
+    width: 100%;
+  }
+
   .xhidden-xs {
     display: none;
   }

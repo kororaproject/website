@@ -63,10 +63,12 @@
 %       }
 
                 <div class="checksums">
-%       foreach my $c ( keys %{ $r->{isos}{ $d }{ $a }{checksum} } ) {
+%       foreach my $c ( sort keys %{ $r->{isos}{ $d }{ $a }{checksum} } ) {
                   <div class="checksum">
-                    <span class="label label-default pull-left"><%= $c %></span>
-                    <div class="hash"><%= $r->{isos}{ $d }{ $a }{checksum}{ $c } %></div>
+                    <div class="hash">
+                      <span class="label label-default pull-left"><%= $c %></span>
+                      <%= $r->{isos}{ $d }{ $a }{checksum}{ $c } %>
+                    </div>
                   </div>
 %       }
                 </div>
@@ -135,13 +137,17 @@
                   <div ng-repeat="(type, url) in getLinks()" class="btn-download">
                     <a href="{{url}}" class="btn btn-large btn-block btn-success"><i class="fa fa-cloud-download"></i> Download via <span class="uppercase">{{type}}</span></a>
                     <div class="hr hr-xs"></div>
-                  </div ng-repeat-end>
+                  </div>
                 </div>
                 <div class="checksums">
-                  <div ng-repeat="(type, hash) in getChecksums()" class="checksum">
-                    <span class="label label-default pull-left">{{type}}</span>
-                    <div class="hash" title="{{hash}}">{{formatShortHash(hash)}}</div>
-                  </div ng-repeat-end>
+                  <div ng-repeat="(type, hash) in getChecksums()" class="panel panel-checksum in">
+                    <div class="panel-heading">
+                      <a data-toggle="collapse" href="#collapse{{type}}"><span class="label label-default">{{type}}</a></span>
+                    </div>
+                    <div id="collapse{{type}}" class="panel-collapse collapse">
+                      <div class="panel-body">{{hash}}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
