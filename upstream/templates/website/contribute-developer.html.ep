@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    %= include 'website/navigation.inc', active => 'about'
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div id="page-about" class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <ol class="breadcrumb">
+              <div class="btn-group pull-right">
+                <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
+                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
+                <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
+              </div>
+              <li><a href="/">Home</a></li>
+              <li><a href="/contribute">Contribute</a></li>
+              <li class="active">Developer</li>
+            </ol>
+            <h1 class="page-title"><strong>Developer.</strong> Shaping Korora</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Colour</h2>
+            <p>Use colour primarily for emphasis. Choose colours that provide good contrast between visual components. Note that red and green may be indistinguishable to colour-blind users.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <h3>Android + Grey/Brown Custom</h3>
+            <ul class="colour-row">
+% foreach my $c ( @{ $colours } ) {
+%   my $b  = sprintf("rgb(%d, %d, %d)", @{ $c->{base} } );
+%   my $bh = sprintf("#%X%X%X", @{ $c->{base} } );
+%   my $s  = sprintf("rgb(%d, %d, %d)", @{ $c->{shadow} } );
+%   my $sh = sprintf("#%X%X%X)", @{ $c->{shadow} } );
+              <li>
+                <div class="swatch" style="background-color: <%= $b %>;">
+                  <span style="color: <%= $b %>;"><%= $bh %></span>
+                </div>
+                <div class="swatch-thin" style="background-color: <%= $s %>;">
+                  <span style="color: <%= $s %>;"><%= $sh %></span>
+                </div>
+              </li>
+% }
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <h3>Flat UI</h3>
+            <ul class="colour-row">
+% foreach my $c ( @{ $colours_alt } ) {
+%   my $b  = sprintf("rgb(%d, %d, %d)", @{ $c->{base} } );
+%   my $bh = sprintf("#%X%X%X", @{ $c->{base} } );
+%   my $s  = sprintf("rgb(%d, %d, %d)", @{ $c->{shadow} } );
+%   my $sh = sprintf("#%X%X%X)", @{ $c->{shadow} } );
+              <li>
+                <div class="swatch" style="background-color: <%= $b %>;">
+                  <span style="color: <%= $b %>;"><%= $bh %></span>
+                </div>
+                <div class="swatch-thin" style="background-color: <%= $s %>;">
+                  <span style="color: <%= $s %>;"><%= $sh %></span>
+                </div>
+              </li>
+% }
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 text-center">
+            <h3>KDE Oxygen</h3>
+            <ul class="colour-row">
+% foreach my $c ( @{ $colours_kde } ) {
+%   my $b  = sprintf("rgb(%d, %d, %d)", @{ $c->{base} } );
+%   my $bh = sprintf("#%X%X%X", @{ $c->{base} } );
+%   my $s  = sprintf("rgb(%d, %d, %d)", @{ $c->{shadow} } );
+%   my $sh = sprintf("#%X%X%X)", @{ $c->{shadow} } );
+              <li>
+                <div class="swatch" style="background-color: <%= $b %>;">
+                  <span style="color: <%= $b %>;"><%= $bh %></span>
+                </div>
+                <div class="swatch-thin" style="background-color: <%= $s %>;">
+                  <span style="color: <%= $s %>;"><%= $sh %></span>
+                </div>
+              </li>
+% }
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h3>Palette</h3>
+            <p>Blue is the standard accent color in Android's color palette. Each color has a corresponding darker shade that can be used as a complement when needed.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Iconography</h2>
+            <p>An icon is a graphic that takes up a small portion of screen real estate and provides a quick, intuitive representation of an action, a status, or an app.</p>
+            <p>When designing icons for Korora, it's important to keep in mind that it will be seen on a variety of devices that offer a range of pixel densities, as mentioned in Devices and Displays. In order to make icons look great on all devices, is to design with a vector descriptive language.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'website/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+</body>
+</html>

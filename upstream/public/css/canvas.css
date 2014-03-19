@@ -1374,6 +1374,44 @@ h4.step {
   padding: 0 2px;
 }
 
+
+.colour-row-container {
+  line-height: 0;
+  text-align: center;
+}
+
+.colour-row {
+  cursor: pointer;
+  list-style-type: none;
+  text-align: center;
+  width: 100%;
+  display: block;
+}
+
+.colour-row li {
+  position: relative;
+
+  float: left;
+}
+
+.colour-row li:last-child {
+  margin-bottom: 16px;
+}
+
+.colour-row li .swatch {
+  height: 64px;
+  width: 84px;
+}
+
+.colour-row li .swatch-thin {
+  height: 32px;
+  width: 84px;
+}
+
+.colour-row li span {
+  display: none;
+}
+
 /*
 ** PROFILE PAGES
 */
