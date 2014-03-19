@@ -79,6 +79,32 @@
         </div>
         <div class="row">
           <div class="col-sm-12 text-center">
+            <h3>Tango</h3>
+            <ul class="colour-row">
+% foreach my $c ( @{ $colours_tango } ) {
+%   my $o  = sprintf("rgb(%d, %d, %d)", @{ $c->{other} } );
+%   my $oh = sprintf("#%X%X%X", @{ $c->{other} } );
+%   my $b  = sprintf("rgb(%d, %d, %d)", @{ $c->{base} } );
+%   my $bh = sprintf("#%X%X%X", @{ $c->{base} } );
+%   my $s  = sprintf("rgb(%d, %d, %d)", @{ $c->{shadow} } );
+%   my $sh = sprintf("#%X%X%X)", @{ $c->{shadow} } );
+              <li>
+                <div class="swatch-thin" style="background-color: <%= $o %>;">
+                  <span style="color: <%= $o %>;"><%= $oh %></span>
+                </div>
+                <div class="swatch" style="background-color: <%= $b %>;">
+                  <span style="color: <%= $b %>;"><%= $bh %></span>
+                </div>
+                <div class="swatch-thin" style="background-color: <%= $s %>;">
+                  <span style="color: <%= $s %>;"><%= $sh %></span>
+                </div>
+              </li>
+% }
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 text-center">
             <h3>KDE Oxygen</h3>
             <ul class="colour-row">
 % foreach my $c ( @{ $colours_kde } ) {
