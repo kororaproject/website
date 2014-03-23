@@ -1657,6 +1657,7 @@ footer a:visited {
     padding-left: 16px;
   }
 }
+
 /* md */
 @media all and (min-width: 992px) {
   .col-img-leader {
