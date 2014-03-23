@@ -117,7 +117,7 @@ sub register {
     return 'unknown' unless _is_engage_post $post;
 
     # it's new if no replies and no modified status
-    return 'new' if $post->status eq '' && $post->reply_count == 0;
+    return 'new'    if $post->status eq '' && $post->reply_count == 0;
     return 'active' if $post->status eq '';
 
     my $t = TYPE_STATUS_MAP->{ $post->type };
