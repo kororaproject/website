@@ -240,7 +240,7 @@
           <h4 class="modal-title" id="modalEngageGuidelinesLabel">Engage Guidelines</h4>
         </div>
         <div class="modal-body">
-          %= include 'engage-guidelines.inc'
+          %= include 'website/engage-guidelines.inc'
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
