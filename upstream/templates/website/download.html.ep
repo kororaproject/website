@@ -159,23 +159,10 @@
             <div class="callout callout-info">
               <p>We recommend loading Korora from a USB stick!</p>
             </div>
-            <p>Our recommended and supported method of loading Korora is via a <a href="http://docs.fedoraproject.org/en-US/Fedora/20/html/Installation_Guide/Making_USB_Media.html">USB stick</a>. If you prefer, you can also burn the image to a <a href="http://docs.fedoraproject.org/en-US/Fedora/20/html/Installation_Guide/sn-making-media.html#sn-making-disc-media">DVD disk</a>, however this may be very slow and your milage may vary. Of course you can also just kick it off inside a virtual machine.</p>
+            <p>Our <a href="/support/documentation/creating-bootable-media">recommended and supported method of loading Korora</a> is via a <em>USB stick</em> (a DVD will be too slow and most likely fail). Of course you can also kick it off inside a virtual machine.</p>
             <div class="callout callout-info">
               <p>We highly recommend that you test the media on your first boot by selecting the <em>Test this media and boot Korora</em> option from the <em>Troubleshooting</em> menu. This will help to catch any problems due to corrupt download or write, before they happen.</p>
             </div>
-            <h3>Create USB media on Linux and Unix</h3>
-            <p>If you're already running a Linux distro, you can easily turn the ISO image into a bootable USB stick with the <em>dd</em> command.</p>
-            <p>Using the example below, replace the path to the ISO image with the location you downloaded it to (where we've used "/path/to/korora.iso"). Also change the device (where we've used "sdX") to be your suitably sized (2GB+) USB stick <em>device</em>, not a partition (which would be followed by a number, like sdX1).</p>
-            <p>You can usually find out your USB stick device on Linux by running the <em>dmesg</em> command after plugging it in and seeing what device was detected. Under OS X the
-            device will be diskX where X is a number greater than zero.</p>
-            <div class="callout callout-danger">
-              <p>Please be aware that this action will wipe the entire contents of the USB stick! Ensure you back up anything you want to keep on it and don't specify the wrong device.</p>
-            </div>
-            <pre><code class="bash">$ sudo dd if=/path/to/korora.iso of=/dev/sdX bs=4M &amp;&amp; sync</code></pre>
-            <p>Make sure that the drive has finished writing before you unplug it!</p>
-
-            <h3>Create USB media on Windows</h3>
-            <p>Windows users can download and install the <a href="https://fedorahosted.org/liveusb-creator/">LiveUSB creator tool</a> to easily make the bootable USB stick.</p>
             <h2>Source</h2>
             <p>Feel free to grab the source that was used to build Korora.</p>
             <ul>
