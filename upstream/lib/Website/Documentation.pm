@@ -100,7 +100,7 @@ sub index_get {
   my $pager = Canvas::Store::Post->pager(
     where             => { type => 'document', status => 'publish' },
     order_by          => 'menu_order, title',
-    entries_per_page  => 5,
+    entries_per_page  => 50,
     current_page      => ( $self->param('page') // 1 ) - 1,
   );
 
