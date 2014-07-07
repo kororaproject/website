@@ -35,7 +35,7 @@
           <div class="col-sm-12">
             <div class="callout engage-detail engage-<%= $response->type %>">
               <h1 class="engage-detail-title"><%= $response->title %></h1>
-              <div class="engage-detail-content">
+              <div id="reply-<%= $response->id %>" class="engage-detail-content">
                 <%== render_markdown( $response->content ) %>
               </div>
               <div class="row">
@@ -220,6 +220,7 @@
       $("[id^=quote-]").each( function( i ) {
         $(this).on('click', function() {
           var id = '#reply-' + $(this).attr('id').substr(6);
+          console.log("quoting: " + id );
           var url = $(location).attr('pathname') + '/reply/' + $(this).attr('id').substr(6);
 
           $.get(url, function(data) {

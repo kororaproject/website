@@ -168,13 +168,13 @@ sub register {
       $url .= '/reply/' . $post->id;
 
       if( $self->auth_user && $self->auth_user->is_active_account ) {
-        # add quote button
-        push @caps, sprintf '<li><a id="quote-%d" href="" class="text-left"><i class="fa fa-fwl fa-quote-left"></i> Quote</a></li>', $post->id;
-
         # add self-link
         push @caps, sprintf '<li><a id="quote-%d" href="%s#quote-%d" class="text-left"><i class="fa fa-fwl fa-link"></i> Link</a></li>', $post->id, $self->url_for, $post->id;
       }
     }
+
+    # add quote button
+    push @caps, sprintf '<li><a id="quote-%d" href="" class="text-left"><i class="fa fa-fwl fa-quote-left"></i> Quote</a></li>', $post->id;
 
     if( $self->engage_post_can_accept( $post ) ) {
       push @caps, sprintf '<li><a href="%s/accept" class="text-left"><i class="fa fa-fwl fa-check"></i> Accept</a></li>', $url;

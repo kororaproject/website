@@ -695,9 +695,9 @@ sub engage_reply_any {
     my $stub = $self->param('stub');
     my $id   = $self->param('id');
 
-    my $r = Canvas::Store::Post->search({ type => 'reply', id => $id, })->first;
+    my $r = Canvas::Store::Post->search({ id => $id })->first;
 
-    if( $r ) {
+    if( grep { $_ eq $r->type } qw(reply thank idea question problem) ) {
       $quote = {
         author  => $r->author_id->username,
         content => $r->content,
