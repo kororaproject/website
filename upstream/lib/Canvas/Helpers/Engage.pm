@@ -154,8 +154,8 @@ sub register {
 
     my $url = $self->url_for('current');
 
-    if( $post->type ne 'reply' ) {
-      if( $self->auth_user && $self->auth_user->is_active_account ) {
+    if( $self->auth_user && $self->auth_user->is_active_account ) {
+      if( $post->type ne 'reply' ) {
         if( $self->engage_post_can_subscribe( $post ) ) {
           push @caps, sprintf '<li><a href="%s/subscribe" class="text-left"><i class="fa fa-fwl fa-bookmark"></i> Subscribe</a></li>', $url;
         }
@@ -163,33 +163,31 @@ sub register {
            push @caps, sprintf '<li><a href="%s/unsubscribe" class="text-left"><i class="fa fa-fwl fa-bookmark-o"></i> Unsubscribe</a></li>', $url;
         }
       }
-    }
-    else {
-      $url .= '/reply/' . $post->id;
+      else {
+        $url .= '/reply/' . $post->id;
 
-      if( $self->auth_user && $self->auth_user->is_active_account ) {
         # add self-link
         push @caps, sprintf '<li><a id="quote-%d" href="%s#quote-%d" class="text-left"><i class="fa fa-fwl fa-link"></i> Link</a></li>', $post->id, $self->url_for, $post->id;
       }
-    }
 
-    # add quote button
-    push @caps, sprintf '<li><a id="quote-%d" href="" class="text-left"><i class="fa fa-fwl fa-quote-left"></i> Quote</a></li>', $post->id;
+      # add quote button
+      push @caps, sprintf '<li><a id="quote-%d" href="" class="text-left"><i class="fa fa-fwl fa-quote-left"></i> Quote</a></li>', $post->id;
 
-    if( $self->engage_post_can_accept( $post ) ) {
-      push @caps, sprintf '<li><a href="%s/accept" class="text-left"><i class="fa fa-fwl fa-check"></i> Accept</a></li>', $url;
-    }
+      if( $self->engage_post_can_accept( $post ) ) {
+        push @caps, sprintf '<li><a href="%s/accept" class="text-left"><i class="fa fa-fwl fa-check"></i> Accept</a></li>', $url;
+      }
 
-    if( $self->engage_post_can_unaccept( $post ) ) {
-      push @caps, sprintf '<li><a href="%s/unaccept" class="text-left"><i class="fa fa-fwl fa-times"></i> Unaccept</a></li>', $url;
-    }
+      if( $self->engage_post_can_unaccept( $post ) ) {
+        push @caps, sprintf '<li><a href="%s/unaccept" class="text-left"><i class="fa fa-fwl fa-times"></i> Unaccept</a></li>', $url;
+      }
 
-    if( $self->engage_post_can_edit( $post ) ) {
-      push @caps, sprintf '<li><a href="%s/edit" class="text-left"><i class="fa fa-fwl fa-edit"></i> Edit</a></li>', $url;
-    }
+      if( $self->engage_post_can_edit( $post ) ) {
+        push @caps, sprintf '<li><a href="%s/edit" class="text-left"><i class="fa fa-fwl fa-edit"></i> Edit</a></li>', $url;
+      }
 
-    if( $self->engage_post_can_delete( $post ) ) {
-      push @caps, sprintf '<li><a href="%s/delete" class="text-left"><i class="fa fa-fwl fa-trash-o"></i> Delete</a></li>', $url;
+      if( $self->engage_post_can_delete( $post ) ) {
+        push @caps, sprintf '<li><a href="%s/delete" class="text-left"><i class="fa fa-fwl fa-trash-o"></i> Delete</a></li>', $url;
+      }
     }
 
     my $template = '';
