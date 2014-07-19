@@ -195,6 +195,7 @@ sub engage_post_prepare_add_get {
 
   $self->render('website/engage-new');
 }
+
 sub engage_post_add_post {
   my $self = shift;
 
@@ -229,7 +230,9 @@ sub engage_post_add_post {
     return $self->redirect_to( 'supportengagetypeadd', type => $type );
   }
 
-  my %tags = map { sanitise_with_dashes( trim $_ ) => 1 } split /[ ,]+/, $tag_list;
+  my %tags = map  { $_ => 1 }
+             grep { $_ }
+             map  { sanitise_with_dashes( trim $_ ) } split /[ ,]+/, $tag_list;
 
   # ensure we have some at least one tag
   unless( keys %tags ) {
