@@ -3,7 +3,7 @@
 */
 
 /* fonts */
-@import url("//fonts.googleapis.com/css?family=Open+Sans:300,300italic,600");
+@import url("//fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic|Roboto Condensed:300,400");
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
@@ -113,14 +113,15 @@ body.modal-open,
 ** FONTS
 */
 body {
-  font-family:'Open Sans';
+  font-family:'Source Sans Pro';
   font-weight: 300;
   font-size: 16px;
   line-height: 24px;
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
-  font-family:'Open Sans';
+  font-family:'Roboto Condensed';
+  font-weight: 300;
 }
 
 p {
@@ -138,7 +139,8 @@ blockquote.title p {
 }
 
 .alert .alert-link {
-  font-weight: 600;
+  font-family: 'Roboto Condensed';
+  font-weight: 400;
 }
 
 
@@ -185,10 +187,12 @@ p.no-space {
 
 b,
 strong {
-  font-weight: 600;
+  font-family: 'Roboto Condensed';
+  font-weight: 400;
 }
 
 .page-title {
+  font-family 'Source Sans Pro';
   margin-bottom: 32px;
   text-align: center;
 }
@@ -214,7 +218,8 @@ blockquote p {
 .exception-title {
   font-size: 144px;
   line-height: 144px;
-  font-weight: 600;
+  font-family: 'Roboto Condensed';
+  font-weight: 400;
 }
 /*
 ** BUTTONS
@@ -1030,7 +1035,8 @@ blockquote p {
 .team-profile .username {
   margin: 0 0 4px 0;
   font-size: 12px;
-  font-weight: 600;
+  font-family: 'Roboto Condensed';
+  font-weight: 400;
   text-align: center;
 }
 
@@ -1430,7 +1436,8 @@ h4.step {
 }
 
 #site-map h4 {
-  font-weight: bold;
+  font-family: 'Roboto Condensed'
+  font-weight: 400;
 }
 
 #site-map a,
@@ -1470,7 +1477,8 @@ footer .copyright > a:hover,
 footer .copyright > a:active,
 footer .copyright > a:visited {
   color: #fff;
-  font-weight: 600;
+  font-family: 'Roboto Condensed'
+  font-weight: 400;
 }
 
 footer p {
@@ -1517,7 +1525,8 @@ footer a:visited {
   border-bottom: 1px solid #ddd;
 
   font-size: 16px;
-  font-weight: 600;
+  font-family: 'Roboto Condensed';
+  font-weight: 400;
 }
 
 .row-table > .row-entry {
@@ -1566,7 +1575,7 @@ footer a:visited {
   border: 0;
   background-color: inherit;
 
-  font-family:'Open Sans';
+  font-family:'Source Sans Pro';
   font-size: 14px;
 
   word-wrap: normal;
