@@ -122,7 +122,7 @@ sub register {
 
     my $t = TYPE_STATUS_MAP->{ $post->type };
 
-    my( $s ) = ( grep { $post->status ~~ @$_ } @$t );
+    my( $s ) = ( grep { $post->status eq $_->[1] } @$t );
 
     return 'unknown' unless defined $s;
 
@@ -186,7 +186,7 @@ sub register {
       }
 
       if( $self->engage_post_can_delete( $post ) ) {
-        push @caps, sprintf '<li><a href="%s/delete" class="text-left"><i class="fa fa-fwl fa-trash-o"></i> Delete</a></li>', $url;
+        push @caps, sprintf '<li><a href="%s/delete" class="engage-post-delete text-left"><i class="fa fa-fwl fa-trash-o"></i> Delete</a></li>', $url;
       }
     }
 

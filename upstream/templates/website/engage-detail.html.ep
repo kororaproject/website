@@ -220,7 +220,6 @@
       $("[id^=quote-]").each( function( i ) {
         $(this).on('click', function() {
           var id = '#reply-' + $(this).attr('id').substr(6);
-          console.log("quoting: " + id );
           var url = $(location).attr('pathname') + '/reply/' + $(this).attr('id').substr(6);
 
           $.get(url, function(data) {
@@ -239,8 +238,34 @@
           });
         });
       });
+      $("a.engage-post-delete").each( function( i ) {
+        $(this).on('click', function() {
+          $('#modalEngagePostDeleteUrl').attr('href', $(this).attr('href'));
+          $('#modalEngagePostDelete').modal('show');
+          return false;
+        });
+      });
     });
   </script>
 % }
+
+  <div class="modal fade" id="modalEngagePostDelete" tabindex="-1" role="dialog" aria-labelledby="modalEngagePostDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-responsive">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="modalEngagePostDeleteLabel">Engage - Delete Post</h4>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this post?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+          <a id="modalEngagePostDeleteUrl" href="#" class="btn btn-danger">Yes</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
