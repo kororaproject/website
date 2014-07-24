@@ -1477,7 +1477,7 @@ footer .copyright > a:hover,
 footer .copyright > a:active,
 footer .copyright > a:visited {
   color: #fff;
-  font-family: 'Roboto Condensed'
+  font-family: 'Roboto Condensed';
   font-weight: 400;
 }
 
