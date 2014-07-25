@@ -26,7 +26,6 @@ use base 'Canvas::Store';
 use Data::Dumper;
 use Digest::MD5 qw(md5);
 use POSIX qw(ceil);
-use Sort::Versions qw(versioncmp);
 
 #
 # MODEL DEFINITION
