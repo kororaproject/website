@@ -26,6 +26,7 @@ use base 'Canvas::Store';
 use Data::Dumper;
 use Digest::MD5 qw(md5);
 use POSIX qw(ceil);
+use Sort::Versions qw(versioncmp);
 
 #
 # MODEL DEFINITION
@@ -45,6 +46,8 @@ __PACKAGE__->has_a( author_id => 'Canvas::Store::User' );
 __PACKAGE__->has_many(post_tags => 'Canvas::Store::PostTag'   => 'post_id');
 __PACKAGE__->has_many(tags      => [ 'Canvas::Store::PostTag' => 'tag_id' ] );
 __PACKAGE__->has_many(meta      => 'Canvas::Store::PostMeta'  => 'post_id');
+
+__PACKAGE__->has_many(children  => [__PACKAGE__, 'parent_id']);
 
 #
 # INFLATOR/DEFLATORS
@@ -156,7 +159,6 @@ sub tag_list_array {
   return map { $_->name } shift->tags;
 }
 
-
 sub search_type_status_and_tags {
   my $self = shift;
   my %params = @_ > 1 ? @_ : ref $_[0] eq 'HASH' ? %{ $_[0] } : ();
@@ -195,7 +197,6 @@ sub search_type_status_and_tags {
     }
   }
 
-
   # build total count query
   my $raw_count_sql = 'SELECT COUNT(DISTINCT(p.id)) FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) WHERE (' . join( ') AND (', @filter ) . ')' ;
 
@@ -222,6 +223,35 @@ sub search_type_status_and_tags {
     page        => $page,
     page_last   => ceil($item_count / $page_size),
   }
+}
+
+#
+# DOCUMENT HELPERS
+#
+
+sub documentation_index() {
+  my $self = shift;
+  my $dbh = $self->db_Main();
+
+  # fetch the paginated items
+  my $sth = $dbh->prepare_cached("SELECT ho.meta_value AS ho, hd.meta_value, parent_id, name, title, id FROM canvas_post JOIN canvas_postmeta AS ho ON (ho.post_id=canvas_post.id AND ho.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=canvas_post.id AND hd.meta_key='hierarchy_depth') WHERE type='document' ORDER BY ho*1");
+  $sth->execute;
+
+  my $index = [];
+
+  while( my $row = $sth->fetchrow_arrayref ) {
+    push @{ $index }, {
+      order  => $row->[0],
+      depth  => $row->[1],
+      parent => $row->[2],
+      name   => $row->[3],
+      title  => $row->[4],
+      id     => $row->[5],
+    };
+  }
+  $sth->finish;
+
+  return $index;
 }
 
 #

@@ -49,6 +49,55 @@ use constant POST_STATUS_MAP => (
 # HELPERS
 #
 
+sub _tree {
+  my $t    = shift;
+  my $p_id = shift // 0;
+  my $depth = shift // 0;
+
+  my( @docs ) = Canvas::Store::Post->search({
+    type      => 'document',
+    parent_id => $p_id,
+  });
+
+  foreach my $d ( sort { $a->menu_order <=> $b->menu_order } @docs ) {
+    push @{ $t }, {
+      data => $d,
+      depth => $depth
+    };
+    _tree( $t, $d->id, $depth+1 );
+  }
+}
+
+
+sub rebuild_index() {
+  my $documents = [];
+
+  # recursively rebuild the doc index
+  _tree( $documents );
+
+  # update documenation metadata
+  my $order = 0;
+  Canvas::Store->do_transaction(sub {
+    for my $d ( @{ $documents } ) {
+      $order++;
+
+      my $do = Canvas::Store::PostMeta->find_or_create({
+        post_id     => $d->{data}->id,
+        meta_key    => 'hierarchy_order',
+      });
+      $do->meta_value( $order );
+      $do->update;
+
+      my $dd = Canvas::Store::PostMeta->find_or_create({
+        post_id     => $d->{data}->id,
+        meta_key    => 'hierarchy_depth',
+      });
+      $dd->meta_value( $d->{depth} );
+      $dd->update;
+    }
+  });
+}
+
 sub sanitise_with_dashes($) {
   my $stub = shift;
 
@@ -73,8 +122,29 @@ sub sanitise_with_dashes($) {
   return $stub;
 }
 
+sub list_parents_for_post {
+  my $selected = shift;
+
+  my $parents = [];
+
+  push @{ $parents }, [ ( defined $selected && $selected == 0 ) ?
+    ( "None", 0, 'selected', 'selected' ) :
+    ( "None", 0, )
+  ];
+
+  my $documents = Canvas::Store::Post->documentation_index;
+  foreach my $d ( @{ $documents } ) {
+    my $title = ( "-" x $d->{depth} ) . " " . $d->{title};
+    push @{ $parents }, [ ( defined $selected && $selected == $d->{id} ) ?
+      ( $title, $d->{id}, 'selected', 'selected' ) :
+      ( $title, $d->{id} )
+    ]
+  }
+
+  return $parents;
+}
+
 sub list_status_for_post {
-  my $type = shift;
   my $selected = shift;
 
   my $status = [];
@@ -97,25 +167,13 @@ sub list_status_for_post {
 sub index_get {
   my $self = shift;
 
-  my $pager = Canvas::Store::Post->pager(
-    where             => { type => 'document', status => 'publish' },
-    order_by          => 'menu_order, title',
-    entries_per_page  => 50,
-    current_page      => ( $self->param('page') // 1 ) - 1,
-  );
+  my $documents = Canvas::Store::Post->documentation_index;
 
-  my $documents = {
-    items       => [ $pager->search_where ],
-    item_count  => $pager->total_entries,
-    page_size   => $pager->entries_per_page,
-    page        => $pager->current_page + 1,
-    page_last   => ceil($pager->total_entries / $pager->entries_per_page),
-  };
-
-  $self->stash( documents => $documents);
+  $self->stash( documents => $documents );
 
   $self->render('website/document');
 }
+
 
 sub document_detail_get {
   my $self = shift;
@@ -138,7 +196,8 @@ sub document_add_get {
   return $self->redirect_to('/') unless $self->document_can_add;
 
   $self->stash(
-    statuses  => list_status_for_post( 'document', 'draft' )
+    statuses  => list_status_for_post( 'draft' ),
+    parents  => list_parents_for_post( 0 ),
   );
   $self->render('website/document-new');
 }
@@ -155,7 +214,8 @@ sub document_edit_get {
 
   $self->stash(
     document => $p,
-    statuses => list_status_for_post( $p->type, $p->status )
+    statuses => list_status_for_post( $p->status ),
+    parents  => list_parents_for_post( $p->parent_id ),
   );
 
   $self->render('website/document-edit');
@@ -184,15 +244,18 @@ sub document_add_post {
   my $p = Canvas::Store::Post->create({
     name       => $stub,
     type       => 'document',
-    menu_order => 0,
+    menu_order => $self->param('order'),
     status     => $self->param('status'),
     title      => $self->param('title'),
     excerpt    => $self->param('excerpt'),
     content    => $self->param('content'),
+    parent_id  => $self->param('parent'),
     author_id  => $self->auth_user->id,
     created    => $now,
     updated    => $now,
   });
+
+  rebuild_index();
 
   $self->redirect_to( 'supportdocumentationid', id => $stub );
 }
@@ -215,6 +278,8 @@ sub document_edit_post {
   $p->content( $self->param('content') );
   $p->excerpt( $self->param('excerpt') );
   $p->status( $self->param('status') );
+  $p->parent_id( $self->param('parent') );
+  $p->menu_order( $self->param('order') );
 
   # update author if changed
   if( $self->param('author') ne $p->author_id->username ) {
@@ -234,6 +299,8 @@ sub document_edit_post {
 
   # commit the updates
   $p->update;
+
+  rebuild_index();
 
   $self->redirect_to( 'supportdocumentationid', id => $stub );
 }

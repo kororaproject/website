@@ -43,21 +43,15 @@
         </ul>
       </div>
       <div class="col-sm-2">
-        <div class="pull-right">
-          <a href="http://creativecommons.org/licenses/by-sa/4.0/" class="cc-by-sa"></a>
-          <p class="text-right">All published content is licensed under the CC&#8209;BY&#8209;SA 4.0 International license.</p>
-        </div>
       </div>
     </div>
     <div class="row">
-      <div class="col-xs-6 col-sm-8">
+      <div class="col-md-6">
         <p class="copyright">Derived from  <a href="http://www.fedoraproject.org">Fedora</a> | Powered by  <a href="http://en.wiktionary.org/wiki/freedom">Freedom</a>, <a href="http://en.wiktionary.org/wiki/dedication">Dedication</a> and the pursuit of <a href="http://en.wiktionary.org/wiki/perfection">Perfection</a></p>
       </div>
-      <div class="col-xs-6 col-sm-3 col-sm-offset-1">
-        <div id="social">
-          <a href="https://plus.google.com/+KororaProjectOrg"><img class="img-bumper" src="/img/social-google.png" alt="Google+"></a>
-          <a href="https://www.facebook.com/kororaproject"><img class="img-bumper" src="/img/social-facebook.png" alt="Facebook"></a>
-          <a href="https://twitter.com/kororaproject"><img class="img-bumper" src="/img/social-twitter.png" alt="Twitter"></a>
+      <div class="col-md-6">
+        <div class="pull-right">
+          <p class="copyright text-right">All published content is licensed under the CC&#8209;BY&#8209;SA 4.0 International license. <a href="http://creativecommons.org/licenses/by-sa/4.0/"><img src="/img/cc-by-sa-logo.png" class="cc-by-sa"></img></a></p>
         </div>
       </div>
     </div>

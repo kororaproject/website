@@ -67,6 +67,17 @@
               <input type="text" name="created" class="form-control" value="<%= $document->created->strftime('%d/%m/%Y %H:%M:%S') %>">
             </div>
           </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div class="col-sm-6">
+              <h2>Parent Page</h2>
+              %= select_field parent => $parents, class => "form-control"
+            </div>
+            <div class="col-sm-3">
+              <h2>Order</h2>
+              <input type="text" name="order" class="form-control" value="<%= $document->menu_order%>">
+            </div>
+          </div>
           <div class="hr hr-sm"></div>
           <div class="row">
             <div class="col-sm-12">

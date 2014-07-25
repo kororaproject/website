@@ -32,9 +32,10 @@
 
         <div class="row">
           <div class="col-sm-12">
-% if( @{ $documents->{items} } ) {
-  % foreach my $n ( @{ $documents->{items} } ) {
-            <p><a href="<%= url_for_path(0, $n->name) %>"><h3><%= $n->title %></h3></a></p>
+% if( @{ $documents } ) {
+%   foreach my $n ( @{ $documents } ) {
+<p class="documentation-index documentation-level-<%= $n->{depth} %>"><a href="<%= url_for_path(0, $n->{name}) %>"><%= $n->{title} %></a></p>
+
 %   }
 % } else {
             <p>Documentation to sink your teeth into will be along shortly.</p>
