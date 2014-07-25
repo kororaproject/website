@@ -234,7 +234,7 @@ sub documentation_index() {
   my $dbh = $self->db_Main();
 
   # fetch the paginated items
-  my $sth = $dbh->prepare_cached("SELECT ho.meta_value AS ho, hd.meta_value, parent_id, name, title, id FROM canvas_post JOIN canvas_postmeta AS ho ON (ho.post_id=canvas_post.id AND ho.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=canvas_post.id AND hd.meta_key='hierarchy_depth') WHERE type='document' ORDER BY ho*1");
+  my $sth = $dbh->prepare_cached("SELECT ho.meta_value AS ho, hd.meta_value, parent_id, name, title, id FROM canvas_post JOIN canvas_postmeta AS ho ON (ho.post_id=canvas_post.id AND ho.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=canvas_post.id AND hd.meta_key='hierarchy_depth') WHERE type='document' AND status='publish' ORDER BY ho*1");
   $sth->execute;
 
   my $index = [];
