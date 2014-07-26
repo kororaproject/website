@@ -25,6 +25,7 @@ use strict;
 #
 use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
+use Mojo::Util qw(trim);
 use POSIX qw(ceil);
 use Time::Piece;
 
@@ -255,6 +256,24 @@ sub document_add_post {
     updated    => $now,
   });
 
+  my $tag_list  = trim $self->param('tags');
+  my %tags = map  { $_ => 1 }
+             grep { $_ }
+             map  { sanitise_with_dashes( trim $_ ) } split /[ ,]+/, $tag_list;
+
+  Canvas::Store->do_transaction( sub {
+    # create the tags
+    foreach my $tag ( keys %tags ) {
+      $tag = trim $tag;
+      my $t  = Canvas::Store::Tag->find_or_create({ name => $tag });
+      my $pt = Canvas::Store::PostTag->find_or_create({
+        post_id => $p->id,
+        tag_id  => $t->id
+      });
+    }
+  });
+
+
   rebuild_index();
 
   $self->redirect_to( 'supportdocumentationid', id => $stub );
@@ -297,8 +316,28 @@ sub document_edit_post {
     $p->created( $t );
   }
 
-  # commit the updates
-  $p->update;
+  Canvas::Store->do_transaction( sub {
+    $p->update;
+
+    # find tags to add and remove
+    my @tags_old = $p->tag_list_array;
+    my @tags_new = map { sanitise_with_dashes( trim $_ ) } split /[ ,]+/, $self->param('tags');
+
+    my %to = map { $_ => 1 } @tags_old;
+    my %tn = map { $_ => 1 } @tags_new;
+
+    # add tags
+    foreach my $ta ( grep( ! defined $to{$_}, @tags_new ) ) {
+      my $t  = Canvas::Store::Tag->find_or_create({ name => $ta });
+      my $pt = Canvas::Store::PostTag->find_or_create({ post_id => $p->id, tag_id => $t->id })
+    }
+
+    # remove tags
+    foreach my $td ( grep( ! defined $tn{$_}, @tags_old ) ) {
+      my $t  = Canvas::Store::Tag->search({ name => $td })->first;
+      Canvas::Store::PostTag->search({ post_id => $p->id, tag_id => $t->id })->first->delete;
+    }
+  });
 
   rebuild_index();
 

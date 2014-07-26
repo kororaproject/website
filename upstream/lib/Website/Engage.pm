@@ -390,11 +390,11 @@ sub engage_post_edit_post {
   my $content= $self->param('content');
   my $status = $self->param('status');
 
+  $p->status( $status );
+  $p->title( $title ) if length trim $title;
+  $p->content( $content ) if length trim $content;
 
   Canvas::Store->do_transaction( sub {
-    $p->status( $status );
-    $p->title( $title ) if length trim $title;
-    $p->content( $content ) if length trim $content;
     $p->update;
 
     # find tags to add and remove
