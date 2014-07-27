@@ -37,32 +37,32 @@
             <p>Without our dedicated core team which work very hard, Korora would not exist. Thank you!</p>
 
             <div class="row">
-              <div class="col-sm-4 team-profile">
+              <div class="col-sm-3 team-profile">
                 <img src="/img/avatars/csmart.jpg" class="avatar" alt="Chris Smart">
                 <h1 class="realname">Chris Smart</h1>
                 <h2 class="username">csmart</h2>
                 <p class="description">Founder and lead developer</p>
                 <p class="year">2005</p>
               </div>
-              <div class="col-sm-4 team-profile">
+              <div class="col-sm-3 team-profile">
                 <img src="/img/avatars/firnsy.jpg" class="avatar" alt="Ian Firns">
                 <h1 class="realname">Ian Firns</h1>
                 <h2 class="username">firnsy</h2>
                 <p class="description">Lead developer</p>
                 <p class="year">2010</p>
               </div>
-              <div class="col-sm-4 team-profile">
+              <div class="col-sm-3 team-profile">
                 <img src="/img/avatars/ozjd.jpg" class="avatar" alt="Jim Dean">
                 <h1 class="realname">Jim Dean</h1>
                 <h2 class="username">ozjd</h2>
                 <p class="description">Tester and support administrator</p>
                 <p class="year">2011</p>
               </div>
-              <div class="col-sm-4 team-profile">
+              <div class="col-sm-3 team-profile">
                 <img src="/img/avatars/darkera.jpg" class="avatar" alt="Jim Dean">
                 <h1 class="realname">Maik Adamietz</h1>
                 <h2 class="username">DarkEra</h2>
-                <p class="description">Xfce desktop support, testing</p>
+                <p class="description">Tester and Xfce desktop support</p>
                 <p class="year">2013</p>
               </div>
             </ul>
