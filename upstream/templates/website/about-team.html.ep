@@ -58,12 +58,19 @@
                 <p class="description">Tester and support administrator</p>
                 <p class="year">2011</p>
               </div>
+              <div class="col-sm-4 team-profile">
+                <img src="/img/avatars/darkera.jpg" class="avatar" alt="Jim Dean">
+                <h1 class="realname">Maik Adamietz</h1>
+                <h2 class="username">DarkEra</h2>
+                <p class="description">Xfce desktop support, testing</p>
+                <p class="year">2013</p>
+              </div>
             </ul>
             </div>
             <h2>Active contributors</h2>
             <p>We would like to specifically recognise the following developers and community members for their contributions to the Korora Project.</p>
             <ul>
-              <li>Maik Adamietz (DarkEra) – Xfce desktop (2013)</li>
+              <li>Larry Cafiero (lcafiero) – Testing, documentation and evangelism (2014)</li>
             </ul>
             <h2>Former contributors</h2>
             <p>Some have stopped by only briefly but have made significant contributions and we would like to recognise them also.</p>
