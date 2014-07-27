@@ -133,7 +133,7 @@ sub list_parents_for_post {
     ( "None", 0, )
   ];
 
-  my $documents = Canvas::Store::Post->documentation_index;
+  my $documents = Canvas::Store::Post->documentation_index( all => 1 );
   foreach my $d ( @{ $documents } ) {
     my $title = ( "-" x $d->{depth} ) . " " . $d->{title};
     push @{ $parents }, [ ( defined $selected && $selected == $d->{id} ) ?
