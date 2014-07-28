@@ -3,10 +3,14 @@
 <head>
   %= include 'header.inc', title => 'Korora Project'
 
+  <meta property="og:title" content="<%= $post->title %>"/>
+  <meta property="og:image" content="/img/kp-button-128.png"/>
+  <meta property="og:description" content="<%= $post->excerpt %>"/>
+
   <!-- RSS -->
   <link rel="alternate" type="application/rss+xml" title="Korora Project - News" href="/news/rss">
 </head>
-<body>
+<body itemscope itemtype="http://schema.org/Article">
   %= include 'noscript.inc'
 
   <div class="page-container">
@@ -31,22 +35,23 @@
               <li><a href="/about/news">News</a></li>
               <li class="active"><%= $post->title %></li>
             </ol>
-            <h1><%= $post->title %></h1>
+            <h1 itemprop="name"><%= $post->title %></h1>
             <div class="news-detail-subtitle">
               <div class="news-detail-subtitle-metadata">
                 <%== post_gravatar( $post, 32 ) %>
               </div>
               <div class="news-detail-subtitle-metadata">
                 <p>written on <%= $post->created->strftime('%e %B %Y') %></p>
-                <p>by <%= $post->author_id->username %></p>
+                <p>by <span itemprop="author"><%= $post->author_id->username %></span></p>
               </div>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
-
+            <div itemprop="description">
 %== render_markdown( $post->excerpt );
+            </div>
 %== render_markdown( $post->content );
 
           </div>
