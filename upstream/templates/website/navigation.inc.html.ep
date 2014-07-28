@@ -8,7 +8,7 @@
       </button>
       <a href="/" class="navbar-brand">
         <div class="kp-logo-48">
-          <h1 class="title">KORORA<span class="title-dark">PROJECT</span></h1>
+          <h1 class="title">KORORA<span class="title-dark hidden-xxs">PROJECT</span></h1>
         </div>
       </a>
     </div>

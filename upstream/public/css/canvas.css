@@ -447,10 +447,10 @@ blockquote p {
   min-width: 48px;
   padding-left: 48px;
 
-  background-image: url('/img/kp-logo.png');
-  background-size: 40px 40px;
+  background-image: url('/img/kp-logo-32.png');
+  background-size: 32px 32px;
   background-repeat: no-repeat;
-  background-position: 4px center;
+  background-position: 8px center;
 }
 
 .canvas-logo {
@@ -805,6 +805,7 @@ blockquote p {
   -moz-border-radius: 2px 2px 0 0;
   -webkit-border-radius: 2px 2px 0 0;
   border-radius: 2px 2px 0 0;
+  font-family: "Roboto Condensed";
 }
 
 .nav-tabs li.secondary-nav {
@@ -852,6 +853,7 @@ blockquote p {
 
 .navbar-default .navbar-nav>li>a {
   color: #fff;
+  font-family: "Roboto Condensed";
   text-shadow: 1px 1px 2px rgba(0, 0, 0, .6);
 }
 
@@ -938,12 +940,13 @@ blockquote p {
 
 #register > a,
 #register > button {
-  width: 64px;
-  padding: 4px;
-
-  text-transform: uppercase;
+  font-family: "Roboto Condensed";
+  font-weight: 300;
   font-size: 10px;
   line-height: 16px;
+  padding: 5px 4px 3px;
+  text-transform: uppercase;
+  width: 64px;
 }
 
 #korobar {
@@ -1638,6 +1641,19 @@ footer a:visited {
 
 .forum-title {
   margin: 4px 0;
+}
+
+/* xxs - explicit */
+@media all and (max-width: 320px) {
+  .hidden-xxxs {
+    display: none!important;
+  }
+}
+
+@media all and (max-width: 480px) {
+  .hidden-xxs {
+    display: none!important;
+  }
 }
 
 /* xs - explicit */
