@@ -58,13 +58,15 @@ use constant {
 sub startup {
   my $self = shift;
 
-  $self->secret('canvas');
-
   #
   # CONFIGURATION
   my $config = $self->plugin('JSONConfig' => {
     file => './canvas.conf',
   });
+
+  # set the secret
+  die "Ensure secrets are specified in config." unless ref $config->{secret} eq 'ARRAY';
+  $self->secrets( $config->{secret} );
 
   #
   # HYPNOTOAD

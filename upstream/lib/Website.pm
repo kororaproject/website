@@ -65,7 +65,8 @@ sub startup {
   });
 
   # set the secret
-  $self->secret( $config->{secret} // 'website');
+  die "Ensure secrets are specified in config." unless ref $config->{secret} eq 'ARRAY';
+  $self->secrets( $config->{secret} );
 
   #
   # HYPNOTOAD
