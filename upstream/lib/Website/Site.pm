@@ -112,7 +112,7 @@ sub deauthenticate_any {
 
   $self->logout;
 
-  return $self->render( status => 200, json => 'Done!' ) if $self->stash('format') eq 'json';
+  return $self->render( status => 200, json => 'Done!' ) if $self->stash('format') // '' eq 'json';
 
   # extract the redirect url and fall back to the index
   my $url = $self->param('redirect_to') // '/';
