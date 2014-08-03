@@ -60,7 +60,7 @@ sub _tree {
     parent_id => $p_id,
   });
 
-  foreach my $d ( sort { $a->menu_order <=> $b->menu_order } @docs ) {
+  foreach my $d ( sort { $a->menu_order <=> $b->menu_order or $a->title cmp $b->title } @docs ) {
     push @{ $t }, {
       data => $d,
       depth => $depth
