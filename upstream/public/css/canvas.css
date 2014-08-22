@@ -1779,7 +1779,6 @@ footer a:visited {
   opacity:0;
 }
 
-
 .ng-hide {
   position: absolute;
   top: -9999px;
@@ -1787,5 +1786,12 @@ footer a:visited {
   display: block!important;
 }
 
-
+.anchor:before {
+  content: '';
+  display: block;
+  position: relative;
+  width: 0;
+  height: 64px;
+  margin-top: -64px;
+}
 
