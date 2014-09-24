@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # Copyright (C) 2013    Ian Firns   <firnsy@kororaproject.org>
 #                       Chris Smart <csmart@kororaproject.org>
@@ -18,13 +18,16 @@
 #
 
 import argparse
+import dnf
 import getpass
 import json
 import optparse
 import os
 import signal
 import sys
-import yum
+
+# TODO: REMOVE
+sys.path.append('./lib-python')
 
 
 from Canvas import CanvasService
@@ -231,7 +234,7 @@ def main():
           print('Templates:')
 
           for t in tl:
-            print('  - %s (%s)' % ( t['name'], t['owner'] ))
+            print('  - %s (%s)' % ( t['name'], t['user'] ))
 
           print
           print('%d template(s) found.' % ( len(tl) ))
@@ -246,17 +249,25 @@ def main():
       if args.system:
         print('Adding current system packages to template ...')
 
-        yb = yum.YumBase()
+        db = dnf.Base()
+        db.read_all_repos()
+        db.read_comps()
+        try:
+          db.fill_sack()
+        except OSError as e:
+          pass
 
-        pkgs = yb.rpmdb.returnPackages()
+        db_query = db.sack.query()
+
+        pkgs = db_query.installed()
 
         for p in pkgs:
-          _yd = p.yumdb_info
-          if _yd.get('reason') == 'user':
-            pl.add( Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch, action=1) )
+#          _yd = p.yumdb_info
+#          if _yd.get('reason') == 'user':
+          pl.add( Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch, action=1) )
 
 
-        rl = RepositoryList( yb.repos.listEnabled() )
+        rl = RepositoryList( db.repos.enabled() )
 
         t.setPackageList( pl )
         t.setRepositoryList( rl )
@@ -327,10 +338,17 @@ def main():
         # calculate existing system specs
         t_system = Template()
 
-        yb = yum.YumBase()
-        yb.conf.cache = os.geteuid() != 0
+        db = dnf.Base()
+        db.conf.cache = os.geteuid() != 0
+        db.read_all_repos()
+        db.read_comps()
+        try:
+          db.fill_sack()
+        except OSError as e:
+          pass
 
-        pkgs = yb.rpmdb.returnPackages()
+        db_query = db.sack.query()
+        pkgs = db_query.installed()
         pl = PackageList()
 
         count_package_installs = 0
@@ -340,31 +358,31 @@ def main():
 
         # loop through packages on system and compare to template
         for p in pkgs:
-          _yd = p.yumdb_info
-          if _yd.get('reason') == 'user':
-            # action set to 1 indicating to be installed
-            _p = Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch)
+        #  _yd = p.yumdb_info
+        #  if _yd.get('reason') == 'user':
+          # action set to 1 indicating to be installed
+          _p = Package( name=p.name, epoch=p.epoch, version=p.version, release=p.release, arch=p.arch)
 
-            found = False
+          found = False
 
-            # look for packages in template to apply and on the system
-            for tp in t_apply.getPackageList().packages():
-              if p.name != tp.name:
-                continue
+          # look for packages in template to apply and on the system
+          for tp in t_apply.getPackageList().packages():
+            if p.name != tp.name:
+              continue
 
-              found = True
+            found = True
 
-              # template indicates explicit removal
-              if tp.actionUninstall():
-                print('  - Remove ' + str(tp))
-                yb.remove( name=tp.name )
-                count_package_removals +=1
+            # template indicates explicit removal
+            if tp.actionUninstall():
+              print('  - Remove ' + str(tp))
+              yb.remove( name=tp.name )
+              count_package_removals +=1
 
-            # package on system, installed by user, was not found in template
-            if not found and args.merge_clean:
-              print('  - Remove ' + str(_p))
-              yb.remove( name=p.name )
-              count_package_removals += 1
+          # package on system, installed by user, was not found in template
+          if not found and args.merge_clean:
+            print('  - Remove ' + str(_p))
+            yb.remove( name=p.name )
+            count_package_removals += 1
 
         # loop through packages in template that are not in the system
         for tp in t_apply.getPackageList().packages():

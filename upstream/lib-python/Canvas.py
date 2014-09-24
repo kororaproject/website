@@ -17,14 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import cookielib
-import urllib
-import urllib2
-import yum
+import dnf
+import http.cookiejar
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 from json import dumps as json_encode
 from json import loads as json_decode
-from urlgrabber.progress import TextMeter
 
 #
 # CONSTANTS
@@ -73,18 +72,18 @@ class Template(object):
         self._user = template['account']
 
       if 'description' in template:
-        self._name = template['description']
+        self._description = template['description']
 
-      if 'r' in template:
-        if isinstance(template['r'], list):
-          for r in template['r']:
+      if 'repos' in template:
+        if isinstance(template['repos'], list):
+          for r in template['repos']:
             _r = Repository()
             _r.fromObject(r)
             self._repo_list.add( _r )
 
-      if 'p' in template:
-        if isinstance(template['p'], list):
-          for p in template['p']:
+      if 'packages' in template:
+        if isinstance(template['packages'], list):
+          for p in template['packages']:
             _p = Package()
             _p.fromObject(p)
             self._package_list.add( _p )
@@ -132,10 +131,10 @@ class Template(object):
     self._repo_list = repo_list
 
   def toObject(self):
-    return { 'n': self._name,
-             'u': self._user,
-             'r': self._repo_list.toObject(),
-             'p': self._package_list.toObject() }
+    return { 'name': self._name,
+             'user': self._user,
+             'repos': self._repo_list.toObject(),
+             'packages': self._package_list.toObject() }
 
   def toJSON(self):
     return json_encode( self.toObject(), separators=(',',':') )
@@ -339,8 +338,7 @@ class RepositoryList(object):
 
   def _parse_repos(self, repos ):
     for r in repos:
-      if isinstance(r, yum.yumRepo.YumRepository):
-        self._repos.append( Repository( r.id, r.name, r.baseurl, r.mirrorlist, r.metalink, r.enabled, r.gpgkey, r.gpgcheck, r.metadata_expire, r.cost, r.exclude ) )
+      self._repos.append( Repository( r.id, r.name, r.baseurl, r.mirrorlist, r.metalink, r.enabled, r.gpgkey, r.gpgcheck, r.metadata_expire, r.cost, r.exclude ) )
 
   def add(self, repo):
     if not isinstance( repo, Repository ):
@@ -363,31 +361,31 @@ class CanvasService(object):
     self._host = host
     self._urlbase = host
 
-    self._cookiejar = cookielib.CookieJar()
-    self._opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self._cookiejar))
+    self._cookiejar = http.cookiejar.CookieJar()
+    self._opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self._cookiejar))
 
     self._authenticated = False
 
   def authenticate(self, username='', password='', force=False):
 
-    print('Authenticating to %s' % ( self._urlbase ))
+    print(('Authenticating to %s' % ( self._urlbase )))
 
     if self._authenticated and not self._force:
       return self._authenticated
 
-    auth = json_encode( { 'u': username, 'p': password }, separators=(',',':') )
+    auth = json_encode( { 'u': username, 'p': password }, separators=(',',':') ).encode('utf-8')
 
     self._authenticated = False
 
     try:
-      r = urllib2.Request(self._urlbase + '/authenticate.json', auth)
+      r = urllib.request.Request(self._urlbase + '/authenticate.json', auth)
       u = self._opener.open(r)
       self._authenticated = True
 
-    except urllib2.URLError, e:
-      print e
-    except urllib2.HTTPError, e:
-      print e
+    except urllib.error.URLError as e:
+      print(e)
+    except urllib.error.HTTPError as e:
+      print(e)
 
     return self._authenticated
 
@@ -396,13 +394,13 @@ class CanvasService(object):
       return self._authenticated
 
     try:
-      r = urllib2.Request('%s/deauthenticate.json' % ( self._urlbase ))
+      r = urllib.request.Request('%s/deauthenticate.json' % ( self._urlbase ))
       u = self._opener.open(r)
 
-    except urllib2.URLError, e:
-      print e
-    except urllib2.HTTPError, e:
-      print e
+    except urllib.error.URLError as e:
+      print(e)
+    except urllib.error.HTTPError as e:
+      print(e)
 
     #
     self._authenticated = False
@@ -416,16 +414,16 @@ class CanvasService(object):
       TypeError('template is not of type Template')
 
     try:
-      r = urllib2.Request('%s/api/templates.json' % ( self._urlbase ), template.toJSON())
+      r = urllib.request.Request('%s/api/templates.json' % ( self._urlbase ), template.toJSON().encode('utf-8'))
       u = self._opener.open(r)
-      print u.read()
+      print(( u.read() ))
 
       return True
 
-    except urllib2.URLError, e:
-      print e
-    except urllib2.HTTPError, e:
-      print e
+    except urllib.error.URLError as e:
+      print(e)
+    except urllib.error.HTTPError as e:
+      print(e)
 
     return False
 
@@ -433,17 +431,17 @@ class CanvasService(object):
   def template_delete(self, template_id):
 
     try:
-      r = urllib2.Request('%s/api/template/%d.json' % ( self._urlbase, template_id ))
+      r = urllib.request.Request('%s/api/template/%d.json' % ( self._urlbase, template_id ))
       r.get_method = lambda: 'DELETE'
       u = self._opener.open(r)
-      o = json_decode( u.read() )
+      o = json_decode( u.read().decode('utf-8') )
 
       return True
 
-    except urllib2.URLError, e:
-      print e
-    except urllib2.HTTPError, e:
-      print e
+    except urllib.error.URLError as e:
+      print(e)
+    except urllib.error.HTTPError as e:
+      print(e)
 
     return False
 
@@ -454,17 +452,17 @@ class CanvasService(object):
       TypeError('template is not of type Template')
 
     try:
-      r = urllib2.Request('%s/api/templates.json' % ( self._urlbase ), template.toJSON())
+      r = urllib.request.Request('%s/api/templates.json' % ( self._urlbase ), template.toJSON())
       r.get_method = lambda: 'PUT'
       u = self._opener.open(r)
-      print u.read()
+      print(( u.read() ))
 
       return True
 
-    except urllib2.URLError, e:
-      print e
-    except urllib2.HTTPError, e:
-      print e
+    except urllib.error.URLError as e:
+      print(e)
+    except urllib.error.HTTPError as e:
+      print(e)
 
     return False
 
@@ -476,22 +474,22 @@ class CanvasService(object):
 
     query = { 'account': template.user, 'name': template.name }
     try:
-      r = urllib2.Request('%s/api/templates.json?%s' % ( self._urlbase, urllib.urlencode(query) ))
+      r = urllib.request.Request('%s/api/templates.json?%s' % ( self._urlbase, urllib.parse.urlencode(query) ))
       u = self._opener.open(r)
 
-      template_summary = json_decode( u.read() )
+      template_summary = json_decode( u.read().decode('utf-8') )
 
       if len( template_summary ):
         # we only have one returned since template names are unique per account
-        r = urllib2.Request('%s/api/template/%d.json' % ( self._urlbase, template_summary[0]['id'] ))
+        r = urllib.request.Request('%s/api/template/%d.json' % ( self._urlbase, template_summary[0]['id'] ))
         u = self._opener.open(r)
 
-        return Template( template=json_decode( u.read() ) )
+        return Template( template=json_decode( u.read().decode('utf-8') ) )
 
-    except urllib2.URLError, e:
-      print e
-    except urllib2.HTTPError, e:
-      print e
+    except urllib.error.URLError as e:
+      print(e)
+    except urllib.error.HTTPError as e:
+      print(e)
 
     return None
 
@@ -499,15 +497,15 @@ class CanvasService(object):
     """ Check if the korora template exists
     """
     try:
-      r = urllib2.Request('%s/api/templates.json' % ( self._urlbase ))
+      r = urllib.request.Request('%s/api/templates.json' % ( self._urlbase ))
       u = self._opener.open(r)
 
-      return json_decode( u.read() )
+      return json_decode( u.read().decode('utf-8') )
 
-    except urllib2.URLError, e:
-      print e
-    except urllib2.HTTPError, e:
-      print e
+    except urllib.error.URLError as e:
+      print(e)
+    except urllib.error.HTTPError as e:
+      print(e)
 
     return []
 
@@ -525,10 +523,10 @@ class CanvasService(object):
       query['s'] = stub
 
     try:
-      r = urllib2.Request('%s/api/repositories.json?%s' % ( self._urlbase, urllib.urlencode(query) ))
+      r = urllib.request.Request('%s/api/repositories.json?%s' % ( self._urlbase, urllib.parse.urlencode(query) ))
       u = self._opener.open(r)
 
-      repo_summary = json_decode( u.read() )
+      repo_summary = json_decode( u.read().decode('utf-8') )
 
       if len( repo_summary ):
         query = {}
@@ -541,17 +539,17 @@ class CanvasService(object):
         if url is not None:
           query['u'] = url
 
-        r = urllib2.Request('%s/api/repository/%d.json?%s' % ( self._urlbase, repo_summary[0]['id'], urllib.urlencode(query) ))
+        r = urllib.request.Request('%s/api/repository/%d.json?%s' % ( self._urlbase, repo_summary[0]['id'], urllib.parse.urlencode(query) ))
         u = self._opener.open(r)
 
         repo = Repository()
-        repo.fromObject( json_decode( u.read() ) )
+        repo.fromObject( json_decode( u.read().decode('utf-8') ) )
 
         return repo
 
-    except urllib2.URLError, e:
-      print e
-    except urllib2.HTTPError, e:
-      print e
+    except urllib.error.URLError as e:
+      print(e)
+    except urllib.error.HTTPError as e:
+      print(e)
 
     return None
