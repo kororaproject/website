@@ -21,6 +21,8 @@ package Canvas::Template;
 # PERL INCLUDES
 #
 use Data::Dumper;
+use Mango;
+use Mango::BSON;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::JSON qw(j);
 use Mojo::Util qw(trim);
@@ -29,8 +31,6 @@ use Time::Piece;
 #
 # LOCAL INCLUDES
 #
-use Canvas::Store::Template;
-use Canvas::Store::Tag;
 use Canvas::Store::User;
 
 #
@@ -40,12 +40,22 @@ use Canvas::Store::User;
 sub index_get {
   my $self = shift;
 
-  my $cache = Canvas::Store::Template->search_paged(
-    page_size => 20,
-    page      => $self->param('page'),
-  );
+  my $mango = Mango->new('mongodb://localhost:27017');
+  my $collection = $mango->db('canvas')->collection('templates');
+
+  # find or create new template
+  my $tc = $collection->find( {}, {
+    name => 1,
+    stub => 1,
+    user => 1,
+  });
+
+  my $total = $tc->count;
+
+  my $cache = $tc->all;
 
   $self->stash(
+    total => $total,
     responses => $cache,
   );
 
@@ -59,51 +69,23 @@ sub detail_get {
 
   return $self->redirect_to('/templates') unless $user;
 
-  my $template = Canvas::Store::Template->search( {
-    user_id => $user->id,
-    stub    => $self->param('name'),
-  })->first;
+  my $mango = Mango->new('mongodb://localhost:27017');
+  my $collection = $mango->db('canvas')->collection('templates');
+
+  # find or create new template
+  my $template = $collection->find_one({
+    user => $user->username,
+    stub => $self->param('name')
+  });
 
   return $self->redirect_to('/templates') unless $template;
 
   # TODO: ensure we have visibility rights
 
-  my $p = [];
-  my $r = [];
-
-  my @packages     = $template->template_packages;
-  my @repositories = $template->template_repositories;
-
-  foreach my $package    ( $template->template_packages     ) {
-    push @{ $p }, {
-      n => $package->name,
-      e => $package->epoch,
-      v => $package->version,
-      r => $package->rel,
-      a => $package->arch,
-      x => $package->action,
-    };
-  }
-
-  foreach my $repository ( $template->template_repositories ) {
-    push @{ $r }, {
-      n => $repository->name,
-      s => $repository->stub,
-      c => $repository->cost,
-    };
-  }
-
-  my $canvas = j({
-    template => {
-      details      => "",
-      packages     => $p,
-      repositories => $r,
-    }
-  });
-
+  #$template->{_id} = $template->{_id}->to_string;
   $self->stash(
-    details => $template,
-    canvas  => $canvas,
+    canvas      => $template,
+    canvas_json => j($template),
   );
 
   $self->render('canvas/template-detail');

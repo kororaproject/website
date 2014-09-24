@@ -5,7 +5,7 @@
   <link href="/css/layerslider.css" rel="stylesheet" media="screen">
 
   <script>
-    window.kp = <%== $canvas // {} %>;
+    window.kp = { template: <%== $canvas_json // {} %> }
   </script>
 </head>
 <body>
@@ -29,10 +29,10 @@
               </div>
               <li><a href="/">Home</a></li>
               <li><a href="/templates">Templates</a></li>
-              <li><a href="/template/<%= $details->user_id->username %>"><%= $details->user_id->username %></a></li>
-              <li class="active"><%= $details->name %></li>
+              <li><a href="/template/<%= $user %>"><%= $user %></a></li>
+              <li class="active"><%= $canvas->{name} %></li>
             </ol>
-            <h1 class="page-title"><%= $details->name %></h1>
+            <h1 class="page-title"><%= $canvas->{name} %></h1>
           </div>
         </div>
 
@@ -85,7 +85,7 @@
                     <div class="col-sm-1">
                     </div>
                   </div>
-                  <div class="row row-entry" ng-repeat="r in data.repositories.$orderBy( 'n', true)">
+                  <div class="row row-entry" ng-repeat="r in data.repos.$orderBy( 'n', true)">
                     <div class="col-sm-9">
                       <span>{{ r.n }}</span>
                     </div>

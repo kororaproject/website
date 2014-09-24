@@ -706,7 +706,7 @@ function TemplateController($scope) {
   $scope.orderReverse = true;
   $scope.pageSize = 10;
   $scope.page = 0;
-  $scope.pages = Math.floor( $scope.data.repositories.length / $scope.pageSize );
+  $scope.pages = Math.floor( $scope.data.repos.length / $scope.pageSize );
 
 
 };

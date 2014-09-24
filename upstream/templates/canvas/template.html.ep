@@ -30,7 +30,7 @@
           </div>
         </div>
 
-% if( $responses->{item_count} > $responses->{page_size} ) {
+% if( $total > 10 ) {
         <!-- PAGINATION -->
         <div class="row">
           <div class="col-sm-12 text-center">
@@ -42,20 +42,20 @@
         <div class="hr"></div>
 
         <div class="row">
-% foreach my $t ( @{ $responses->{items} } ) {
+% foreach my $t ( @{ $responses} ) {
           <div class="col-sm-4">
             <div class="callout callout-default callout-hover">
-              <a href="/template/<%= $t->user_id->username %>/<%= $t->stub %>">
-                <h4 class="title" title="<%= $t->name %>"><%= $t->name %></h4>
+              <a href="/template/<%= $t->{user} %>/<%= $t->{stub} %>">
+                <h4 class="title" title="<%= $t->{name} %>"><%= $t->{name} %></h4>
               </a>
-              <p class="subtitle">by <%= $t->user_id->username %></p>
+              <p class="subtitle">by <%= $t->{user} %></p>
             </div>
           </div>
 % }
         </div>
         <div class="hr"></div>
 
-% if( $responses->{item_count} > $responses->{page_size} ) {
+% if( $total > 10 ) {
         <!-- PAGINATION -->
         <div class="row">
           <div class="col-sm-12 text-center">

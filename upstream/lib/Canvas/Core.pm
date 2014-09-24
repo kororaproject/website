@@ -25,6 +25,10 @@ use Mojo::Base 'Mojolicious::Controller';
 #
 # PERL INCLUDES
 #
+use Mango;
+use Mojo::Util qw(dumper);
+
+
 use Time::Piece;
 
 #
@@ -65,24 +69,27 @@ sub authenticate_any {
   my $user = $self->param('u') // $data->{u} // '';
   my $pass = $self->param('p') // $data->{p} // '';
 
+  my $format = $self->stash('format') // '';
+
   # extract the redirect url and fall back to the index
   my $url = $self->param('redirect_to') // $data->{redirect_to} // '/';
 
   unless( $self->authenticate($user, $pass) ) {
     $self->flash( page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?' );
 
-    return $self->render( status => 403, json => 'Not Authorised!' ) if $self->stash('format') eq 'json';
+    return $self->render( status => 403, json => 'Not Authorised!' ) if $format eq 'json';
   }
+  else {
+    unless( $self->auth_user->metadata('is_canvas_member') ) {
+      $self->logout;
 
-  unless( $self->auth_user->metadata('is_canvas_member') ) {
-    $self->logout;
+      $self->flash( page_errors => 'You are not a member of the Canvas alpha test team. Stay tuned for future announcments.' );
 
-    $self->flash( page_errors => 'You are not a member of the Canvas alpha test team. Stay tuned for future announcments.' );
+      return $self->render( status => 403, json => 'Not Authorised!' ) if $format eq 'json';
+    }
 
-    return $self->render( status => 403, json => 'Not Authorised!' ) if $self->stash('format') eq 'json';
+    return $self->render( status => 200, json => 'Access Granted!' ) if $format eq 'json';
   }
-
-  return $self->render( status => 200, json => 'Access Granted!' ) if $self->stash('format') eq 'json';
 
   return $self->redirect_to( $url );
 };
@@ -230,13 +237,14 @@ sub templates_get {
 
   $q->{name}    = $q_name     if defined($q_name);
 
-  my @templates;
-  if( keys %$q ) {
-    @templates = Canvas::Store::Template->search( $q );
-  }
-  else {
-    @templates = Canvas::Store::Template->retrieve_all();
-  }
+  my $mango = Mango->new('mongodb://localhost:27017');
+  my $collection = $mango->db('canvas')->collection('templates');
+
+  # find or create new template
+  my $tc = $collection->find( $q, {
+    name => 1,
+    user => 1,
+  })->all;
 
   # get auth'd user
   my $cu = $self->auth_user;
@@ -244,17 +252,18 @@ sub templates_get {
   # configure default return
   my $ret = [];
 
-  foreach my $t ( @templates ) {
-    # skip if private and not ( our user or membership to user )
-    next if( $t->private && ! ( ( $t->user_id eq $cu->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->id ) ) ) );
-    next if( defined( $q_user ) && ( $t->user_id->username ne $q_user) );
+  foreach my $t ( @{ $tc } ) {
+    # skip unless sharable ( our user or membership to user )
+    # next unless $t->isSharable( $cu->id );
+
+    #next if( defined( $q_user ) && ( $t->user_id->username ne $q_user) );
 
     # add to available
     push @$ret, {
-      id          => $t->id+0,
-      name        => $t->name,
-      owner       => $t->user_id->username,
-      description => $t->description,
+      id          => $t->{_id}->to_string,
+      name        => $t->{name},
+      user        => $t->{user},
+      description => $t->{description} // '',
     };
   }
 
@@ -325,14 +334,14 @@ sub templates_post {
   my $data = $json->decode( $self->req->body );
 
   # find the user requested
-  my $u = Canvas::Store::User->search({ username => $data->{u} })->first;
+  my $u = Canvas::Store::User->search({ username => $data->{user} })->first;
 
   # bail if the user doesn't exist
   unless( defined($u) ) {
     say "NO USER";
     return $self->render(
       status  => 500,
-      text    => 'No user with that user.',
+      text    => 'No user with that name.',
       json    => { error => 'No user with that user.' },
     );
   }
@@ -341,7 +350,7 @@ sub templates_post {
   my @membership = $u->user_memberships( member_id => $cu->id );
 
   # validate the current user has access to write on this user
-  unless( ( $data->{u} eq $cu->username ) ||
+  unless( ( $data->{user} eq $cu->username ) ||
           ( scalar @membership && $membership[0]->can_create ) ) {
 
     return $self->render(
@@ -351,13 +360,18 @@ sub templates_post {
     );
   }
 
-  # find or create new template
-  my $t = Canvas::Store::Template->search({
-    user_id => $u->id+0,
-    name    => $data->{n},
-  })->first;
+  my $mango = Mango->new('mongodb://localhost:27017');
+  my $collection = $mango->db('canvas')->collection('templates');
 
-  # template already exists
+  # generate sanitised unique stub based on template name
+  $data->{stub} = $self->sanitise_with_dashes( $data->{name} );
+
+  # check if template already exists
+  my $t = $collection->find_one({
+    user => $u->username,
+    stub => $data->{stub}
+  });
+
   if( defined($t) ) {
     say "EXISTS";
     return $self->render(
@@ -367,72 +381,13 @@ sub templates_post {
     );
   }
 
-  my $now = gmtime;
-
-  Canvas::Store->do_transaction( sub {
-
-    # generate sanitised unique stub based on defined stub or template name
-    my $stub = $self->sanitise_with_dashes( $data->{s} // $data->{n} );
-    my( @te ) = Canvas::Store::Template->search( { user_id => $u->id, stub => $stub } );
-    $stub .= '-' . ( $te[-1]->id + 1 ) if @te;
-
-    # create the template
-    $t = Canvas::Store::Template->insert({
-      user_id => $u->id+0,
-      name    => $data->{n},
-      stub    => $stub,
-      created => $now,
-      updated => $now,
-    });
-
-    # store repositories
-    foreach my $r ( @{ $data->{r} } ) {
-      # calculate the base url
-      Canvas::Store::TemplateRepository->insert({
-        template_id => $t->id,
-        name        => $r->{n},
-        stub        => $r->{s},
-        baseurl     => join( ',', @{ $r->{bu} // [] } ),
-        mirrorlist  => $r->{ml} // '',
-        metalink    => $r->{ma} // '',
-        gpg_key     => $r->{gk}[0] // '',
-        enabled     => $r->{e},
-        exclude     => join( ',', @{ $r->{x} // [] } ),
-        cost        => $r->{c}+0,
-        gpg_check   => $r->{gc},
-        created     => $now,
-        updated     => $now,
-      });
-    }
-
-    # store pacakges
-    foreach my $p ( @{ $data->{p} } ) {
-      Canvas::Store::TemplatePackage->insert({
-        template_id => $t->id,
-        name        => $p->{n},
-        arch        => $p->{a},
-        epoch       => $p->{e},
-        version     => $p->{v},
-        rel         => $p->{r},
-        action      => $p->{z},
-        created     => $now,
-        updated     => $now,
-      });
-    }
-  });
-
-  unless( defined($t) ) {
-    return $self->render(
-      status  => 500,
-      text    => 'Unable to create template.',
-      json    => { error => 'Unable to create template.' }
-    );
-  }
+  # insert document
+  my $oid   = $mango->db('canvas')->collection('templates')->insert( $data );
 
   $self->render(
     status  => 200,
-    text    => 'id: ' . $t->id,
-    json    => { id => $t->id },
+    text    => 'id: ' . $oid,
+    json    => { id => $oid },
   );
 };
 
@@ -487,7 +442,14 @@ sub templates_post {
 sub template_id_get {
   my $self = shift;
   my $id = $self->param('id');
-  my $t = Canvas::Store::Template->retrieve($id);
+
+  my $mango = Mango->new('mongodb://localhost:27017');
+  my $collection = $mango->db('canvas')->collection('templates');
+
+  # find or create new template
+  my $t = $collection->find_one({
+    oid => $id
+  });
 
   # check we actually received a valid template
   unless( defined($t) ) {
@@ -498,50 +460,21 @@ sub template_id_get {
   }
 
   # skip if private and not ( our user or membership to user )
-  if( $t->private && ! ( ( $t->user_id eq $self->auth_user->id ) || ( scalar $t->user_id->user_memberships( member_id => $self->auth_user->id ) ) ) ) {
-    return $self->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
-
-  # populate repository array
-  my $r = [];
-  foreach my $_r ( $t->template_repositories ) {
-    push @$r, {
-      n   => $_r->name,
-      s   => $_r->stub,
-      bu  => split( /,/, $_r->baseurl ),
-      ml  => split( /,/, $_r->mirrorlist ),
-      ma  => split( /,/, $_r->metalink ),
-      v   => $_r->version,
-      c   => $_r->cost+0,
-      e   => $_r->enabled eq 1 ? Mojo::JSON->true : Mojo::JSON->false,
-      x   => $_r->exclude,
-      gc  => $_r->gpg_check,
-    }
-  }
-
-  # populate package array
-  my $p = [];
-  foreach my $_p ( $t->template_packages ) {
-    push @$p, {
-      n => $_p->name,
-      e => $_p->epoch,
-      v => $_p->version,
-      r => $_p->rel,
-      a => $_p->arch,
-      z => $_p->action,
-    }
-  }
+#  if( $t->private && ! ( ( $t->user_id eq $self->auth_user->id ) || ( scalar $t->user_id->user_memberships( member_id => $self->auth_user->id ) ) ) ) {
+#    return $self->render(
+#      status  => 403,
+#      text    => 'denied',
+#      json    => { error => 'denied' },
+#    );
+#  }
 
   $self->render( json => {
-    id          => $t->id+0,
-    name        => $t->name,
-    description => $t->description,
-    r           => $r,
-    p           => $p,
+    id          => $t->{_id}->to_string,
+    name        => $t->{name},
+    user        => $t->{user},
+    repos       => $t->{repos}        // [],
+    packages    => $t->{packages}     // [],
+    description => $t->{description}  // '',
   });
 }
 
@@ -562,9 +495,9 @@ sub template_id_get {
 # An overview of the JSON structure is shown below:
 #
 # {
-#   u: "user / organisation",
-#   n: "name",
-#   r: [
+#   user: "user / organisation",
+#   name: "name",
+#   repos: [
 #     ... array of repo objects to add ...,
 #     {
 #       n:  "name",
@@ -584,7 +517,7 @@ sub template_id_get {
 #     "repo_id_2",
 #     ...
 #   ],
-#   p: [
+#   packages: [
 #     ... array of package objects to add ...,
 #     {
 #       n: "name",
@@ -611,7 +544,11 @@ sub template_id_put {
   my $id = $self->param('id');
   my $data = $json->decode( $self->req->body );
 
-  my $t = Canvas::Store::Template->retrieve($id);
+  my $mango = Mango->new('mongodb://localhost:27017');
+  my $collection = $mango->db('canvas')->collection('templates');
+
+  # find template
+  my $t = $collection->find_one( { oid => $id } );
 
   # check we actually received a valid template
   unless( defined($t) ) {
@@ -622,136 +559,16 @@ sub template_id_put {
   }
 
   # skip if private and not ( our user or membership to user )
-  if( $t->private && ! ( ( $t->user_id eq $self->auth_user->id ) || ( scalar $t->user_id->user_memberships( member_id => $self->auth_user->id ) ) ) ) {
-    return $self->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
+#  if( $t->private && ! ( ( $t->user_id eq $self->auth_user->id ) || ( scalar $t->user_id->user_memberships( member_id => $self->auth_user->id ) ) ) ) {
+#    return $self->render(
+#      status  => 403,
+#      text    => 'denied',
+#      json    => { error => 'denied' },
+#    );
+#  }
 
-  Canvas::Store->do_transaction( sub {
-    # get all archs to cache
-    my $arch_cache = {};
-
-    # add/update repositories
-    foreach my $r ( @{ $data->{r} } ) {
-      # calculate the base url
-      my $bu = $r->{ml} // '';
-      if( $bu eq '' ) {
-        $bu = $r->{bu}[0] // '';
-      }
-
-      my $pu = $r->{bu}[0] // '';
-
-      my $rr = Canvas::Store::Repository->find_or_create({
-        name      => $r->{n},
-        stub      => $r->{id},
-        base_url  => $bu,
-        gpg_key   => $r->{gk}[0] // '',
-      });
-
-      my @tr = $t->template_repositories({
-        repo_id => $rr->id,
-        template_id => $t->id,
-      });
-
-      # already exists, so update
-      if( scalar @tr ) {
-        $tr[0]->set({
-          pref_url    => $pu,
-          enabled     => $r->{e},
-          cost        => $r->{c}+0,
-          gpg_check   => $r->{gc},
-        });
-
-        $tr[0]->udpate;
-      }
-      # otherwise we must add
-      else {
-        $t->add_to_template_repositories({
-          repo_id     => $rr->id,
-          pref_url    => $pu,
-          enabled     => $r->{e},
-          cost        => $r->{c}+0,
-          gpg_check   => $r->{gc},
-        });
-      }
-    }
-
-    # remove repositories
-    foreach my $r ( @{ $data->{dr} } ) {
-      my @rr = Canvas::Store::Repository->search({
-        stub => $r->{id},
-      });
-
-      if( scalar @rr ) {
-        my @dr = $t->template_repositories({
-          repo_id => $rr[0]->id,
-          template_id => $t->id,
-        });
-
-        foreach my $drr ( @dr ) {
-          $drr->delete;
-        }
-      }
-    }
-
-    # add/update packages
-    foreach my $p ( @{ $data->{p} } ) {
-      my $pp = Canvas::Store::Package->find_or_create({ name => $p->{n} });
-
-      # cache arch lookups since there are very few
-      unless( defined($arch_cache->{$p->{a}}) ) {
-        $arch_cache->{$p->{a}} = Canvas::Store::Arch->find_or_create({ name => $p->{a} });
-      }
-      my $pa = $arch_cache->{$p->{a}};
-
-      my @tp = $t->template_packages({
-        package_id => $pp->id,
-        template_id => $t->id,
-      });
-
-      # already exists, so update
-      if( scalar @tp ) {
-        $tp[0]->set({
-          arch_id     => $pa->id+0,
-          epoch       => $p->{e},
-          version     => $p->{v},
-          rel         => $p->{r},
-          action      => $p->{p}
-        });
-
-        $tp[0]->udpate;
-      }
-      # otherwise we must add
-      else {
-        $t->add_to_template_packages({
-          package_id  => $pp->id+0,
-          arch_id     => $pa->id+0,
-          epoch       => $p->{e},
-          version     => $p->{v},
-          rel         => $p->{r},
-          action      => $p->{p}
-        });
-      }
-    }
-
-    # remove packages
-    foreach my $p ( @{ $data->{dp} } ) {
-      my @pp = Canvas::Store::Package->search({ name => $p->{n} });
-
-      if( scalar @pp ) {
-        my @dp = $t->template_repositories({
-          package_id => $pp[0]->id,
-          template_id => $t,
-        });
-        foreach my $dpp ( @dp ) {
-          $dpp->delete;
-        }
-      }
-    }
-  });
+  # add new repos and packages
+  $collection->update( { _id => $t->{_id} }, { '$set' => $data } );
 
   $self->render(
     status  => 200,
@@ -776,7 +593,13 @@ sub template_id_del {
 
   my $id = $self->param('id');
 
-  my $t = Canvas::Store::Template->retrieve($id);
+  my $mango = Mango->new('mongodb://localhost:27017');
+  my $collection = $mango->db('canvas')->collection('templates');
+
+  # find or create new template
+  my $t = $collection->find_one({
+    oid => $id
+  });
 
   # check we actually received a valid template
   unless( defined($t) ) {
@@ -788,17 +611,15 @@ sub template_id_del {
   }
 
   # skip if private and not ( our user or membership to user )
-  if( $t->private && ! ( ( $t->user_id eq $self->auth_user->id ) || ( scalar $t->user_id->user_memberships( member_id => $self->auth_user->id ) ) ) ) {
-    return $self->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
+  #if( $t->private && ! ( ( $t->user_id eq $self->auth_user->id ) || ( scalar $t->user_id->user_memberships( member_id => $self->auth_user->id ) ) ) ) {
+  #  return $self->render(
+  #    status  => 403,
+  #    text    => 'denied',
+  #    json    => { error => 'denied' },
+  #  );
+  #}
 
-  Canvas::Store->do_transaction( sub {
-    $t->delete;
-  });
+  $collection->remove( _id => $t->{_id} );
 
   $self->render(
     status  => 200,
@@ -823,12 +644,16 @@ sub user_user_template_name_get {
   my $user = $self->param('user');
   my $name = $self->param('name');
 
-  my $cu = $self->authenticated_user;
-  my $t = Canvas::Store::Template->search({
-    name  => $name,
-    owner => $user,
+  my $mango = Mango->new('mongodb://localhost:27017');
+  my $collection = $mango->db('canvas')->collection('templates');
+
+  # find or create new template
+  my $t = $collection->find_one({
+    user => $user,
+    stub => $name,
   });
 
+  my $cu = $self->authenticated_user;
   # TODO: reuse below from GET /api/template/:id
 
   # check we actually received a valid template
@@ -840,45 +665,21 @@ sub user_user_template_name_get {
   }
 
   # skip if private and not ( our user or membership to user )
-  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
-    return $self->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
-
-  # populate repository array
-  my $r = [];
-  foreach my $_r ( $t->template_repositories ) {
-    push @$r, {
-      n   => $_r->repo_id->name,
-      v   => $_r->version,
-      c   => $_r->cost+0,
-      e   => $_r->enabled eq 1 ? Mojo::JSON->true : Mojo::JSON->false,
-      gc  => $_r->gpg_check,
-    }
-  }
-
-  # populate package array
-  my $p = [];
-  foreach my $_p ( $t->template_packages ) {
-    push @$p, {
-      n => $_p->package_id->name,
-      e => $_p->epoch,
-      v => $_p->version,
-      r => $_p->rel,
-      a => $_p->arch_id->name,
-      p => $_p->action,
-    }
-  }
+  #if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
+  #  return $self->render(
+  #    status  => 403,
+  #    text    => 'denied',
+  #    json    => { error => 'denied' },
+  #  );
+  #}
 
   $self->render( json => {
-    id          => $t->id+0,
-    name        => $t->name,
-    description => $t->description,
-    r           => $r,
-    p           => $p,
+    id          => $t->{_id}->to_string,
+    name        => $t->{name},
+    user        => $t->{user},
+    repos       => $t->{repos}        // [],
+    packages    => $t->{packages}     // [],
+    description => $t->{description}  // '',
   });
 }
 
@@ -897,13 +698,11 @@ sub user_user_template_name_put {
   my $name = $self->param('name');
   my $data = $json->decode( $self->req->body );
 
-  my $cu = $self->authenticated_user;
-  my $t = Canvas::Store::Template->search({
-    name  => $name,
-    owner => $user,
-  });
+  my $mango = Mango->new('mongodb://localhost:27017');
+  my $collection = $mango->db('canvas')->collection('templates');
 
-  # TODO: reuse below from PUT /api/template/:id
+  # find template
+  my $t = $collection->find_one( { user => $user, name => $name } );
 
   # check we actually received a valid template
   unless( defined($t) ) {
@@ -914,136 +713,16 @@ sub user_user_template_name_put {
   }
 
   # skip if private and not ( our user or membership to user )
-  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
-    return $self->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
+#  if( $t->private && ! ( ( $t->user_id eq $self->auth_user->id ) || ( scalar $t->user_id->user_memberships( member_id => $self->auth_user->id ) ) ) ) {
+#    return $self->render(
+#      status  => 403,
+#      text    => 'denied',
+#      json    => { error => 'denied' },
+#    );
+#  }
 
-  Canvas::Store->do_transaction( sub {
-    # get all archs to cache
-    my $arch_cache = {};
-
-    # add/update repositories
-    foreach my $r ( @{ $data->{r} } ) {
-      # calculate the base url
-      my $bu = $r->{ml} // '';
-      if( $bu eq '' ) {
-        $bu = $r->{bu}[0] // '';
-      }
-
-      my $pu = $r->{bu}[0] // '';
-
-      my $rr = Canvas::Store::Repository->find_or_create({
-        name      => $r->{n},
-        stub      => $r->{id},
-        base_url  => $bu,
-        gpg_key   => $r->{gk}[0] // '',
-      });
-
-      my @tr = $t->template_repositories({
-        repo_id => $rr->id,
-        template_id => $t->id,
-      });
-
-      # already exists, so update
-      if( scalar @tr ) {
-        $tr[0]->set({
-          pref_url    => $pu,
-          enabled     => $r->{e},
-          cost        => $r->{c}+0,
-          gpg_check   => $r->{gc},
-        });
-
-        $tr[0]->udpate;
-      }
-      # otherwise we must add
-      else {
-        $t->add_to_template_repositories({
-          repo_id     => $rr->id,
-          pref_url    => $pu,
-          enabled     => $r->{e},
-          cost        => $r->{c}+0,
-          gpg_check   => $r->{gc},
-        });
-      }
-    }
-
-    # remove repositories
-    foreach my $r ( @{ $data->{dr} } ) {
-      my @rr = Canvas::Store::Repository->search({
-        stub => $r->{id},
-      });
-
-      if( scalar @rr ) {
-        my @dr = $t->template_repositories({
-          repo_id => $rr[0]->id,
-          template_id => $t->id,
-        });
-
-        foreach my $drr ( @dr ) {
-          $drr->delete;
-        }
-      }
-    }
-
-    # add/update packages
-    foreach my $p ( @{ $data->{p} } ) {
-      my $pp = Canvas::Store::Package->find_or_create({ name => $p->{n} });
-
-      # cache arch lookups since there are very few
-      unless( defined($arch_cache->{$p->{a}}) ) {
-        $arch_cache->{$p->{a}} = Canvas::Store::Arch->find_or_create({ name => $p->{a} });
-      }
-      my $pa = $arch_cache->{$p->{a}};
-
-      my @tp = $t->template_packages({
-        package_id => $pp->id,
-        template_id => $t->id,
-      });
-
-      # already exists, so update
-      if( scalar @tp ) {
-        $tp[0]->set({
-          arch_id     => $pa->id+0,
-          epoch       => $p->{e},
-          version     => $p->{v},
-          rel         => $p->{r},
-          action      => $p->{p}
-        });
-
-        $tp[0]->udpate;
-      }
-      # otherwise we must add
-      else {
-        $t->add_to_template_packages({
-          package_id  => $pp->id+0,
-          arch_id     => $pa->id+0,
-          epoch       => $p->{e},
-          version     => $p->{v},
-          rel         => $p->{r},
-          action      => $p->{p}
-        });
-      }
-    }
-
-    # remove packages
-    foreach my $p ( @{ $data->{dp} } ) {
-      my @pp = Canvas::Store::Package->search({ name => $p->{n} });
-
-      if( scalar @pp ) {
-        my @dp = $t->template_repositories({
-          package_id => $pp[0]->id,
-          template_id => $t,
-        });
-        foreach my $dpp ( @dp ) {
-          $dpp->delete;
-        }
-      }
-    }
-  });
+  # add new repos and packages
+  $collection->update( { _id => $t->{_id} }, { '$set' => $data } );
 
   $self->render(
     status  => 200,
@@ -1066,13 +745,14 @@ sub user_user_template_name_del {
   my $user = $self->param('user');
   my $name = $self->param('name');
 
-  my $cu = $self->authenticated_user;
-  my $t = Canvas::Store::Template->search({
-    name  => $name,
-    owner => $user,
-  });
+  my $mango = Mango->new('mongodb://localhost:27017');
+  my $collection = $mango->db('canvas')->collection('templates');
 
-  # TODO: reuse below from DEL /api/template/:id
+  # find or create new template
+  my $t = $collection->find_one({
+    name => $name,
+    user => $user,
+  });
 
   # check we actually received a valid template
   unless( defined($t) ) {
@@ -1083,18 +763,18 @@ sub user_user_template_name_del {
     );
   }
 
-  # skip if private and not ( our user or membership to user )
-  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
-    return $self->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
+  my $cu = $self->authenticated_user;
 
-  Canvas::Store->do_transaction( sub {
-    $t->delete;
-  });
+  # skip if private and not ( our user or membership to user )
+#  if( $t->private && ! ( ( $t->user_id eq $cu->{u}->id ) || ( scalar $t->user_id->user_memberships( member_id => $cu->{u}->id ) ) ) ) {
+#    return $self->render(
+#      status  => 403,
+#      text    => 'denied',
+#      json    => { error => 'denied' },
+#    );
+#  }
+
+  $collection->remove( _id => $t->{_id} );
 
   $self->render(
     status  => 200,
