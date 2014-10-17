@@ -4,7 +4,7 @@
   %= include 'header.inc', title => 'Korora Project'
 
   <!-- RSS -->
-  <link rel="alternate" type="application/rss+xml" title="Korora Project - News" href="/news/about/rss">
+  <link rel="alternate" type="application/rss+xml" title="Korora Project - News" href="/about/news/rss">
 </head>
 <body>
   %= include 'noscript.inc'
