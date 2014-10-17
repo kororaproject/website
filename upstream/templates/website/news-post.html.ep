@@ -8,7 +8,7 @@
   <meta property="og:description" content="<%= $post->excerpt %>"/>
 
   <!-- RSS -->
-  <link rel="alternate" type="application/rss+xml" title="Korora Project - News" href="/news/rss">
+  <link rel="alternate" type="application/rss+xml" title="Korora Project - News" href="/news/about/rss">
 </head>
 <body itemscope itemtype="http://schema.org/Article">
   %= include 'noscript.inc'

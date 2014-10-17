@@ -6,7 +6,7 @@
 <body>
   %= include 'noscript.inc'
 
-  <div class="page-container">
+  <div class="page-container theme-developer">
 
     %= include 'website/navigation.inc', active => 'contribute'
 
