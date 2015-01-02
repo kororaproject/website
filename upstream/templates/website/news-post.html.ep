@@ -3,9 +3,9 @@
 <head>
   %= include 'header.inc', title => 'Korora Project'
 
-  <meta property="og:title" content="<%= $post->title %>"/>
+  <meta property="og:title" content="<%= $post->{title} %>"/>
   <meta property="og:image" content="/img/kp-button-128.png"/>
-  <meta property="og:description" content="<%= $post->excerpt %>"/>
+  <meta property="og:description" content="<%= $post->{excerpt} %>"/>
 
   <!-- RSS -->
   <link rel="alternate" type="application/rss+xml" title="Korora Project - News" href="/about/news/rss">
@@ -33,16 +33,16 @@
               <li><a href="/">Home</a></li>
               <li><a href="/about">About</a></li>
               <li><a href="/about/news">News</a></li>
-              <li class="active"><%= $post->title %></li>
+              <li class="active"><%= $post->{title} %></li>
             </ol>
-            <h1 itemprop="name"><%= $post->title %></h1>
+            <h1 itemprop="name"><%= $post->{title} %></h1>
             <div class="news-detail-subtitle">
               <div class="news-detail-subtitle-metadata">
-                <%== post_gravatar( $post, 32 ) %>
+                <%== email_gravatar( $post->{email}, 32 ) %>
               </div>
               <div class="news-detail-subtitle-metadata">
-                <p>written on <%= $post->created->strftime('%e %B %Y') %></p>
-                <p>by <span itemprop="author"><%= $post->author_id->username %></span></p>
+                <p>written on <%= $post->{created} %></p>
+                <p>by <span itemprop="author"><%= $post->{username} %></span></p>
               </div>
             </div>
           </div>
@@ -50,9 +50,9 @@
         <div class="row">
           <div class="col-sm-12">
             <div itemprop="description">
-%== render_markdown( $post->excerpt );
+              <%== render_markdown($post->{excerpt}) %>
             </div>
-%== render_markdown( $post->content );
+            <%== render_markdown($post->{content}) %>
 
           </div>
         </div>

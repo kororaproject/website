@@ -78,11 +78,6 @@ sub register {
         return shift->is_user_authenticated(@_);
     });
 
-    $app->helper(user => sub {
-        warn __PACKAGE__, ': the "user" helper is deprecated, use "', $current_user_fn, '" instead', "\n";
-        return shift->$current_user_fn(@_);
-    });
-
     my $current_user = sub {
         my $c = shift;
         return $user_stash_extractor_sub->($c);

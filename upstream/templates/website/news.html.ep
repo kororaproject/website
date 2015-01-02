@@ -38,7 +38,7 @@
         <!-- PAGINATION -->
         <div class="row">
           <div class="col-sm-12 text-center">
-            <%== paginate( $news ) %>
+            <%== paginate($news) %>
           </div>
         </div>
 % }
@@ -46,24 +46,22 @@
 % foreach my $n ( @{ $news->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
-            <a href="<%= url_for_path(0, $n->name) %>"><h2><%= $n->title %></h2></a>
+            <a href="<%= url_for_path(0, $n->{name}) %>"><h2><%= $n->{title} %></h2></a>
 
             <div class="news-summary-subtitle">
               <div class="news-detail-subtitle-metadata">
-                <%== post_gravatar( $n, 32 ) %>
+                <%== email_gravatar($n->{email}, 32) %>
               </div>
               <div class="news-detail-subtitle-metadata">
-                <p>written on <%= $n->created->strftime('%e %B %Y') %></p>
-                <p>by <%= $n->author_id->username %></p>
+                <p>written on <%= $n->{created} %></p>
+                <p>by <%= $n->{username} %></p>
               </div>
             </div>
             <div class="news-excerpt">
-
-%== render_markdown( $n->excerpt );
-
+              <%== render_markdown($n->{excerpt}) %>
             </div>
             <div>
-              <a class="btn btn-default" href="<%= url_for_path(0, $n->name) %>">Read more ... </a>
+              <a class="btn btn-default" href="<%= url_for_path(0, $n->{name}) %>">Read more ... </a>
             </div>
 
           </div>
@@ -75,7 +73,7 @@
         <!-- PAGINATION -->
         <div class="row">
           <div class="col-sm-12 text-center">
-            <%== paginate( $news ) %>
+            <%== paginate($news) %>
           </div>
         </div>
 % }

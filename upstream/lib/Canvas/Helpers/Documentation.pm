@@ -20,54 +20,52 @@ package Canvas::Helpers::Documentation;
 use Mojo::Base 'Mojolicious::Plugin';
 
 sub register {
-  my( $self, $app ) = @_;
+  my ($self, $app) = @_;
 
   $app->helper(document_can_view => sub {
-    my( $self, $document ) = @_;
+    my ($c, $document) = @_;
 
     return 0 unless ref $document eq 'Canvas::Store::Post';
 
     return 1 if $document->status eq 'publish';
 
-    return 0 unless defined $self->auth_user;
+    return 0 unless $c->users->is_active($c->auth_user);
 
-    return 0 unless $self->auth_user->is_active_account;
-
-    return 1 if $self->auth_user->is_document_moderator;
+    return 1 if $c->users->is_document_moderator($c->auth_user);
 
     return 0;
   });
 
   $app->helper(document_can_add => sub {
-    my( $self ) = @_;
+    my ($c) = @_;
 
-    return 0 unless defined $self->auth_user;
+    return 0 unless $c->users->is_active($c->auth_user);
 
-    return 0 unless $self->auth_user->is_active_account;
-
-    return 1 if $self->auth_user->is_document_moderator;
+    return 1 if $c->users->is_document_moderator($c->auth_user);
 
     return 0;
   });
 
   $app->helper(document_can_delete => sub {
-    my( $self ) = @_;
+    my ($c) = @_;
 
-    return 0 unless defined $self->auth_user;
+    return 0 unless $c->users->is_active($c->auth_user);
 
-    return 0 unless $self->auth_user->is_active_account;
-
-    return 1 if $self->auth_user->is_admin;
+    return 1 if $c->users->is_document_moderator($c->auth_user);
 
     return 0;
   });
 
   $app->helper(document_can_edit => sub {
-    my( $self, $document ) = @_;
+    my ($c, $document) = @_;
 
     return 0 unless ref $document eq 'Canvas::Store::Post';
 
     return 0 unless defined $self->auth_user;
+
+    return 0 unless $c->users->is_active($c->auth_user);
+
+    return 1 if $c->users->is_document_moderator($c->auth_user);
 
     return 0 unless $self->auth_user->is_active_account;
 
