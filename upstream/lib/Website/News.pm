@@ -25,14 +25,15 @@ use strict;
 #
 use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
+use Mojo::Pg;
 use POSIX qw(ceil);
 use Time::Piece;
 
 #
 # LOCAL INCLUDES
 #
-use Canvas::Store::Post;
-use Canvas::Store::Pager;
+#use Canvas::Store::Post;
+#use Canvas::Store::Pager;
 
 #
 # CONSTANTS
@@ -71,99 +72,108 @@ sub list_status_for_post {
 #
 
 sub index {
-  my $self = shift;
+  my $c = shift;
 
+  my $page_size = 10;
+  my $page = ($c->param('page') // 1);
 
-  my $pager = Canvas::Store::Post->pager(
-    where             => { type => 'news', status => 'publish' },
-    order_by          => 'created DESC',
-    entries_per_page  => 5,
-    current_page      => ( $self->param('page') // 1 ) - 1,
-  );
+  $c->render_steps('website/news', sub {
+    my $delay = shift;
 
-  my $news = {
-    items       => [ $pager->search_where ],
-    item_count  => $pager->total_entries,
-    page_size   => $pager->entries_per_page,
-    page        => $pager->current_page + 1,
-    page_last   => ceil($pager->total_entries / $pager->entries_per_page),
-  };
+    # get total count
+    $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='news' AND status='publish'" => $delay->begin);
 
-  $self->stash( news => $news );
+    # get paged items with username and email associated
+    $c->pg->db->query("SELECT name, title, excerpt, TO_CHAR(p.created, 'Dy, DD Month YYYY') AS created, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type='news' AND p.status='publish' ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+  },
+  sub {
+    my ($delay, $err, $count_res, $err_res, $res) = @_;
 
-  $self->render('website/news');
+    my $count = $count_res->array->[0];
+
+    $c->stash(news => {
+      items       => $res->hashes,
+      item_count  => $count,
+      page_size   => $page_size,
+      page        => $page,
+      page_last   => ceil($count / $page_size),
+    });
+  });
 }
 
 sub rss_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $pager = Canvas::Store::Post->pager(
-    where             => { type => 'news', status => 'publish' },
-    order_by          => 'created DESC',
-    entries_per_page  => 10,
-    current_page      => 0,
-  );
+  # get latest items paged items with username and email associated
+  my $res = $c->pg->db->query("SELECT title, name, excerpt, TO_CHAR(created, 'Dy, DD Mon YYYY HH24:MI:SS GMT') AS created FROM canvas_post WHERE type='news' AND status='publish' ORDER BY created DESC LIMIT 10");
 
-  my $rss = '<?xml version="1.0" ?><rss version="2.0"><channel>';
-  $rss .= '<title>Korora Project - News</title>';
-  $rss .= '<link>http://kororaproject.org/about/news</link>';
+  my $rss = '<?xml version="1.0" ?><rss version="2.0"><channel>' .
+            '<title>Korora Project - News</title>' .
+            '<link>http://kororaproject.org/about/news</link>';
 
-  foreach my $n ( $pager->search_where ) {
-    $rss .= '<item>';
-    $rss .= '<title>' . $n->title . '</title>';
-    $rss .= '<link>http://kororaproject.org/about/news/' . $n->name . '</link>';
-    $rss .= '<description>' . $n->excerpt . '</description>';
-    $rss .= '<pubDate>' . $n->created->strftime('%a, %d %b %Y %H:%M:%S GMT') . '</pubDate>';
-    $rss .= '</item>';
+  foreach my $n (@{$res->hashes}) {
+    $rss .= '<item>' .
+            '<title>' . $n->{title} . '</title>' .
+            '<link>http://kororaproject.org/about/news/' . $n->{name} . '</link>' .
+            '<description>' . $n->{excerpt} . '</description>' .
+            '<pubDate>' . $n->{created} . '</pubDate>' .
+            '</item>';
   }
 
   $rss .= '</channel></rss>';
 
-  $self->render( text => $rss, format => 'xml' );
+  $c->render(text => $rss, format => 'xml');
 }
 
 sub news_post_get {
-  my $self = shift;
-  my $stub = $self->param('id');
+  my $c = shift;
+  my $stub = $c->param('id');
 
-  my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
+  $c->render_steps('website/news-post', sub {
+    my $delay = shift;
 
-  # check we found the post
-  return $self->redirect_to('aboutnews') unless $self->news_post_can_view( $p );
+    $c->pg->db->query("SELECT title, excerpt, content, TO_CHAR(p.created, 'Dy, DD Month YYYY') AS created, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='news' AND name=?" => ($stub) => $delay->begin);
+  }, sub {
+    my ($delay, $err, $res) = @_;
 
-  $self->stash( post => $p );
+    # check we found the post
+    my $post = $res->hash;
 
-  $self->render('website/news-post');
+    $delay->emit(redirect => 'aboutnews') unless $c->news_post_can_view($post);
+
+    $c->stash(post => $post);
+  });
 }
 
 sub news_add_get {
-  my $self = shift;
+  my $c = shift;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/') unless $self->news_post_can_add;
+  return $c->redirect_to('/') unless $c->news_post_can_add;
 
-  $self->stash(
-    statuses  => list_status_for_post( 'news', 'draft' )
+  $c->stash(
+    statuses => list_status_for_post('news', 'draft')
   );
-  $self->render('website/news-post-new');
+  $c->render('website/news-post-new');
 }
 
 sub news_post_edit_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $stub = $self->param('id');
+  my $stub = $c->param('id');
 
-  my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
+  $c->render_steps('website/news-post-edit', sub {
+    my $delay = shift;
 
-  # only allow those who are authorised to edit posts
-  return $self->redirect_to('aboutnews') unless $self->news_post_can_edit( $p );
+    $c->pg->db->query("SELECT title, excerpt, content, TO_CHAR(p.created, 'YYYY-MM-DD HH24:MI:SS') AS created, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='news' AND name=?" => ($stub) => $delay->begin);
+  }, sub {
+    my ($delay, $err, $res) = @_;
 
-  $self->stash(
-    post      => $p,
-    statuses  => list_status_for_post( $p->type, $p->status )
-  );
+    # check we found the post
+    $delay->emit(redirect => 'aboutnews') unless $res->rows > 0; #$self->news_post_can_edit( $p );
 
-  $self->render('website/news-post-edit');
+    $c->stash(post => $res->hash);
+  });
 }
 
 sub news_post {

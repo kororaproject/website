@@ -30,10 +30,11 @@ use Data::Dumper;
 
 use Mojo::ByteStream;
 use Mojo::JSON;
+use Mojo::Pg;
 use Mojolicious::Plugin::Authentication;
 use Mojolicious::Plugin::Cache;
-use Mojolicious::Plugin::JSONConfig;
 use Mojolicious::Plugin::Mail;
+use Mojolicious::Plugin::RenderSteps;
 
 use POSIX qw(floor);
 use Time::Piece;
@@ -85,23 +86,37 @@ sub startup {
   $self->plugin('authentication' => {
     autoload_user   => 0,
     current_user_fn => 'auth_user',
-    load_user       => sub {
-      my( $app, $uid ) = @_;
+    load_user => sub {
+      my ($app, $user) = @_;
 
-      return Canvas::Store::User->search( username => $uid )->first;
+      my $user_hash = $app->pg->db->query("SELECT * FROM canvas_user WHERE username=?", $user)->hash // {};
+
+      # load metadata
+      if ($user_hash->{id}) {
+        $user_hash->{meta} = {};
+
+        my $key_values = $app->pg->db->query("SELECT meta_key AS key, array_agg(meta_value) AS values FROM canvas_usermeta where user_id=? GROUP BY meta_key", $user_hash->{id})->hashes // {};
+
+        $key_values->each(sub {
+          my $e = shift;
+          $user_hash->{meta}{$e->{key}} = $e->{values};
+        });
+      }
+
+      return $user_hash;
     },
-    validate_user   => sub {
-      my( $app, $user, $pass, $extra ) = @_;
+    validate_user => sub {
+      my ($app, $user, $pass, $extra) = @_;
 
-      my $u = Canvas::Store::User->search( username => $user )->first;
+      my $u = $app->pg->db->query("SELECT * FROM canvas_user WHERE username=?", $user)->hash;
 
-      if( defined($u) && $u->status eq 'active' && $u->validate_password($pass)  ) {
-        return $u->username;
-      };
+      return $u->{username} if $app->users->validate($u, $pass);
 
       return undef;
     },
   });
+
+  $self->plugin('RenderSteps');
 
   #
   # MAIL
@@ -127,6 +142,11 @@ sub startup {
   $self->plugin('Canvas::Helpers::Engage');
   $self->plugin('Canvas::Helpers::News');
   $self->plugin('Canvas::Helpers::Profile');
+  $self->plugin('Canvas::Helpers::User');
+
+  $self->helper(pg => sub {
+    state $pg = Mojo::Pg->new($config->{database}{uri});
+  });
 
   #
   # PAYPAL

@@ -36,7 +36,6 @@ use Digest::SHA qw(sha512 sha256_hex);
 #
 use Canvas::Store::User;
 use Canvas::Store::UserMeta;
-use Canvas::Store::WPUser;
 use Canvas::Util qw(get_random_bytes);
 
 #
@@ -49,7 +48,7 @@ use Canvas::Util qw(get_random_bytes);
 sub create_auth_token {
   my $bytes = get_random_bytes(48);
 
-  return sha256_hex( $bytes );
+  return sha256_hex($bytes);
 }
 
 
@@ -57,11 +56,7 @@ sub create_auth_token {
 # controller handlers
 #
 sub index {
-  my $self = shift;
-
-  #return $self->redirect_to('login') unless( $self->is_user_authenticated );
-
-  $self->render('website/index');
+  shift->render('website/index');
 }
 
 sub exception_get {
@@ -77,15 +72,11 @@ sub forums_get {
 }
 
 sub discover {
-  my $self = shift;
-
-  $self->render('website/discover');
+  shift->render('website/discover');
 }
 
 sub login {
-  my $self = shift;
-
-  $self->render('website/login');
+  shift->render('website/login');
 }
 
 sub authenticate_any {
@@ -99,11 +90,11 @@ sub authenticate_any {
   # extract the redirect url and fall back to the index
   my $url = $self->param('redirect_to') // $data->{redirect_to} // '/';
 
-  unless( $self->authenticate($user, $pass) ) {
+  unless ($self->authenticate($user, $pass)) {
     $self->flash( page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?' );
   }
 
-  return $self->redirect_to( $url );
+  return $self->redirect_to($url);
 };
 
 sub deauthenticate_any {
@@ -111,12 +102,12 @@ sub deauthenticate_any {
 
   $self->logout;
 
-  return $self->render( status => 200, json => 'Done!' ) if $self->stash('format') // '' eq 'json';
+  return $self->render(status => 200, json => 'Done!') if $self->stash('format') // '' eq 'json';
 
   # extract the redirect url and fall back to the index
   my $url = $self->param('redirect_to') // '/';
 
-  return $self->redirect_to( $url );
+  return $self->redirect_to($url);
 };
 
 sub activated {
