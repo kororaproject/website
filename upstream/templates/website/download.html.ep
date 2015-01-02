@@ -111,7 +111,7 @@
                 <h4 class="step">Step&nbsp;2</h4>
               </div>
               <div class="col-sm-9">
-                <select class="form-control" ng-model="arch" ng-options="archLabel(a) for a in archs"></select>
+                <select class="form-control" ng-model="arch" ng-options="archLabel(a) for a in getArchs()"></select>
               </div>
             </div>
             <div class="hr hr-sm"></div>
@@ -121,7 +121,7 @@
               </div>
               <div class="col-sm-9">
                 <div id="desktops" class="text-center form-control form-control-generic">
-                  <div class="img-well" ng-repeat="d in desktops" ng-class="{'img-well-selected': isSelected(d)}" ng-click="selectDesktop(d)">
+                  <div class="img-well" ng-repeat="d in getDesktops()" ng-class="{'img-well-selected': isSelected(d)}" ng-click="selectDesktop(d)">
                     <img class="img-desktop-logo img-bumper" ng-src="/img/ico-logo-{{d}}.png" bs-tooltip="desktopLabel(d)" alt="Logo">
                   </div>
                 </div>

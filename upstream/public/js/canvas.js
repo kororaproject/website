@@ -348,7 +348,7 @@ function DownloadController($scope) {
   // GLOBALS
   //
 
-  $scope.downloads = angular.fromJson( document._download_map );
+  $scope.downloads = angular.fromJson(document._download_map);
 
   /* pre-process the map for available releases */
   $scope.releases = [];
@@ -359,13 +359,19 @@ function DownloadController($scope) {
     }
   }
 
-  $scope.getPreferredRelease = function( args ) {
+  $scope.release = $scope.releases[0];
+
+  $scope.getPreferredRelease = function(args) {
     var _release = $scope.releases[0];
 
+    console.debug($scope.releases);
+
     // check for specified arch
-    if( args.hasOwnProperty('v') ) {
-      for(var n=0, l=$scope.releases.length; n<l; n++ ) {
-        if( $scope.releases[n].version === args.v ) {
+    if (args.hasOwnProperty('v') ) {
+      for (var n=0, l=$scope.releases.length; n<l; n++) {
+        if ($scope.releases[n].version === args.v &&
+            !!$scope.releases[n].isCurrent &&
+            !!$scope.releases[n].isStable ) {
           _release = $scope.releases[n];
           continue;
         }
@@ -373,9 +379,9 @@ function DownloadController($scope) {
     }
     // otherise pick most current stable
     else {
-      for(var n=0, l=$scope.downloads.length; n<l; n++ ) {
-        if( $scope.releases[n].isCurrent &&
-            $scope.releases[n].isStable ) {
+      for (var n=0, l=$scope.releases.length; n<l; n++) {
+        if( !!$scope.releases[n].isCurrent &&
+            !!$scope.releases[n].isStable ) {
           _release = $scope.releases[n];
           continue;
         }
@@ -383,38 +389,7 @@ function DownloadController($scope) {
     }
 
     /* process for available desktops and archs */
-    $scope.desktops = [];
-    $scope.archs = [];
-
-    for( var d in _release.isos ) {
-      if( $scope.desktops.indexOf( d ) === -1 ) {
-        $scope.desktops.push( d );
-      }
-
-      for( var a in _release.isos[d] ) {
-        if( $scope.archs.indexOf( a ) === -1 ) {
-          $scope.archs.push( a );
-        }
-      }
-    }
-
-    /* calculate preferred arch */
-    if( args.hasOwnProperty('a') && 
-        $scope.archs.indexOf( args.a ) !== -1 ) {
-      $scope.arch = args.a;
-    }
-    else {
-      var _system_arch = ( window.navigator.userAgent.indexOf('WOW64')>-1 ||
-                           window.navigator.platform == 'Win64' ||
-                           window.navigator.userAgent.indexOf('x86_64')>-1 ) ? 'x86_64' : 'i686';
-
-      if( $scope.archs.indexOf( _system_arch ) !== -1 ) {
-        $scope.arch = _system_arch;
-      }
-      else {
-        $scope.arch = $scope.archs[0];
-      }
-    }
+    $scope.desktops = Object.keys(_release.isos)
 
     /* calculate preferred desktop */
     if( args.hasOwnProperty('d') &&
@@ -423,8 +398,28 @@ function DownloadController($scope) {
     }
     else {
       /* check randomise as a fallback */
+      $scope.desktop = $scope.desktops[Math.floor(Math.random() * $scope.desktops.length )];
+    }
 
-      $scope.desktop = $scope.desktops[ Math.floor( Math.random() * $scope.desktops.length ) ];
+    /* re-calculate available archs */
+    $scope.archs = Object.keys($scope.release.isos[$scope.desktop]);
+
+    /* calculate preferred arch */
+    if (args.hasOwnProperty('a') && 
+        $scope.archs.indexOf( args.a ) !== -1) {
+      $scope.arch = args.a;
+    }
+    else {
+      var _system_arch = ( window.navigator.userAgent.indexOf('WOW64')>-1 ||
+                           window.navigator.platform == 'Win64' ||
+                           window.navigator.userAgent.indexOf('x86_64')>-1 ) ? 'x86_64' : 'i686';
+
+      if($scope.archs.indexOf(_system_arch) !== -1) {
+        $scope.arch = _system_arch;
+      }
+      else {
+        $scope.arch = $scope.archs[0];
+      }
     }
 
     return _release;
@@ -436,10 +431,6 @@ function DownloadController($scope) {
 
   $scope.selectDesktop = function(d) {
     $scope.desktop = d;
-  };
-
-  $scope.selectedDesktop = function() {
-    return $scope.desktop;
   };
 
   $scope.archLabel = function(a) {
@@ -456,6 +447,14 @@ function DownloadController($scope) {
     }
 
     return 'Unknown';
+  };
+
+  $scope.getArchs = function() {
+    return Object.keys($scope.release.isos[$scope.desktop]);
+  };
+
+  $scope.getDesktops = function() {
+    return Object.keys($scope.release.isos);
   };
 
   $scope.getChecksums = function() {
@@ -509,6 +508,24 @@ function DownloadController($scope) {
 
     return hash;
   }
+
+  //
+  // WATCHES
+  //
+  $scope.$watch('release', function(n,o) {
+    if (o!=n) {
+      /* re-calculate preferred desktop */
+      $scope.desktops = Object.keys($scope.release.isos)
+
+      if ($scope.desktops.indexOf($scope.desktop) === -1 ) {
+        /* check randomise as a fallback */
+        $scope.desktop = $scope.desktops[Math.floor(Math.random() * $scope.desktops.length )];
+      }
+
+      /* re-calculate available archs */
+      $scope.archs = Object.keys($scope.release.isos[$scope.desktop]);
+    }
+  })
 
   //
   // INIT
