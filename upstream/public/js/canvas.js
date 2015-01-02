@@ -402,6 +402,7 @@ function DownloadController($scope) {
     }
 
     /* re-calculate available archs */
+    console.debug($scope.desktop);
     $scope.archs = Object.keys($scope.release.isos[$scope.desktop]);
 
     /* calculate preferred arch */
