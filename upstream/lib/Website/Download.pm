@@ -57,6 +57,7 @@ use constant DOWNLOAD_MAP => {
           i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-i386-cinnamon-live.iso/download',
+              torrent => '/torrents/korora-21-beta-i386-cinnamon-live-iso.torrent'
             },
             checksum => {
               md5     => 'f625a9ba53371124ddadade8785ca687',
@@ -67,6 +68,7 @@ use constant DOWNLOAD_MAP => {
           x86_64 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-x86_64-cinnamon-live.iso/download',
+              torrent => '/torrents/korora-21-beta-x86_64-cinnamon-live-iso.torrent'
             },
             checksum => {
               md5    => 'cf6c2dc4b71e401c2ad8279b4db14ae4',
@@ -79,6 +81,7 @@ use constant DOWNLOAD_MAP => {
           i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-i386-gnome-live.iso/download',
+              torrent => '/torrents/korora-21-beta-i386-gnome-live-iso.torrent'
             },
             checksum => {
               md5     => '72ce907bb59b48a74eff382fe1ab121d',
@@ -89,6 +92,7 @@ use constant DOWNLOAD_MAP => {
           x86_64 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-x86_64-gnome-live.iso/download',
+              torrent => '/torrents/korora-21-beta-x86_64-gnome-live-iso.torrent'
             },
             checksum => {
               md5     => 'ac6cff1811b2e94e7b11e98cfb40b87e',
@@ -101,6 +105,7 @@ use constant DOWNLOAD_MAP => {
           i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-i386-kde-live.iso/download',
+              torrent => '/torrents/korora-21-beta-i386-kde-live-iso.torrent'
             },
             checksum => {
               md5     => 'c742544afa6153fff55461c2f18c2f18',
@@ -111,6 +116,7 @@ use constant DOWNLOAD_MAP => {
           x86_64 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-x86_64-kde-live.iso/download',
+              torrent => '/torrents/korora-21-beta-x86_64-kde-live-iso.torrent'
             },
             checksum => {
               md5     => '1678d80713f4ec166cab78b3a2e3abcc',
@@ -123,6 +129,7 @@ use constant DOWNLOAD_MAP => {
           i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-i386-xfce-live.iso/download',
+              torrent => '/torrents/korora-21-beta-i386-xfce-live-iso.torrent'
             },
             checksum => {
               md5     => '2ebcd2cd67d25cbf14a2872e48dee425',
@@ -133,6 +140,7 @@ use constant DOWNLOAD_MAP => {
           x86_64 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-x86_64-xfce-live.iso/download',
+              torrent => '/torrents/korora-21-beta-x86_64-xfce-live-iso.torrent'
             },
             checksum => {
               md5     => '6df9fac7c3ac338631700c3387e059c9',
