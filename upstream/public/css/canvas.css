@@ -59,6 +59,10 @@ pre {
   background-color: #f8f8ff;
 }
 
+sup, .sup {
+  vertical-align: super;
+  font-size: smaller;
+}
 
 /*
 ** SCROLLBARS
