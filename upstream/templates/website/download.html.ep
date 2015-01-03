@@ -140,11 +140,9 @@
                   </div>
                 </div>
                 <div class="checksums">
+                  <a ng-repeat="(type, hash) in getChecksums()" class="btn btn-xs btn-default" data-toggle="collapse" href="#collapse-{{type}}">{{type}}</a>
                   <div ng-repeat="(type, hash) in getChecksums()" class="panel panel-checksum in">
-                    <div class="panel-heading">
-                      <a data-toggle="collapse" href="#collapse{{type}}"><span class="label label-default">{{type}}</a></span>
-                    </div>
-                    <div id="collapse{{type}}" class="panel-collapse collapse">
+                    <div id="collapse-{{type}}" class="panel-collapse collapse">
                       <div class="panel-body">{{hash}}</div>
                     </div>
                   </div>

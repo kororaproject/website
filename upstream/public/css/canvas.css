@@ -1261,6 +1261,11 @@ h4.step {
   vertical-align: top;
 }
 
+.checksums .btn {
+  margin-right: 8px;
+  margin-bottom: 4px;
+}
+
 .panel-checksum {
   background-color: inherit;
   border: 0;
@@ -1292,7 +1297,7 @@ h4.step {
   border: 1px solid #ccc;
   border-radius: 2px;
   font-family: monospace;
-  font-size: 14px;
+  font-size: 10px;
   line-height: 14px;
   padding: 8px;
   text-align: center;

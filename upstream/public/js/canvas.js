@@ -364,14 +364,10 @@ function DownloadController($scope) {
   $scope.getPreferredRelease = function(args) {
     var _release = $scope.releases[0];
 
-    console.debug($scope.releases);
-
     // check for specified arch
     if (args.hasOwnProperty('v') ) {
       for (var n=0, l=$scope.releases.length; n<l; n++) {
-        if ($scope.releases[n].version === args.v &&
-            !!$scope.releases[n].isCurrent &&
-            !!$scope.releases[n].isStable ) {
+        if ($scope.releases[n].version === args.v) {
           _release = $scope.releases[n];
           continue;
         }
@@ -393,27 +389,27 @@ function DownloadController($scope) {
 
     /* calculate preferred desktop */
     if( args.hasOwnProperty('d') &&
-        $scope.desktops.indexOf( args.d ) !== -1 ) {
+        $scope.desktops.indexOf(args.d) !== -1) {
         $scope.desktop = args.d;
     }
     else {
       /* check randomise as a fallback */
-      $scope.desktop = $scope.desktops[Math.floor(Math.random() * $scope.desktops.length )];
+      $scope.desktop = $scope.desktops[Math.floor(Math.random() * $scope.desktops.length)];
     }
 
     /* re-calculate available archs */
-    console.debug($scope.desktop);
-    $scope.archs = Object.keys($scope.release.isos[$scope.desktop]);
+    console.debug(_release, $scope.desktop);
+    $scope.archs = Object.keys(_release.isos[$scope.desktop]);
 
     /* calculate preferred arch */
-    if (args.hasOwnProperty('a') && 
-        $scope.archs.indexOf( args.a ) !== -1) {
+    if (args.hasOwnProperty('a') && $scope.archs.indexOf(args.a) !== -1) {
       $scope.arch = args.a;
     }
     else {
-      var _system_arch = ( window.navigator.userAgent.indexOf('WOW64')>-1 ||
-                           window.navigator.platform == 'Win64' ||
-                           window.navigator.userAgent.indexOf('x86_64')>-1 ) ? 'x86_64' : 'i686';
+      var _nav = window.navigator;
+      var _system_arch = (_nav.userAgent.indexOf('WOW64') > -1 ||
+                          _nav.platform == 'Win64' ||
+                          _nav.userAgent.indexOf('x86_64') > -1) ? 'x86_64' : 'i686';
 
       if($scope.archs.indexOf(_system_arch) !== -1) {
         $scope.arch = _system_arch;
@@ -543,7 +539,7 @@ function DownloadController($scope) {
     }
   }
 
-  $scope.release = $scope.getPreferredRelease( args );
+  $scope.release = $scope.getPreferredRelease(args);
 
   $scope.pageLoaded = true;
 };
