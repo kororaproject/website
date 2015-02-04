@@ -46,7 +46,7 @@
 % foreach my $n ( @{ $news->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
-            <a href="<%= url_for_path(0, $n->{name}) %>"><h2><%= $n->{title} %></h2></a>
+            <a class="news-post-title" href="<%= url_for('aboutnewsid', id => $n->{name}) %>"><h2><%= $n->{title} %></h2></a>
 
             <div class="news-summary-subtitle">
               <div class="news-detail-subtitle-metadata">
@@ -61,9 +61,14 @@
               <%== render_markdown($n->{excerpt}) %>
             </div>
             <div>
-              <a class="btn btn-default" href="<%= url_for_path(0, $n->{name}) %>">Read more ... </a>
-            </div>
+% foreach my $t ( @{ $n->{tags} } ) {
+              <span class="label label-default"><%= $t %></span>
+% }
 
+            </div>
+            <div>
+              <a class="btn btn-default" href="<%= url_for('aboutnewsid', id => $n->{name}) %>">Read more ... </a>
+            </div>
           </div>
         </div>
         <div class="hr hr-lg"></div>

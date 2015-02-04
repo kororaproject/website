@@ -22,7 +22,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app) = @_;
 
-  $app->helper(news_post_can_view => sub {
+  $app->helper('news.can_view' => sub {
     my ($c, $post) = @_;
 
     return 1 if $post->{status} eq 'publish';
@@ -34,7 +34,7 @@ sub register {
     return 0;
   });
 
-  $app->helper(news_post_can_add => sub {
+  $app->helper('news.can_add' => sub {
     my ($c) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);
@@ -44,7 +44,7 @@ sub register {
     return 0;
   });
 
-  $app->helper(news_post_can_delete => sub {
+  $app->helper('news.can_delete' => sub {
     my ($c) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);
@@ -54,7 +54,7 @@ sub register {
     return 0;
   });
 
-  $app->helper(news_post_can_edit => sub {
+  $app->helper('news.can_edit' => sub {
     my ($c) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);

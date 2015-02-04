@@ -58,13 +58,16 @@
         </div>
         <div class="row">
           <div class="col-sm-12">
+% foreach my $t (@{$post->{tags}}) {
+            <span class="label label-default"><%= $t %></span>
+% }
           </div>
         </div>
         <div class="hr"></div>
         <div class="row">
           <div class="col-sm-12">
             <div class="text-right">
-% if( news_post_can_edit( $post ) ) {
+% if ($c->news->can_edit) {
               <a class="btn btn-default" href="<%= url_for_path(0, 'edit') %>">Edit</a>
 % }
             </div>

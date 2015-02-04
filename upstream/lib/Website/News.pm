@@ -32,8 +32,6 @@ use Time::Piece;
 #
 # LOCAL INCLUDES
 #
-#use Canvas::Store::Post;
-#use Canvas::Store::Pager;
 
 #
 # CONSTANTS
@@ -84,10 +82,10 @@ sub index {
     $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='news' AND status='publish'" => $delay->begin);
 
     # get paged items with username and email associated
-    $c->pg->db->query("SELECT name, title, excerpt, TO_CHAR(p.created, 'Dy, DD Month YYYY') AS created, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type='news' AND p.status='publish' ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.status='publish' GROUP BY p.id, u.username, u.email ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
   },
   sub {
-    my ($delay, $err, $count_res, $err_res, $res) = @_;
+    my ($delay, $count_err, $count_res, $err, $res) = @_;
 
     my $count = $count_res->array->[0];
 
@@ -132,14 +130,14 @@ sub news_post_get {
   $c->render_steps('website/news-post', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT title, excerpt, content, TO_CHAR(p.created, 'Dy, DD Month YYYY') AS created, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='news' AND name=?" => ($stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
     # check we found the post
     my $post = $res->hash;
 
-    $delay->emit(redirect => 'aboutnews') unless $c->news_post_can_view($post);
+    $delay->emit(redirect => 'aboutnews') unless $c->news->can_view($post);
 
     $c->stash(post => $post);
   });
@@ -149,7 +147,7 @@ sub news_add_get {
   my $c = shift;
 
   # only allow authenticated and authorised users
-  return $c->redirect_to('/') unless $c->news_post_can_add;
+  return $c->redirect_to('/') unless $c->news->can_add;
 
   $c->stash(
     statuses => list_status_for_post('news', 'draft')
@@ -160,130 +158,120 @@ sub news_add_get {
 sub news_post_edit_get {
   my $c = shift;
 
-  my $stub = $c->param('id');
+  my $stub    = $c->param('id');
 
   $c->render_steps('website/news-post-edit', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT title, excerpt, content, TO_CHAR(p.created, 'YYYY-MM-DD HH24:MI:SS') AS created, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='news' AND name=?" => ($stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
     # check we found the post
-    $delay->emit(redirect => 'aboutnews') unless $res->rows > 0; #$self->news_post_can_edit( $p );
+    $delay->emit(redirect => 'aboutnews') unless $c->news->can_edit;
 
-    $c->stash(post => $res->hash);
+    my $p = $res->hash;
+    $c->stash(
+      post     => $p,
+      statuses => list_status_for_post('news', $p->{status})
+    );
   });
 }
 
 sub news_post {
-  my $self = shift;
+  my $c = shift;
 
-  my $stub = $self->param('post_id');
+  my $stub    = $c->param('post_id');
+  my $title   = $c->param('title');
+  my $content = $c->param('content');
+  my $excerpt = $c->param('excerpt');
+  my $status  = $c->param('status');
+  my $author  = $c->param('author');
 
-  if( $stub ne '' ) {
-    my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
+  my $now = gmtime;
 
-    # update if we found the object
-    if( $self->news_post_can_edit( $p ) ) {
-      $p->title( $self->param('title') );
-      $p->content( $self->param('content') );
-      $p->excerpt( $self->param('excerpt') );
-      $p->status( $self->param('status') );
+  my $created = $c->param('created');
 
-      # update author if changed
-      if( $self->param('author') ne $p->author_id->username ) {
-        my $u = Canvas::Store::User->search({ username => $self->param('author') } )->first;
+  if ($stub ne '' && $c->news->can_edit) {
+    my $p = $c->pg->db->query("SELECT title, excerpt, content, TO_CHAR(p.created, 'YYYY-MM-DD HH24:MI:SS') AS created, author_id, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='news' AND name=?", $stub)->hash;
 
-        if( $u ) {
-          $p->author_id( $u->id );
-        }
-      }
+    # update author if changed
+    if ($author ne $p->{username}) {
+      my $u = $c->pg->db->query("SELECT id, username WHERE username=?", $author)->hash;
 
-      # update created if changed
-      my $t = Time::Piece->strptime( $self->param('created'), "%d/%m/%Y %H:%M:%S" );
-
-      if( $t ne $p->created ) {
-        $p->created( $t );
-      }
-
-      $p->update;
+      $p->{author_id} = $u->{id} if $u->{id};
     }
-    else {
-      return $self->redirect_to('aboutnewsadmin');
-    }
+
+    # TODO: update created if changed
+    #my $t = Time::Piece->strptime($created, '%d/%m/%Y %H:%M:%S');
+    #
+    # TODO: update tags
+
+    my $r = $c->pg->db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, created=?, updated=? WHERE type='news' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $created, $now, $stub);
   }
   # otherwise create a new entry
-  elsif( $self->news_post_can_add ) {
-    $stub = $self->sanitise_with_dashes( $self->param('title') );
+  elsif ($c->news->can_add) {
+    $stub = $c->sanitise_with_dashes($title);
 
     my $now = gmtime;
 
-    my $p = Canvas::Store::Post->create({
-      name         => $stub,
-      type         => 'news',
-      status       => $self->param('status'),
-      title        => $self->param('title'),
-      content      => $self->param('content'),
-      excerpt      => $self->param('excerpt'),
-      author_id    => $self->auth_user->id,
-      created      => $now,
-      updated      => $now,
-    });
+    my $r = $c->pg->db->query('INSERT INTO canvas_post (type, name, status, title, content, excerpt, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', 'news', $stub, $status, $title, $content, $excerpt, $c->auth_user->{id}, $now, $now);
+
+    # TODO: insert tags
   }
   else {
-    return $self->redirect_to('aboutnewsadmin');
+    return $c->redirect_to('aboutnewsadmin');
   }
 
-  $self->redirect_to( 'aboutnewsid', id => $stub );
+  $c->redirect_to('aboutnewsid', id => $stub);
 }
 
 sub news_post_delete_any {
-  my $self = shift;
-
-  my $stub = $self->param('id');
-
-  my $p = Canvas::Store::Post->search({ name => $stub, type => 'news' })->first;
+  my $c = shift;
 
   # only allow authenticated users
-  return $self->redirect_to('aboutnews') unless $self->news_post_can_delete( $p );
+  if ($c->news->can_delete) {
+    my $stub = $c->param('id');
 
-  # check we found the post
-  if( $self->news_post_can_delete( $p ) ) {
-    $p->delete;
-  }
+    my $r = $c->pg->db->query("DELETE FROM canvas_post WHERE type='news' AND name=?", $stub);
+  };
 
-  $self->redirect_to('aboutnews');
+  $c->redirect_to('aboutnews');
 }
 
 sub news_admin_get {
-  my $self = shift;
+  my $c = shift;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('aboutnews') unless (
-    $self->news_post_can_add ||
-    $self->news_post_can_delete
+  return $c->redirect_to('aboutnews') unless (
+    $c->news->can_add || $c->news->can_delete
   );
 
-  my $pager = Canvas::Store::Post->pager(
-    where             => { type => 'news' },
-    order_by          => 'created DESC',
-    entries_per_page  => 20,
-    current_page      => ( $self->param('page') // 1 ) - 1,
-  );
+  my $page_size = 20;
+  my $page = ($c->param('page') // 1);
 
-  my $news = {
-    items       => [ $pager->search_where ],
-    item_count  => $pager->total_entries,
-    page_size   => $pager->entries_per_page,
-    page        => $pager->current_page + 1,
-    page_last   => ceil($pager->total_entries / $pager->entries_per_page),
-  };
+  $c->render_steps('website/news-admin', sub {
+    my $delay = shift;
 
-  $self->stash( news => $news );
+    # get total count
+    $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='news'" => $delay->begin);
 
-  $self->render('website/news-admin');
+    # get paged items with username and email associated
+    $c->pg->db->query("SELECT name, p.status, title, excerpt, TO_CHAR(p.created, 'DD/MM/YYYY') AS created, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type='news' ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+  },
+  sub {
+    my ($delay, $err, $count_res, $err_res, $res) = @_;
+
+    my $count = $count_res->array->[0];
+
+    $c->stash(news => {
+      items       => $res->hashes,
+      item_count  => $count,
+      page_size   => $page_size,
+      page        => $page,
+      page_last   => ceil($count / $page_size),
+    });
+  });
 }
-
 
 1;
