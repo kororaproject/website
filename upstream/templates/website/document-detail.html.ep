@@ -20,16 +20,16 @@
              <li><a href="/">Home</a></li>
               <li><a href="/support">Support</a></li>
               <li><a href="/support/documentation">Documentation</a></li>
-              <li class="active"><%= $document->title %></li>
+              <li class="active"><%= $document->{title} %></li>
             </ol>
-            <h1><%= $document->title %></h1>
+            <h1><%= $document->{title} %></h1>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
 
-%== render_markdown( $document->excerpt );
-%== render_markdown( $document->content );
+            <%== render_markdown($document->{excerpt}) %>
+            <%== render_markdown($document->{content}) %>
 
           </div>
         </div>
@@ -41,7 +41,7 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="text-right">
-% if( document_can_edit( $document ) ) {
+% if ($c->document->can_edit) {
               <a class="btn btn-default" href="<%= url_for_path(0, 'edit') %>">Edit</a>
 % }
             </div>

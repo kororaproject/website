@@ -32,8 +32,8 @@ use Time::Piece;
 #
 # LOCAL INCLUDES
 #
-use Canvas::Store::Post;
-use Canvas::Store::Pager;
+#use Canvas::Store::Post;
+#use Canvas::Store::Pager;
 
 #
 # CONSTANTS
@@ -123,31 +123,8 @@ sub sanitise_with_dashes($) {
   return $stub;
 }
 
-sub list_parents_for_post {
-  my $selected = shift;
-
-  my $parents = [];
-
-  push @{ $parents }, [ ( defined $selected && $selected == 0 ) ?
-    ( "None", 0, 'selected', 'selected' ) :
-    ( "None", 0, )
-  ];
-
-  my $documents = Canvas::Store::Post->documentation_index( all => 1 );
-  foreach my $d ( @{ $documents } ) {
-    my $title = ( "-" x $d->{depth} ) . " " . $d->{title};
-    push @{ $parents }, [ ( defined $selected && $selected == $d->{id} ) ?
-      ( $title, $d->{id}, 'selected', 'selected' ) :
-      ( $title, $d->{id} )
-    ]
-  }
-
-  return $parents;
-}
-
 sub list_status_for_post {
   my $selected = shift;
-
   my $status = [];
 
   foreach my $s ( POST_STATUS_MAP ) {
@@ -165,61 +142,79 @@ sub list_status_for_post {
 # DOCUMENTATION
 #
 
-sub index_get {
-  my $self = shift;
+sub index {
+  my $c = shift;
 
-  my $documents = Canvas::Store::Post->documentation_index;
+  $c->render_steps('website/document', sub {
+    my $delay = shift;
 
-  $self->stash( documents => $documents );
+    # get paged items with username and email associated
+    $c->pg->db->query("SELECT pm.meta_value::integer AS ho, hd.meta_value::integer AS depth, parent_id, name, title, id FROM canvas_post JOIN canvas_postmeta AS pm ON (pm.post_id=canvas_post.id AND pm.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=canvas_post.id AND hd.meta_key='hierarchy_depth') WHERE type='document'  AND status='publish' ORDER BY ho" => $delay->begin);
+  },
+  sub {
+    my ($delay, $err, $res) = @_;
 
-  $self->render('website/document');
+    $c->stash(documents => $res->hashes);
+  });
 }
 
 
 sub document_detail_get {
-  my $self = shift;
-  my $stub = $self->param('id');
+  my $c = shift;
+  my $stub = $c->param('id');
 
-  my $p = Canvas::Store::Post->search({ name => $stub, type => 'document' })->first;
+  $c->render_steps('website/document-detail', sub {
+    my $delay = shift;
 
-  # check we found the post
-  return $self->redirect_to('supportdocumentation') unless $self->document_can_view( $p );
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='document' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
+  }, sub {
+    my ($delay, $err, $res) = @_;
 
-  $self->stash( document => $p );
+    # check we found the post
+    my $post = $res->hash;
 
-  $self->render('website/document-detail');
+    $delay->emit(redirect => 'supportdocumentation') unless $c->document->can_view($post);
+
+    $c->stash(document => $post);
+  });
 }
 
 sub document_add_get {
-  my $self = shift;
+  my $c = shift;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/') unless $self->document_can_add;
+  return $c->redirect_to('/') unless $c->document->can_add;
 
-  $self->stash(
-    statuses  => list_status_for_post( 'draft' ),
-    parents  => list_parents_for_post( 0 ),
+  $c->stash(
+    statuses  => list_status_for_post('draft'),
+    parents  =>  $c->document->parents(0),
   );
-  $self->render('website/document-new');
+
+  $c->render('website/document-new');
 }
 
 sub document_edit_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $stub = $self->param('id');
+  my $stub = $c->param('id');
 
-  my $p = Canvas::Store::Post->search({ name => $stub, type => 'document' })->first;
+  $c->render_steps('website/document-edit', sub {
+    my $delay = shift;
 
-  # only allow those who are authorised to edit posts
-  return $self->redirect_to('supportdocumentation') unless $self->document_can_edit( $p );
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='document' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
+  }, sub {
+    my ($delay, $err, $res) = @_;
 
-  $self->stash(
-    document => $p,
-    statuses => list_status_for_post( $p->status ),
-    parents  => list_parents_for_post( $p->parent_id ),
-  );
+    # check we found the post
+    $delay->emit(redirect => 'supportdocumentation') unless $c->document->can_edit;
 
-  $self->render('website/document-edit');
+    my $d = $res->hash;
+    $c->stash(
+      document => $d,
+      statuses => list_status_for_post($d->{status}),
+      parents  => $c->document->parents($d->{parent_id}),
+    );
+  });
 }
 
 sub document_add_post {
@@ -363,32 +358,38 @@ sub document_delete_any {
 }
 
 sub document_admin_get {
-  my $self = shift;
+  my $c = shift;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('supportdocumentation') unless (
-    $self->document_can_add ||
-    $self->document_can_delete
+  return $c->redirect_to('supportdocumentation') unless (
+    $c->document->can_add || $c->document->can_delete
   );
 
-  my $pager = Canvas::Store::Post->pager(
-    where             => { type => 'document' },
-    order_by          => 'menu_order, title',
-    entries_per_page  => 20,
-    current_page      => ( $self->param('page') // 1 ) - 1,
-  );
+  my $page_size = 20;
+  my $page = ($c->param('page') // 1);
 
-  my $documents = {
-    items       => [ $pager->search_where ],
-    item_count  => $pager->total_entries,
-    page_size   => $pager->entries_per_page,
-    page        => $pager->current_page + 1,
-    page_last   => ceil($pager->total_entries / $pager->entries_per_page),
-  };
+  $c->render_steps('website/document-admin', sub {
+    my $delay = shift;
 
-  $self->stash( documents => $documents );
+    # get total count
+    $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='document'" => $delay->begin);
 
-  $self->render('website/document-admin');
+    # get paged items with username and email associated
+    $c->pg->db->query("SELECT name, p.status, title, excerpt, TO_CHAR(p.created, 'DD/MM/YYYY') AS created, username, email, pm.meta_value::integer AS ho, hd.meta_value::integer AS depth FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) JOIN canvas_postmeta AS pm ON (pm.post_id=p.id AND pm.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=p.id AND hd.meta_key='hierarchy_depth') WHERE p.type='document' ORDER BY ho, p.title, p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+  },
+  sub {
+    my ($delay, $err, $count_res, $err_res, $res) = @_;
+
+    my $count = $count_res->array->[0];
+
+    $c->stash(documents => {
+      items       => $res->hashes,
+      item_count  => $count,
+      page_size   => $page_size,
+      page        => $page,
+      page_last   => ceil($count / $page_size),
+    });
+  });
 }
 
 
