@@ -179,17 +179,6 @@ sub register {
     return ( $user_hash->{access} // 0 ) & ACCESS_CAN_NEWS_MODERATE;
   });
 
-
-
-  $app->helper('users.is_document_moderator' => sub {
-    my ($c, $user_hash) = @_;
-
-    return 0 unless ref $user_hash eq 'HASH';
-
-    return ( $user_hash->{access} // 0 ) & 0x80;
-  });
-
-
   $app->helper('users.validate' => sub {
     my ($c, $user_hash, $password) = @_;
 

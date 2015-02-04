@@ -56,7 +56,7 @@
           <div class="row">
             <div class="col-sm-6">
               <h2>Tags</h2>
-              <input type="text" name="tags" class="form-control" value="<%= $post->tag_list %>">
+              <input type="text" name="tags" class="form-control" value="<%= join ', ', @{$post->{tags}} %>">
             </div>
             <div class="col-sm-3">
               <h2>Author</h2>
@@ -72,7 +72,7 @@
             <div class="col-sm-12">
               <div class="text-right">
                 <a class="btn btn-default" href="<%= url_for_path(-2, 'admin') %>">Cancel</a>
-% if( news_post_can_delete( $post ) ) {
+% if ($c->news->can_delete) {
                 <a href="" class="btn btn-danger" data-toggle="modal" data-target="#modalNewsDelete">Delete</i></a>
 % }
                 <button type="submit" class="btn btn-success">Save</button>
@@ -92,7 +92,7 @@
   <!-- MODALS -->
   %= include 'authenticate.inc'
 
-% if( news_post_can_delete( $post ) ) {
+% if ($c->news->can_delete) {
   <div class="modal fade" id="modalNewsDelete" tabindex="-1" role="dialog" aria-labelledby="modalNewsDeleteLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-responsive">
       <div class="modal-content">

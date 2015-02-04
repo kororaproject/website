@@ -26,18 +26,18 @@
           </div>
         </div>
 
-% if( news_post_can_add ) {
+% if ($c->news->can_add) {
         <div class="row">
           <div class="col-sm-12">
             <div class="text-right">
-              <a class="btn btn-default" href="<%= url_for_path(-1, 'add') %>"><i class="fa fa-plus"></i> Post</a>
+              <a class="btn btn-default" href="<%= url_for('aboutnewsadd') %>"><i class="fa fa-plus"></i> Post</a>
             </div>
           </div>
         </div>
         <div class="hr"></div>
 % }
 
-% if( @{ $news->{items} } ) {
+% if (@{ $news->{items} }) {
         <div class="row-table admin-row-table">
           <div class="row row-header">
             <div class="col-sm-6">
@@ -57,16 +57,16 @@
 %   foreach my $n ( @{ $news->{items} } ) {
           <div class="row row-entry">
             <div class="col-sm-6">
-              <a href="<%= url_for_path(-1, $n->name, 'edit') %>"><%= $n->title %></a>
+              <a href="<%= url_for('aboutnewsidedit', id => $n->{name}) %>"><%= $n->{title} %></a>
             </div>
             <div class="col-sm-2">
-              <p class="text-center"><%= $n->status %></p>
+              <p class="text-center"><%= $n->{status} %></p>
             </div>
             <div class="col-sm-2">
-              <p class="text-center"><%= $n->author_id->username %></p>
+              <p class="text-center"><%= $n->{username} %></p>
             </div>
             <div class="col-sm-2">
-              <p class="text-center"><%= $n->created->strftime('%d/%m/%Y') %></p>
+              <p class="text-center"><%= $n->{created} %></p>
             </div>
           </div>
 %   }

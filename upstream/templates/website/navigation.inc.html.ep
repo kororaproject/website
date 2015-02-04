@@ -39,7 +39,7 @@
             <li><a href="/discover/xfce">Xfce Desktop</a></li>
           </ul>
         </li>
-        <li class="<%= 'active' if ( $active eq 'download' ) %>"><a href="/download">Download</a></li>
+        <li class="<%= 'active' if ($active eq 'download') %>"><a href="/download">Download</a></li>
         <li class="dropdown <%= 'active' if ( $active eq 'support' ) %>">
           <a href="/support" class="dropdown-toggle" data-toggle="dropdown">Support <b class="caret"></b></a>
           <ul class="dropdown-menu" role="menu">
@@ -52,16 +52,16 @@
       </ul>
 % if (is_user_authenticated) {
       <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown <%= 'active' if ( $active eq 'user' )%>">
+        <li class="dropdown <%= 'active' if ($active eq 'user')%>">
           <a href="" class="dropdown-toggle user-avatar" data-toggle="dropdown"><%== email_gravatar(auth_user->{email}) %><b class="caret"></b></a>
           <ul class="dropdown-menu" role="menu">
-%   if( news_post_can_add) {
+%   if ($c->news->can_add) {
             <li><a href="/about/news/admin">News Admin</a></li>
 %   }
-%   if( profile_user_can_add ) {
+%   if (profile_user_can_add) {
             <li><a href="/profile/admin">Profiles Admin</a></li>
 %   }
-%   if( document_can_add ) {
+%   if ($c->document->can_add) {
             <li><a href="/support/documentation/admin">Documentation Admin</a></li>
 %   }
             <li><a href="/profile/<%= auth_user->{username} %>">Profile</a></li>

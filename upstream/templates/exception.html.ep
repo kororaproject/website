@@ -11,6 +11,7 @@
 
   <link href="/css/bootstrap.min.css" rel="stylesheet">
   <link href="/css/font-awesome.css" rel="stylesheet">
+
   <link href="/css/canvas.css" rel="stylesheet" media="screen">
 
   <style type="text/css">
@@ -23,7 +24,8 @@
     }
 
     .wrapper {
-      margin: 16px 0;
+      margin: 8px auto;
+      max-width: 1048px;
       width: 100%;
     }
 
@@ -206,59 +208,57 @@
     <div class="error-page-content">
       <!-- CONTENT -->
 
+      <div class="error-page-banner">
+        <div class="text-center">
+          <a href="/" class="error-page-brand">
+            <div class="kp-logo-48">
+              <h1 class="title">KORORA<span class="title-dark">PROJECT</span></h1>
+            </div>
+          </a>
+        </div>
+
+        <div class="wrapper">
+          <div id="shell" class="px-shell">
+            <img src="/img/background.jpg" data-xrange="0" data-yrange="0" id="background"/>
+
+            <img src="/img/hills-3.png" data-xrange="10" data-yrange="5" id="hills-back"/>
+            <img src="/img/hills-2.png" data-xrange="20" data-yrange="10" id="hills-middle"/>
+            <img src="/img/hills-1.png" data-xrange="30" data-yrange="15" id="hills-fore"/>
+
+            <img src="/img/penguin.png" data-xrange="30" data-yrange="10" id="penguin"/>
+
+            <img src="/img/tree-1.png" data-xrange="30" data-yrange="12" id="tree-1-1"/>
+            <img src="/img/tree-2.png" data-xrange="25" data-yrange="10" id="tree-1-2"/>
+            <img src="/img/tree-3.png" data-xrange="35" data-yrange="15" id="tree-1-3"/>
+
+            <img src="/img/tree-4.png" data-xrange="25" data-yrange="10" id="tree-2-1"/>
+            <img src="/img/tree-4.png" data-xrange="25" data-yrange="10" id="tree-2-2"/>
+            <img src="/img/tree-1.png" data-xrange="25" data-yrange="10" id="tree-2-3"/>
+            <img src="/img/tree-4.png" data-xrange="22" data-yrange="8" id="tree-2-4"/>
+            <img src="/img/tree-2.png" data-xrange="25" data-yrange="10" id="tree-2-5"/>
+            <img src="/img/tree-4.png" data-xrange="20" data-yrange="7" id="tree-2-6"/>
+
+            <img src="/img/tree-2.png" data-xrange="14" data-yrange="5" id="tree-3-1"/>
+            <img src="/img/tree-1.png" data-xrange="16" data-yrange="6" id="tree-3-2"/>
+            <img src="/img/tree-1.png" data-xrange="12" data-yrange="4" id="tree-3-3"/>
+            <img src="/img/tree-2.png" data-xrange="14" data-yrange="5" id="tree-3-4"/>
+            <img src="/img/tree-1.png" data-xrange="15" data-yrange="5" id="tree-3-5"/>
+            <img src="/img/tree-1.png" data-xrange="15" data-yrange="5" id="tree-3-6"/>
+
+            <img src="/img/rock-1.png" data-xrange="45" data-yrange="15" id="rock-1-1"/>
+            <img src="/img/rock-2.png" data-xrange="35" data-yrange="10" id="rock-1-2"/>
+            <img src="/img/rock-3.png" data-xrange="40" data-yrange="12" id="rock-1-3"/>
+          </div>
+        </div>
+      </div>
+
       <div class="container">
         <div class="row">
           <div class="col-sm-12">
-            <div class="text-center">
-              <a href="/" class="brand">
-                <div class="kp-logo-48">
-                  <h1 class="title">KORORA<span class="title-dark">PROJECT</span></h1>
-                </div>
-              </a>
-            </div>
-
-            <div class="wrapper">
-              <div id="shell" class="px-shell">
-                <img src="/img/background.jpg" data-xrange="0" data-yrange="0" id="background"/>
-
-                <img src="/img/hills-3.png" data-xrange="10" data-yrange="5" id="hills-back"/>
-                <img src="/img/hills-2.png" data-xrange="20" data-yrange="10" id="hills-middle"/>
-                <img src="/img/hills-1.png" data-xrange="30" data-yrange="15" id="hills-fore"/>
-
-                <img src="/img/penguin.png" data-xrange="30" data-yrange="10" id="penguin"/>
-
-                <img src="/img/tree-1.png" data-xrange="30" data-yrange="12" id="tree-1-1"/>
-                <img src="/img/tree-2.png" data-xrange="25" data-yrange="10" id="tree-1-2"/>
-                <img src="/img/tree-3.png" data-xrange="35" data-yrange="15" id="tree-1-3"/>
-
-                <img src="/img/tree-4.png" data-xrange="25" data-yrange="10" id="tree-2-1"/>
-                <img src="/img/tree-4.png" data-xrange="25" data-yrange="10" id="tree-2-2"/>
-                <img src="/img/tree-1.png" data-xrange="25" data-yrange="10" id="tree-2-3"/>
-                <img src="/img/tree-4.png" data-xrange="22" data-yrange="8" id="tree-2-4"/>
-                <img src="/img/tree-2.png" data-xrange="25" data-yrange="10" id="tree-2-5"/>
-                <img src="/img/tree-4.png" data-xrange="20" data-yrange="7" id="tree-2-6"/>
-
-                <img src="/img/tree-2.png" data-xrange="14" data-yrange="5" id="tree-3-1"/>
-                <img src="/img/tree-1.png" data-xrange="16" data-yrange="6" id="tree-3-2"/>
-                <img src="/img/tree-1.png" data-xrange="12" data-yrange="4" id="tree-3-3"/>
-                <img src="/img/tree-2.png" data-xrange="14" data-yrange="5" id="tree-3-4"/>
-                <img src="/img/tree-1.png" data-xrange="15" data-yrange="5" id="tree-3-5"/>
-                <img src="/img/tree-1.png" data-xrange="15" data-yrange="5" id="tree-3-6"/>
-
-                <img src="/img/rock-1.png" data-xrange="45" data-yrange="15" id="rock-1-1"/>
-                <img src="/img/rock-2.png" data-xrange="35" data-yrange="10" id="rock-1-2"/>
-                <img src="/img/rock-3.png" data-xrange="40" data-yrange="12" id="rock-1-3"/>
-              </div>
-            </div>
-
-            <h3 class="text-center">Damn! A 500! ... Things just got real.</h3>
+            <h3 class="text-center">Damn! A <b>500</b>?! ... Things just got real.</h3>
             <div class="hr hr-lg"></div>
             <p class="text-center">We track these errors automatically, but if the problem persists feel free to <a href="mailto:webmaster@kororaproject.org">let us know</a>.</p>
-            <p class="text-center">In the meantime, try refreshing.</p>
-            <div class="text-center">
-              <a href="/" class="btn btn-success">Return Home</a>
-            </div>
-
+            <p class="text-center">In the meantime, try refreshing. Or just <a href="/">return Home</a>.</p>
           </div>
         </div>
       </div>

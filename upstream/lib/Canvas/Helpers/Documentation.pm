@@ -22,12 +22,10 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app) = @_;
 
-  $app->helper(document_can_view => sub {
+  $app->helper('document.can_view' => sub {
     my ($c, $document) = @_;
 
-    return 0 unless ref $document eq 'Canvas::Store::Post';
-
-    return 1 if $document->status eq 'publish';
+    return 1 if $document->{status} eq 'publish';
 
     return 0 unless $c->users->is_active($c->auth_user);
 
@@ -36,7 +34,7 @@ sub register {
     return 0;
   });
 
-  $app->helper(document_can_add => sub {
+  $app->helper('document.can_add' => sub {
     my ($c) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);
@@ -46,8 +44,18 @@ sub register {
     return 0;
   });
 
-  $app->helper(document_can_delete => sub {
+  $app->helper('document.can_delete' => sub {
     my ($c) = @_;
+
+    return 0 unless $c->users->is_active($c->auth_user);
+
+    return 1 if $c->users->is_admin($c->auth_user);
+
+    return 0;
+  });
+
+  $app->helper('document.can_edit' => sub {
+    my ($c, $document) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);
 
@@ -56,22 +64,26 @@ sub register {
     return 0;
   });
 
-  $app->helper(document_can_edit => sub {
-    my ($c, $document) = @_;
 
-    return 0 unless ref $document eq 'Canvas::Store::Post';
+  $app->helper('document.parents' => sub {
+    my ($c, $selected) = @_;
+    my $parents = [];
 
-    return 0 unless defined $self->auth_user;
+    $selected //= -1;
+    push @{$parents}, [
+      ($selected == 0) ? ("None", 0, 'selected', 'selected') : ("None", 0)
+    ];
 
-    return 0 unless $c->users->is_active($c->auth_user);
+    my $documents = $c->pg->db->query("SELECT pm.meta_value::integer AS ho, hd.meta_value::integer AS depth, title, id FROM canvas_post JOIN canvas_postmeta AS pm ON (pm.post_id=canvas_post.id AND pm.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=canvas_post.id AND hd.meta_key='hierarchy_depth') WHERE type='document' ORDER BY ho")->hashes;
 
-    return 1 if $c->users->is_document_moderator($c->auth_user);
+    foreach my $d (@{$documents}) {
+      my $t = ("-" x $d->{depth}) . " " . $d->{title};
+      push @{$parents}, [
+        ($selected == $d->{id}) ? ($t, $d->{id}, 'selected', 'selected') : ($t, $d->{id})
+      ]
+    }
 
-    return 0 unless $self->auth_user->is_active_account;
-
-    return 1 if $self->auth_user->is_document_moderator;
-
-    return 0;
+    return $parents;
   });
 }
 
