@@ -137,6 +137,7 @@ sub startup {
   #
   # HELPERS
   $self->app->log->info('Loading page helpers.');
+
   $self->plugin('Canvas::Helpers');
   $self->plugin('Canvas::Helpers::Documentation');
   $self->plugin('Canvas::Helpers::Engage');
@@ -216,7 +217,7 @@ sub startup {
 
   # support pages
   $r->get('/support')->to('support#index_get');
-  $r->get('/support/documentation')->to('documentation#index_get');
+  $r->get('/support/documentation')->to('documentation#index');
   $r->post('/support/documentation')->to('documentation#document_add_post');
   $r->get('/support/documentation/admin')->to('documentation#document_admin_get');
   $r->get('/support/documentation/add')->to('documentation#document_add_get');
@@ -246,7 +247,8 @@ sub startup {
   $r->any('/support/engage/:type/:stub/reply/:id/unaccept')->to('engage#engage_reply_unaccept_any');
 
 
-
+  # custom public static files
+  $r->get('/public/torrents/:file')->to('public#torrent');
 
   # authentication and registration
   $r->any('/authenticate')->to('site#authenticate_any');

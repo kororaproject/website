@@ -26,7 +26,7 @@
           </div>
         </div>
 
-% if( document_can_add ) {
+% if ($c->document->can_add ) {
         <div class="row">
           <div class="col-sm-12">
             <div class="text-right">
@@ -37,7 +37,7 @@
         <div class="hr"></div>
 % }
 
-% if( @{ $documents->{items} } ) {
+% if (@{$documents->{items}}) {
         <div class="row-table admin-row-table">
           <div class="row row-header">
             <div class="col-sm-6">
@@ -54,26 +54,26 @@
             </div>
           </div>
 
-%   foreach my $d ( @{ $documents->{items} } ) {
+%   foreach my $d (@{$documents->{items}}) {
           <div class="row row-entry">
             <div class="col-sm-6">
-              <a href="<%= url_for_path(-1, $d->name, 'edit') %>"><%= $d->title %></a>
+              <a href="<%= url_for('supportdocumentationidedit', id => $d->{name}) %>"><%== '&mdash;&nbsp;' x $d->{depth} %><%= $d->{title} %></a>
             </div>
             <div class="col-sm-2">
-              <p class="text-center"><%= $d->status %></p>
+              <p class="text-center"><%= $d->{status} %></p>
             </div>
             <div class="col-sm-2">
-              <p class="text-center"><%= $d->author_id->username %></p>
+              <p class="text-center"><%= $d->{username} %></p>
             </div>
             <div class="col-sm-2">
-              <p class="text-center"><%= $d->created->strftime('%d/%m/%Y') %></p>
+              <p class="text-center"><%= $d->{created} %></p>
             </div>
           </div>
 %   }
         </div>
 % }
 
-% if( $documents->{item_count} > $documents->{page_size} ) {
+% if ($documents->{item_count} > $documents->{page_size}) {
         <div class="row">
           <div class="col-sm-12 text-center">
             <%== paginate( $documents ) %>
