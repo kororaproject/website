@@ -30,7 +30,7 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="text-right">
-              <a class="btn btn-default" href="<%= url_for_path(-1, 'add') %>"><i class="fa fa-plus"></i> Document</a>
+              <a class="btn btn-default" href="<%= url_for('supportdocumentationadd') %>"><i class="fa fa-plus"></i> Document</a>
             </div>
           </div>
         </div>
@@ -76,7 +76,7 @@
 % if ($documents->{item_count} > $documents->{page_size}) {
         <div class="row">
           <div class="col-sm-12 text-center">
-            <%== paginate( $documents ) %>
+            <%== paginate($documents) %>
           </div>
         </div>
 % }

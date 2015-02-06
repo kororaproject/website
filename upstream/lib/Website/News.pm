@@ -181,12 +181,13 @@ sub news_post_edit_get {
 sub news_post {
   my $c = shift;
 
-  my $stub    = $c->param('post_id');
-  my $title   = $c->param('title');
+  my $author  = $c->param('author');
   my $content = $c->param('content');
   my $excerpt = $c->param('excerpt');
   my $status  = $c->param('status');
-  my $author  = $c->param('author');
+  my $stub    = $c->param('post_id');
+  my $title   = $c->param('title');
+  my $tag_list  = trim $c->param('tags');
 
   my $now = gmtime;
 

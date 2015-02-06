@@ -185,6 +185,8 @@ sub register {
   $app->helper(sanitise_with_dashes => sub {
     my( $self, $stub ) = @_;
 
+    $stub = trim $stub;
+
     # preserve escaped octets
     $stub =~ s|%([a-fA-F0-9][a-fA-F0-9])|---$1---|g;
     # remove percent signs that are not part of an octet
@@ -204,18 +206,6 @@ sub register {
     $stub =~ s/-+$//g;
 
     return $stub;
-  });
-
-  $app->helper(url_for_path => sub {
-    my( $self, $modifier ) = ( shift, shift );
-
-    $modifier //= 0;
-
-    my @path = split /\//, $self->url_for->path;
-    @path = @path[0..($#path+$modifier)];
-    push @path, @_;
-
-    return join '/', @path;
   });
 
   $app->helper(is_active_auth => sub {

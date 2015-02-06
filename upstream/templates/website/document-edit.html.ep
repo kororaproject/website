@@ -15,6 +15,7 @@
 
       <div id="page-about" class="container">
         <form action="<%= url_for('supportdocumentation') %>" method="post">
+          <input type="hidden" name="stub" value="<%= $document->{name} %>">
           <div class="row">
             <div class="col-sm-12">
             <ol class="breadcrumb">
@@ -82,7 +83,7 @@
           <div class="row">
             <div class="col-sm-12">
               <div class="text-right">
-                <a class="btn btn-default" href="<%= url_for_path(-2, 'admin') %>">Cancel</a>
+                <a class="btn btn-default" href="<%= url_for('supportdocumentationadmin') %>">Cancel</a>
 % if ($c->document->can_delete) {
                 <a href="" class="btn btn-danger" data-toggle="modal" data-target="#modalDocumentDelete">Delete</i></a>
 % }

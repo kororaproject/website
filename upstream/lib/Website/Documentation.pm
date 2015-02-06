@@ -99,30 +99,6 @@ sub rebuild_index() {
   });
 }
 
-sub sanitise_with_dashes($) {
-  my $stub = shift;
-
-  # preserve escaped octets
-  $stub =~ s|%([a-fA-F0-9][a-fA-F0-9])|---$1---|g;
-  # remove percent signs that are not part of an octet
-  $stub =~ s/%//g;
-  # restore octets.
-  $stub =~ s|---([a-fA-F0-9][a-fA-F0-9])---|%$1|g;
-
-  $stub = lc $stub;
-
-  # kill entities
-  $stub =~ s/&.+?;//g;
-  $stub =~ s/\./-/g;
-
-  $stub =~ s/[^%a-z0-9 _-]//g;
-  $stub =~ s/\s+/-/g;
-  $stub =~ s|-+|-|g;
-  $stub =~ s/-+$//g;
-
-  return $stub;
-}
-
 sub list_status_for_post {
   my $selected = shift;
   my $status = [];
@@ -157,7 +133,6 @@ sub index {
     $c->stash(documents => $res->hashes);
   });
 }
-
 
 sub document_detail_get {
   my $c = shift;
@@ -217,61 +192,99 @@ sub document_edit_get {
   });
 }
 
-sub document_add_post {
-  my $self = shift;
+sub document_post {
+  my $c = shift;
 
-  # ensure we can add pages
-  unless( $self->document_can_add ) {
-    return $self->redirect_to( 'supportdocumentation' );
-  }
-
-  my $stub = sanitise_with_dashes( $self->param('title') );
-
-  # enforce max stub size
-  $stub = substr $stub, 0, 128 if length( $stub ) > 128;
-
-  my( @e ) = Canvas::Store::Post->search({ type => 'document', name => $stub });
-
-  # check for existing stubs and append the ID + 1 of the last
-  $stub .= '-' . ( $e[-1]->id + 1 ) if @e;
+  my $author    = $c->param('author');
+  my $created   = $c->param('created');
+  my $content   = $c->param('content');
+  my $excerpt   = $c->param('excerpt');
+  my $order     = $c->param('order');
+  my $parent_id = $c->param('parent');
+  my $status    = $c->param('status');
+  my $stub      = $c->param('stub');
+  my $title     = $c->param('title');
+  my $tag_list  = trim $c->param('tags');
 
   my $now = gmtime;
 
-  my $p = Canvas::Store::Post->create({
-    name       => $stub,
-    type       => 'document',
-    menu_order => $self->param('order'),
-    status     => $self->param('status'),
-    title      => $self->param('title'),
-    excerpt    => $self->param('excerpt'),
-    content    => $self->param('content'),
-    parent_id  => $self->param('parent'),
-    author_id  => $self->auth_user->id,
-    created    => $now,
-    updated    => $now,
-  });
+  if ($stub ne '' && $c->document->can_edit) {
+    my $p = $c->pg->db->query("SELECT title, excerpt, content, TO_CHAR(p.created, 'YYYY-MM-DD HH24:MI:SS') AS created, author_id, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='document' AND name=?", $stub)->hash;
 
-  my $tag_list  = trim $self->param('tags');
-  my %tags = map  { $_ => 1 }
-             grep { $_ }
-             map  { sanitise_with_dashes( trim $_ ) } split /[ ,]+/, $tag_list;
+    # update author if changed
+    if ($author ne $p->{username}) {
+      my $u = $c->pg->db->query("SELECT id, username WHERE username=?", $author)->hash;
 
-  Canvas::Store->do_transaction( sub {
-    # create the tags
-    foreach my $tag ( keys %tags ) {
-      $tag = trim $tag;
-      my $t  = Canvas::Store::Tag->find_or_create({ name => $tag });
-      my $pt = Canvas::Store::PostTag->find_or_create({
-        post_id => $p->id,
-        tag_id  => $t->id
-      });
+      $p->{author_id} = $u->{id} if $u->{id};
     }
-  });
 
+    # TODO: update created if changed
+    #my $t = Time::Piece->strptime($created, '%d/%m/%Y %H:%M:%S');
+ 
+    my $r = $c->pg->db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, parent_id=?, menu_order=?, created=?, updated=? WHERE type='document' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $parent_id, $order, $created, $now, $stub);
 
-  rebuild_index();
+    # find tags to add and remove
+    my @tags_old = $p->tag_list_array;
+    my @tags_new = map { sanitise_with_dashes($_) } split /[ ,]+/, $self->param('tags');
 
-  $self->redirect_to( 'supportdocumentationid', id => $stub );
+    my %to = map { $_ => 1 } @tags_old;
+    my %tn = map { $_ => 1 } @tags_new;
+
+    # add tags
+    foreach my $ta ( grep( ! defined $to{$_}, @tags_new ) ) {
+      my $t  = Canvas::Store::Tag->find_or_create({ name => $ta });
+      my $pt = Canvas::Store::PostTag->find_or_create({ post_id => $p->id, tag_id => $t->id })
+    }
+
+    # remove tags
+    foreach my $td ( grep( ! defined $tn{$_}, @tags_old ) ) {
+      my $t = Canvas::Store::Tag->search({ name => $td })->first;
+      Canvas::Store::PostTag->search({ post_id => $p->id, tag_id => $t->id })->first->delete;
+    }
+  }
+  # otherwise create a new entry
+  elsif ($c->document->can_add) {
+    my $stub = $c->sanitise_with_dashes($title);
+
+    my $db = $c->pg->db;
+    my $tx = $db->begin;
+
+    # check for existing stubs and append the ID + 1 of the last
+    my $e = $db->query("SELECT id FROM canvas_post WHERE type='document' AND name=? ORDER BY id DESC LIMIT 1", $stub)->array;
+    $stub .= '-' . ($e->[0] + 1) if $e;
+
+    $created = $now;
+
+    my $post_id = $db->query("INSERT INTO canvas_post (type, name, status, title, excerpt, content, author_id, parent_id, menu_order, created, updated) VALUES ('document', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID", $stub, $status, $title, $excerpt, $content, 1, $parent_id, $order, $created, $now)->array->[0];
+
+    # ensure we only insert sanitised and unique tags
+    my %tags = map  { trim($_) => 1 }
+                 grep { $_ }
+                   map  { $c->sanitise_with_dashes($_) }
+                     split /[ ,]+/, $tag_list;
+
+    # create the tags
+    foreach my $tag (keys %tags) {
+      # find or create tag
+      my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $tag)->hash;
+
+      unless ($t) {
+        $t->{id} = $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $tag)->array->[0];
+      }
+
+      # insert the link
+      my $pt = $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?) ", $post_id, $t->{id});
+    }
+
+    $tx->commit;
+  }
+  else {
+    return $c->redirect_to('aboutdocumentadmin');
+  }
+
+#  rebuild_index();
+
+  $c->redirect_to('supportdocumentationid', id => $stub);
 }
 
 sub document_edit_post {
@@ -316,7 +329,7 @@ sub document_edit_post {
 
     # find tags to add and remove
     my @tags_old = $p->tag_list_array;
-    my @tags_new = map { sanitise_with_dashes( trim $_ ) } split /[ ,]+/, $self->param('tags');
+    my @tags_new = map { sanitise_with_dashes($_) } split /[ ,]+/, $self->param('tags');
 
     my %to = map { $_ => 1 } @tags_old;
     my %tn = map { $_ => 1 } @tags_new;

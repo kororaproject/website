@@ -34,7 +34,7 @@
           <div class="col-sm-12">
 % if( @{ $documents } ) {
 %   foreach my $n ( @{ $documents } ) {
-<p class="documentation-index documentation-level-<%= $n->{depth} %>"><a href="<%= url_for_path(0, $n->{name}) %>"><%= $n->{title} %></a></p>
+<p class="documentation-index documentation-level-<%= $n->{depth} %>"><a href="<%= url_for('supportdocumentationid', id => $n->{name}) %>"><%= $n->{title} %></a></p>
 
 %   }
 % } else {

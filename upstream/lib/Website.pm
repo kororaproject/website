@@ -218,12 +218,11 @@ sub startup {
   # support pages
   $r->get('/support')->to('support#index_get');
   $r->get('/support/documentation')->to('documentation#index');
-  $r->post('/support/documentation')->to('documentation#document_add_post');
+  $r->post('/support/documentation')->to('documentation#document_post');
   $r->get('/support/documentation/admin')->to('documentation#document_admin_get');
   $r->get('/support/documentation/add')->to('documentation#document_add_get');
   $r->get('/support/documentation/:id')->to('documentation#document_detail_get');
   $r->get('/support/documentation/:id/edit')->to('documentation#document_edit_get');
-  $r->post('/support/documentation/:id/edit')->to('documentation#document_edit_post');
   $r->any('/support/documentation/:id/delete')->to('documentation#document_delete_any');
 
 
