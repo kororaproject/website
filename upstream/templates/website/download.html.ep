@@ -48,6 +48,7 @@
           </ul>
 
 % foreach my $r ( @{ $map->{releases} } ) {
+%   next unless $r->{available};
           <div class="row callout callout-<%= $r->{isStable} ? 'info' : 'warning'%>" ng-hide="pageLoaded">
             <h2><%= $r->{name} %> (<%= $r->{codename} %>)</h2>
             <h4>Released: <span><%= $r->{released} %></span></h4>

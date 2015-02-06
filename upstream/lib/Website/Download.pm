@@ -45,107 +45,107 @@ use constant DOWNLOAD_MAP => {
   },
   releases => [
     {
-      name      => 'Korora 21 - Beta',
+      name      => 'Korora 21',
       version   => '21',
       codename  => 'Darla',
-      isStable  => 0,
-      isCurrent => 0,
-      released  => '3 January 2015',
+      isStable  => 1,
+      isCurrent => 1,
+      released  => '6 February 2015',
       available => 1,
       isos => {
         cinnamon => {
           i386 => {
             url => {
-              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-i386-cinnamon-live.iso/download',
-              torrent => '/torrents/korora-21-beta-i386-cinnamon-live-iso.torrent'
+              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-i386-cinnamon-live.iso/download',
+              torrent => '/torrents/korora-21-i386-cinnamon-live-iso.torrent'
             },
             checksum => {
-              md5     => 'f625a9ba53371124ddadade8785ca687',
-              sha1    => '41d7e72a9f73c5e76559cea2f3b4dc1d9c1172bf',
-              sha256  => '09404a4118f11435f13af4335f4c6a134df23d46bb70b8a5583b19a6d4262509',
+              md5     => 'de6252cd96cacc888b4acbef8c8afec2',
+              sha1    => 'ce3f6b9bb84c4573a5b8a2ad9904da2e8ba8f435',
+              sha256  => '6fe00371dfc12a7e12283e5f2c49d454947e514a6869676c12fe947279062ccd',
             },
           },
           x86_64 => {
             url => {
-              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-x86_64-cinnamon-live.iso/download',
-              torrent => '/torrents/korora-21-beta-x86_64-cinnamon-live-iso.torrent'
+              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-x86_64-cinnamon-live.iso/download',
+              torrent => '/torrents/korora-21-x86_64-cinnamon-live-iso.torrent'
             },
             checksum => {
-              md5    => 'cf6c2dc4b71e401c2ad8279b4db14ae4',
-              sha1   => '8a54e52d7df64818731f27aa7b415deeba8a409e',
-              sha256 => '046d0b8f69343d5fe5682710a1ea9293f6bb56188f71afd0362d93cffa0f9dc9'
+              md5    => 'd600dfbd777d4b39385dab7b1ad95783',
+              sha1   => '0a8897c3a74666452733e9b5d550efa18637a8a3',
+              sha256 => 'a44e7e2f3ad0fbe67a35aa3d71bf9f2e81eb1ba8a3f11075eba970996c3fe269'
             },
           },
         },
         gnome => {
           i386 => {
             url => {
-              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-i386-gnome-live.iso/download',
-              torrent => '/torrents/korora-21-beta-i386-gnome-live-iso.torrent'
+              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-i386-gnome-live.iso/download',
+              torrent => '/torrents/korora-21-i386-gnome-live-iso.torrent'
             },
             checksum => {
-              md5     => '72ce907bb59b48a74eff382fe1ab121d',
-              sha1    => 'b4ddc9774e6a544d765a768de9abff14cd0d457b',
-              sha256  => '17fcb0b39a26e9f3116e9aec987abd24808c049e25601e9fa64527d5fc0b6296',
+              md5     => '59aa3addf189861b9d0cb1f3e3d1169b',
+              sha1    => '5fcecabcb43028a4d2d341730f216d03fcdcb307',
+              sha256  => 'fa38a6039ced9995cb8c0ccf6662cf3989d25fc659f2f4779b64298771766782',
             },
           },
           x86_64 => {
             url => {
-              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-x86_64-gnome-live.iso/download',
-              torrent => '/torrents/korora-21-beta-x86_64-gnome-live-iso.torrent'
+              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-x86_64-gnome-live.iso/download',
+              torrent => '/torrents/korora-21-x86_64-gnome-live-iso.torrent'
             },
             checksum => {
-              md5     => 'ac6cff1811b2e94e7b11e98cfb40b87e',
-              sha1    => 'aa20fd6bc30a8256c9f96e4f1edbbf7c17b93c36',
-              sha256  => '4d44072ffe9cadc9e3c0fcfcbc1d9c6abdaae081ea20aad858de91330f1b1400'
+              md5     => '741fbae6cc9246892a7ca8172b3674f1',
+              sha1    => '2c8cdecdd0324f83ce4d5a0c5f16b71d99ff4e08',
+              sha256  => 'b5794237aadb9a719b5dd35c4ef3d908d90b20debb8f6b2c94884ada74628bcf'
             },
           },
         },
         kde => {
           i386 => {
             url => {
-              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-i386-kde-live.iso/download',
-              torrent => '/torrents/korora-21-beta-i386-kde-live-iso.torrent'
+              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-i386-kde-live.iso/download',
+              torrent => '/torrents/korora-21-i386-kde-live-iso.torrent'
             },
             checksum => {
-              md5     => 'c742544afa6153fff55461c2f18c2f18',
-              sha1    => 'efe003d3263cf3a8160d78577c0b4bd8600ea63f',
-              sha256  => '380a82e004bf30d981927d892c2a388062cd17fa53a80135783b3986e8223cab',
+              md5     => '76c8041a8b447f948c931050e101f0ba',
+              sha1    => 'b259d451e120424aa545ab04f3ea73911f2c5e11',
+              sha256  => '2a7722dc56d481f8825851fab28014cede6cb250df7a5f7788420011a4c98185',
             },
           },
           x86_64 => {
             url => {
-              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-x86_64-kde-live.iso/download',
-              torrent => '/torrents/korora-21-beta-x86_64-kde-live-iso.torrent'
+              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-x86_64-kde-live.iso/download',
+              torrent => '/torrents/korora-21-x86_64-kde-live-iso.torrent'
             },
             checksum => {
-              md5     => '1678d80713f4ec166cab78b3a2e3abcc',
-              sha1    => 'd36660d6e1f1398dc56d77ef886dfb26215158d7',
-              sha256  => 'de7a311bf87262b56a6afccc8573531d9f953c5bddf09b7b95be66619f785e39'
+              md5     => '8a75040a6f426292319aff5375ddbddc',
+              sha1    => '9a72b79d00c9c8815203a1665b7af066cafc2b10',
+              sha256  => '76578bc4ae127a58f3bab490fde957e6d944661d4f292e75f8b6d274721fd447'
             },
           },
         },
         xfce => {
           i386 => {
             url => {
-              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-i386-xfce-live.iso/download',
-              torrent => '/torrents/korora-21-beta-i386-xfce-live-iso.torrent'
+              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-i386-xfce-live.iso/download',
+              torrent => '/torrents/korora-21-i386-xfce-live-iso.torrent'
             },
             checksum => {
-              md5     => '2ebcd2cd67d25cbf14a2872e48dee425',
-              sha1    => '6297e4b41cee070b3c0781cc8e60eab03c8c0ef6',
-              sha256  => '3eb3ffc8d8c1ac7b113cf545b01ebb02db3ae655cd6ddac5c02b19e1b8dd1ebe'
+              md5     => '8a355a3c797d767e57720b080f2592f8',
+              sha1    => 'b447a279fc67dca235d2e4db326fcfae862320d0',
+              sha256  => 'c62212897f7f0aa6027d56ffdb34d4b4ca6f62b3d4cb85c308755ff11bc0875c'
             },
           },
           x86_64 => {
             url => {
-              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-beta-x86_64-xfce-live.iso/download',
-              torrent => '/torrents/korora-21-beta-x86_64-xfce-live-iso.torrent'
+              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-x86_64-xfce-live.iso/download',
+              torrent => '/torrents/korora-21-x86_64-xfce-live-iso.torrent'
             },
             checksum => {
-              md5     => '6df9fac7c3ac338631700c3387e059c9',
-              sha1    => '9cc534b46499d8c1ba0498d88ebc3f44d540a56d',
-              sha256  => 'cecf291356f9cab4a930de8b42492dab5ff283e9f7a2fd27f874db8b8861e536',
+              md5     => '08f8e173e89735bba69fde8f81b7ebb6',
+              sha1    => 'a7a803e7ad155876ad5a0ea5b8bd776c9a66b22b',
+              sha256  => '492ad02a512f995d0f1cb43e30eca78bc79642ff56e25960c1c6c9f4395552e7',
             },
           },
         },
@@ -156,7 +156,7 @@ use constant DOWNLOAD_MAP => {
       version   => '20',
       codename  => 'Peach',
       isStable  => 1,
-      isCurrent => 1,
+      isCurrent => 0,
       released  => '10 January 2014',
       available => 1,
       isos => {
