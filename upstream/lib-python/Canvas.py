@@ -65,6 +65,9 @@ class Template(object):
       if 'id' in template:
         self._id = template['id']
 
+      if 'user' in template:
+        self._user = template['user']
+
       if 'name' in template:
         self._name = template['name']
 
