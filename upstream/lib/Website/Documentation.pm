@@ -51,30 +51,26 @@ use constant POST_STATUS_MAP => (
 #
 
 sub _tree {
+  my $c    = shift;
   my $t    = shift;
   my $p_id = shift // 0;
   my $depth = shift // 0;
 
-  my( @docs ) = Canvas::Store::Post->search({
-    type      => 'document',
-    parent_id => $p_id,
-  });
+  my $docs = $c->pg->db->query("SELECT menu_order, title FROM canvas_post WHERE type='document' AND parent_id=?", $p_id)->hashes;
 
-  foreach my $d ( sort { $a->menu_order <=> $b->menu_order or $a->title cmp $b->title } @docs ) {
-    push @{ $t }, {
-      data => $d,
-      depth => $depth
-    };
-    _tree( $t, $d->id, $depth+1 );
+  foreach my $d (sort { $a->{menu_order} <=> $b->{menu_order} or $a->{title} cmp $b->{title} } @{$docs}) {
+    push @{$t}, { data => $d, depth => $depth };
+    $c->_tree($t, $d->id, $depth+1);
   }
 }
 
 
 sub rebuild_index() {
+  my $c    = shift;
   my $documents = [];
 
   # recursively rebuild the doc index
-  _tree( $documents );
+  $c->_tree($documents);
 
   # update documenation metadata
   my $order = 0;
@@ -82,19 +78,27 @@ sub rebuild_index() {
     for my $d ( @{ $documents } ) {
       $order++;
 
-      my $do = Canvas::Store::PostMeta->find_or_create({
-        post_id     => $d->{data}->id,
-        meta_key    => 'hierarchy_order',
-      });
-      $do->meta_value( $order );
-      $do->update;
+      # find tag
+      my $t = $c->pg->db->query("SELECT meta_id FROM canvas_postmeta WHERE post_id=? AND meta_key='hierarchy_order", $d->{data}{id})->hash;
 
-      my $dd = Canvas::Store::PostMeta->find_or_create({
-        post_id     => $d->{data}->id,
-        meta_key    => 'hierarchy_depth',
-      });
-      $dd->meta_value( $d->{depth} );
-      $dd->update;
+      # create or update
+      if ($t) {
+        $c->pg->db->query("UPDATE canvas_postmeta SET meta_value=?", $order);
+      }
+      else {
+        $c->pg->db->query("INSERT INTO canvas_postmeta (meta_value) VALUES (?)", $order);
+      }
+
+      # find tag
+      my $d = $c->pg->db->query("SELECT meta_id FROM canvas_postmeta WHERE post_id=? AND meta_key='hierarchy_depth", $d->{data}{id})->hash;
+
+      # create or update
+      if ($d) {
+        $c->pg->db->query("UPDATE canvas_postmeta SET meta_value=?", $d->{depth});
+      }
+      else {
+        $c->pg->db->query("INSERT INTO canvas_postmeta (meta_value) VALUES (?)", $d->{depth});
+      }
     }
   });
 }
@@ -202,7 +206,7 @@ sub document_post {
   my $order     = $c->param('order');
   my $parent_id = $c->param('parent');
   my $status    = $c->param('status');
-  my $stub      = $c->param('stub');
+  my $stub      = $c->param('stub') // '';
   my $title     = $c->param('title');
   my $tag_list  = trim $c->param('tags');
 
@@ -224,8 +228,8 @@ sub document_post {
     my $r = $c->pg->db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, parent_id=?, menu_order=?, created=?, updated=? WHERE type='document' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $parent_id, $order, $created, $now, $stub);
 
     # find tags to add and remove
-    my @tags_old = $p->tag_list_array;
-    my @tags_new = map { sanitise_with_dashes($_) } split /[ ,]+/, $self->param('tags');
+    my @tags_old = $p->tags;
+    my @tags_new = map { sanitise_with_dashes($_) } split /[ ,]+/, $tag_list;
 
     my %to = map { $_ => 1 } @tags_old;
     my %tn = map { $_ => 1 } @tags_new;
