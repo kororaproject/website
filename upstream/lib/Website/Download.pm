@@ -57,7 +57,7 @@ use constant DOWNLOAD_MAP => {
           i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-i386-cinnamon-live.iso/download',
-              torrent => '/torrents/korora-21-i386-cinnamon-live-iso.torrent'
+              torrent => '/download/torrents/korora-21-i386-cinnamon-live-iso.torrent'
             },
             checksum => {
               md5     => 'de6252cd96cacc888b4acbef8c8afec2',
@@ -68,7 +68,7 @@ use constant DOWNLOAD_MAP => {
           x86_64 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-x86_64-cinnamon-live.iso/download',
-              torrent => '/torrents/korora-21-x86_64-cinnamon-live-iso.torrent'
+              torrent => '/download/torrents/korora-21-x86_64-cinnamon-live-iso.torrent'
             },
             checksum => {
               md5    => 'd600dfbd777d4b39385dab7b1ad95783',
@@ -81,7 +81,7 @@ use constant DOWNLOAD_MAP => {
           i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-i386-gnome-live.iso/download',
-              torrent => '/torrents/korora-21-i386-gnome-live-iso.torrent'
+              torrent => '/download/torrents/korora-21-i386-gnome-live-iso.torrent'
             },
             checksum => {
               md5     => '59aa3addf189861b9d0cb1f3e3d1169b',
@@ -92,7 +92,7 @@ use constant DOWNLOAD_MAP => {
           x86_64 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-x86_64-gnome-live.iso/download',
-              torrent => '/torrents/korora-21-x86_64-gnome-live-iso.torrent'
+              torrent => '/download/torrents/korora-21-x86_64-gnome-live-iso.torrent'
             },
             checksum => {
               md5     => '741fbae6cc9246892a7ca8172b3674f1',
@@ -105,7 +105,7 @@ use constant DOWNLOAD_MAP => {
           i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-i386-kde-live.iso/download',
-              torrent => '/torrents/korora-21-i386-kde-live-iso.torrent'
+              torrent => '/download/torrents/korora-21-i386-kde-live-iso.torrent'
             },
             checksum => {
               md5     => '76c8041a8b447f948c931050e101f0ba',
@@ -116,7 +116,7 @@ use constant DOWNLOAD_MAP => {
           x86_64 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-x86_64-kde-live.iso/download',
-              torrent => '/torrents/korora-21-x86_64-kde-live-iso.torrent'
+              torrent => '/download/torrents/korora-21-x86_64-kde-live-iso.torrent'
             },
             checksum => {
               md5     => '8a75040a6f426292319aff5375ddbddc',
@@ -129,7 +129,7 @@ use constant DOWNLOAD_MAP => {
           i386 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-i386-xfce-live.iso/download',
-              torrent => '/torrents/korora-21-i386-xfce-live-iso.torrent'
+              torrent => '/download/torrents/korora-21-i386-xfce-live-iso.torrent'
             },
             checksum => {
               md5     => '8a355a3c797d767e57720b080f2592f8',
@@ -140,7 +140,7 @@ use constant DOWNLOAD_MAP => {
           x86_64 => {
             url => {
               http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-x86_64-xfce-live.iso/download',
-              torrent => '/torrents/korora-21-x86_64-xfce-live-iso.torrent'
+              torrent => '/download/torrents/korora-21-x86_64-xfce-live-iso.torrent'
             },
             checksum => {
               md5     => '08f8e173e89735bba69fde8f81b7ebb6',
@@ -289,11 +289,19 @@ use constant DOWNLOAD_MAP => {
 # CONTROLLER HANDLERS
 #
 sub index {
-  my $self = shift;
+  my $c = shift;
 
-  $self->stash(map => DOWNLOAD_MAP, static_map => encode_json(DOWNLOAD_MAP));
+  $c->stash(map => DOWNLOAD_MAP, static_map => encode_json(DOWNLOAD_MAP));
 
-  $self->render('website/download');
+  $c->render('website/download');
+}
+
+sub torrent_file {
+  my $c = shift;
+  my $file = $c->param('file');
+
+  $c->res->headers->content_type('application/x-bittorrent');
+  $c->reply->static('torrents/' . $file);
 }
 
 1;

@@ -192,6 +192,7 @@ sub startup {
 
   # download pages
   $r->get('/download')->to('download#index');
+  $r->get('/download/torrents/#file')->to('download#torrent_file');
 
   # support pages
   $r->get('/support')->to('support#index_get');
