@@ -90,8 +90,7 @@ sub login {
 
 sub authenticate_any {
   my $self = shift;
-  my $json = Mojo::JSON->new;
-  my $data = $json->decode($self->req->body);
+  my $data = $self->req->json;
 
   # collect first out of the parameters and then json decoded body
   my $user = $self->param('u') // $data->{u} // '';
