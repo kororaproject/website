@@ -22,7 +22,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app) = @_;
 
-  $app->helper(profile_can_change_password => sub {
+  $app->helper('profile.can_change_password' => sub {
     my ($c, $user) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);
@@ -34,7 +34,7 @@ sub register {
     return 0;
   });
 
-  $app->helper(profile_user_can_add => sub {
+  $app->helper('profile.can_add' => sub {
     my ($c, $user) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);
@@ -44,7 +44,7 @@ sub register {
     return 0;
   });
 
-  $app->helper(profile_user_can_edit => sub {
+  $app->helper('profile.can_edit' => sub {
     my ($c, $user) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);
@@ -54,10 +54,22 @@ sub register {
     return 0;
   });
 
-  $app->helper(profile_user_can_delete => sub {
+  $app->helper('profile.can_manage' => sub {
+    my ($c) = @_;
+
+    return 0 unless $c->users->is_active($c->auth_user);
+
+    return 1 if $c->users->is_admin($c->auth_user);
+
+    return 0;
+  });
+
+  $app->helper('profile.user_can_delete' => sub {
     my ($c, $user) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);
+
+    return 1 if $c->auth_user->{id} == $user->{id};
 
     return 1 if $c->users->is_admin($c->auth_user);
 

@@ -48,19 +48,19 @@
 %   foreach my $u ( @{ $profiles->{items} } ) {
           <div class="row row-entry">
             <div class="col-sm-2">
-              <a href="/profile/<%= $u->username %>"><%= $u->username %></a>
+              <a href="<%= url_for('profilename', name => $u->{username}) %>"><%= $u->{username} %></a>
             </div>
             <div class="col-sm-2">
-              <p class=""><%= $u->realname %></p>
+              <p class=""><%= $u->{realname} %></p>
             </div>
             <div class="col-sm-4">
-              <p class=""><%= $u->email %></p>
+              <p class=""><%= $u->{email} %></p>
             </div>
             <div class="col-sm-2">
-              <p class="text-center"><%= $u->status %></p>
+              <p class="text-center"><%= $u->{status} %></p>
             </div>
             <div class="col-sm-2">
-              <p class="text-center"><%= $u->created->strftime('%d/%m/%Y') %></p>
+              <p class="text-center"><%= $u->{created} %></p>
             </div>
           </div>
 %   }

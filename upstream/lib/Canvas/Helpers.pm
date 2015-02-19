@@ -23,8 +23,9 @@ use Mojo::Base 'Mojolicious::Plugin';
 # PERL INCLUDES
 #
 use Data::Dumper;
+use List::Util qw(min max);
 use List::MoreUtils qw(any);
-use Mojo::Util qw(md5_sum trim url_escape);
+use Mojo::Util qw(b64_decode b64_encode md5_sum trim url_escape);
 use POSIX qw(floor);
 use Time::Piece;
 
@@ -182,6 +183,22 @@ sub register {
 
   });
 
+  $app->helper(ub64_decode => sub {
+    my ($self, $in) = @_;
+    $in =~ tr|-_~|+/=|;
+    my $out = b64_decode($in);
+
+    return $out;
+  });
+
+  $app->helper(ub64_encode => sub {
+    my ($self, $in) = @_;
+    my $out = b64_encode($in);
+    $out =~ tr|+/=|-_~|;
+
+    return $out;
+  });
+
   $app->helper(sanitise_with_dashes => sub {
     my( $self, $stub ) = @_;
 
@@ -219,7 +236,7 @@ sub register {
   });
 
   $app->helper(paginate => sub {
-    my( $self, $pager ) = ( shift, shift );
+    my ($self, $pager) = (shift, shift);
 
     my $items     = $pager->{item_count}  // 0;
     my $page_size = $pager->{page_size}   // 0;
@@ -227,21 +244,34 @@ sub register {
     my $page_last = $pager->{page_last}   // 0;
 
     # only build if we have more than one page
-    if( $page_last > 1 ) {
-      my $page_show = 5;
+    if ($page_last > 1) {
+      my $page_show_max = 6;
       my $url = $self->url_with;
 
       my @pager_items;
 
-      # add "previous" marker
-      push @pager_items,'<li class="' . ( ($page > 1 ) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => ($page > 1) ? ($page-1) : undef ]) . '"><i class="fa fa-fw fa-chevron-left"></i></a></li>';
+      my $page_show_start = min(max(1, $page - floor($page_show_max / 2)), $page_last-$page_show_max);
+      my $page_show_end = $page_show_start + $page_show_max;
 
-      foreach my $p ( 1..$page_last ) {
+      #
+      # add "first" marker
+      push @pager_items, '<li class="' . ( ($page > $page_show_max) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => ($page-$page_show_max>1) ? ($page-$page_show_max) : 1]) . '"><i class="fa fa-fw fa-angle-double-left"></i></a></li>';
+
+      #
+      # add "previous" marker
+      push @pager_items, '<li class="' . ( ($page > 1 ) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => ($page > 1) ? ($page-1) : undef ]) . '"><i class="fa fa-fw fa-angle-left"></i></a></li>';
+
+
+
+      foreach my $p ($page_show_start..$page_show_end) {
         push @pager_items, '<li class="' . ( ( $p == $page ) ? 'active': '' ) . '"><a href="' . $url->query([ page => ($p > 1) ? $p : undef ]) . '">' . $p . '</a></li>';
       }
 
       # add "next" marker
-      push @pager_items,'<li class="' . ( ( $page < $page_last ) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => $page+1 ]) . '"><i class="fa fa-fw fa-chevron-right"></i></a></li>';
+      push @pager_items,'<li class="' . ( ( $page < $page_last ) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => $page+1 ]) . '"><i class="fa fa-fw fa-angle-right"></i></a></li>';
+
+      # add "next" marker
+      push @pager_items,'<li class="' . ( ( $page < $page_last ) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => $page+1 ]) . '"><i class="fa fa-fw fa-angle-double-right"></i></a></li>';
 
       return '<ul class="pagination pagination-sm">' . join('', @pager_items) . '</ul>';
     }

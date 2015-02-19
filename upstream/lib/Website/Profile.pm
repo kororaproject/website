@@ -34,42 +34,45 @@ use POSIX qw(ceil);
 #
 
 sub profile_get {
-  my $self = shift;
+  my $c = shift;
 
-  return $self->redirect_to('/') unless $self->is_user_authenticated;
+  # TODO: what aspect of the profile should be public?
+#  return $c->redirect_to('/') unless $c->is_user_authenticated;
 
-  my $u = Canvas::Store::User->search({
-    username  => $self->param('name'),
-  })->first;
+  $c->render_steps('website/profile', sub {
+    my $delay = shift;
 
-  return $self->redirect_to('/') unless defined $u;
+    my $username = $c->param('name');
 
-  $self->stash( user => $u );
-  $self->render('website/profile');
+    # get paged items with username and email associated
+    $c->pg->db->query("SELECT * FROM canvas_user WHERE username=?" => ($username) => $delay->begin);
+  },
+  sub {
+    my ($delay, $err, $res) = @_;
+
+    my $u = $res->hash;
+
+    $delay->emit(redirect => '/') unless defined $u;
+
+    $c->stash(user => $u);
+  });
 }
 
 sub profile_reset_password_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $user = $self->param('name');
+  my $user = $c->param('name');
+  my $token = $c->param('token');
 
   # lookup the requested account for activation
-  my $u = Canvas::Store::User->search({ username => $user })->first;
-
-  my $token = $u->metadata('password_reset_token');
+  my $u = $c->pg->db->query("SELECT u.*, meta_key AS key FROM canvas_user u JOIN canvas_usermeta um ON (u.id=um.user_id) WHERE u.username=? AND key='password_reset_token'", $user)->hash;
 
   # redirect to home unless account and activation token suffix exists
-  return $self->redirect_to('/') unless(
-    defined $u &&
-    defined $token &&
-    $token eq $self->param('token')
-  );
+  return $c->redirect_to('/') unless defined $u && $u->{token} eq $token;
 
-  $self->stash(
-    values  => { user => $user },
-  );
+  $c->stash(values => { user => $user });
 
-  $self->render('website/forgot-password');
+  $c->render('website/forgot-password');
 }
 
 sub profile_reset_password_post {
@@ -143,66 +146,59 @@ sub profile_reset_password_post {
 }
 
 sub profile_status_post {
-  my $self = shift;
+  my $c = shift;
 
-  my $username = $self->param('name')   // '';
-  my $email    = $self->param('email')  // '';
+  my $username = $c->param('name')   // '';
+  my $email    = $c->param('email')  // '';
 
   my $result = {};
 
-  if( length $username ) {
-    my $u = Canvas::Store::User->search({
-      username  => $username,
-    })->first;
+  my $r = $c->pg->db->query("SELECT id FROM canvas_user WHERE username=?", $username);
 
-    $result->{username} = {
-      key     => $username,
-      status  => defined $u ? 1 : 0,
-    };
-  }
+  $result->{username} = {
+    key     => $username,
+    status  => $r->rows,
+  };
 
-  if( length $email ) {
-    my $e = Canvas::Store::User->search({
-      email  => $email,
-    })->first;
+  say Dumper $result;
 
-    $result->{email} = {
-      key     => $email,
-      status  => defined $e ? 1 : 0,
-    }
-  }
-
-
-  $self->render( json => $result );
+  $c->render(json => $result);
 }
 
 sub profile_admin_get {
-  my $self = shift;
+  my $c = shift;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/') unless (
-    $self->profile_user_can_add ||
-    $self->profile_user_can_delete
+  return $c->redirect_to('/') unless (
+    $c->profile->can_add ||
+    $c->profile->can_delete
   );
 
-  my $pager = Canvas::Store::User->pager(
-    order_by          => 'created DESC',
-    entries_per_page  => 20,
-    current_page      => ( $self->param('page') // 1 ) - 1,
-  );
+  my $page_size = 100;
+  my $page = ($c->param('page') // 1);
 
-  my $profiles = {
-    items       => [ $pager->search_where ],
-    item_count  => $pager->total_entries,
-    page_size   => $pager->entries_per_page,
-    page        => $pager->current_page + 1,
-    page_last   => ceil($pager->total_entries / $pager->entries_per_page),
-  };
+  $c->render_steps('website/profiles-admin', sub {
+    my $delay = shift;
 
-  $self->stash( profiles => $profiles );
+    # get total count
+    $c->pg->db->query("SELECT COUNT(id) FROM canvas_user" => $delay->begin);
 
-  $self->render('website/profiles-admin');
+    # get paged items with username and email associated
+    $c->pg->db->query("SELECT id, username, email, status, created FROM canvas_user ORDER BY created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+  },
+  sub {
+    my ($delay, $count_err, $count_res, $err, $res) = @_;
+
+    my $count = $count_res->array->[0];
+
+    $c->stash(profiles => {
+      items       => $res->hashes,
+      item_count  => $count,
+      page_size   => $page_size,
+      page        => $page,
+      page_last   => ceil($count / $page_size),
+    });
+  });
 }
-
 
 1;

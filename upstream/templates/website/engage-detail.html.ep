@@ -25,25 +25,25 @@
               <li><a href="/">Home</a></li>
               <li><a href="/support">Support</a></li>
               <li><a href="/support/engage">Engage</a></li>
-              <li><a href="<%= url_with('/support/engage')->query([ type => $response->type]) %>"><%= ucfirst $response->type %>s</a></li>
-              <li class="active"><%= $response->title %></li>
+              <li><a href="<%= url_with('/support/engage')->query([type => $response->{type}]) %>"><%= ucfirst $response->{type} %>s</a></li>
+              <li class="active"><%= $response->{title} %></li>
             </ol>
             <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Your Community</h1>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <div class="callout engage-detail engage-<%= $response->type %>">
-              <h1 class="engage-detail-title"><%= $response->title %></h1>
-              <div id="reply-<%= $response->id %>" class="engage-detail-content">
-                <%== render_markdown( $response->content ) %>
+            <div class="callout engage-detail engage-<%= $response->{type} %>">
+              <h1 class="engage-detail-title"><%= $response->{title} %></h1>
+              <div id="reply-<%= $response->{id} %>" class="engage-detail-content">
+                <%== render_markdown( $response->{content} ) %>
               </div>
               <div class="row">
                 <div class="col-sm-6">
                   <div class="engage-detail-tags">
-                    <%== engage_icon_label( $response->type, 'fa-fw' ) %>
-% foreach my $t ( $response->tags ) {
-                    <span class="label label-default"><%= $t->name %></span>
+                    <%== engage_icon_label($response->{type}, 'fa-fw' ) %>
+% foreach my $t ($response->{tags}) {
+                    <span class="label label-default"><%= $t->{name} %></span>
 % }
                   </div>
 
@@ -51,14 +51,14 @@
                 <div class="col-sm-6">
                   <div class="engage-detail-footer">
                     <div class="engage-detail-footer-metadata">
-                      <p class="text-right">asked <%= distance_of_time_in_words( $response->created ) %></p>
-                      <p class="text-right">by <%= $response->author_id->username %></p>
+                      <p class="text-right">asked <%= distance_of_time_in_words( $response->{created} ) %></p>
+                      <p class="text-right">by <%= $response->{author_id} %></p>
                     </div>
                     <div class="engage-detail-footer-metadata">
-                      <%== post_gravatar( $response, 32 ) %>
+                      <%== email_gravatar($response->{email}, 32) %>
                     </div>
 
-                    <%== engage_post_admin_template( $response) %>
+                    <%== engage_post_admin_template($response) %>
 
                   </div>
                 </div>
@@ -68,11 +68,11 @@
         </div>
         <div class="hr hr-sm"></div>
 
-% if( $accepted ) {
+% if ($accepted) {
         <div class="row">
           <div class="col-sm-12">
             <div id="accepted-reply" class="callout callout-default engage-reply engage-reply-accepted">
-              <%== render_markdown( $accepted->content ) %>
+              <%== render_markdown( $accepted->{content} ) %>
 
               <div class="row">
                 <div class="col-sm-12">
@@ -81,14 +81,14 @@
                   </div>
                   <div class="engage-detail-footer">
                     <div class="engage-detail-footer-metadata">
-                      <p class="text-right">replied <%= distance_of_time_in_words( $accepted->created ) %></p>
-                      <p class="text-right">by <%= $accepted->author_id->username %></p>
+                      <p class="text-right">replied <%= distance_of_time_in_words( $accepted->{created} ) %></p>
+                      <p class="text-right">by <%= $accepted->{author_id} %></p>
                     </div>
                     <div class="engage-detail-footer-metadata">
-                      <%== post_gravatar( $accepted, 32 ) %>
+                      <%== email_gravatar($accepted->{accepted}, 32) %>
                     </div>
 
-                    <%== engage_post_admin_template( $accepted ) %>
+                    <%== engage_post_admin_template($accepted) %>
                   </div>
                 </div>
               </div>
@@ -113,27 +113,27 @@
 %   for my $r ( @{ $replies->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
-            <div id="reply-<%= $r->id %>" class="callout callout-default engage-reply <%= ( $r->status eq 'accepted' ) ? 'engage-reply-accepted' : '' %>">
-              <%== render_markdown( $r->content ) %>
+            <div id="reply-<%= $r->{id} %>" class="callout callout-default engage-reply <%= ( $r->{status} eq 'accepted' ) ? 'engage-reply-accepted' : '' %>">
+              <%== render_markdown( $r->{content} ) %>
 
               <div class="row">
                 <div class="col-sm-12">
 
-%     if( $r->status eq 'accepted' ) {
+%     if( $r->{status} eq 'accepted' ) {
                   <div class="engage-detail-tags">
                     <span class="label label-default">accepted</span>
                   </div>
 %     }
                   <div class="engage-detail-footer">
                     <div class="engage-detail-footer-metadata">
-                      <p class="text-right">replied <%= distance_of_time_in_words( $r->created ) %></p>
-                      <p class="text-right">by <%= $r->author_id->username %></p>
+                      <p class="text-right">replied <%= distance_of_time_in_words($r->{created}) %></p>
+                      <p class="text-right">by <%= $r->{author_id} %></p>
                     </div>
                     <div class="engage-detail-footer-metadata">
-                      <%== post_gravatar( $r, 32 ) %>
+                      <%== email_gravatar($r->{email}, 32) %>
                     </div>
 
-                    <%== engage_post_admin_template( $r ) %>
+                    <%== engage_post_admin_template($r) %>
                   </div>
                 </div>
               </div>
@@ -149,7 +149,7 @@
         <!-- PAGINATION -->
         <div class="row">
           <div class="col-sm-12 text-center">
-            <%== paginate( $replies ) %>
+            <%== paginate($replies) %>
           </div>
         </div>
         <div class="hr"></div>
@@ -159,7 +159,7 @@
         <div class="row">
           <div class="col-sm-12">
             <form action="<%= url_for('current') . '/reply' %>" method="post">
-              <input type="hidden" name="parent" value="<%= $response->id %>"></input>
+              <input type="hidden" name="parent" value="<%= $response->{id} %>"></input>
               <input type="hidden" name="redirect_url" value="<%= url_with %>"></input>
               <div class="row">
                 <div class="col-sm-12">

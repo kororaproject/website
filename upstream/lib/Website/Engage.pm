@@ -26,6 +26,7 @@ use strict;
 use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(trim);
+use POSIX qw(ceil);
 use Time::Piece;
 
 #
@@ -43,32 +44,6 @@ use constant TYPE_MAP => {
     status => {
       ''  => 'All Responses'
     }
-  },
-  idea      => {
-    name  => 'idea',
-    title => 'Share a New Idea',
-    icon  => 'fa-lightbulb-o',
-    status  => {
-      ''                    => 'All Ideas',
-      'under-consideration' => 'Ideas - Under Consideration',
-      'declined'            => 'Ideas - Declined',
-      'planned'             => 'Ideas - Planned',
-      'in-progress'         => 'Ideas - In Progress',
-      'completed'           => 'Ideas - Completed',
-      'gathering-feedback'  => 'Ideas - Gathering Feedback',
-    },
-  },
-  problem   => {
-    name  => 'problem',
-    title => 'Add a New Problem',
-    icon  => 'fa-bug',
-    status  => {
-      ''              => 'All Problems',
-      'known-problem' => 'Problems - Known Problem',
-      'declined'      => 'Problems - Declined',
-      'solved'        => 'Problems - Solved',
-      'in-progress'   => 'Problems - In Progress',
-    },
   },
   question  => {
     name  => 'question',
@@ -97,34 +72,8 @@ use constant TYPE_MAP => {
 # HELPERS
 #
 
-sub sanitise_with_dashes($) {
-  my $stub = shift;
-
-  # preserve escaped octets
-  $stub =~ s|%([a-fA-F0-9][a-fA-F0-9])|---$1---|g;
-  # remove percent signs that are not part of an octet
-  $stub =~ s/%//g;
-  # restore octets.
-  $stub =~ s|---([a-fA-F0-9][a-fA-F0-9])---|%$1|g;
-
-  $stub = lc $stub;
-
-  # kill entities
-  $stub =~ s/&.+?;//g;
-  $stub =~ s/\./-/g;
-
-  $stub =~ s/[^%a-z0-9 _-]//g;
-  $stub =~ s/\s+/-/g;
-  $stub =~ s|-+|-|g;
-  $stub =~ s/-+$//g;
-
-  return $stub;
-}
-
 sub filter_valid_types($) {
   my $types_valid_map =  {
-    idea => 1,
-    problem => 1,
     question => 1,
     thank => 1,
   };
@@ -144,56 +93,100 @@ sub filter_valid_types($) {
 #
 
 sub index {
-  my $self = shift;
+  my $c = shift;
 
-  my $type = $self->param('type') // '';
-  my $status = $self->param('status') // '';
+  my $page      = $c->param('page')   // 1;
+  my $page_size = 20;
+  my $status    = $c->param('status') // '';
+  my $tags      = $c->param('tags');
+  my $type      = filter_valid_types($c->param('type')) // '';
 
-  my $cache = Canvas::Store::Post->search_type_status_and_tags(
-    type      => filter_valid_types( $self->param('type') ),
-    status    => $self->param('status') // '',
-    tags      => $self->param('tags')   // '',
-    page_size => 20,
-    page      => $self->param('page'),
-  );
+  $c->render_steps('website/engage', sub {
+    my $delay = shift;
 
-  $self->stash(
-    responses => $cache,
-    filter    => TYPE_MAP->{ $type }{ status }{ $status },
-  );
-  $self->render('website/engage');
+    my $db = $c->pg->db;
+    my @filter = ();
+
+    # filter on type
+    if ($type) {
+      push @filter, ' p.type IN (' . join(',', map { $db->dbh->quote($_) } @{$type}) . ')';
+    }
+
+    # filter on type
+    if ($status) {
+      push @filter, ' p.status=' . $db->dbh->quote($status);
+    }
+
+    # filter on tags
+    if ($tags) {
+      foreach my $t (split /[ ,]+/, $tags) {
+        my $lt = $db->dbh->quote( '%' . $t . '%' );
+        push @filter, '(p.title LIKE ' . $lt . ' OR p.content LIKE ' . $lt . ' OR t.name LIKE ' . $lt . ' OR r.content LIKE ' . $lt . ')';
+      }
+    }
+
+    # build total count query
+    my $raw_count_sql = 'SELECT COUNT(DISTINCT(p.id)) FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) WHERE (' . join( ') AND (', @filter ) . ')';
+
+    # build paginated query
+    my $raw_sql = 'SELECT p.*, pu.username, pu.email, ARRAY_AGG(DISTINCT t.name) AS tags, ARRAY_TO_JSON(ARRAY_AGG(DISTINCT ROW(ru.username, ru.email))) AS replies FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) JOIN canvas_user pu ON (pu.id=p.author_id) JOIN canvas_user ru ON (ru.id=r.author_id) WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id, pu.id ORDER BY p.updated DESC';
+
+    $raw_sql .= ' LIMIT ' . $page_size . ' OFFSET ' . ($page_size * ($page-1));
+
+    # get total count
+    $db->query($raw_count_sql => $delay->begin);
+
+    # get paged items with username and email associated
+    $db->query($raw_sql => $delay->begin);
+  },
+  sub {
+    my ($delay, $count_err, $count_res, $err, $res) = @_;
+
+    my $count = $count_res->array->[0];
+
+    my $r = $res->expand->hashes;
+
+    $c->stash(
+      filter    => TYPE_MAP->{$type}{status}{$status},
+      responses => {
+        items       => $r,
+        item_count  => $count,
+        page_size   => $page_size,
+        page        => $page,
+        page_last   => ceil($count / $page_size),
+      },
+    );
+  });
 }
 
 sub engage_syntax_get {
-  my $self = shift;
+  my $c = shift;
 
-  $self->render('website/engage-syntax-help');
+  $c->render('website/engage-syntax-help');
 }
 
 sub engage_post_prepare_add_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $type = $self->param('type');
-  my $title = $self->param('title') // $self->flash('title') // '';
-  my $content = $self->flash('content') // '';
-  my $tags = $self->flash('tags') // '';
+  my $content = $c->flash('content')  // '';
+  my $tags    = $c->flash('tags')     // '';
+  my $title   = $c->param('title')    // $c->flash('title') // '';
+  my $type    = $c->param('type');
 
   # ensure it's a valid type
-  return $self->redirect_to('/support/engage') unless grep { $_ eq $type } qw(idea problem question thank);
+  return $c->redirect_to('/support/engage') unless grep { $_ eq $type } qw(question thank);
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless (
-    $self->is_user_authenticated()
-  );
+  return $c->redirect_to('/support/engage') unless $c->is_user_authenticated;
 
-  $self->stash(
-    type    => TYPE_MAP->{ $type },
+  $c->stash(
+    type    => TYPE_MAP->{$type},
     title   => $title,
     content => $content,
     tags    => $tags,
   );
 
-  $self->render('website/engage-new');
+  $c->render('website/engage-new');
 }
 
 sub engage_post_add_post {
@@ -214,9 +207,7 @@ sub engage_post_add_post {
   );
 
   # ensure it's a valid type
-  unless( grep { $_ eq $type } qw(idea problem question thank) ) {
-    return $self->redirect_to('/support/engage')
-  }
+  return $self->redirect_to('/support/engage') unless grep { $_ eq $type } qw(question thank);
 
   # ensure we have some sane title (at least 16 characters)
   unless( length $title >= 16 ) {
@@ -322,30 +313,60 @@ sub engage_post_add_post {
 }
 
 sub engage_post_detail_get {
-  my $self = shift;
-  my $stub = $self->param('stub');
-  my $type = $self->param('type');
+  my $c = shift;
+  my $stub = $c->param('stub');
+  my $type = $c->param('type');
 
   # could have flashed 'content' from an attempted reply
-  my $content = $self->flash('content') // '';
+  my $content = $c->flash('content') // '';
 
-  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
 
-  # check we found the post
-  return $self->redirect_to('/support/engage') unless defined $p;
+  my $page_size = 10;
+  my $page = ($c->param('page') // 1);
 
-  my $a = $p->accepted_reply;
+  $c->render_steps('website/engage-detail', sub {
+    my $delay = shift;
 
-  my $r = $p->search_replies(
-    page_size => 20,
-    page      => $self->param('page'),
-  );
+    $c->pg->db->query("SELECT * FROM canvas_post WHERE type=? AND name=?" => ($type, $stub) => $delay->begin);
 
-  # allow path to get back here
-  $self->flash( redirect_url => $self->url_with );
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type=? AND p.name=? GROUP BY p.id, u.username, u.email" => ($type, $stub) => $delay->begin);
+  },
+  sub {
+    my ($delay, $p_err, $p_res) = @_;
 
-  $self->stash( response => $p, accepted => $a, replies => $r, content => $content );
-  $self->render('website/engage-detail');
+    # check we found the post
+    $delay->emit(redirect => '/support/engage') unless $p_res;
+
+    my $post = $p_res->hash;
+    $delay->data(post => $post);
+
+    $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='reply' AND parent_id=?" => ($post->{id}) => $delay->begin);
+
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='reply' AND p.id=? GROUP BY p.id, u.username, u.email" => ($post->{id}) => $delay->begin);
+  },
+  sub {
+    my ($delay, $rc_err, $rc_res, $r_err, $r_res) = @_;
+
+    my $count = $rc_res->array->[0];
+    my $post = $delay->data('post');
+
+    # allow path to get back here
+    $c->flash(rt_url => $c->ub64_encode($c->url_with));
+
+    $c->stash({
+      response => $post,
+      accepted => {},
+      content => {},
+      replies => {
+        items       => $r_res->hashes,
+        item_count  => $count,
+        page_size   => $page_size,
+        page        => $page,
+        page_last   => ceil($count / $page_size),
+      },
+    });
+
+  });
 }
 
 sub engage_post_edit_get {
@@ -700,7 +721,7 @@ sub engage_reply_any {
 
     my $r = Canvas::Store::Post->search({ id => $id })->first;
 
-    if( grep { $_ eq $r->type } qw(reply thank idea question problem) ) {
+    if (grep { $_ eq $r->type } qw(reply thank question)) {
       $quote = {
         author  => $r->author_id->username,
         content => $r->content,

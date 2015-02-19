@@ -225,8 +225,8 @@ function RegisterController($scope, $http) {
 
   $scope.lookupDetails = function() {
     /* check for cached results */
-    if( $scope.usernames.hasOwnProperty( $scope.username ) &&
-        $scope.emails.hasOwnProperty( $scope.email ) ) {
+    if ($scope.usernames.hasOwnProperty($scope.username) &&
+        $scope.emails.hasOwnProperty($scope.email)) {
       return;
     }
 
@@ -242,11 +242,11 @@ function RegisterController($scope, $http) {
       }
     })
       .success( function(data, status, headers, config) {
-        if( data.hasOwnProperty('username') ) {
-          $scope.usernames[ data.username.key ] = ( data.username.status === 1 ) ? false : true;
+        if (data.hasOwnProperty('username') ) {
+          $scope.usernames[data.username.key] = (data.username.status !== 1);
         }
-        if( data.hasOwnProperty('email') ) {
-          $scope.emails[ data.email.key ] = ( data.email.status === 1 ) ? false : true;
+        if (data.hasOwnProperty('email')) {
+          $scope.emails[data.email.key] = (data.email.status !== 1);
         }
         $scope._lookup_details = false;
       })
@@ -256,12 +256,11 @@ function RegisterController($scope, $http) {
   };
 
   $scope.usernameIsValid = function() {
-    if( $scope.username.length > 0 ) {
+    if ($scope.username.length > 0) {
       var re = /^[A-Za-z0-9_]+$/;
-      if( re.test($scope.username) ) {
-        if( $scope.usernames.hasOwnProperty( $scope.username ) ) {
-
-          if( $scope.usernames[ $scope.username ] ) {
+      if (re.test($scope.username)) {
+        if ($scope.usernames.hasOwnProperty($scope.username)) {
+          if ($scope.usernames[$scope.username]) {
             $scope.error.username = '';
             return true;
           }
@@ -274,7 +273,7 @@ function RegisterController($scope, $http) {
         }
       }
       else {
-        $scope.error.username = 'Usernames can only cotain alphanumeric characters and underscores only.';
+        $scope.error.username = 'Usernames can only contain alphanumeric characters and underscores only.';
       }
     }
 
@@ -282,13 +281,13 @@ function RegisterController($scope, $http) {
   };
 
   $scope.emailIsValid = function() {
-    if( $scope.email.length > 0 ) {
-      if( $scope.emails.hasOwnProperty( $scope.email ) ) {
-        if( $scope.emails[ $scope.email ] ) {
+    if ($scope.email.length > 0) {
+      if ($scope.emails.hasOwnProperty($scope.email)) {
+        if ($scope.emails[$scope.email] ) {
           var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
           $scope.error.email = '';
-          if( re.test($scope.email) ) {
+          if (re.test($scope.email)) {
             return true;
           }
 
@@ -315,13 +314,13 @@ function RegisterController($scope, $http) {
   };
 
   $scope.usernameIsState = function(state) {
-    return $scope.usernames.hasOwnProperty( $scope.username ) &&
-           ( state === $scope.usernameIsValid() );
+    var _u = $scope.username;
+    return _u.length && $scope.usernames.hasOwnProperty(_u) && (state === $scope.usernameIsValid());
   };
 
   $scope.emailIsState = function(state) {
-    return $scope.emails.hasOwnProperty( $scope.email ) &&
-           ( state === $scope.emailIsValid() );
+    var _e = $scope.email;
+    return _e.length && $scope.emails.hasOwnProperty(_e) && (state === $scope.emailIsValid());
   };
 
   $scope.passwordIsState = function(state) {
@@ -331,7 +330,6 @@ function RegisterController($scope, $http) {
   $scope.verifyIsState = function(state) {
     return $scope.verify.length > 0 && ( state === $scope.verifyIsValid() );
   };
-
 
   $scope.canRegister = function() {
     return $scope.usernameIsValid() &&

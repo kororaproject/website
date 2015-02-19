@@ -58,14 +58,14 @@
 %   if ($c->news->can_add) {
             <li><a href="/about/news/admin">News Admin</a></li>
 %   }
-%   if (profile_user_can_add) {
+%   if ($c->profile->can_manage) {
             <li><a href="/profile/admin">Profiles Admin</a></li>
 %   }
 %   if ($c->document->can_add) {
             <li><a href="/support/documentation/admin">Documentation Admin</a></li>
 %   }
             <li><a href="/profile/<%= auth_user->{username} %>">Profile</a></li>
-            <li><a href="/deauthenticate?redirect_to=<%= url_for('current') %>">Log Out</a></li>
+            <li><a href="/deauthenticate?rt=<%= ub64_encode(url_for('current')) %>">Log Out</a></li>
           </ul>
         </li>
       </ul>
@@ -73,7 +73,7 @@
 % else {
       <div class="nav navbar-right">
         <div id="register" class="navbar-btn btn-group btn-group-sm">
-          <a href="/register?redirect_to=<%= url_for('current') %>" class="btn btn-default">Register</a>
+          <a href="/register?rt=<%= ub64_encode(url_for('current')) %>" class="btn btn-default">Register</a>
           <a data-toggle="modal" href="#loginModal" class="btn btn-success">Log In</a>
         </div>
       </div>

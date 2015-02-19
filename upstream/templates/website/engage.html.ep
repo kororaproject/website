@@ -46,20 +46,6 @@
                   <ul class="dropdown-menu" role="menu">
                     <li><a href="<%= url_with->query([type => undef, status => undef, tags => undef, page => undef]) %>">All Responses</a></li>
                     <li class="divider"></li>
-                    <li><a href="<%= url_with->query([type => 'idea', status => undef, tags => undef, page => undef]) %>">All Ideas</a></li>
-                    <li><a href="<%= url_with->query([type => 'idea', status => 'under-consideration', tags => undef, page => undef]) %>">Ideas - Under Consideration</a></li>
-                    <li><a href="<%= url_with->query([type => 'idea', status => 'declined', tags => undef, page => undef]) %>">Ideas - Declined</a></li>
-                    <li><a href="<%= url_with->query([type => 'idea', status => 'planned', tags => undef, page => undef]) %>">Ideas - Planned</a></li>
-                    <li><a href="<%= url_with->query([type => 'idea', status => 'in-progress', tags => undef, page => undef]) %>">Ideas - In Progress</a></li>
-                    <li><a href="<%= url_with->query([type => 'idea', status => 'completed', tags => undef, page => undef]) %>">Ideas - Completed</a></li>
-                    <li><a href="<%= url_with->query([type => 'idea', status => 'gathering-feedback', tags => undef, page => undef]) %>">Ideas - Gathering Feedback</a></li>
-                    <li class="divider"></li>
-                    <li><a href="<%= url_with->query([type => 'problem', status => undef, tags => undef, page => undef]) %>">All Problems</a></li>
-                    <li><a href="<%= url_with->query([type => 'problem', status => 'known-problem', tags => undef, page => undef]) %>">Problems - Known Problem</a></li>
-                    <li><a href="<%= url_with->query([type => 'problem', status => 'declined', tags => undef, page => undef]) %>">Problems - Declined</a></li>
-                    <li><a href="<%= url_with->query([type => 'problem', status => 'solved', tags => undef, page => undef]) %>">Problems - Solved</a></li>
-                    <li><a href="<%= url_with->query([type => 'problem', status => 'in-progress', tags => undef, page => undef]) %>">Problems - In Progress</a></li>
-                    <li class="divider"></li>
                     <li><a href="<%= url_with->query([type => 'question', status => undef, tags => undef, page => undef]) %>">All Questions</a></li>
                     <li><a href="<%= url_with->query([type => 'question', status => 'answered', tags => undef, page => undef]) %>">Answers - Answered</a></li>
                     <li><a href="<%= url_with->query([type => 'question', status => 'need-answer', tags => undef, page => undef]) %>">Answers - Need Answer</a></li>
@@ -85,72 +71,9 @@
 
 % if( is_user_authenticated ) {
         <div class="row">
-          <div class="col-sm-12">
-            <ul class="nav nav-tabs nav-justified">
-              <li class="active"><a href="#idea" data-toggle="tab"><i class="fa fa-lightbulb-o"></i> Share an Idea</a></li>
-              <li class=""><a href="#problem" data-toggle="tab"><i class="fa fa-bug"></i> Report a Problem</a></li>
-              <li class=""><a href="#question" data-toggle="tab"><i class="fa fa-question"></i> Ask a Question</a></li>
-              <li class=""><a href="#thank" data-toggle="tab"><i class="fa fa-heart"></i> Say Thanks</a></li>
-            </ul>
-
-            <div class="tab-content">
-              <div class="tab-pane active" id="idea">
-                <form action="/support/engage/idea/add" method="get" enctype="application/x-www-form-urlencoded">
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <div class="input-group">
-                        <input type="text" name="title" class="form-control"></input>
-                        <span class="input-group-btn">
-                          <button type="submit" class="btn btn-info">Continue</button>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div class="tab-pane" id="problem">
-                <form action="/support/engage/problem/add" method="get">
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <div class="input-group">
-                        <input type="text" name="title" class="form-control"></input>
-                        <span class="input-group-btn">
-                          <button type="submit" class="btn btn-danger">Continue</button>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div class="tab-pane" id="question">
-                <form action="/support/engage/question/add" method="get">
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <div class="input-group">
-                        <input type="text" name="title" class="form-control"></input>
-                        <span class="input-group-btn">
-                          <button type="submit" class="btn btn-warning">Continue</button>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div class="tab-pane" id="thank">
-                <form action="/support/engage/thank/add" method="get">
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <div class="input-group">
-                        <input type="text" name="title" class="form-control"></input>
-                        <span class="input-group-btn">
-                          <button type="submit" class="btn btn-success">Continue</button>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
+          <div class="col-sm-12 engage-post-buttons">
+            <a href="/support/engage/question/add" class="btn btn-lg btn-warning">Ask a Question</a>
+            <a href="/support/engage/thank/add" class="btn btn-lg btn-success">Say Thanks</a>
           </div>
         </div>
 % } else {
@@ -163,46 +86,47 @@
 
         <div class="hr"></div>
 
-% if( $responses->{item_count} > $responses->{page_size} ) {
+% if ($responses->{item_count} > $responses->{page_size}) {
         <!-- PAGINATION -->
         <div class="row">
           <div class="col-sm-12 text-center">
-            <%== paginate( $responses ) %>
+            <%== paginate($responses) %>
           </div>
         </div>
-% }
+%  }
 
         <div class="hr"></div>
 
-% foreach my $r ( @{ $responses->{items} } ) {
+% foreach my $r (@{$responses->{items}}) {
         <div class="row">
           <div class="col-sm-12">
-            <div class="callout engage-summary engage-<%= $r->type %>">
-              <div class="engage-summary-content">
-                <h4 class="engage-summary-title">
-                  <div class="engage-summary-reply-count pull-right" data-toggle="tooltip" data-original-title="<%= pluralise( $r->reply_count, 'reply' )%>"><%= $r->reply_count %></div>
-                  <a href="/support/engage/<%= $r->type %>/<%= $r->name %>"><%= $r->title %> </a>
-                </h4>
-              </div>
+            <div class="callout engage-summary engage-<%= $r->{type} %>">
               <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-9">
+                  <div class="engage-summary-content">
+                    <h4 class="engage-summary-title">
+                      <a href="<%= url_for('supportengagetypestub', type => $r->{type}, stub => $r->{name}) %>" class="engage-summary-title-link"><%= $r->{title} %> </a>
+                    </h4>
+                  </div>
+% if (@{$r->{tags}}) {
                   <div class="post-tags">
-                    <%== engage_icon_label( $r->type, 'fa-fw' ) %>
-                    <%== engage_label( $r->type, '',  engage_status( $r ) ) %></span>
-% foreach my $t ( $r->tags ) {
-                    <span class="label label-default"><%= $t->name %></span>
+                    <i class="fa fa-tags"></i>
+%   foreach my $t (@{$r->{tags}}) {
+                    <span class="tag"><%= $t %></span>
+%   }
+                  </div>
+% }
+                </div>
+                <div class="col-sm-3">
+                  <div class="text-right">
+                    <a href="<%= url_for('profilename', name => $r->{username}) %>" data-toggle="tooltip" data-original-title="<%= $r->{username} %>"><%== email_gravatar($r->{email}, 24) %></a>
+% foreach my $u (@{$r->{replies}}) {
+%   next if $u->{f1} eq $r->{username};
+                    <a href="<%= url_for('profilename', name => $u->{f1}) %>" data-toggle="tooltip" data-original-title="<%= $u->{f1} %>"><%== email_gravatar($u->{f2}, 24) %></a>
 % }
                   </div>
-                </div>
-                <div class="col-sm-6">
-                  <div class="pull-right reply-meta">
-                    <div class="engage-detail-footer-metadata">
-                      <p class="text-right">updated <%= distance_of_time_in_words( engage_post_last_update( $r ) ) %></p>
-                      <p class="text-right">by <%= $r->latest_reply->author_id->username %></p>
-                    </div>
-                    <div class="engage-detail-footer-metadata">
-                      <%== post_gravatar( $r->latest_reply, 32 ) %>
-                    </div>
+                  <div class="post-tags text-right">
+                    <%= pluralise( $r->{reply_count}, 'reply') %>
                   </div>
                 </div>
               </div>
@@ -212,11 +136,11 @@
 % }
         <div class="hr"></div>
 
-% if( $responses->{item_count} > $responses->{page_size} ) {
+% if ($responses->{item_count} > $responses->{page_size}) {
         <!-- PAGINATION -->
         <div class="row">
           <div class="col-sm-12 text-center">
-            <%== paginate( $responses ) %>
+            <%== paginate($responses) %>
           </div>
         </div>
 % }

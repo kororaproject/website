@@ -28,22 +28,6 @@ use Data::Dumper;
 # CONSTANTS
 #
 use constant TYPE_STATUS_MAP => {
-  idea => [
-    [ ''                    => ''                   ],
-    [ 'Under Consideration' => 'under-consideration'],
-    [ 'Declined'            => 'declined'           ],
-    [ 'Planned'             => 'planned'            ],
-    [ 'In Progress'         => 'in-progress'        ],
-    [ 'Completed'           => 'completed'          ],
-    [ 'Gathering Feedback'  => 'gathering-feedback' ],
-  ],
-  problem => [
-    [ ''              => ''             ],
-    [ 'Known Problem' => 'known-problem'],
-    [ 'Declined'      => 'declined'     ],
-    [ 'Solved'        => 'solved'       ],
-    [ 'In Progress'   => 'in-progress'  ],
-  ],
   question => [
     [ 'Answered'    => 'answered'   ],
     [ 'Need Answer' => 'need-answer'],
@@ -55,14 +39,6 @@ use constant TYPE_STATUS_MAP => {
 };
 
 use constant TYPE_ICON_COLOUR_MAP => {
-  idea => {
-    icon    => 'fa-lightbulb-o',
-    colour  => 'info',
-  },
-  problem => {
-    icon    => 'fa-bug',
-    colour  => 'danger',
-  },
   question => {
     icon    => 'fa-question',
     colour  => 'warning',
@@ -76,14 +52,12 @@ use constant TYPE_ICON_COLOUR_MAP => {
 sub _is_engage_post($) {
   my $post = shift;
 
-  return 0 unless ref $post eq 'Canvas::Store::Post';
-
-  return grep { $_ eq $post->type } qw(reply idea thank problem question);
+  return grep { $_ eq $post->{type} } qw(reply thank question);
 }
 
 
 sub register {
-  my( $self, $app ) = @_;
+  my ($self, $app) = @_;
 
   $app->helper(engage_icon => sub {
     my( $self, $type, $classes ) = @_;
@@ -99,15 +73,16 @@ sub register {
     $classes //= '';
     $text    //= '';
 
-    return '<span class="label label-' . TYPE_ICON_COLOUR_MAP->{ $type }{colour} . '"><i class="fa ' . ( TYPE_ICON_COLOUR_MAP->{ $type }{icon} // 'fa-ban' ) . ' ' . $classes . '"></i>' . $text . '</span>';
+    return '<span class="text-' . TYPE_ICON_COLOUR_MAP->{ $type }{colour} . '"><i class="fa ' . ( TYPE_ICON_COLOUR_MAP->{ $type }{icon} // 'fa-ban' ) . ' ' . $classes . '"></i>' . $text . '</span>';
   });
+
   $app->helper(engage_label => sub {
     my( $self, $type, $classes, $text ) = @_;
 
     $classes //= '';
     $text    //= '';
 
-    return '<span class="label label-' . TYPE_ICON_COLOUR_MAP->{ $type }{colour} . ' ' . $classes . '">' . $text . '</span>';
+    return '<span class="text-' . TYPE_ICON_COLOUR_MAP->{ $type }{colour} . ' ' . $classes . '">' . $text . '</span>';
   });
 
 
@@ -117,12 +92,12 @@ sub register {
     return 'unknown' unless _is_engage_post $post;
 
     # it's new if no replies and no modified status
-    return 'new'    if $post->status eq '' && $post->reply_count == 0;
-    return 'active' if $post->status eq '';
+    return 'new'    if $post->{status} eq '' && $post->{reply_count} == 0;
+    return 'active' if $post->{status} eq '';
 
-    my $t = TYPE_STATUS_MAP->{ $post->type };
+    my $t = TYPE_STATUS_MAP->{ $post->{type} };
 
-    my( $s ) = ( grep { $post->status eq $_->[1] } @$t );
+    my ($s) = (grep { $post->{status} eq $_->[1] } @{$t} );
 
     return 'unknown' unless defined $s;
 
@@ -223,7 +198,7 @@ sub register {
     return ( $t > $post->latest_reply->updated ) ? $t : $post->latest_reply->updated;
   });
 
-  $app->helper(engage_post_can_accept => sub {
+  $app->helper('engage.can_accept' => sub {
     my( $self, $post ) = @_;
 
     return 0 unless _is_engage_post $post;
@@ -241,7 +216,7 @@ sub register {
     return 0;
   });
 
-  $app->helper(engage_post_can_unaccept => sub {
+  $app->helper('engage.can_unaccept' => sub {
     my( $self, $post ) = @_;
 
     return 0 unless _is_engage_post $post;
@@ -259,7 +234,7 @@ sub register {
     return 0;
   });
 
-  $app->helper(engage_post_can_subscribe => sub {
+  $app->helper('engage.can_subscribe' => sub {
     my( $self, $post ) = @_;
 
     return 0 unless _is_engage_post $post;
@@ -278,7 +253,7 @@ sub register {
     return not defined $um;
   });
 
-  $app->helper(engage_post_can_edit => sub {
+  $app->helper('engage.can_edit' => sub {
     my( $self, $post ) = @_;
 
     return 0 unless _is_engage_post $post;
@@ -294,7 +269,7 @@ sub register {
     return 0;
   });
 
-  $app->helper(engage_post_can_edit_status => sub {
+  $app->helper('engage.can_edit_status' => sub {
     my( $self, $post ) = @_;
 
     return 0 unless _is_engage_post $post;
@@ -314,7 +289,7 @@ sub register {
     return 0;
   });
 
-  $app->helper(engage_post_can_delete => sub {
+  $app->helper('engage.can_delete' => sub {
     my( $self, $post ) = @_;
 
     return 0 unless _is_engage_post $post;

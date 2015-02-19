@@ -193,7 +193,6 @@ sub startup {
 
   # contribute pages
   $r->get('/contribute')->to('contribute#index_get');
-  $r->get('/contribute/developer')->to('contribute#developer_get');
   $r->get('/contribute/donate')->to('contribute#donate_get');
   $r->post('/contribute/donate')->to('contribute#donate_post');
   $r->get('/contribute/donate/confirm')->to('contribute#donate_confirm_get');

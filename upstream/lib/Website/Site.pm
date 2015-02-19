@@ -26,7 +26,7 @@ use Mojo::Base 'Mojolicious::Controller';
 # PERL INCLUDES
 #
 use Data::Dumper;
-use Mojo::Util qw(b64_encode url_escape url_unescape);
+use Mojo::Util qw(url_escape url_unescape);
 use Time::Piece;
 use Time::HiRes qw(gettimeofday);
 use Digest::SHA qw(sha512 sha256_hex);
@@ -80,45 +80,51 @@ sub login {
 }
 
 sub authenticate_any {
-  my $self = shift;
-  my $data = $self->req->json;
+  my $c = shift;
+  my $data = $c->req->json;
 
   # collect first out of the parameters and then json decoded body
-  my $user = $self->param('u') // $data->{u} // '';
-  my $pass = $self->param('p') // $data->{p} // '';
+  my $user = $c->param('u') // $data->{u} // '';
+  my $pass = $c->param('p') // $data->{p} // '';
 
   # extract the redirect url and fall back to the index
-  my $url = $self->param('redirect_to') // $data->{redirect_to} // '/';
+  my $url = $c->param('rt') // $data->{rt};
+  $url = defined $url ? $c->ub64_decode($url) : '/';
 
-  unless ($self->authenticate($user, $pass)) {
-    $self->flash( page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?' );
+  say Dumper $url;
+
+  unless ($c->authenticate($user, $pass)) {
+    $c->flash( page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?' );
   }
 
-  return $self->redirect_to($url);
+  return $c->redirect_to($url);
 };
 
 sub deauthenticate_any {
-  my $self = shift;
+  my $c = shift;
 
-  $self->logout;
+  my $format = $c->stash('format') // 'html';
 
-  return $self->render(status => 200, json => 'Done!') if $self->stash('format') // '' eq 'json';
+  $c->logout;
+
+  return $c->render(status => 200, json => 'Done!') if $format eq 'json';
 
   # extract the redirect url and fall back to the index
-  my $url = $self->param('redirect_to') // '/';
+  my $url = $c->param('rt');
+  $url = defined $url ? $c->ub64_decode($url) : '/';
 
-  return $self->redirect_to($url);
+  return $c->redirect_to($url);
 };
 
 sub activated {
-  my $self = shift;
+  my $c = shift;
 
-  my $username = $self->flash('username');
+  my $username = $c->flash('username');
 
-  return $self->redirect_to( '/' ) unless defined $username;
+  return $c->redirect_to('/') unless defined $username;
 
-  $self->stash( username => $username );
-  $self->render('website/activated');
+  $c->stash(username => $username);
+  $c->render('website/activated');
 }
 
 sub activate_get {
@@ -315,40 +321,40 @@ sub registered_get {
 }
 
 sub register_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $error = $self->flash('error') // { code => 0, message => '' };
-  my $values = $self->flash('values') // { user => '', email => '' };
-  my $url = $self->param('redirect_to') // ( $self->flash('redirect_to') // '' );
+  my $error = $c->flash('error') // { code => 0, message => '' };
+  my $values = $c->flash('values') // { user => '', email => '' };
+  my $url = $c->param('rt') // ( $c->flash('rt') // '' );
 
-  $self->stash( error => $error, values => $values, redirect_to => $url );
+  $c->stash(error => $error, values => $values, rt => $url, rt_url => $c->ub64_decode($url));
 
-  $self->render('website/register');
+  $c->render('website/register');
 }
 
 sub register_post {
-  my $self = shift;
+  my $c = shift;
 
   # extract the redirect url and fall back to the index
-  my $url = $self->param('redirect_to') // '/';
+  my $url = $c->param('redirect_to') // '/';
 
   # grab registration details
-  my $user = $self->param('user');
-  my $pass = $self->param('pass');
-  my $pass_confirm = $self->param('confirm');
-  my $email = $self->param('email');
+  my $user  = $c->param('user');
+  my $email = $c->param('email');
+  my $pass  = $c->param('pass');
+  my $pass_confirm = $c->param('confirm');
 
   # flash the redirect and previous values for future redirects
-  $self->flash(
-    redirect_to => $url,
-    values      => { user => $user, email => $email }
+  $c->flash(
+    rt => $url,
+    values => { user => $user, email => $email }
   );
 
   # validate username
   unless( $user =~ m/^[a-zA-Z0-9_]+$/ ) {
-    $self->flash( error => { code => 1, message => 'Your username can only consist of alphanumeric characters and underscores only [A-Z, a-z, 0-9, _].' });
+    $c->flash( error => { code => 1, message => 'Your username can only consist of alphanumeric characters and underscores only [A-Z, a-z, 0-9, _].' });
 
-    return $self->redirect_to('/register');
+    return $c->redirect_to('/register');
   }
 
   # validate user name is available
@@ -356,38 +362,31 @@ sub register_post {
     username => $user,
   })->first;
 
-  if( defined $u ) {
-    $self->flash( error => { code => 2, message => 'That username already exists.' } );
+  if (defined $u) {
+    $c->flash( error => { code => 2, message => 'That username already exists.' } );
 
-    return $self->redirect_to('/register');
+    return $c->redirect_to('/register');
   }
 
   # validate email address
   unless( $email =~ m/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/ ) {
-    $self->flash( error => { code => 3, message => 'Your email address is invalid.' });
+    $c->flash( error => { code => 3, message => 'Your email address is invalid.' });
 
-    return $self->redirect_to('/register');
-  }
-
-  # validate email is available
-  if( defined Canvas::Store::User->search({ email => $email, })->first ) {
-    $self->flash( error => { code => 4, message => 'That email already exists.' } );
-
-    return $self->redirect_to('/register');
+    return $c->redirect_to('/register');
   }
 
   # validate passwords have sufficient length
-  if( length $pass < 8 ) {
-    $self->flash( error => { code => 5, message => 'Your password must be at least 8 characters long.' });
+  if (length $pass < 8) {
+    $c->flash(error => { code => 5, message => 'Your password must be at least 8 characters long.' });
 
-    return $self->redirect_to('/register');
+    return $c->redirect_to('/register');
   }
 
   # validate passwords match
-  if( $pass ne $pass_confirm ) {
-    $self->flash( error => { code => 6, message => 'Your passwords don\'t match.' } );
+  if ($pass ne $pass_confirm) {
+    $c->flash(error => { code => 6, message => 'Your passwords don\'t match.' } );
 
-    return $self->redirect_to('/register');
+    return $c->redirect_to('/register');
   };
 
   $u = Canvas::Store::User->create({
@@ -395,7 +394,7 @@ sub register_post {
     email     => $email,
   });
 
-  if( defined $u ) {
+  if (defined $u) {
     # store password as a salted hash
     $u->password( $u->hash_password( $pass ) );
     $u->update;
@@ -423,7 +422,7 @@ sub register_post {
       "The Korora Team.\n";
 
     # send the activiation email
-    $self->mail(
+    $c->mail(
       to      => $email,
       from    => 'admin@kororaproject.org',
       subject => 'Korora Project - Prime Registration',
@@ -431,7 +430,7 @@ sub register_post {
     );
 
     # subscribed "new registration event" notifications
-    $self->notify_users(
+    $c->notify_users(
       'user_notify_on_register',
       'admin@kororaproject.org',
       'Korora Project - New Prime Registration',
@@ -443,7 +442,7 @@ sub register_post {
     );
   }
 
-  $self->redirect_to('/registered');
+  $c->redirect_to('/registered');
 }
 
 

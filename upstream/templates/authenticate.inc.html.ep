@@ -5,7 +5,7 @@
       <div id="login-modal" class="modal-body">
 
         <ul class="nav nav-tabs nav-justified">
-          <li class="active"><a class="muted" href="#login" data-toggle="tab">Login</a></li>
+          <li class="active"><a class="muted" href="#login" data-toggle="tab">Log In</a></li>
           <li><a class="muted" href="#forgot" data-toggle="tab">Forgot Password</a></li>
         </ul>
 
@@ -13,30 +13,44 @@
 
           <!-- TAB - LOGIN -->
           <div id="login" class="tab-pane active">
-            <form action="/authenticate" method="post" class="form-signin" role="form">
-              <input type="hidden" name="redirect_to" value="<%= url_for('current') %>">
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                  <input name="u" type="text" class="form-control" placeholder="username">
+
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="oauth-providers">
+                  <a class="btn btn-default btn-github"><i class="fa fa-fw fa-github"></i> Log in with GitHub</a>
+                  <a class="btn btn-default btn-google-plus"><i class="fa fa-fw fa-google"></i> Log in with Google</a>
+                  <a class="btn btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i> Log in with Twitter</a>
                 </div>
               </div>
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-                  <input name="p" type="password" class="form-control" placeholder="password">
-                </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <form action="/authenticate" method="post" class="form-signin" role="form">
+                  <input type="hidden" name="rt" value="<%= ub64_encode(url_for('current')) %>">
+                  <div class="form-group">
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+                      <input name="u" type="text" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
+                      <input name="p" type="password" class="form-control">
+                    </div>
+                  </div>
+                  <div>
+                    <button class="btn btn-success" type="submit">Sign In</button>
+                  </div>
+                </form>
               </div>
-              <div class="text-right">
-                <button class="btn btn-large btn-success" type="submit">Sign In</button>
-              </div>
-            </form>
+            </div>
           </div>
 
           <!-- TAB - FORGOT -->
           <div id="forgot" class="tab-pane">
             <form action="/forgot" method="post" class="form-signin" role="form">
-              <input type="hidden" name="redirect_to" value="<%= url_for('current') %>">
+              <input type="hidden" name="rt" value="<%= ub64_encode(url_for('current')) %>">
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>

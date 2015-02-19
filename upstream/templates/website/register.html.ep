@@ -26,44 +26,57 @@
             <p>Down the road, a Korora Prime account will provide single sign-on access to other Korora Project services that you choose to be part of.</p>
           </div>
           <div class="col-sm-6 callout callout-nfo">
-            <h2>Please complete ...</h2>
+            <h2>Register quickly with ...</h2>
+
+            <div class="oauth-providers">
+
+              <a class="btn btn-default btn-github"><i class="fa fa-fw fa-github"></i> GitHub</a>
+              <a class="btn btn-default btn-google-plus"><i class="fa fa-fw fa-google"></i> Google</a>
+              <a class="btn btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i> Twitter</a>
+            </div>
+            <h2>Or via email ...</h2>
             <form action="<%= url_for('current') %>" method="post" class="form-signin" role="form">
-              <input type="hidden" name="redirect_to" value="<%= $redirect_to %>"></input>
-% if( $error->{code} ) {
+              <input type="hidden" name="rt" value="<%= $rt %>"></input>
+% if ($error->{code}) {
               <div class="alert alert-danger">
                 <p><%= $error->{message} %></p>
               </div>
 % }
-              <div class="form-group" ng-class="{'has-error': usernameIsState(false), 'has-success': usernameIsState(true)}">
-                <div class="input-group">
+              <div class="form-group">
+                <div class="input-group" ng-class="{'has-error': usernameIsState(false), 'has-success': usernameIsState(true)}">
                   <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                  <input type="text" class="form-control" name="user" placeholder="username" value="<%= $values->{user} %>" ng-model="username" ng-blur="lookupDetails()">
+                  <input type="text" class="form-control" name="user" value="<%= $values->{user} %>" ng-model="username" ng-blur="lookupDetails()">
                 </div>
-                <span class="help-block ng-hide" ng-show="usernameIsState(false)">{{error.username}}</span>
-              </div>
-              <div class="form-group" ng-class="{'has-error': emailIsState(false), 'has-success': emailIsState(true)}">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
-                  <input type="input" class="form-control" name="email" placeholder="you@example.org" value="<%= $values->{email} %>" ng-model="email" ng-blur="lookupDetails()">
-                </div>
-                <span class="help-block ng-hide" ng-show="emailIsState(false)">{{error.email}}</span>
-              </div>
-              <div class="form-group" ng-class="{'has-error': passwordIsState(false), 'has-success': passwordIsState(true)}">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-                  <input type="password" class="form-control" name="pass" placeholder="password" ng-model="password">
-                </div>
-                <span class="help-block ng-hide" ng-show="passwordIsState(false)">{{error.password}}</span>
-              </div>
-              <div class="form-group" ng-class="{'has-error': verifyIsState(false), 'has-success': verifyIsState(true)}">
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
-                  <input type="password" class="form-control" name="confirm" placeholder="confirm password" ng-model="verify">
-                </div>
-                <span class="help-block ng-hide" ng-show="verifyIsState(false)">{{error.verify}}</span>
+                <span class="help-block">This will be your unique username.</span>
               </div>
               <div class="form-group">
-                <button class="btn btn-large btn-success pull-right" ng-class="{disabled: !canRegister()}" type="submit">Register</button>
+                <div class="input-group" ng-class="{'has-error': emailIsState(false), 'has-success': emailIsState(true)}">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
+                  <input type="input" class="form-control" name="email" value="<%= $values->{email} %>" ng-model="email" ng-blur="lookupDetails()">
+                </div>
+                <span class="help-block">An email address to send you account validation information.</span>
+              </div>
+              <div class="row">
+                <div class="form-group col-sm-6">
+                  <div class="input-group" ng-class="{'has-error': passwordIsState(false), 'has-success': passwordIsState(true)}">
+                    <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
+                    <input type="password" class="form-control" name="pass" ng-model="password">
+                  </div>
+                  <span class="help-block">A very secret passphrase.</span>
+                </div>
+                <div class="form-group col-sm-6">
+                  <div class="input-group" ng-class="{'has-error': verifyIsState(false), 'has-success': verifyIsState(true)}">
+                    <span class="input-group-addon"><i class="fa fa-fw fa-lock"></i></span>
+                    <input type="password" class="form-control" name="confirm" ng-model="verify">
+                  </div>
+                  <span class="help-block">Verify your passphrase and keep it handy.</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="pull-right">
+                  <a href="<%= $rt_url %>" class="btn btn-large btn-default">Cancel</a>
+                  <button class="btn btn-large btn-success" ng-class="{disabled: !canRegister()}" type="submit">Register</button>
+                </div>
               </div>
             </form>
           </div>
