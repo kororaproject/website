@@ -205,20 +205,73 @@ sub news_post {
 
     # TODO: update created if changed
     #my $t = Time::Piece->strptime($created, '%d/%m/%Y %H:%M:%S');
-    #
-    # TODO: update tags
 
-    my $r = $c->pg->db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, created=?, updated=? WHERE type='news' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $created, $now, $stub);
+    my $db = $c->pg->db;
+    my $tx = $db->begin;
+
+    my $r = $db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, created=?, updated=? WHERE type='news' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $created, $now, $stub);
+
+    # TODO: update tags
+    my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
+    say Dumper "FOO", $tt;
+    my @tags_old = $tt->{tags};
+    my @tags_new = map { $c->sanitise_with_dashes($_) } split /[ ,]+/, $tag_list;
+
+    my %to = map { $_ => 1 } @tags_old;
+    my %tn = map { $_ => 1 } @tags_new;
+
+    # add tags
+    foreach my $ta ( grep( ! defined $to{$_}, @tags_new ) ) {
+      # find or create tag
+      my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $ta)->hash;
+      unless ($t) {
+        $t = { id => $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $ta)->array->[0] };
+      }
+
+      # find or create post/tag reference
+      my $pt = $db->query("SELECT * FROM canvas_post_tag WHERE post_id=? AND tag_id=?", $p->{id}, $t->{id})->hash;
+      unless ($pt) {
+        $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?)", $p->{id}, $t->{id});
+      }
+    }
+
+    $tx->commit;
   }
   # otherwise create a new entry
   elsif ($c->news->can_add) {
     $stub = $c->sanitise_with_dashes($title);
 
-    my $now = gmtime;
+    my $db = $c->pg->db;
+    my $tx = $db->begin;
 
-    my $r = $c->pg->db->query('INSERT INTO canvas_post (type, name, status, title, content, excerpt, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', 'news', $stub, $status, $title, $content, $excerpt, $c->auth_user->{id}, $now, $now);
+    # check for existing stubs and append the ID + 1 of the last
+    my $e = $db->query("SELECT id FROM canvas_post WHERE type='news' AND name=? ORDER BY id DESC LIMIT 1", $stub)->array;
+    $stub .= '-' . ($e->[0] + 1) if $e;
 
-    # TODO: insert tags
+    $created = $now;
+
+    my $post_id = $c->pg->db->query('INSERT INTO canvas_post (type, name, status, title, content, excerpt, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', 'news', $stub, $status, $title, $content, $excerpt, $c->auth_user->{id}, $created, $now)->array->[0];
+
+    # ensure we only insert sanitised and unique tags
+    my %tags = map  { trim($_) => 1 }
+                 grep { $_ }
+                   map  { $c->sanitise_with_dashes($_) }
+                     split /[ ,]+/, $tag_list;
+
+    # create the tags
+    foreach my $tag (keys %tags) {
+      # find or create tag
+      my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $tag)->hash;
+
+      unless ($t) {
+        $t->{id} = $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $tag)->array->[0];
+      }
+
+      # insert the link
+      my $pt = $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?) ", $post_id, $t->{id});
+    }
+
+    $tx->commit;
   }
   else {
     return $c->redirect_to('aboutnewsadmin');
