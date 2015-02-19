@@ -35,7 +35,7 @@
             <h2>Why sponsor?</h2>
             <p>We build Korora because we love it and there is no pressure to sponsor, however we do welcome anything that you can spare.</p>
             <p>By sponsoring Korora you contribute by giving the development team a regular and predictable income to cover our hosting, development and hardware testing costs.</p>
-            <p>All sponsorships are processed securely online and we do not store any of your payment details.</p>
+            <p>All sponsorships are processed securely online and we do not store any of your personal payment information.</p>
             <h2>Sponsorship levels</h2>
             <p>There are five levels of sponsorship:</p>
             <table class="table table-responsive table-hover">
@@ -104,6 +104,28 @@
             </div>
           </form>
         </div>
+% if (@{$s}) {
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Current Sponsors</h2>
+
+            <table class='table table-striped'>
+              <tr>
+                <th class="col-sm-4">Date</th>
+                <th class="col-sm-4 text-center">Sponsor</th>
+                <th class="col-sm-4 text-center">Amount</th>
+              </tr>
+%   foreach my $ss ( @{$s} ) {
+              <tr>
+                <td><%= $ss->{dtg} %></td>
+                <td class="text-center"><%= $ss->{name} || "Anonymous" %></td>
+                <td class="text-center">$<%= $ss->{amount} %></td>
+              </tr>
+% }
+            </table>
+          </div>
+        </div>
+% }
       </div>
 
       <!-- END CONTENT -->

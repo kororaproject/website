@@ -33,211 +33,38 @@ use Time::Piece;
 #
 # LOCAL INCLUDES
 #
-use Canvas::Store::Contribution;
+use Canvas::Util::PayPal;
 
 #
 # CONTROLLER HANDLERS
 #
 sub index_get {
-  my $self = shift;
+  my $c = shift;
 
-  $self->render('website/contribute');
-}
-
-sub developer_get {
-  my $self = shift;
-
-  $self->stash( colours => [
-    { # cherry
-      base   => [255,  68,  68],
-      shadow => [204,   0,   0],
-    },
-    {
-      base   => [255, 187,  51],
-      shadow => [255, 136,   0],
-    },
-    {
-      base   => [255, 229,  51],
-      shadow => [255, 204,   0],
-    },
-    {
-      base   => [ 51, 181, 229],
-      shadow => [  0, 153, 204],
-    },
-#    {
-#      base   => [153, 204, 153],
-#      shadow => [102, 153, 102],
-#    },
-    {
-      base   => [153, 204,   0],
-      shadow => [102, 153,   0],
-    },
-    {
-      base   => [170, 102, 204],
-      shadow => [153,  51, 204],
-    },
-    {
-      base   => [153, 153, 153],
-      shadow => [ 68,  68,  68],
-    },
-    { # wood
-      base   => [153, 102,  51],
-      shadow => [ 68,  51,   0],
-    },
-  ], colours_alt => [
-
-    {
-      base   => [231,  76,  60],
-      shadow => [192,  57,  43],
-    },
-    {
-      base   => [230, 126,  34],
-      shadow => [211,  84,   0],
-    },
-    {
-      base   => [241, 196,  15],
-      shadow => [243, 156,  18],
-    },
-    {
-      base   => [ 26, 188, 156],
-      shadow => [ 22, 160, 133],
-    },
-    {
-      base   => [ 46, 204, 113],
-      shadow => [ 39, 174,  96],
-    },
-    {
-      base   => [ 52, 152, 219],
-      shadow => [ 41, 128, 185],
-    },
-    {
-      base   => [155,  89, 182],
-      shadow => [142,  68, 173],
-    },
-    {
-      base   => [ 52,  73,  94],
-      shadow => [ 44,  62,  80],
-    },
-    {
-      base   => [149, 165, 166],
-      shadow => [127, 140, 141],
-    },
-    {
-      base   => [236, 240, 241],
-      shadow => [189, 195, 199],
-    },
-  ], colours_kde => [
-    {
-      base   => [191,   3,   3],
-      shadow => [156,  15,  15],
-    },
-    {
-      base   => [191,   3,  97],
-      shadow => [156,  15,  86],
-    },
-    {
-      base   => [133,   2, 108],
-      shadow => [106,   0,  86],
-    },
-    {
-      base   => [ 52,  23, 110],
-      shadow => [ 29,  10,  85],
-    },
-    {
-      base   => [  0,  67, 138],
-      shadow => [  0,  49, 110],
-    },
-    {
-      base   => [  0,  96, 102],
-      shadow => [  0,  72,  77],
-    },
-    {
-      base   => [  0, 115,  77],
-      shadow => [  0,  88,   6],
-    },
-    {
-      base   => [  0, 137,  44],
-      shadow => [  0, 110,  41],
-    },
-    {
-      base   => [243, 195,   0],
-      shadow => [227, 173,   0],
-    },
-    {
-      base   => [207,  73,  19],
-      shadow => [172,  67,  17],
-    },
-    {
-      base   => [ 85,  87,  83],
-      shadow => [ 46,  52,  54],
-    },
-    {
-      base   => [ 87,  64,  30],
-      shadow => [ 56,  37,   9],
-    },
-  ], colours_tango => [
-    {
-      other  => [239, 41, 41],
-      base   => [204,  0,  0],
-      shadow => [164,  0,  0],
-    },
-    {
-      other  => [252,175, 62],
-      base   => [245,121,  0],
-      shadow => [206, 92,  0],
-    },
-    {
-      other  => [252,233, 79],
-      base   => [237,212,  0],
-      shadow => [196,160,  0],
-    },
-    {
-      other  => [138,226, 52],
-      base   => [115,210, 22],
-      shadow => [78,154,  6],
-    },
-    {
-      other  => [114,159,207],
-      base   => [52,101,164],
-      shadow => [32, 74,135],
-    },
-    {
-      other  => [173,127,168],
-      base   => [117, 80,123],
-      shadow => [92 ,53,102],
-    },
-    {
-      other  => [233,185,110],
-      base   => [193,125, 17],
-      shadow => [143, 89,  2],
-    },
-    {
-      other  => [238, 238,236],
-      base   => [211, 215,207],
-      shadow => [186, 189,182],
-    },
-    {
-      other  => [136, 138, 133],
-      base   => [85,   87,  83],
-      shadow => [46,   52,  54],
-    },
-  ] );
-
-  $self->render('website/contribute-developer');
+  $c->render('website/contribute');
 }
 
 sub donate_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $v = $self->flash('values') // {
+  my $v = $c->flash('values') // {
     donor_name => '',
     donor_email => '',
     donor_amount => '',
   };
 
-  $self->stash(v => $v);
+  $c->render_steps('website/contribute-donate', sub {
+    my $delay = shift;
 
-  $self->render('website/contribute-donate');
+    $c->pg->db->query("SELECT name, amount, TO_CHAR(created, 'DD/MM/YYYY') AS dtg FROM canvas_contribution WHERE type='donation' ORDER BY created DESC LIMIT 100" => $delay->begin);
+  }, sub {
+    my ($delay, $err, $res) = @_;
+
+    $c->stash(
+      d => $res->hashes,
+      v => $v,
+    );
+  });
 }
 
 
@@ -390,17 +217,8 @@ sub donate_confirm_post {
 
     my $created = Time::Piece->strptime( $pp_donation->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ' );
 
-    my $d = Canvas::Store::Contribution->create({
-      type           => 'donation',
-      merchant_id    => $pp_donation->{PAYMENTINFO_0_SECUREMERCHANTACCOUNTID},
-      transaction_id => $pp_donation->{PAYMENTINFO_0_TRANSACTIONID},
-      amount         => $pp_donation->{PAYMENTINFO_0_AMT},
-      fee            => $pp_donation->{PAYMENTINFO_0_FEEAMT},
-      name           => $name,
-      email          => $email,
-      paypal_raw     => j($pp_donation),
-      created        => $created,
-    });
+    my $c->pg->db->query("INSERT INTO canvas_contribution ('type', 'merchant_id', 'transaction_id', 'amount', 'fee', 'name', 'email', 'paypal_raw', 'created') VALUES ('donation', ?, ?, ?, ?, ?, ?, ?, ?)", $pp_donation->{PAYMENTINFO_0_SECUREMERCHANTACCOUNTID}, $pp_donation->{PAYMENTINFO_0_TRANSACTIONID}, $pp_donation->{PAYMENTINFO_0_AMT}, $pp_donation->{PAYMENTINFO_0_FEEAMT}, $name, $email, json_encode($pp_donation), $created);
+
   }
   else {
     $self->flash(page_errors => "Your transaction could not be completed. Nothing has been charged to your account.");
@@ -413,17 +231,26 @@ sub donate_confirm_post {
 }
 
 sub sponsor_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $v = $self->flash('values') // {
+  my $v = $c->flash('values') // {
     donor_name => '',
     donor_email => '',
     donor_amount => '',
   };
 
-  $self->stash(v => $v);
+  $c->render_steps('website/contribute-sponsor', sub {
+    my $delay = shift;
 
-  $self->render('website/contribute-sponsor');
+    $c->pg->db->query("SELECT name, amount, TO_CHAR(created, 'DD/MM/YYYY') as dtg FROM canvas_contribution WHERE type='sponsorship' ORDER BY created DESC LIMIT 100" => $delay->begin);
+  }, sub {
+    my ($delay, $err, $res) = @_;
+
+    $c->stash(
+      s => $res->hashes,
+      v => $v,
+    );
+  });
 }
 
 
@@ -583,17 +410,7 @@ sub sponsor_confirm_post {
     #my $created = Time::Piece->strptime( $pp_sponsorship->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ' );
     my $created = gmtime;
 
-    my $d = Canvas::Store::Contribution->create({
-      type           => 'sponsorship',
-      merchant_id    => $self->session('payerid'),
-      transaction_id => $pp_sponsorship->{PROFILEID},
-      amount         => $self->session('amount'),
-      fee            => 0,
-      name           => $name,
-      email          => $email,
-      paypal_raw     => j($pp_sponsorship),
-      created        => $created,
-    });
+    my $c->pg->db->query("INSERT INTO canvas_contribution ('type', 'merchant_id', 'transaction_id', 'amount', 'fee', 'name', 'email', 'paypal_raw', 'created') VALUES ('sponsorship', ?, ?, ?, ?, ?, ?, ?, ?)", $self->session('payerid'), $pp_sponsorship->{PROFILEID}, $self->session('amount'), 0, $name, $email, json_encode($pp_sponsorship), $created);
   }
   else {
     $self->flash(page_errors => "Your transaction could not be completed. Nothing has been charged to your account.");

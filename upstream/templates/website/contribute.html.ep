@@ -67,10 +67,10 @@
             <h2>Financial Support</h2>
             <h3>Donations</h3>
             <p>If it is your desire, you can help by making a financial contribution to the Korora Project. Any revenue from your donations allows the Korora Project to afford new hardware and equipment as well as maintain the server hosting infrastructure.</p>
-            <a href="<%= url_for_path(0, 'donate')%>" class="btn btn-success">I want to Donate</a>
+            <a href="<%= url_for('contributedonate')%>" class="btn btn-success">I want to Donate</a>
             <h3>Sponsorships</h3>
             <p>By financially sponsoring the Korora Project, you will be giving the development team a regular and predictable income. Sponsorships are the best way to help developers plan and prioritise development costs.</p>
-            <a href="<%= url_for_path(0, 'sponsor')%>" class="btn btn-success">I want to Sponsor</a>
+            <a href="<%= url_for('contributesponsor')%>" class="btn btn-success">I want to Sponsor</a>
           </div>
         </div>
       </div>

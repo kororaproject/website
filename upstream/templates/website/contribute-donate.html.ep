@@ -35,7 +35,7 @@
             <h2>Why donate?</h2>
             <p>We build Korora because we love it and there is no pressure to make a donation.</p>
             <p>Korora is personally funded by our core developers however and we welcome any contributions to help us with that.</p>
-            <p>All donations are processed securely online and we do not store any of your payment details.</p>
+            <p>All donations are processed securely online and we do not store any of your personal payment information.</p>
             <h2>How is the money used?</h2>
             <p>Any donation will be put to good use, like helping to cover our hosting costs and purchasing new equipment to make Korora even better.</p>
             <h2>How much should you give?</h2>
@@ -94,6 +94,28 @@
             </div>
           </form>
         </div>
+% if (@{$d}) {
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>Latest Donations</h2>
+
+            <table class='table table-striped'>
+              <tr>
+                <th class="col-sm-4">Date</th>
+                <th class="col-sm-4 text-center">Donor</th>
+                <th class="col-sm-4 text-center">Amount</th>
+              </tr>
+%   foreach my $dd ( @{$d} ) {
+              <tr>
+                <td><%= $dd->{dtg} %></td>
+                <td class="text-center"><%= $dd->{name} || "Anonymous" %></td>
+                <td class="text-center">$<%= $dd->{amount} %></td>
+              </tr>
+% }
+            </table>
+          </div>
+        </div>
+% }
       </div>
 
       <!-- END CONTENT -->
