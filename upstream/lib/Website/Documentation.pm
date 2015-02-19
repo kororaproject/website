@@ -32,8 +32,6 @@ use Time::Piece;
 #
 # LOCAL INCLUDES
 #
-#use Canvas::Store::Post;
-#use Canvas::Store::Pager;
 
 #
 # CONSTANTS
@@ -56,51 +54,55 @@ sub _tree {
   my $p_id = shift // 0;
   my $depth = shift // 0;
 
-  my $docs = $c->pg->db->query("SELECT menu_order, title FROM canvas_post WHERE type='document' AND parent_id=?", $p_id)->hashes;
+  my $docs = $c->pg->db->query("SELECT id, menu_order, title FROM canvas_post WHERE type='document' AND parent_id=?", $p_id)->hashes;
 
   foreach my $d (sort { $a->{menu_order} <=> $b->{menu_order} or $a->{title} cmp $b->{title} } @{$docs}) {
     push @{$t}, { data => $d, depth => $depth };
-    $c->_tree($t, $d->id, $depth+1);
+    _tree($c, $t, $d->{id}, $depth+1);
   }
 }
 
-
-sub rebuild_index() {
+sub rebuild_index {
   my $c    = shift;
   my $documents = [];
 
   # recursively rebuild the doc index
-  $c->_tree($documents);
+  _tree($c, $documents);
 
   # update documenation metadata
-  my $order = 0;
-  Canvas::Store->do_transaction(sub {
-    for my $d ( @{ $documents } ) {
+  {
+    my $db = $c->pg->db;
+    my $tx = $db->begin;
+    my $order = 0;
+
+    for my $d (@{$documents}) {
       $order++;
 
-      # find tag
-      my $t = $c->pg->db->query("SELECT meta_id FROM canvas_postmeta WHERE post_id=? AND meta_key='hierarchy_order", $d->{data}{id})->hash;
+      # find hierarchy order
+      my $ho = $db->query("SELECT meta_id FROM canvas_postmeta WHERE post_id=? AND meta_key='hierarchy_order'", $d->{data}{id})->hash;
 
       # create or update
-      if ($t) {
-        $c->pg->db->query("UPDATE canvas_postmeta SET meta_value=?", $order);
+      if ($ho) {
+        $db->query("UPDATE canvas_postmeta SET meta_value=? WHERE post_id=?", $order, $ho->{meta_id});
       }
       else {
-        $c->pg->db->query("INSERT INTO canvas_postmeta (meta_value) VALUES (?)", $order);
+        $db->query("INSERT INTO canvas_postmeta (post_id, meta_key, meta_value) VALUES (?, 'hierarchy_order', ?)", $d->{data}{id}, $order);
       }
 
-      # find tag
-      my $d = $c->pg->db->query("SELECT meta_id FROM canvas_postmeta WHERE post_id=? AND meta_key='hierarchy_depth", $d->{data}{id})->hash;
+      # find hierarchy depth
+      my $hd = $db->query("SELECT meta_id FROM canvas_postmeta WHERE post_id=? AND meta_key='hierarchy_depth'", $d->{data}{id})->hash;
 
       # create or update
-      if ($d) {
-        $c->pg->db->query("UPDATE canvas_postmeta SET meta_value=?", $d->{depth});
+      if ($hd) {
+        $db->query("UPDATE canvas_postmeta SET meta_value=? WHERE meta_id=?", $d->{depth}, $hd->{meta_id});
       }
       else {
-        $c->pg->db->query("INSERT INTO canvas_postmeta (meta_value) VALUES (?)", $d->{depth});
+        $db->query("INSERT INTO canvas_postmeta (post_id, meta_key, meta_value) VALUES (?, 'hierarchy_depth', ?)", $d->{data}{id}, $hd->{depth});
       }
     }
-  });
+
+    $tx->commit;
+  }
 }
 
 sub list_status_for_post {
@@ -212,8 +214,9 @@ sub document_post {
 
   my $now = gmtime;
 
+  # edit existing post
   if ($stub ne '' && $c->document->can_edit) {
-    my $p = $c->pg->db->query("SELECT title, excerpt, content, TO_CHAR(p.created, 'YYYY-MM-DD HH24:MI:SS') AS created, author_id, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='document' AND name=?", $stub)->hash;
+    my $p = $c->pg->db->query("SELECT p.id, title, excerpt, content, TO_CHAR(p.created, 'YYYY-MM-DD HH24:MI:SS') AS created, author_id, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='document' AND name=?", $stub)->hash;
 
     # update author if changed
     if ($author ne $p->{username}) {
@@ -224,27 +227,42 @@ sub document_post {
 
     # TODO: update created if changed
     #my $t = Time::Piece->strptime($created, '%d/%m/%Y %H:%M:%S');
- 
-    my $r = $c->pg->db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, parent_id=?, menu_order=?, created=?, updated=? WHERE type='document' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $parent_id, $order, $created, $now, $stub);
 
-    # find tags to add and remove
-    my @tags_old = $p->tags;
-    my @tags_new = map { sanitise_with_dashes($_) } split /[ ,]+/, $tag_list;
+    my $db = $c->pg->db;
+    my $tx = $db->begin;
+
+    my $r = $db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, parent_id=?, menu_order=?, created=?, updated=? WHERE type='document' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $parent_id, $order, $created, $now, $stub);
+
+    # update tags
+    my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
+    say Dumper "FOO", $tt;
+    my @tags_old = $tt->{tags};
+    my @tags_new = map { $c->sanitise_with_dashes($_) } split /[ ,]+/, $tag_list;
 
     my %to = map { $_ => 1 } @tags_old;
     my %tn = map { $_ => 1 } @tags_new;
 
     # add tags
     foreach my $ta ( grep( ! defined $to{$_}, @tags_new ) ) {
-      my $t  = Canvas::Store::Tag->find_or_create({ name => $ta });
-      my $pt = Canvas::Store::PostTag->find_or_create({ post_id => $p->id, tag_id => $t->id })
+      # find or create tag
+      my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $ta)->hash;
+      unless ($t) {
+        $t = { id => $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $ta)->array->[0] };
+      }
+
+      # find or create post/tag reference
+      my $pt = $db->query("SELECT * FROM canvas_post_tag WHERE post_id=? AND tag_id=?", $p->{id}, $t->{id})->hash;
+      unless ($pt) {
+        $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?)", $p->{id}, $t->{id});
+      }
     }
 
     # remove tags
     foreach my $td ( grep( ! defined $tn{$_}, @tags_old ) ) {
-      my $t = Canvas::Store::Tag->search({ name => $td })->first;
-      Canvas::Store::PostTag->search({ post_id => $p->id, tag_id => $t->id })->first->delete;
+      $db->query("DELETE FROM canvas_post_tag WHERE tag_id IN (SELECT id FROM canvas_tag WHERE name=?) AND post_id=?", $td, $p->{id});
     }
+
+    $tx->commit;
   }
   # otherwise create a new entry
   elsif ($c->document->can_add) {
@@ -286,92 +304,24 @@ sub document_post {
     return $c->redirect_to('aboutdocumentadmin');
   }
 
-#  rebuild_index();
+  rebuild_index($c);
 
   $c->redirect_to('supportdocumentationid', id => $stub);
 }
 
-sub document_edit_post {
-  my $self = shift;
-
-  my $stub = $self->param('id');
-
-  # find the post
-  my $p = Canvas::Store::Post->search({ name => $stub, type => 'document' })->first;
-
-  # ensure we can edit
-  unless( $self->document_can_edit( $p ) ) {
-    return $self->redirect_to( 'supportdocumentation' );
-  }
-
-  # update the fields
-  $p->title( $self->param('title') );
-  $p->content( $self->param('content') );
-  $p->excerpt( $self->param('excerpt') );
-  $p->status( $self->param('status') );
-  $p->parent_id( $self->param('parent') );
-  $p->menu_order( $self->param('order') );
-
-  # update author if changed
-  if( $self->param('author') ne $p->author_id->username ) {
-    my $u = Canvas::Store::User->search({ username => $self->param('author') } )->first;
-
-    if( $u ) {
-      $p->author_id( $u->id );
-    }
-  }
-
-  # update created if changed
-  my $t = Time::Piece->strptime( $self->param('created'), "%d/%m/%Y %H:%M:%S" );
-
-  if( $t ne $p->created ) {
-    $p->created( $t );
-  }
-
-  Canvas::Store->do_transaction( sub {
-    $p->update;
-
-    # find tags to add and remove
-    my @tags_old = $p->tag_list_array;
-    my @tags_new = map { sanitise_with_dashes($_) } split /[ ,]+/, $self->param('tags');
-
-    my %to = map { $_ => 1 } @tags_old;
-    my %tn = map { $_ => 1 } @tags_new;
-
-    # add tags
-    foreach my $ta ( grep( ! defined $to{$_}, @tags_new ) ) {
-      my $t  = Canvas::Store::Tag->find_or_create({ name => $ta });
-      my $pt = Canvas::Store::PostTag->find_or_create({ post_id => $p->id, tag_id => $t->id })
-    }
-
-    # remove tags
-    foreach my $td ( grep( ! defined $tn{$_}, @tags_old ) ) {
-      my $t  = Canvas::Store::Tag->search({ name => $td })->first;
-      Canvas::Store::PostTag->search({ post_id => $p->id, tag_id => $t->id })->first->delete;
-    }
-  });
-
-  rebuild_index();
-
-  $self->redirect_to( 'supportdocumentationid', id => $stub );
-}
-
 sub document_delete_any {
-  my $self = shift;
+  my $c = shift;
 
-  my $stub = $self->param('id');
-
-  my $p = Canvas::Store::Post->search({ name => $stub, type => 'document' })->first;
+  my $stub = $c->param('id');
 
   # only allow authenticated users
-  return $self->redirect_to('supportdocumentation') unless $self->document_can_delete( $p );
+  return $c->redirect_to('supportdocumentation') unless $c->document->can_delete;
 
-  # check we found the post
-  if( $self->document_can_delete( $p ) ) {
-    $p->delete;
-  }
+  $c->pg->db->query("DELETE FROM canvas_post WHERE name=? AND type='document'");
 
-  $self->redirect_to('supportdocumentation');
+  rebuild_index($c);
+
+  $c->redirect_to('supportdocumentation');
 }
 
 sub document_admin_get {
