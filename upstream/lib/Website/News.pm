@@ -26,6 +26,7 @@ use strict;
 use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Pg;
+use Mojo::Util qw(trim);
 use POSIX qw(ceil);
 use Time::Piece;
 
@@ -82,15 +83,17 @@ sub index {
     $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='news' AND status='publish'" => $delay->begin);
 
     # get paged items with username and email associated
-    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.status='publish' GROUP BY p.id, u.username, u.email ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.status='publish' GROUP BY p.id, u.username, u.email ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
   },
   sub {
     my ($delay, $count_err, $count_res, $err, $res) = @_;
 
     my $count = $count_res->array->[0];
+    my $re = $res->hashes;
+    say Dumper $re;
 
     $c->stash(news => {
-      items       => $res->hashes,
+      items       => $re,
       item_count  => $count,
       page_size   => $page_size,
       page        => $page,
@@ -103,7 +106,7 @@ sub rss_get {
   my $c = shift;
 
   # get latest items paged items with username and email associated
-  my $res = $c->pg->db->query("SELECT title, name, excerpt, TO_CHAR(created, 'Dy, DD Mon YYYY HH24:MI:SS GMT') AS created FROM canvas_post WHERE type='news' AND status='publish' ORDER BY created DESC LIMIT 10");
+  my $res = $c->pg->db->query("SELECT title, name, excerpt, EXTRACT(EPOCH FROM created) AS created_epoch, EXTRACT(EPOCH FROM updated) AS updated_epoch FROM canvas_post WHERE type='news' AND status='publish' ORDER BY created DESC LIMIT 10");
 
   my $rss = '<?xml version="1.0" ?><rss version="2.0"><channel>' .
             '<title>Korora Project - News</title>' .
@@ -130,7 +133,7 @@ sub news_post_get {
   $c->render_steps('website/news-post', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
@@ -163,7 +166,7 @@ sub news_post_edit_get {
   $c->render_steps('website/news-post-edit', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
@@ -181,12 +184,12 @@ sub news_post_edit_get {
 sub news_post {
   my $c = shift;
 
-  my $author  = $c->param('author');
-  my $content = $c->param('content');
-  my $excerpt = $c->param('excerpt');
-  my $status  = $c->param('status');
-  my $stub    = $c->param('post_id');
-  my $title   = $c->param('title');
+  my $author    = $c->param('author');
+  my $content   = $c->param('content');
+  my $excerpt   = $c->param('excerpt');
+  my $status    = $c->param('status');
+  my $stub      = $c->param('post_id');
+  my $title     = $c->param('title');
   my $tag_list  = trim $c->param('tags');
 
   my $now = gmtime;
@@ -194,7 +197,7 @@ sub news_post {
   my $created = $c->param('created');
 
   if ($stub ne '' && $c->news->can_edit) {
-    my $p = $c->pg->db->query("SELECT title, excerpt, content, TO_CHAR(p.created, 'YYYY-MM-DD HH24:MI:SS') AS created, author_id, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='news' AND name=?", $stub)->hash;
+    my $p = $c->pg->db->query("SELECT p.id, title, excerpt, content, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, author_id, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='news' AND name=?", $stub)->hash;
 
     # update author if changed
     if ($author ne $p->{username}) {
@@ -209,13 +212,13 @@ sub news_post {
     my $db = $c->pg->db;
     my $tx = $db->begin;
 
-    my $r = $db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, created=?, updated=? WHERE type='news' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $created, $now, $stub);
+    $db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, created=?, updated=? WHERE type='news' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $created, $now, $stub);
 
-    # TODO: update tags
+    # update tags
     my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
-    say Dumper "FOO", $tt;
+
     my @tags_old = $tt->{tags};
-    my @tags_new = map { $c->sanitise_with_dashes($_) } split /[ ,]+/, $tag_list;
+    my @tags_new = @{$c->sanitise_taglist($tag_list)};
 
     my %to = map { $_ => 1 } @tags_old;
     my %tn = map { $_ => 1 } @tags_new;
@@ -252,14 +255,8 @@ sub news_post {
 
     my $post_id = $c->pg->db->query('INSERT INTO canvas_post (type, name, status, title, content, excerpt, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', 'news', $stub, $status, $title, $content, $excerpt, $c->auth_user->{id}, $created, $now)->array->[0];
 
-    # ensure we only insert sanitised and unique tags
-    my %tags = map  { trim($_) => 1 }
-                 grep { $_ }
-                   map  { $c->sanitise_with_dashes($_) }
-                     split /[ ,]+/, $tag_list;
-
     # create the tags
-    foreach my $tag (keys %tags) {
+    foreach my $tag (@{$c->sanitise_taglist($tag_list)}) {
       # find or create tag
       my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $tag)->hash;
 
@@ -311,7 +308,7 @@ sub news_admin_get {
     $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='news'" => $delay->begin);
 
     # get paged items with username and email associated
-    $c->pg->db->query("SELECT name, p.status, title, excerpt, TO_CHAR(p.created, 'DD/MM/YYYY') AS created, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type='news' ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+    $c->pg->db->query("SELECT name, p.status, title, excerpt, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type='news' ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
   },
   sub {
     my ($delay, $err, $count_res, $err_res, $res) = @_;

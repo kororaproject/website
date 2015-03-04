@@ -46,7 +46,7 @@
 % foreach my $n ( @{ $news->{items} } ) {
         <div class="row">
           <div class="col-sm-12">
-            <a class="news-post-title" href="<%= url_for('aboutnewsid', id => $n->{name}) %>"><h2><%= $n->{title} %></h2></a>
+            <h2><a class="news-post-title" href="<%= url_for('aboutnewsid', id => $n->{name}) %>"><%= $n->{title} %></a></h2>
 
             <div class="news-summary-subtitle">
               <div class="news-detail-subtitle-metadata">
@@ -60,15 +60,23 @@
             <div class="news-excerpt">
               <%== render_markdown($n->{excerpt}) %>
             </div>
-            <div>
-% foreach my $t ( @{ $n->{tags} } ) {
-              <span class="label label-default"><%= $t %></span>
+            <div class="row">
+              <div class="col-xs-8">
+% if (grep {$_} @{$n->{tags}}) {
+                <div class="post-tags">
+                  <i class="fa fa-tags"></i>
+%   foreach my $t (@{$n->{tags}}) {
+                  <span class="tag"><%= $t %></span>
+%   }
+                </div>
 % }
+              </div><!--
+           --><div class="col-xs-4 text-right">
+                <a class="btn btn-default" href="<%= url_for('aboutnewsid', id => $n->{name}) %>">Read more ... </a>
+              </div>
+            </div>
 
-            </div>
-            <div>
-              <a class="btn btn-default" href="<%= url_for('aboutnewsid', id => $n->{name}) %>">Read more ... </a>
-            </div>
+
           </div>
         </div>
         <div class="hr hr-lg"></div>

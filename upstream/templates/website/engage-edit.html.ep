@@ -25,32 +25,32 @@
               <li><a href="/">Home</a></li>
               <li><a href="/support">Support</a></li>
               <li><a href="/support/engage">Engage</a></li>
-              <li><a href="<%= url_with('/support/engage')->query([ type => $post->type]) %>"><%= ucfirst $post->type %>s</a></li>
-              <li><a href="<%= url_for_path(-1)%>"><%= $post->title %></a></li>
+              <li><a href="<%= url_with('/support/engage')->query([type => $post->{type}]) %>"><%= ucfirst $post->{type} %>s</a></li>
+              <li><a href="<%= url_for('supportengagetypestub', type => $post->{type}, stub => $post->{name}) %>"><%= $post->{title} %></a></li>
               <li class="active">Edit</li>
             </ol>
-            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Edit <%== engage_icon( $post->type )%></h1>
+            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Edit</h1>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
             <form action="<%= url_for('current') %>" method="post" enctype="application/x-www-form-urlencoded">
               <div class="row">
-% if( engage_post_can_edit_status( $post ) ) {
+% if ($c->engage->can_edit_status($post)) {
                 <div class="col-sm-8">
                   <h3>Title</h3>
-                  <input type="text" name="title" class="form-control" value="<%= $post->title %>"></input>
+                  <input type="text" name="title" class="form-control" value="<%= $post->{title} %>"></input>
                   <span class="help-block">The title is a brief, short sentence, summary of your item.</span>
                 </div>
                 <div class="col-sm-4">
                   <h3>Status</h3>
-                  <%= select_field status => engage_status_list( $post ), class => "form-control" %>
+                  <%= select_field status => engage_status_list($post), class => "form-control" %>
                   <span class="help-block">The status provides additional working states of this item.</span>
                 </div>
 % } else {
                 <div class="col-sm-12">
                   <h3>Title</h3>
-                  <input type="text" name="title" class="form-control" value="<%= $post->title %>"></input>
+                  <input type="text" name="title" class="form-control" value="<%= $post->{title} %>"></input>
                   <span class="help-block">The title is a brief, short sentence, summary of your item.</span>
                 </div>
 % }
@@ -58,21 +58,21 @@
               <div class="row">
                 <div class="col-sm-12">
                   <h3>Description <a href="" class="btn pull-right" data-toggle="modal" data-target="#modalEngageSyntax"><i class="fa fa-fw fa-question"></i></a></h3>
-                  <textarea name="content" class="form-control" rows="10"><%= $post->content %></textarea>
+                  <textarea name="content" class="form-control" rows="10"><%= $post->{content} %></textarea>
                   <span class="help-block">Engage content interprets a superset of the original <a href="http://daringfireball.net/projects/markdown/">Markdown</a> syntax that we refer to as <a href="/support/engage/syntax">Engage Markdown</a>. If you are already familiar with Markdown from other sites such as GitHub and StackOverflow then you should feel right at home.</span>
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-12">
                   <h3>Tags</h3>
-                  <input type="text" name="tags" class="form-control" value="<%= $post->tag_list %>"></input>
+                  <input type="text" name="tags" class="form-control" value="<%= join ", ", @{$post->{tags}} %>"></input>
                   <span class="help-block">Tags allow you to nonimate the keywords of your item (e.g. "gnome, k19, boot, black, screen"). Multiple tags can be specified by using a space or comma as a separator.</span>
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-12">
                   <div class="text-right">
-                    <a href="<%= url_for_path(-1) %>" class="btn btn-default">Cancel</a>
+                    <a href="<%= url_for('supportengagetypestub', type => $post->{type}, stub => $post->{name}) %>" class="btn btn-default">Cancel</a>
                     <button type="submit" class="btn btn-success">Save</button>
                   </div>
                 </div>

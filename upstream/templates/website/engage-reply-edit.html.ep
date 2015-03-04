@@ -25,17 +25,17 @@
               <li><a href="/">Home</a></li>
               <li><a href="/support">Support</a></li>
               <li><a href="/support/engage">Engage</a></li>
-              <li><a href="<%= url_with('/support/engage')->query([ type => $reply->parent_id->type]) %>"><%= ucfirst $reply->parent_id->type %>s</a></li>
-              <li><a href="<%= $redirect_url %>"><%= $reply->parent_id->title %></a></li>
+              <li><a href="<%= url_with('/support/engage')->query([type => $reply->{type}]) %>"><%= ucfirst $reply->{type} %>s</a></li>
+              <li><a href="<%= $rt_url %>"><%= $reply->{title} %></a></li>
               <li class="active">Edit Reply</li>
             </ol>
-            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Edit Reply<%== engage_icon( $reply->parent_id->type )%></h1>
+            <h1 class="page-title"><a href="/support/engage"><strong>Engage.</strong></a> Edit Reply</h1>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-12">
             <form action="<%= url_for('current') %>" method="post" enctype="application/x-www-form-urlencoded">
-              <input type="hidden" name="redirect_url" value="<%= $redirect_url %>"></input>
+              <input type="hidden" name="rt" value="<%= $rt %>"></input>
               <div class="row">
                 <div class="col-sm-12">
                   <h3>Reply <a href="" class="btn pull-right" data-toggle="modal" data-target="#modalEngageSyntax"><i class="fa fa-fw fa-question"></i></a> </h3>
@@ -46,7 +46,7 @@
               <div class="row">
                 <div class="col-sm-12">
                   <div class="text-right">
-                    <a href="<%= $redirect_url %>" class="btn btn-default">Cancel</a>
+                    <a href="<%= $rt_url %>" class="btn btn-default">Cancel</a>
                     <button type="submit" class="btn btn-success">Save</button>
                   </div>
                 </div>

@@ -53,7 +53,7 @@
 % if (is_user_authenticated) {
       <ul class="nav navbar-nav navbar-right">
         <li class="dropdown <%= 'active' if ($active eq 'user')%>">
-          <a href="" class="dropdown-toggle user-avatar" data-toggle="dropdown"><%== email_gravatar(auth_user->{email}) %><b class="caret"></b></a>
+          <a href="" class="dropdown-toggle user-avatar" data-toggle="dropdown"><%= $c->users->name %><%== email_gravatar(auth_user->{email}) %><b class="caret"></b></a>
           <ul class="dropdown-menu" role="menu">
 %   if ($c->news->can_add) {
             <li><a href="/about/news/admin">News Admin</a></li>

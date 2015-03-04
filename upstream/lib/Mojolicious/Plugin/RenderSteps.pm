@@ -26,7 +26,7 @@ sub register {
 
       # render exceptions on error
       $delay->on(error => sub {
-        $self->render_exception(pop)
+        $self->reply->exception(pop)
       });
 
       $delay->on(finish => sub {

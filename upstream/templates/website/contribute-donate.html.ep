@@ -107,7 +107,7 @@
               </tr>
 %   foreach my $dd ( @{$d} ) {
               <tr>
-                <td><%= $dd->{dtg} %></td>
+                <td><%= $dd->{created_epoch} %></td>
                 <td class="text-center"><%= $dd->{name} || "Anonymous" %></td>
                 <td class="text-center">$<%= $dd->{amount} %></td>
               </tr>

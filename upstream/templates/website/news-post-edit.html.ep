@@ -14,7 +14,7 @@
       <!-- CONTENT -->
 
       <div id="page-about" class="container">
-        <form action="<%= url_for_path(-2) %>" method="post">
+        <form action="<%= url_for('aboutnews') %>" method="post">
           <input type="hidden" name="post_id" value="<%= $post->{name} %>">
           <div class="row">
             <div class="col-sm-12">
@@ -71,7 +71,7 @@
           <div class="row">
             <div class="col-sm-12">
               <div class="text-right">
-                <a class="btn btn-default" href="<%= url_for_path(-2, 'admin') %>">Cancel</a>
+                <a class="btn btn-default" href="<%= url_for('aboutnewsadmin') %>">Cancel</a>
 % if ($c->news->can_delete) {
                 <a href="" class="btn btn-danger" data-toggle="modal" data-target="#modalNewsDelete">Delete</i></a>
 % }
@@ -105,7 +105,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Ummm, No.</button>
-          <a class="btn btn-danger" href="<%= url_for_path(-1, 'delete') %>">Yes, I'm sure.</a>
+          <a class="btn btn-danger" href="<%= url_for('aboutnewsiddelete', id => $post->{name}) %>">Yes, I'm sure.</a>
         </div>
       </div>
     </div>

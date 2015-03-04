@@ -53,7 +53,7 @@ sub index {
 }
 
 sub exception_get {
-  return shift->render_exception('render_only');
+  return shift->reply->exception('render_only');
 }
 
 sub not_found_get {

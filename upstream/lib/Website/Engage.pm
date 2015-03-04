@@ -32,9 +32,6 @@ use Time::Piece;
 #
 # LOCAL INCLUDES
 #
-use Canvas::Store::Post;
-use Canvas::Store::PostTag;
-use Canvas::Store::Tag;
 
 #
 # CONSTANTS
@@ -129,7 +126,7 @@ sub index {
     my $raw_count_sql = 'SELECT COUNT(DISTINCT(p.id)) FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) WHERE (' . join( ') AND (', @filter ) . ')';
 
     # build paginated query
-    my $raw_sql = 'SELECT p.*, pu.username, pu.email, ARRAY_AGG(DISTINCT t.name) AS tags, ARRAY_TO_JSON(ARRAY_AGG(DISTINCT ROW(ru.username, ru.email))) AS replies FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) JOIN canvas_user pu ON (pu.id=p.author_id) JOIN canvas_user ru ON (ru.id=r.author_id) WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id, pu.id ORDER BY p.updated DESC';
+    my $raw_sql = 'SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, pu.username, pu.email, ARRAY_AGG(DISTINCT t.name) AS tags, ARRAY_TO_JSON(ARRAY_AGG(DISTINCT ROW(ru.username, ru.email))) AS replies FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) LEFT JOIN canvas_user pu ON (pu.id=p.author_id) LEFT JOIN canvas_user ru ON (ru.id=r.author_id) WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id, pu.id ORDER BY p.updated DESC';
 
     $raw_sql .= ' LIMIT ' . $page_size . ' OFFSET ' . ($page_size * ($page-1));
 
@@ -190,126 +187,100 @@ sub engage_post_prepare_add_get {
 }
 
 sub engage_post_add_post {
-  my $self = shift;
+  my $c = shift;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless $self->is_user_authenticated;
+  return $c->redirect_to('/support/engage') unless $c->users->is_active;
 
-  my $type      = $self->param('type');
-  my $title     = trim $self->param('title');
-  my $content   = trim $self->param('content');
-  my $tag_list  = trim $self->param('tags');
+  my $type      = $c->param('type');
+  my $content   = trim $c->param('content');
+  my $title     = trim $c->param('title');
+  my $tag_list  = trim $c->param('tags');
 
-  $self->flash(
-    title   => $title,
+  my $status    = $type eq 'question' ? 'need-answer' : '';
+
+  $c->flash(
     content => $content,
     tags    => $tag_list,
+    title   => $title,
   );
 
   # ensure it's a valid type
-  return $self->redirect_to('/support/engage') unless grep { $_ eq $type } qw(question thank);
+  return $c->redirect_to('/support/engage') unless grep {$_ eq $type} qw(question thank);
 
   # ensure we have some sane title (at least 16 characters)
-  unless( length $title >= 16 ) {
-    $self->flash( page_errors => 'Your title lacks a little description. Pleast use at least least 16 characters.' );
-    return $self->redirect_to( 'supportengagetypeadd', type => $type );
+  unless (length $title >= 16) {
+    $c->flash( page_errors => 'Your title lacks a little description. Pleast use at least least 16 characters.' );
+    return $c->redirect_to('supportengagetypeadd', type => $type);
   }
 
   # ensure we have some sane content (at least 16 characters)
-  unless( length $content >= 16 ) {
-    $self->flash( page_errors => 'Your content lacks a little description. Pleast use at least least 16 characters to convey something meaningful.' );
-    return $self->redirect_to( 'supportengagetypeadd', type => $type );
+  unless (length $content >= 16) {
+    $c->flash(page_errors => 'Your content lacks a little description. Pleast use at least least 16 characters to convey something meaningful.');
+    return $c->redirect_to('supportengagetypeadd', type => $type);
   }
 
-  my %tags = map  { $_ => 1 }
-             grep { $_ }
-             map  { sanitise_with_dashes( trim $_ ) } split /[ ,]+/, $tag_list;
+  my $tags = $c->sanitise_taglist($tag_list);
 
   # ensure we have some at least one tag
-  unless( keys %tags ) {
-    $self->flash( page_errors => 'Your post will be a lot easier to find with tags added. Please add at least one tag.' );
-    return $self->redirect_to( 'supportengagetypeadd', type => $type );
+  unless (@{$tags}) {
+    $c->flash(page_errors => 'Your post will be a lot easier to find with tags added. Please add at least one tag.');
+    return $c->redirect_to('supportengagetypeadd', type => $type);
   }
-
 
   my $now = gmtime;
-  my $stub = sanitise_with_dashes( $title );
+  my $stub = $c->sanitise_with_dashes($title);
 
-  # enforce max stub size
-  $stub = substr $stub, 0, 128 if length( $stub ) > 128;
+  # enforce max stub size allowing 16 chars for padding
+  $stub = substr $stub, 0, 112 if length($stub) > 112;
 
   # check for existing stubs and append the ID + 1 of the last
-  my( @e ) = Canvas::Store::Post->search({ type => $type, name => $stub });
+  my $e = $c->pg->db->query("SELECT MAX(id) FROM canvas_post WHERE type=? AND name=?", $type, $stub)->hash;
 
-  $stub .= '-' . ( $e[-1]->id + 1 ) if @e;
+  $stub .= '-' . ($e->{max} + 1) if $e;
+
+  my $db = $c->pg->db;
+  my $tx = $db->begin;
+
+  my $created = $now;
 
   # create the post
-  my $p = Canvas::Store::Post->create({
-    name         => $stub,
-    type         => $type,
-    status       => ( $type eq 'question' ) ? 'need-answer' : '',
-    title        => $title,
-    content      => $content,
-    author_id    => $self->auth_user->id,
-    created      => $now,
-    updated      => $now,
-  });
+  my $post_id = $db->query('INSERT INTO canvas_post (type, name, status, title, content, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', $type, $stub, $status, $title, $content, $c->auth_user->{id}, $created, $now)->array->[0];
 
   # create the tags
-  foreach my $tag ( keys %tags ) {
-    $tag = trim $tag;
-    my $t  = Canvas::Store::Tag->find_or_create({ name => $tag });
-    my $pt = Canvas::Store::PostTag->find_or_create({
-      post_id => $p->id,
-      tag_id  => $t->id
-    });
+  foreach my $tag (@{$tags}) {
+    # find or create tag
+    my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $tag)->hash;
+
+    unless ($t) {
+      $t->{id} = $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $tag)->array->[0];
+    }
+
+    # insert the link
+    my $pt = $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?) ", $post_id, $t->{id});
   }
+
+  $tx->commit;
 
   # undo our flash since we succeeded
-  $self->flash(
-    content => '',
-  );
+  $c->flash(content => '');
 
-  # auto-subscribe the creator (engage_subscriptions)
-  Canvas::Store::UserMeta->find_or_create({
-    user_id     => $self->auth_user->id,
-    meta_key    => 'engage_subscriptions',
-    meta_value  => $p->id,
-  });
+  my $subject = 'Korora Project - New Engage Item: ' . $title;
+  my $message = join "",
+    "G'day,\n\n",
+    "A new engage item has been posted by " . $c->auth_user->{username} . "\n\n",
+    "URL: https://kororaproject.org" . $c->url_for('supportengagetypestub', type => $type, stub => $stub) . "\n",
+    "Type: " . $type . "\n",
+    "Status: " . $status . "\n",
+    "Excerpt:\n",
+    $content . "\n\n",
+    "Regards,\n",
+    "The Korora Team.\n";
 
-  # mail all admins with "notify new engage items" checked
-  my @um = Canvas::Store::UserMeta->search({
-    meta_key   => 'engage_notify_on_new',
-    meta_value => 1,
-  });
-
-  if( @um ) {
-    my $subject = 'Korora Project - New Engage Item: ' . $p->title;
-    my $message = join "",
-      "G'day,\n\n",
-      "A new engage item has been posted by " . $p->author_id->username . "\n\n",
-      "URL: https://kororaproject.org" . $self->url_for( 'supportengagetypestub', type=> $type, stub => $stub ) . "\n",
-      "Type: " . $p->type .. "\n",
-      "Status: " . $p->type .. "\n",
-      "Excerpt:\n",
-      $p->content . "\n\n",
-      "Regards,\n",
-      "The Korora Team.\n";
-
-    foreach my $_um ( @um ) {
-      # send the activiation email
-      $self->mail(
-        from    => 'engage@kororaproject.org',
-        to      => $_um->user_id->email,
-        subject => $subject,
-        data    => $message,
-      );
-    }
-  }
-
+  $c->notify_users('engage_notify_on_new', 1, 'engage@kororaproject.org', $subject, $message);
 
   # redirect to the detail
-  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+  $c->redirect_to('supportengagetypestub', type => $type, stub => $stub);
 }
 
 sub engage_post_detail_get {
@@ -320,16 +291,13 @@ sub engage_post_detail_get {
   # could have flashed 'content' from an attempted reply
   my $content = $c->flash('content') // '';
 
-
   my $page_size = 10;
   my $page = ($c->param('page') // 1);
 
   $c->render_steps('website/engage-detail', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT * FROM canvas_post WHERE type=? AND name=?" => ($type, $stub) => $delay->begin);
-
-    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type=? AND p.name=? GROUP BY p.id, u.username, u.email" => ($type, $stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email, ARRAY_AGG(DISTINCT t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type=? AND p.name=? GROUP BY p.id, u.username, u.email" => ($type, $stub) => $delay->begin);
   },
   sub {
     my ($delay, $p_err, $p_res) = @_;
@@ -340,24 +308,27 @@ sub engage_post_detail_get {
     my $post = $p_res->hash;
     $delay->data(post => $post);
 
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type='reply' AND p.status='accepted' AND p.parent_id=? GROUP BY p.id, u.username, u.email ORDER BY created" => ($post->{id}) => $delay->begin);
+
     $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='reply' AND parent_id=?" => ($post->{id}) => $delay->begin);
 
-    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='reply' AND p.id=? GROUP BY p.id, u.username, u.email" => ($post->{id}) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type='reply' AND p.parent_id=? GROUP BY p.id, u.username, u.email ORDER BY created" => ($post->{id}) => $delay->begin);
   },
   sub {
-    my ($delay, $rc_err, $rc_res, $r_err, $r_res) = @_;
+    my ($delay, $a_err, $a_res, $rc_err, $rc_res, $r_err, $r_res) = @_;
 
     my $count = $rc_res->array->[0];
     my $post = $delay->data('post');
+    my $accepted = $a_res->hash;
 
     # allow path to get back here
     $c->flash(rt_url => $c->ub64_encode($c->url_with));
 
     $c->stash({
-      response => $post,
-      accepted => {},
-      content => {},
-      replies => {
+      response  => $post,
+      accepted  => $accepted,
+      content   => $content,
+      replies   => {
         items       => $r_res->hashes,
         item_count  => $count,
         page_size   => $page_size,
@@ -365,390 +336,349 @@ sub engage_post_detail_get {
         page_last   => ceil($count / $page_size),
       },
     });
-
   });
 }
 
 sub engage_post_edit_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $stub = $self->param('stub');
-  my $type = $self->param('type');
-  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
+  my $stub = $c->param('stub');
+  my $type = $c->param('type');
 
-  # check we found the post
-  return $self->redirect_to('/support/engage') unless defined $p;
+  $c->render_steps('website/engage-edit', sub {
+    my $delay = shift;
 
-  # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless (
-    $self->engage_post_can_edit( $p )
-  );
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email, ARRAY_AGG(DISTINCT t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type=? AND p.name=? GROUP BY p.id, u.username, u.email" => ($type, $stub) => $delay->begin);
+  },
+  sub {
+    my ($delay, $p_err, $p_res) = @_;
 
-  my @r = Canvas::Store::Post->replies( $stub );
+    my $post = $p_res->hash;
 
-  $self->stash( post => $p, replies => \@r );
+    # check we found the post
+    $delay->emit(redirect => '/support/engage') unless $c->engage->can_edit($post);
 
-  $self->render('website/engage-edit');
+    $c->stash(post => $post);
+  });
 }
 
 sub engage_post_edit_post {
-  my $self = shift;
-
-  my $stub = $self->param('stub');
-  my $type = $self->param('type');
-  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
-
-  # check we found the post
-  return $self->redirect_to('/support/engage') unless defined $p;
+  my $c = shift;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless (
-    $self->engage_post_can_edit( $p )
-  );
+  return $c->redirect_to('/support/engage') unless $c->users->is_active;
+
+  my $stub = $c->param('stub');
+  my $type = $c->param('type');
+
+  my $p = $c->pg->db->query("SELECT * FROM canvas_post WHERE type=? AND name=? LIMIT 1", $type, $stub)->hash;
+
+  # check we found the post
+  return $c->redirect_to('/support/engage') unless defined $p;
 
   # update title, content and status
-  my $title = $self->param('title');
-  my $content= $self->param('content');
-  my $status = $self->param('status');
+  my $title     = $c->param('title');
+  my $content   = $c->param('content');
+  my $status    = $c->param('status');
+  my $tag_list  = trim $c->param('tags');
 
-  $p->status( $status );
-  $p->title( $title ) if length trim $title;
-  $p->content( $content ) if length trim $content;
+  my $now = gmtime;
 
-  Canvas::Store->do_transaction( sub {
-    $p->update;
+  my $db = $c->pg->db;
+  my $tx = $db->begin;
 
-    # find tags to add and remove
-    my @tags_old = $p->tag_list_array;
-    my @tags_new = map { sanitise_with_dashes( trim $_ ) } split /[ ,]+/, $self->param('tags');
+  $db->query("UPDATE canvas_post SET status=?, title=?, content=?, updated=? WHERE id=?", $status, $title, $content, $now, $p->{id});
 
-    my %to = map { $_ => 1 } @tags_old;
-    my %tn = map { $_ => 1 } @tags_new;
+  # update tags
+  my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
 
-    # add tags
-    foreach my $ta ( grep( ! defined $to{$_}, @tags_new ) ) {
-      my $t  = Canvas::Store::Tag->find_or_create({ name => $ta });
-      my $pt = Canvas::Store::PostTag->find_or_create({ post_id => $p->id, tag_id => $t->id })
+  my @tags_old = $tt->{tags};
+  my @tags_new = @{$c->sanitise_taglist($tag_list)};
+
+  my %to = map { $_ => 1 } @tags_old;
+  my %tn = map { $_ => 1 } @tags_new;
+
+  # add tags
+  foreach my $ta (grep(!defined $to{$_}, @tags_new)) {
+    # find or create tag
+    my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $ta)->hash;
+    unless ($t) {
+      $t = { id => $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $ta)->array->[0] };
     }
 
-    # remove tags
-    foreach my $td ( grep( ! defined $tn{$_}, @tags_old ) ) {
-      my $t  = Canvas::Store::Tag->search({ name => $td })->first;
-      Canvas::Store::PostTag->search({ post_id => $p->id, tag_id => $t->id })->first->delete;
+    # find or create post/tag reference
+    my $pt = $db->query("SELECT * FROM canvas_post_tag WHERE post_id=? AND tag_id=?", $p->{id}, $t->{id})->hash;
+    unless ($pt) {
+      $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?)", $p->{id}, $t->{id});
     }
-  });
+  }
 
-  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+  $tx->commit;
+
+  $c->redirect_to('supportengagetypestub', type => $type, stub => $stub);
 }
 
 sub engage_post_subscribe_any {
-  my $self = shift;
+  my $c = shift;
 
-  my $stub = $self->param('stub');
-  my $type = $self->param('type');
+  my $stub = $c->param('stub');
+  my $type = $c->param('type');
 
-  my $url = $self->url_for('supportengagetypestub', type => $type, stub => $stub);
+  my $url = $c->url_for('supportengagetypestub', type => $type, stub => $stub);
 
   # redirect unless we're actively auth'd
-  return $self->redirect_to( $url ) unless $self->is_active_auth;
+  return $c->redirect_to($url) unless $c->users->is_active;
 
-  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
+  my $p = $c->pg->db->query("SELECT id FROM canvas_post WHERE type=? AND name=? LIMIT 1", $type, $stub)->hash;
 
   # check we found the post
-  return $self->redirect_to('/support/engage') unless defined $p;
+  return $c->redirect_to($url) unless defined $p;
 
   # subscribe (engage_subscriptions)
-  Canvas::Store::UserMeta->find_or_create({
-    user_id     => $self->auth_user->id,
-    meta_key    => 'engage_subscriptions',
-    meta_value  => $p->id,
-  });
+  $c->pg->db->query("INSERT INTO canvas_usermeta (user_id,meta_key,meta_value) VALUES (?,'engage_subscriptions',?)",$c->auth_user->{id}, $p->{id});
 
-  $self->redirect_to( $url );
+  $c->redirect_to($url);
 }
 
 sub engage_post_unsubscribe_any {
-  my $self = shift;
+  my $c = shift;
 
-  my $stub = $self->param('stub');
-  my $type = $self->param('type');
+  my $stub  = $c->param('stub');
+  my $type  = $c->param('type');
 
+  # delete usermeta entry
+  if ($c->users->is_active) {
+    $c->pg->db->query("DELETE FROM canvas_usermeta WHERE user_id=? AND meta_key='engage_subscriptions' AND meta_value::integer IN (SELECT id FROM canvas_post WHERE type=? AND name=?)", $c->auth_user->{id}, $type, $stub);
+  }
 
-  my $url = $self->url_for('supportengagetypestub', type => $type, stub => $stub);
-
-  # redirect unless we're actively auth'd
-  return $self->redirect_to( $url ) unless $self->is_active_auth;
-
-  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
-
-  # check we found the post
-  return $self->redirect_to('/support/engage') unless defined $p;
-
-  # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless (
-    $self->engage_post_can_edit( $p )
-  );
-
-  # find metadata (engage_subscriptions)
-  my $um = Canvas::Store::UserMeta->search({
-    user_id     => $self->auth_user->id,
-    meta_key    => 'engage_subscriptions',
-    meta_value  => $p->id,
-  })->first;
-
-  $um->delete if defined $um;
-
-  $self->redirect_to( $url );
+  $c->redirect_to($c->url_for('supportengagetypestub', type => $type, stub => $stub));
 }
 
 
 sub engage_reply_post {
-  my $self = shift;
+  my $c= shift;
 
-  my $type = $self->param('type');
-  my $stub = $self->param('stub');
-  my $redirect_url = $self->param('redirect_url') // $self->url_for('supportengagetypestub', type => $type, stub => $stub);
+  my $content   = $c->param('content') // '';
+  my $id        = $c->param('parent_id');
+  my $type      = $c->param('type');
+  my $stub      = $c->param('stub');
+  my $subscribe = $c->param('subscribe') // 0;
+
+  my $rt     = $c->param('rt');
+  my $rt_url = $rt ? $c->ub64_decode($rt) : $c->url_for('supportengagetypestub', type => $type, stub => $stub);
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless(
-    $self->is_user_authenticated && defined $self->auth_user
-  );
-
-  my $subscribe = $self->param('subscribe') // 0;
-  my $content = $self->param('content') // '';
+  return $c->redirect_to($rt_url) unless $c->users->is_active;
 
   # ensure we have content
-  unless( length( trim $content ) >= 16 ) {
-    $self->flash( content => $content );
+  unless (length(trim $content) >= 16) {
+    $c->flash(content => $content);
 
-    $self->flash( page_errors => 'Your reply lacks a little description. Pleast use at least least 16 characters to convey something meaningful.' );
-    return $self->redirect_to( $redirect_url );
+    $c->flash(page_errors => 'Your reply lacks a little description. Pleast use at least least 16 characters to convey something meaningful.');
+    return $c->redirect_to($rt_url);
   }
 
-  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
+  my $p = $c->pg->db->query("SELECT * FROM canvas_post WHERE id=?", $id)->hash;
 
   # check we found the post
-  return $self->redirect_to('/support/engage') unless defined $p;
+  return $c->redirect_to('/support/engage') unless $p;
+
+  my $db = $c->pg->db;
+  my $tx = $db->begin;
 
   my $now = gmtime;
+  my $created = $now;
 
-  my $r = Canvas::Store::Post->create({
-    name         => $stub,
-    type         => 'reply',
-    content      => $content,
-    author_id    => $self->auth_user->id,
-    created      => $now,
-    updated      => $now,
-    parent_id    => $p->id
-  });
+  # create the post
+  my $reply_id = $db->query("INSERT INTO canvas_post (type, name, content, author_id, created, updated, parent_id) VALUES ('reply', ?, ?, ?, ?, ?, ?) RETURNING ID", $stub, $content, $c->auth_user->{id}, $created, $now, $id)->array->[0];
 
   # TODO: optimise with an increment
-  my @c = Canvas::Store::Post->search({ parent_id => $p->id });
-  $p->reply_count( scalar @c );
-  $p->update;
+  $db->query("UPDATE canvas_post SET reply_count=reply_count+1 WHERE id=?", $p->{id});
 
   # auto-subscribe participants (engage_subscriptions)
-  Canvas::Store::UserMeta->find_or_create({
-    user_id     => $self->auth_user->id,
-    meta_key    => 'engage_subscriptions',
-    meta_value  => $p->id,
-  });
+  my $s = $db->query("SELECT meta_id FROM canvas_usermeta WHERE user_id=? AND meta_key='engage_subscriptions' AND meta_value=?", $c->auth_user->{id}, $p->{id})->hash;
 
-  # mail all subscribers
-  my @um = Canvas::Store::UserMeta->search({
-    meta_key   => 'engage_subscriptions',
-    meta_value => $p->id,
-  });
+  $db->query("INSERT INTO canvas_usermeta (user_id, meta_key, meta_value) VALUES (?, 'engage_subscriptions', ?)", $c->auth_user->{id}, $p->{id}) unless ($s);
 
-  if( @um ) {
-    my $subject = 'Korora Project - Engage Reply: ' . $p->title;
-    my $message = join "",
-      "G'day,\n\n",
-      "A new reply has been posted by " . $r->author_id->username . "\n\n",
-      "URL: https://kororaproject.org" . $self->url_for( 'supportengagetypestub', type=> $type, stub => $stub ) . '#reply-' . $r->id . "\n",
-      "Type: " . $p->type .. "\n",
-      "Status: " . $p->type .. "\n",
-      "Excerpt:\n",
-      $r->content . "\n\n",
-      "Regards,\n",
-      "The Korora Team.\n";
+  $tx->commit;
 
-    foreach my $_um ( @um ) {
-      # don't send a notification to the author of the reply
-      next if( $_um->user_id->username eq $r->author_id->username);
+  my $subject = 'Korora Project - Engage Reply: ' . $p->{title};
+  my $message = join "",
+    "G'day,\n\n",
+    "A new reply has been posted by " . $c->auth_user->{username} . "\n\n",
+    "URL: https://kororaproject.org" . $c->url_for( 'supportengagetypestub', type=> $type, stub => $stub ) . '#reply-' . $reply_id . "\n",
+    "Type: " . $type . "\n",
+    "Status: " . $p->{status} . "\n",
+    "Excerpt:\n",
+    $content . "\n\n",
+    "Regards,\n",
+    "The Korora Team.\n";
 
-      # send the activiation email
-      $self->mail(
-        from    => 'engage@kororaproject.org',
-        to      => $_um->user_id->email,
-        subject => $subject,
-        data    => $message,
-      );
-    }
-  }
+  $c->notify_users('engage_subscribers', $p->{id}, 'engage@kororaproject.org', $subject, $message);
 
   # redirect to the detail
-  $self->redirect_to( $redirect_url );
+  $c->redirect_to($rt_url);
 }
 
 sub engage_reply_accept_any {
-  my $self = shift;
+  my $c = shift;
 
-  my $type    = $self->param('type');
-  my $stub    = $self->param('stub');
-  my $id      = $self->param('id');
-  my $content = $self->param('content');
+  my $type    = $c->param('type');
+  my $stub    = $c->param('stub');
+  my $id      = $c->param('id');
+  my $content = $c->param('content');
 
-  my $r = Canvas::Store::Post->search({
-    type  => 'reply',
-    id    => $id,
-  })->first;
+  my $r = $c->pg->db->query("SELECT * FROM canvas_post WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
 
   # ensure we have edit capabilities
-  return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless $self->engage_post_can_accept( $r );
+  return $c->redirect_to('supportengagetypestub', type => $type, stub => $stub) unless $c->engage->can_accept($r);
 
-  $r->status( 'accepted' );
-  $r->update;
+  $c->pg->db->query("UPDATE canvas_post SET status='accepted' WHERE id=?", $id);
 
   # redirect to the detail
-  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+  $c->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
 }
 
 sub engage_reply_unaccept_any {
-  my $self = shift;
+  my $c = shift;
 
-  my $type    = $self->param('type');
-  my $stub    = $self->param('stub');
-  my $id      = $self->param('id');
-  my $content = $self->param('content');
+  my $type    = $c->param('type');
+  my $stub    = $c->param('stub');
+  my $id      = $c->param('id');
+  my $content = $c->param('content');
 
-  my $r = Canvas::Store::Post->search({
-    type  => 'reply',
-    id    => $id,
-  })->first;
+  my $r = $c->pg->db->query("SELECT * FROM canvas_post WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
 
   # ensure we have edit capabilities
-  return $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub ) unless $self->engage_post_can_unaccept( $r );
+  return $c->redirect_to('supportengagetypestub', type => $type, stub => $stub) unless $c->engage->can_unaccept($r);
 
-  $r->status( '' );
-  $r->update;
+  $c->pg->db->query("UPDATE canvas_post SET status='' WHERE id=?", $id);
 
   # redirect to the detail
-  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+  $c->redirect_to('supportengagetypestub', type => $type, stub => $stub);
 }
 
 sub engage_reply_edit_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $id = $self->param('id');
-  my $type = $self->param('type');
-  my $stub = $self->param('stub');
-  my $redirect_url = $self->flash('redirect_url') // $self->url_for('supportengagetypestub', type => $type, stub => $stub);
+  my $id   = $c->param('id');
+  my $type = $c->param('type');
+  my $stub = $c->param('stub');
 
+  my $rt_url = $c->ub64_decode($c->flash('rt')) //
+                 $c->url_for('supportengagetypestub', type => $type, stub => $stub);
 
-  my $r = Canvas::Store::Post->search({
-    type  => 'reply',
-    id    => $id,
-  })->first;
+  $c->render_steps('website/engage-reply-edit', sub {
+    my $delay = shift;
 
-  return $self->redirect_to( $redirect_url ) unless $self->engage_post_can_edit( $r );
+    $c->pg->db->query("SELECT r.content, p.title, p.type, EXTRACT(EPOCH FROM r.created) AS created_epoch, EXTRACT(EPOCH FROM r.updated) AS updated_epoch, u.username, u.email FROM canvas_post r JOIN canvas_post p ON (r.parent_id=p.id) JOIN canvas_user u ON (u.id=r.author_id) WHERE r.type='reply' AND r.id=? LIMIT 1" => ($id) => $delay->begin);
+  },
+  sub {
+    my ($delay, $p_err, $p_res) = @_;
 
-  my $content = $self->flash('content') // $r->content;
+    my $post = $p_res->hash;
 
-  $self->stash( reply => $r, content => $content, redirect_url => $redirect_url );
+    # check we found the post
+    $delay->emit(redirect => $rt_url) unless $c->engage->can_edit($post);
 
-  $self->render('website/engage-reply-edit');
+    my $content = $c->flash('content') // $post->{content};
+
+    $c->stash(
+      content => $content,
+      reply   => $post,
+      rt      => $c->ub64_encode($rt_url),
+      rt_url  => $rt_url
+    );
+  });
 }
 
 sub engage_reply_edit_post {
-  my $self = shift;
+  my $c = shift;
 
-  my $content = $self->param('content');
-  my $id      = $self->param('id');
-  my $type    = $self->param('type');
-  my $stub    = $self->param('stub');
+  my $content = $c->param('content');
+  my $id      = $c->param('id');
+  my $type    = $c->param('type');
+  my $stub    = $c->param('stub');
 
-  my $redirect_url = $self->param('redirect_url') // $self->url_for('supportengagetypestub', type => $type, stub => $stub);
+  my $redirect_url = $c->param('redirect_url') // $c->url_for('supportengagetypestub', type => $type, stub => $stub);
 
 
   # ensure edits maintain some context
   unless( length( trim $content ) >= 16 ) {
-    $self->flash( content => $content,);
-    $self->flash( page_errors => 'Your editted reply lacks a little description. Pleast use at least least 16 characters to convey something meaningful.' );
-    return $self->redirect_to( $self->url_with );
+    $c->flash(content => $content);
+    $c->flash(page_errors => 'Your editted reply lacks a little description. Pleast use at least least 16 characters to convey something meaningful.');
+    return $c->redirect_to( $c->url_with );
   }
 
-  my $r = Canvas::Store::Post->search({
-    type  => 'reply',
-    id    => $id,
-  })->first;
+  my $r = $c->pg->db->query("SELECT * FROM canvas_post WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
 
   # ensure we have edit capabilities
-  return $self->redirect_to( $redirect_url ) unless $self->engage_post_can_edit( $r );
+  return $c->redirect_to( $redirect_url ) unless $c->engage->can_edit( $r );
 
-  $r->content( $content );
-  $r->update;
+  $c->pg->db->query("UPDATE canvas_post SET content=? WHERE id=?", $content, $id);
 
   # redirect to the detail
-  $self->redirect_to( $redirect_url );
+  $c->redirect_to($redirect_url);
 }
 
 sub engage_post_delete_any {
-  my $self = shift;
+  my $c = shift;
 
-  my $type = $self->param('type');
-  my $stub = $self->param('stub');
+  my $type = $c->param('type');
+  my $stub = $c->param('stub');
 
-  my $p = Canvas::Store::Post->search({ type => $type, name => $stub })->first;
+  my $p = $c->pg->db->query("SELECT * FROM canvas_post WHERE type=? AND name=? LIMIT 1", $type, $stub)->hash;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless $self->engage_post_can_delete( $p );
+  return $c->redirect_to('/support/engage') unless $c->engage->can_delete($p);
 
-  $p->delete;
+  # delete post and children
+  $c->pg->db->query("DELETE FROM canvas_post WHERE type IN ('question', 'thank', reply') AND (id=? OR parent_id=?)", $p->{id}, $p->{id});
 
-  $self->redirect_to('/support/engage');
+  $c->redirect_to('/support/engage');
 }
 
 sub engage_reply_any {
-  my $self = shift;
+  my $c = shift;
 
-  my $quote = {};
+  my $id   = $c->param('id');
+  my $stub = $c->param('stub');
 
-  if( $self->is_user_authenticated ) {
-    my $type = $self->param('type');
-    my $stub = $self->param('stub');
-    my $id   = $self->param('id');
+  $c->render_later;
 
-    my $r = Canvas::Store::Post->search({ id => $id })->first;
+  Mojo::IOLoop->delay(sub {
+    my $delay = shift;
 
-    if (grep { $_ eq $r->type } qw(reply thank question)) {
-      $quote = {
-        author  => $r->author_id->username,
-        content => $r->content,
-      };
-    }
-  }
+    $c->pg->db->query("SELECT p.content, u.username FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.id=? AND p.name=? LIMIT 1" => ($id, $stub) => $delay->begin);
+  },
+  sub {
+    my ($delay, $p_err, $p_res) = @_;
 
-  $self->render( json => $quote );
+    my $p = $p_res->hash;
+
+    $c->render(json => $p);
+  })->catch(sub {
+    $c->render(json => {});
+  })->wait;
 }
 
 
 sub engage_reply_delete_any {
-  my $self = shift;
+  my $c = shift;
 
-  my $type = $self->param('type');
-  my $stub = $self->param('stub');
-  my $id   = $self->param('id');
+  my $type = $c->param('type');
+  my $stub = $c->param('stub');
+  my $id   = $c->param('id');
 
-  my $r = Canvas::Store::Post->search({ type => 'reply', id => $id, })->first;
+  my $r = $c->pg->db->query("SELECT * FROM canvas_post WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
 
   # only allow authenticated and authorised users
-  return $self->redirect_to('/support/engage') unless $self->engage_post_can_delete( $r );
+  return $c->redirect_to('/support/engage') unless $c->engage->can_delete($r);
 
-  $r->delete;
+  $c->pg->db->query("DELETE FROM canvas_post WHERE id=?", $id);
 
   # redirect to the detail
-  $self->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
+  $c->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
 }
 
 1;

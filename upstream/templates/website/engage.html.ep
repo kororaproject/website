@@ -100,7 +100,7 @@
 % foreach my $r (@{$responses->{items}}) {
         <div class="row">
           <div class="col-sm-12">
-            <div class="callout engage-summary engage-<%= $r->{type} %>">
+            <div class="engage-callout engage-summary engage-<%= $r->{type} %>">
               <div class="row">
                 <div class="col-sm-9">
                   <div class="engage-summary-content">
@@ -121,7 +121,7 @@
                   <div class="text-right">
                     <a href="<%= url_for('profilename', name => $r->{username}) %>" data-toggle="tooltip" data-original-title="<%= $r->{username} %>"><%== email_gravatar($r->{email}, 24) %></a>
 % foreach my $u (@{$r->{replies}}) {
-%   next if $u->{f1} eq $r->{username};
+%   next if ! defined($u->{f1}) || $u->{f1} eq $r->{username};
                     <a href="<%= url_for('profilename', name => $u->{f1}) %>" data-toggle="tooltip" data-original-title="<%= $u->{f1} %>"><%== email_gravatar($u->{f2}, 24) %></a>
 % }
                   </div>

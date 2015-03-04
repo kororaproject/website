@@ -56,7 +56,7 @@ sub donate_get {
   $c->render_steps('website/contribute-donate', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT name, amount, TO_CHAR(created, 'DD/MM/YYYY') AS dtg FROM canvas_contribution WHERE type='donation' ORDER BY created DESC LIMIT 100" => $delay->begin);
+    $c->pg->db->query("SELECT name, amount, EXTRACT(EPOCH FROM created) AS created_epoch FROM canvas_contribution WHERE type='donation' ORDER BY created DESC LIMIT 100" => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
@@ -242,7 +242,7 @@ sub sponsor_get {
   $c->render_steps('website/contribute-sponsor', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT name, amount, TO_CHAR(created, 'DD/MM/YYYY') as dtg FROM canvas_contribution WHERE type='sponsorship' ORDER BY created DESC LIMIT 100" => $delay->begin);
+    $c->pg->db->query("SELECT name, amount, EXTRACT(EPOCH FROM created) AS created_epoch FROM canvas_contribution WHERE type='sponsorship' ORDER BY created DESC LIMIT 100" => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 

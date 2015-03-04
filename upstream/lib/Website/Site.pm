@@ -56,11 +56,23 @@ sub create_auth_token {
 # controller handlers
 #
 sub index {
-  shift->render('website/index');
+  my $c = shift;
+
+  $c->render_steps('website/index', sub {
+    my $delay = shift;
+
+    # get latest news
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.status='publish' GROUP BY p.id, u.username, u.email ORDER BY p.created DESC LIMIT 1" => $delay->begin);
+  },
+  sub {
+    my ($delay, $err, $res) = @_;
+
+    $c->stash(news => $res->hash);
+  });
 }
 
 sub exception_get {
-  return shift->render_exception('render_only');
+  return shift->reply->exception('render_only');
 }
 
 sub not_found_get {
@@ -90,8 +102,6 @@ sub authenticate_any {
   # extract the redirect url and fall back to the index
   my $url = $c->param('rt') // $data->{rt};
   $url = defined $url ? $c->ub64_decode($url) : '/';
-
-  say Dumper $url;
 
   unless ($c->authenticate($user, $pass)) {
     $c->flash( page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?' );

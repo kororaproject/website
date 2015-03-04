@@ -112,8 +112,8 @@ sub register {
 
     my $status = [];
 
-    foreach my $s ( @{ TYPE_STATUS_MAP->{ $post->type } // [] } ) {
-      push @$status, [ ( grep { m/$post->status/ } @$s) ?
+    foreach my $s ( @{ TYPE_STATUS_MAP->{$post->{type}} // [] } ) {
+      push @$status, [ ( grep { m/$post->{status}/ } @$s) ?
         ( @$s, 'selected', 'selected' ) :
         ( @$s )
       ]
@@ -123,15 +123,16 @@ sub register {
   });
 
   $app->helper(engage_post_admin_template => sub {
-    my( $self, $post ) = @_;
+    my ($c, $post) = @_;
 
     my @caps;
 
-    my $url = $self->url_for('current');
+    my $url = $c->url_for('current');
+    my $rt  = $c->ub64_encode(sprintf('%s#quote-%d', $c->url_for, $post->{id}));
 
-    if( $self->auth_user && $self->auth_user->is_active_account ) {
-      if( $post->type ne 'reply' ) {
-        if( $self->engage_post_can_subscribe( $post ) ) {
+    if ($c->users->is_active($c->auth_user)) {
+      if ($post->{type} ne 'reply') {
+        if ($c->engage->can_subscribe($post)) {
           push @caps, sprintf '<li><a href="%s/subscribe" class="text-left"><i class="fa fa-fwl fa-bookmark"></i> Subscribe</a></li>', $url;
         }
         else {
@@ -139,39 +140,39 @@ sub register {
         }
       }
       else {
-        $url .= '/reply/' . $post->id;
+        $url .= '/reply/' . $post->{id};
 
         # add self-link
-        push @caps, sprintf '<li><a id="quote-%d" href="%s#quote-%d" class="text-left"><i class="fa fa-fwl fa-link"></i> Link</a></li>', $post->id, $self->url_for, $post->id;
+        push @caps, sprintf '<li><a id="quote-%d" href="%s#quote-%d" class="text-left"><i class="fa fa-fwl fa-link"></i> Link</a></li>', $post->{id}, $c->url_for, $post->{id};
       }
 
       # add quote button
-      push @caps, sprintf '<li><a id="quote-%d" href="" class="text-left"><i class="fa fa-fwl fa-quote-left"></i> Quote</a></li>', $post->id;
+      push @caps, sprintf '<li><a id="quote-%d" href="" class="text-left"><i class="fa fa-fwl fa-quote-left"></i> Quote</a></li>', $post->{id};
 
-      if( $self->engage_post_can_accept( $post ) ) {
-        push @caps, sprintf '<li><a href="%s/accept" class="text-left"><i class="fa fa-fwl fa-check"></i> Accept</a></li>', $url;
+      if ($c->engage->can_accept($post)) {
+        push @caps, sprintf '<li><a href="%s/accept?rt=%s" class="text-left"><i class="fa fa-fwl fa-check"></i> Accept</a></li>', $url, $rt;
       }
 
-      if( $self->engage_post_can_unaccept( $post ) ) {
-        push @caps, sprintf '<li><a href="%s/unaccept" class="text-left"><i class="fa fa-fwl fa-times"></i> Unaccept</a></li>', $url;
+      if ($c->engage->can_unaccept($post)) {
+        push @caps, sprintf '<li><a href="%s/unaccept?rt=%s" class="text-left"><i class="fa fa-fwl fa-times"></i> Unaccept</a></li>', $url, $rt;
       }
 
-      if( $self->engage_post_can_edit( $post ) ) {
-        push @caps, sprintf '<li><a href="%s/edit" class="text-left"><i class="fa fa-fwl fa-edit"></i> Edit</a></li>', $url;
+      if ($c->engage->can_edit($post)) {
+        push @caps, sprintf '<li><a href="%s/edit?rt=%s" class="text-left"><i class="fa fa-fwl fa-edit"></i> Edit</a></li>', $url, $rt;
       }
 
-      if( $self->engage_post_can_delete( $post ) ) {
-        push @caps, sprintf '<li><a href="%s/delete" class="engage-post-delete text-left"><i class="fa fa-fwl fa-trash-o"></i> Delete</a></li>', $url;
+      if ($c->engage->can_delete($post)) {
+        push @caps, sprintf '<li><a href="%s/delete?rt=%s" class="engage-post-delete text-left"><i class="fa fa-fwl fa-trash-o"></i> Delete</a></li>', $url, $rt;
       }
     }
 
     my $template = '';
 
-    if( @caps ) {
+    if (@caps) {
       $template .= qq(
         <div class="engage-detail-footer-metadata">
           <div class="dropdown">
-            <button class="btn btn-sm btn-default dropdown-toggle" type="button" id="post-detail-admin-dropdown" data-toggle="dropdown"><i class="fa fa-fw fa-cogs"></i></button>
+            <button class="btn btn-default btn-engage-admin dropdown-toggle" type="button" id="post-detail-admin-dropdown" data-toggle="dropdown"><i class="fa fa-fw fa-cogs"></i></button>
             <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="post-detail-admin-dropdown"> );
 
       $template .= join('', @caps);
@@ -199,111 +200,90 @@ sub register {
   });
 
   $app->helper('engage.can_accept' => sub {
-    my( $self, $post ) = @_;
+    my ($c, $post) = @_;
 
     return 0 unless _is_engage_post $post;
 
-    return 0 unless $post->type eq 'reply' && $post->status ne 'accepted';
+    return 0 unless $post->{type} eq 'reply' && $post->{status} ne 'accepted';
 
-    return 0 unless defined $self->auth_user;
+    return 0 unless $c->users->is_active;
 
-    return 0 unless $self->auth_user->is_active_account;
+    return 1 if $c->users->is_engage_moderator;
 
-    return 1 if $self->auth_user->is_engage_moderator;
-
-    return 1 if $self->auth_user->id == $post->author_id->id;
+    return 1 if $c->auth_user->{id} == $post->{author_id};
 
     return 0;
   });
 
   $app->helper('engage.can_unaccept' => sub {
-    my( $self, $post ) = @_;
+    my ($c, $post ) = @_;
 
     return 0 unless _is_engage_post $post;
 
-    return 0 unless $post->type eq 'reply' && $post->status eq 'accepted';
+    return 0 unless $post->{type} eq 'reply' && $post->{status} eq 'accepted';
 
-    return 0 unless defined $self->auth_user;
+    return 0 unless $c->users->is_active;
 
-    return 0 unless $self->auth_user->is_active_account;
+    return 1 if $c->users->is_engage_moderator;
 
-    return 1 if $self->auth_user->is_engage_moderator;
-
-    return 1 if $self->auth_user->id == $post->author_id->id;
+    return 1 if $c->auth_user->{id} == $post->{author_id};
 
     return 0;
   });
 
   $app->helper('engage.can_subscribe' => sub {
-    my( $self, $post ) = @_;
+    my ($c, $post) = @_;
 
     return 0 unless _is_engage_post $post;
 
-    return 0 unless defined $self->auth_user;
+    return 0 unless $c->users->is_active;
 
-    return 0 unless $self->auth_user->is_active_account;
-
-    my $um = Canvas::Store::UserMeta->search({
-      user_id     => $self->auth_user->id,
-      meta_key    => 'engage_subscriptions',
-      meta_value  => $post->id,
-    })->first;
+    my $um = $c->pg->db->query("SELECT * FROM canvas_usermeta WHERE meta_key='engage_subscriptions' AND user_id::integer=? AND meta_value::integer=?", $c->auth_user->{id}, $post->{id})->hash;
 
     # determine if we're subscribed
-    return not defined $um;
+    return ! defined $um;
   });
 
   $app->helper('engage.can_edit' => sub {
-    my( $self, $post ) = @_;
+    my ($c, $post) = @_;
 
     return 0 unless _is_engage_post $post;
 
-    return 0 unless defined $self->auth_user;
+    return 0 unless $c->users->is_active;
 
-    return 0 unless $self->auth_user->is_active_account;
+    return 1 if $c->users->is_engage_moderator;
 
-    return 1 if $self->auth_user->is_engage_moderator;
-
-    return 1 if $self->auth_user->id == $post->author_id->id;
+    return 1 if $c->auth_user->{id} == $post->{author_id};
 
     return 0;
   });
 
   $app->helper('engage.can_edit_status' => sub {
-    my( $self, $post ) = @_;
+    my ($c, $post) = @_;
 
     return 0 unless _is_engage_post $post;
 
-    return 0 unless defined $self->auth_user;
+    return 0 unless $c->users->is_active;
 
-    return 0 unless $self->auth_user->is_active_account;
-
-    return 1 if $self->auth_user->is_engage_moderator;
+    return 1 if $c->users->is_engage_moderator;
 
     # only allow OP's to change status of questions
-    return 1 if(
-      $post->type eq 'question' &&
-      $self->auth_user->id == $post->author_id->id
-    );
+    return 1 if $post->{type} eq 'question' && $c->auth_user->{id} == $post->{author_id};
 
     return 0;
   });
 
   $app->helper('engage.can_delete' => sub {
-    my( $self, $post ) = @_;
+    my ($c, $post) = @_;
 
     return 0 unless _is_engage_post $post;
 
-    return 0 unless defined $self->auth_user;
+    return 0 unless $c->users->is_active;
 
-    return 0 unless $self->auth_user->is_active_account;
-
-    return 1 if $self->auth_user->is_engage_moderator;
+    return 1 if $c->users->is_engage_moderator;
 
     return 0;
   });
-
-
 }
 
 1;

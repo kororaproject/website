@@ -33,7 +33,7 @@
         </div>
         <div class="row">
           <div class="col-sm-12">
-            <div class="callout engage-detail engage-<%= $response->{type} %>">
+            <div class="engage-callout engage-detail engage-<%= $response->{type} %>">
               <h1 class="engage-detail-title"><%= $response->{title} %></h1>
               <div id="reply-<%= $response->{id} %>" class="engage-detail-content">
                 <%== render_markdown( $response->{content} ) %>
@@ -41,9 +41,13 @@
               <div class="row">
                 <div class="col-sm-6">
                   <div class="engage-detail-tags">
-                    <%== engage_icon_label($response->{type}, 'fa-fw' ) %>
-% foreach my $t ($response->{tags}) {
-                    <span class="label label-default"><%= $t->{name} %></span>
+% if (@{$response->{tags}}) {
+                    <div class="post-tags">
+                      <i class="fa fa-tags"></i>
+%   foreach my $t (@{$response->{tags}}) {
+                      <span class="tag"><%= $t %></span>
+%   }
+                    </div>
 % }
                   </div>
 
@@ -51,11 +55,11 @@
                 <div class="col-sm-6">
                   <div class="engage-detail-footer">
                     <div class="engage-detail-footer-metadata">
-                      <p class="text-right">asked <%= distance_of_time_in_words( $response->{created} ) %></p>
-                      <p class="text-right">by <%= $response->{author_id} %></p>
+                      <p class="text-right">asked <%= $c->users->format_time($response->{created_epoch}) %></p>
+                      <p class="text-right">by <%= $response->{username} %></p>
                     </div>
                     <div class="engage-detail-footer-metadata">
-                      <%== email_gravatar($response->{email}, 32) %>
+                      <%== email_gravatar($response->{email}, 24) %>
                     </div>
 
                     <%== engage_post_admin_template($response) %>
@@ -66,12 +70,11 @@
             </div>
           </div>
         </div>
-        <div class="hr hr-sm"></div>
 
-% if ($accepted) {
+% if (exists $accepted->{content}) {
         <div class="row">
           <div class="col-sm-12">
-            <div id="accepted-reply" class="callout callout-default engage-reply engage-reply-accepted">
+            <div id="accepted-reply" class="engage-callout engage-callout-default engage-reply engage-reply-accepted">
               <%== render_markdown( $accepted->{content} ) %>
 
               <div class="row">
@@ -81,11 +84,11 @@
                   </div>
                   <div class="engage-detail-footer">
                     <div class="engage-detail-footer-metadata">
-                      <p class="text-right">replied <%= distance_of_time_in_words( $accepted->{created} ) %></p>
-                      <p class="text-right">by <%= $accepted->{author_id} %></p>
+                      <p class="text-right">replied <%= $c->users->format_time($accepted->{created_epoch}) %></p>
+                      <p class="text-right">by <%= $accepted->{username} %></p>
                     </div>
                     <div class="engage-detail-footer-metadata">
-                      <%== email_gravatar($accepted->{accepted}, 32) %>
+                      <%== email_gravatar($accepted->{email}, 24) %>
                     </div>
 
                     <%== engage_post_admin_template($accepted) %>
@@ -96,41 +99,39 @@
           </div>
         </div>
         <div class="hr separator-bottom"></div>
-        <div class="hr"></div>
 % }
 
-% if( $replies->{item_count} > $replies->{page_size} ) {
+% if ($replies->{item_count} > $replies->{page_size}) {
         <!-- PAGINATION -->
         <div class="row">
           <div class="col-sm-12 text-center">
             <%== paginate( $replies ) %>
           </div>
         </div>
-        <div class="hr"></div>
 % }
 
-% if( @{ $replies->{items} } ) {
-%   for my $r ( @{ $replies->{items} } ) {
+% if (@{$replies->{items}}) {
+%   foreach my $r (@{$replies->{items}}) {
         <div class="row">
           <div class="col-sm-12">
-            <div id="reply-<%= $r->{id} %>" class="callout callout-default engage-reply <%= ( $r->{status} eq 'accepted' ) ? 'engage-reply-accepted' : '' %>">
+            <div id="reply-<%= $r->{id} %>" class="engage-callout engage-callout-default engage-reply <%= ( $r->{status} eq 'accepted' ) ? 'engage-reply-accepted' : '' %>">
               <%== render_markdown( $r->{content} ) %>
 
               <div class="row">
                 <div class="col-sm-12">
 
-%     if( $r->{status} eq 'accepted' ) {
+%     if ($r->{status} eq 'accepted') {
                   <div class="engage-detail-tags">
                     <span class="label label-default">accepted</span>
                   </div>
 %     }
                   <div class="engage-detail-footer">
                     <div class="engage-detail-footer-metadata">
-                      <p class="text-right">replied <%= distance_of_time_in_words($r->{created}) %></p>
-                      <p class="text-right">by <%= $r->{author_id} %></p>
+                      <p class="text-right">replied <%= $c->users->format_time($r->{created_epoch}) %></p>
+                      <p class="text-right">by <%= $r->{username} %></p>
                     </div>
                     <div class="engage-detail-footer-metadata">
-                      <%== email_gravatar($r->{email}, 32) %>
+                      <%== email_gravatar($r->{email}, 24) %>
                     </div>
 
                     <%== engage_post_admin_template($r) %>
@@ -140,9 +141,7 @@
             </div>
           </div>
         </div>
-        <div class="hr hr-sm"></div>
 %   }
-        <div class="hr"></div>
 % }
 
 % if( $replies->{item_count} > $replies->{page_size} ) {
@@ -152,15 +151,14 @@
             <%== paginate($replies) %>
           </div>
         </div>
-        <div class="hr"></div>
 % }
 
-% if( is_user_authenticated ) {
-        <div class="row">
+        <div class="row row-extra-margin">
           <div class="col-sm-12">
+% if (is_user_authenticated) {
             <form action="<%= url_for('current') . '/reply' %>" method="post">
-              <input type="hidden" name="parent" value="<%= $response->{id} %>"></input>
-              <input type="hidden" name="redirect_url" value="<%= url_with %>"></input>
+              <input type="hidden" name="parent_id" value="<%= $response->{id} %>"></input>
+              <input type="hidden" name="rt" value="<%= $c->ub64_encode(url_with) %>"></input>
               <div class="row">
                 <div class="col-sm-12">
                   <h3>Reply <a href="" class="btn pull-right" data-toggle="modal" data-target="#modalEngageSyntax"><i class="fa fa-fw fa-question"></i></a> </h3>
@@ -172,16 +170,11 @@
                 </div>
               </div>
             </form>
-          </div>
-        </div>
 % } else {
-        <div class="row">
-          <div class="col-sm-12">
             <p class="text-center">Please <a data-toggle="modal" href="#loginModal" class="btn btn btn-default">Log In</a> to participate with the community.</p>
+% }
           </div>
         </div>
-% }
-        <div class="hr"></div>
       </div>
 
       <!-- END CONTENT -->
@@ -224,10 +217,10 @@
 
           $.get(url, function(data) {
             if( data.hasOwnProperty('content') &&
-                data.hasOwnProperty('author') ) {
+                data.hasOwnProperty('username') ) {
               var box = $('#reply-box');
               var quote_lines = data.content.split(/\r?\n/);
-              var quote = '> ' + ( data.author || 'unknown' ) + ' wrote:  \n';
+              var quote = '> ' + ( data.username || 'unknown' ) + ' wrote:  \n';
 
               $.each(quote_lines, function() {
                 quote += '> ' + this + '  \n';

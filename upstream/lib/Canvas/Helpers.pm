@@ -40,6 +40,8 @@ use Canvas::Store::UserMeta;
 # CONSTANTS
 #
 
+use constant TAG_BLACKLIST => qw(an as at if in is of on or and the);
+
 use constant DISTANCE_TIME_FORMAT => {
   less_than_x_seconds => {
     one   => "less than one second ago",
@@ -185,6 +187,9 @@ sub register {
 
   $app->helper(ub64_decode => sub {
     my ($self, $in) = @_;
+
+    return undef unless $in;
+
     $in =~ tr|-_~|+/=|;
     my $out = b64_decode($in);
 
@@ -193,6 +198,9 @@ sub register {
 
   $app->helper(ub64_encode => sub {
     my ($self, $in) = @_;
+
+    return undef unless $in;
+
     my $out = b64_encode($in);
     $out =~ tr|+/=|-_~|;
 
@@ -200,7 +208,7 @@ sub register {
   });
 
   $app->helper(sanitise_with_dashes => sub {
-    my( $self, $stub ) = @_;
+    my ($self, $stub) = @_;
 
     $stub = trim $stub;
 
@@ -225,6 +233,23 @@ sub register {
     return $stub;
   });
 
+  $app->helper(sanitise_taglist => sub {
+    my ($self, $taglist) = @_;
+
+    my %tags = map { trim($_) => 1 }
+                 grep { $_ }
+                   map  { $self->sanitise_with_dashes($_) }
+                     split /[ ,]+/, $taglist;
+
+    # scrub stupidness
+    foreach my $t (TAG_BLACKLIST) {
+      delete $tags{$t};
+    }
+
+
+    return [ keys %tags ];
+  });
+
   $app->helper(is_active_auth => sub {
     my( $self ) = @_;
 
@@ -243,37 +268,82 @@ sub register {
     my $page      = $pager->{page}        // 1;
     my $page_last = $pager->{page_last}   // 0;
 
+    my $page_prev = $page - 1;
+    my $page_next = $page + 1;
+    my $page_lm1  = $page_last - 1;
+
+    my $adjacents = 2;
+
+
     # only build if we have more than one page
     if ($page_last > 1) {
       my $page_show_max = 6;
       my $url = $self->url_with;
 
-      my @pager_items;
-
-      my $page_show_start = min(max(1, $page - floor($page_show_max / 2)), $page_last-$page_show_max);
-      my $page_show_end = $page_show_start + $page_show_max;
+      my @template;
+      my $p = 0;
 
       #
       # add "first" marker
-      push @pager_items, '<li class="' . ( ($page > $page_show_max) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => ($page-$page_show_max>1) ? ($page-$page_show_max) : 1]) . '"><i class="fa fa-fw fa-angle-double-left"></i></a></li>';
+      #push @template, '<li class="' . ( ($page > $page_show_max) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => ($page-$page_show_max>1) ? ($page-$page_show_max) : 1]) . '"><i class="fa fa-fw fa-angle-double-left"></i></a></li>';
 
       #
       # add "previous" marker
-      push @pager_items, '<li class="' . ( ($page > 1 ) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => ($page > 1) ? ($page-1) : undef ]) . '"><i class="fa fa-fw fa-angle-left"></i></a></li>';
+      push @template, sprintf('<li class="%s"><a href="%s"><i class="fa fa-fw fa-angle-left"></i></a></li>', ($page > 1) ? '' : 'disabled', $url->query([page => $page_prev]), $page_prev);
 
+      # not enough pages to bother breaking it up
+      if ($page_last < 7 + ($adjacents * 2)) {
+        foreach $p (1..$page_last) {
+          push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', (($p == $page) ? 'active': ''), $url->query([page => ($p > 1) ? $p : undef]), $p);
+        }
+      }
+      # enough pages to hide some
+      elsif ($page_last > 5 + ($adjacents * 2)) {
+        # close to beginning; only hide later pages
+        if ($page < 1 + ($adjacents * 2)) {
+          for ($p = 1; $p < 4 + ($adjacents * 2); $p++) {
+            push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', (($p == $page) ? 'active': ''), $url->query([page => ($p > 1) ? $p : undef]), $p);
+          }
+          push @template, sprintf('<li><span>...</span></li>');
+          push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', '', $url->query([page => $page_lm1]), $page_lm1);
+          push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', '', $url->query([page => $page_last]), $page_last);
+        }
+        # in middle; hide some front and some back
+        elsif ($page_last - ($adjacents * 2) > $page && $page > ($adjacents * 2)) {
 
+          push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', '', $url->query([page => 1]), '1');
+          push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', '', $url->query([page => 2]), '2');
+          push @template, sprintf('<li><span>...</span></li>');
 
-      foreach my $p ($page_show_start..$page_show_end) {
-        push @pager_items, '<li class="' . ( ( $p == $page ) ? 'active': '' ) . '"><a href="' . $url->query([ page => ($p > 1) ? $p : undef ]) . '">' . $p . '</a></li>';
+          for ($p = $page - $adjacents; $p <= $page + $adjacents; $p++) {
+            push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', (($p == $page) ? 'active': ''), $url->query([page => ($p > 1) ? $p : undef]), $p);
+          }
+
+          push @template, sprintf('<li><span>...</span></li>');
+          push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', '', $url->query([page => $page_lm1]), $page_lm1);
+          push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', '', $url->query([page => $page_last]), $page_last);
+        }
+        # close to end; only hide early pages
+        else { 
+
+          push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', '', $url->query([page => 1]), '1');
+          push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', '', $url->query([page => 2]), '2');
+          push @template, sprintf('<li><span>...</span></li>');
+
+          for ($p = $page_last - (2 + ($adjacents * 2)); $p <= $page_last; $p++) {
+            push @template, sprintf('<li class="%s"><a href="%s">%s</a></li>', (($p == $page) ? 'active': ''), $url->query([page => ($p > 1) ? $p : undef]), $p);
+          }
+        }
       }
 
-      # add "next" marker
-      push @pager_items,'<li class="' . ( ( $page < $page_last ) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => $page+1 ]) . '"><i class="fa fa-fw fa-angle-right"></i></a></li>';
 
       # add "next" marker
-      push @pager_items,'<li class="' . ( ( $page < $page_last ) ? '' : 'disabled' ) . '"><a href="' . $url->query([ page => $page+1 ]) . '"><i class="fa fa-fw fa-angle-double-right"></i></a></li>';
+      push @template, sprintf('<li class="%s"><a href="%s"><i class="fa fa-fw fa-angle-right"></i></a></li>', ($page < $p-1) ? '' : 'disabled', $url->query([page => $page_next]), $page_next);
 
-      return '<ul class="pagination pagination-sm">' . join('', @pager_items) . '</ul>';
+      # add "last" marker
+      #push @template,'<li class="' . (($page+$page_show_max < $page_last) ? '' : 'disabled') . '"><a href="' . $url->query([ page => ($page+$page_show_max < $page_last ? $page+$page_show_max : $page_last)]) . '"><i class="fa fa-fw fa-angle-double-right"></i></a></li>';
+
+      return '<ul class="pagination pagination-sm">' . join('', @template) . '</ul>';
     }
 
     return '';
@@ -319,9 +389,9 @@ sub register {
   });
 
   $app->helper(pluralise => sub {
-    my( $self, $amount, $unit ) = @_;
+    my ($self, $amount, $unit) = @_;
 
-    if( $amount ne '1' ) {
+    if ($amount ne '1') {
       $unit .= 's';
       $unit =~ s/os$/oes/;
       $unit =~ s/([^aeiou])ys$/$1ies/;
@@ -333,28 +403,30 @@ sub register {
 
   # time prettifier
   $app->helper(locale_time => sub {
-    my( $self, $label, $count ) = @_;
+    my ($self, $label, $count) = @_;
 
-    if( defined $count ) {
+    if (defined $count) {
       my $plural = "other";
 
-      if( $count == 1 && exists DISTANCE_TIME_FORMAT->{ $label }{one} ) {
+      if ($count == 1 && exists DISTANCE_TIME_FORMAT->{$label}{one}) {
         $plural = 'one';
       }
-      elsif( $count < 1 && exists DISTANCE_TIME_FORMAT->{ $label }{zero} ) {
+      elsif( $count < 1 && exists DISTANCE_TIME_FORMAT->{$label}{zero} ) {
         $plural = 'zero';
       }
 
-      return sprintf(DISTANCE_TIME_FORMAT->{ $label }{ $plural }, $count);
+      return sprintf(DISTANCE_TIME_FORMAT->{$label}{$plural}, $count);
     }
 
-    return DISTANCE_TIME_FORMAT->{ $label };
+    return DISTANCE_TIME_FORMAT->{$label};
   });
 
   # time prettifier
   $app->helper(distance_of_time_in_words => sub {
-    my( $self, $from_time, $to_time ) = (shift, shift, shift);
+    my ($self, $from_time, $to_time) = (shift, shift, shift);
     my %options = @_;
+
+    $from_time = Time::Piece->strptime($from_time, '%s') unless ref($from_time) eq 'Time::Piece';
 
     return 'not sure' unless ref $from_time eq 'Time::Piece';
 
@@ -413,9 +485,11 @@ sub register {
     }
     else {
       my $remainder         = ($distance_in_minutes % 525600);
-      my $distance_in_years = $distance->years;
+      my $distance_in_years = floor($distance->years);
 
-      if( $remainder < 131400 ) {
+      if ($remainder < 131400) {
+
+        say Dumper $distance_in_years;
         return $self->locale_time('about_x_years',  $distance_in_years);
       }
       elsif( $remainder < 394200 ) {
@@ -429,21 +503,19 @@ sub register {
 
   # notify users on key
   $app->helper(notify_users => sub {
-    my( $self, $channel, $from, $subject, $message ) = @_;
+    my ($c, $channel, $value, $from, $subject, $message) = @_;
 
     return unless length trim $channel;
 
-    # mail all admins with "notify new engage items" checked
-    my @um = Canvas::Store::UserMeta->search({
-      meta_key   => $channel,
-      meta_value => 1,
-    });
+    $value //= 1;
 
-    foreach my $_um ( @um ) {
+    my $emails = $c->pg->db->query("SELECT u.email FROM canvas_user u JOIN canvas_usermeta um ON (um.user_id=u.id) WHERE um.meta_key=? AND um.meta_value=?", $channel, $value)->arrays;
+
+    foreach my $e (@{$emails}) {
       # send the message
-      $self->mail(
+      $c->mail(
         from    => $from,
-        to      => $_um->user_id->email,
+        to      => $e->[0],
         subject => $subject,
         data    => $message,
       );

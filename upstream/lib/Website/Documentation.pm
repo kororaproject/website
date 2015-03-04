@@ -216,7 +216,7 @@ sub document_post {
 
   # edit existing post
   if ($stub ne '' && $c->document->can_edit) {
-    my $p = $c->pg->db->query("SELECT p.id, title, excerpt, content, TO_CHAR(p.created, 'YYYY-MM-DD HH24:MI:SS') AS created, author_id, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='document' AND name=?", $stub)->hash;
+    my $p = $c->pg->db->query("SELECT p.id, title, excerpt, content, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, author_id, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='document' AND name=?", $stub)->hash;
 
     # update author if changed
     if ($author ne $p->{username}) {
@@ -237,7 +237,7 @@ sub document_post {
     my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
     say Dumper "FOO", $tt;
     my @tags_old = $tt->{tags};
-    my @tags_new = map { $c->sanitise_with_dashes($_) } split /[ ,]+/, $tag_list;
+    my @tags_new = @{$c->sanitise_taglist($tag_list)};
 
     my %to = map { $_ => 1 } @tags_old;
     my %tn = map { $_ => 1 } @tags_new;
@@ -279,14 +279,8 @@ sub document_post {
 
     my $post_id = $db->query("INSERT INTO canvas_post (type, name, status, title, excerpt, content, author_id, parent_id, menu_order, created, updated) VALUES ('document', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID", $stub, $status, $title, $excerpt, $content, 1, $parent_id, $order, $created, $now)->array->[0];
 
-    # ensure we only insert sanitised and unique tags
-    my %tags = map  { trim($_) => 1 }
-                 grep { $_ }
-                   map  { $c->sanitise_with_dashes($_) }
-                     split /[ ,]+/, $tag_list;
-
     # create the tags
-    foreach my $tag (keys %tags) {
+    foreach my $tag (@{$c->sanitise_taglist}) {
       # find or create tag
       my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $tag)->hash;
 
@@ -342,7 +336,7 @@ sub document_admin_get {
     $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='document'" => $delay->begin);
 
     # get paged items with username and email associated
-    $c->pg->db->query("SELECT name, p.status, title, excerpt, TO_CHAR(p.created, 'DD/MM/YYYY') AS created, username, email, pm.meta_value::integer AS ho, hd.meta_value::integer AS depth FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) JOIN canvas_postmeta AS pm ON (pm.post_id=p.id AND pm.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=p.id AND hd.meta_key='hierarchy_depth') WHERE p.type='document' ORDER BY ho, p.title, p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+    $c->pg->db->query("SELECT name, p.status, title, excerpt, EXTRACT(EPOCH FROM p.created), EXTRACT(EPOCH FROM p.updated) AS updated_epoch, username, email, pm.meta_value::integer AS ho, hd.meta_value::integer AS depth FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) JOIN canvas_postmeta AS pm ON (pm.post_id=p.id AND pm.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=p.id AND hd.meta_key='hierarchy_depth') WHERE p.type='document' ORDER BY ho, p.title, p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
   },
   sub {
     my ($delay, $err, $count_res, $err_res, $res) = @_;

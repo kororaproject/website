@@ -138,45 +138,53 @@ sub _encode64 {
 sub register {
   my ($self, $app) = @_;
 
+  $app->helper('users.name' => sub {
+    my ($c, $user) = @_;
+
+    $user = $c->auth_user unless ref $user eq 'HASH';
+
+    return $user->{realname} || $user->{username};
+  });
+
   $app->helper('users.is_active' => sub {
-    my ($c, $user_hash) = @_;
+    my ($c, $user) = @_;
 
-    return 0 unless ref $user_hash eq 'HASH';
+    $user = $c->auth_user unless ref $user eq 'HASH';
 
-    return $user_hash->{status} eq 'active';
+    return ($user->{status} // '') eq 'active';
   });
 
   $app->helper('users.is_admin' => sub {
-    my ($c, $user_hash) = @_;
+    my ($c, $user) = @_;
 
-    return 0 unless ref $user_hash eq 'HASH';
+    $user = $c->auth_user unless ref $user eq 'HASH';
 
-    return ( $user_hash->{access} // 0 ) & ACCESS_ADMIN;
+    return ( $user->{access} // 0 ) & ACCESS_ADMIN;
   });
 
   $app->helper('users.is_document_moderator' => sub {
-    my ($c, $user_hash) = @_;
+    my ($c, $user) = @_;
 
-    return 0 unless ref $user_hash eq 'HASH';
+    $user = $c->auth_user unless ref $user eq 'HASH';
 
-    return ( $user_hash->{access} // 0 ) & ACCESS_CAN_DOC_MODERATE;
+    return ( $user->{access} // 0 ) & ACCESS_CAN_DOC_MODERATE;
   });
 
 
   $app->helper('users.is_engage_moderator' => sub {
-    my ($c, $user_hash) = @_;
+    my ($c, $user) = @_;
 
-    return 0 unless ref $user_hash eq 'HASH';
+    $user = $c->auth_user unless ref $user eq 'HASH';
 
-    return ( $user_hash->{access} // 0 ) & ACCESS_CAN_ENGAGE_MODERATE;
+    return ( $user->{access} // 0 ) & ACCESS_CAN_ENGAGE_MODERATE;
   });
 
   $app->helper('users.is_news_moderator' => sub {
-    my ($c, $user_hash) = @_;
+    my ($c, $user) = @_;
 
-    return 0 unless ref $user_hash eq 'HASH';
+    $user = $c->auth_user unless ref $user eq 'HASH';
 
-    return ( $user_hash->{access} // 0 ) & ACCESS_CAN_NEWS_MODERATE;
+    return ( $user->{access} // 0 ) & ACCESS_CAN_NEWS_MODERATE;
   });
 
   $app->helper('users.validate' => sub {
@@ -186,7 +194,21 @@ sub register {
 
     return _crypt_private($password, $user_hash->{password}) eq $user_hash->{password};
   });
+
+  $app->helper('users.format_time' => sub {
+    my ($self, $time) = (shift, shift);
+
+    my %args = @_>1 ? @_ : ref $_[0] eq 'HASH' ? %{$_[0]} : ();
+
+    $args{format} //= 'distance';
+
+    if ($args{format} eq 'distance') {
+      return $app->distance_of_time_in_words($time); 
+    }
+
+  });
 }
+
 
 1;
 

@@ -68,7 +68,7 @@
           <div class="col-sm-12">
             <div class="text-right">
 % if ($c->news->can_edit) {
-              <a class="btn btn-default" href="<%= url_for_path(0, 'edit') %>">Edit</a>
+<a class="btn btn-default" href="<%= url_for('aboutnewsidedit', id => $post->{name}) %>">Edit</a>
 % }
             </div>
           </div>
