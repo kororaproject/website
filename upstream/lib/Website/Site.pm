@@ -29,28 +29,12 @@ use Data::Dumper;
 use Mojo::Util qw(url_escape url_unescape);
 use Time::Piece;
 use Time::HiRes qw(gettimeofday);
-use Digest::SHA qw(sha512 sha256_hex);
 
 #
 # LOCAL INCLUDES
 #
 use Canvas::Store::User;
 use Canvas::Store::UserMeta;
-use Canvas::Util qw(get_random_bytes);
-
-#
-# INTERNAL HELPERS
-#
-
-#
-# create_auth_token()
-#
-sub create_auth_token {
-  my $bytes = get_random_bytes(48);
-
-  return sha256_hex($bytes);
-}
-
 
 #
 # controller handlers
@@ -62,7 +46,7 @@ sub index {
     my $delay = shift;
 
     # get latest news
-    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.status='publish' GROUP BY p.id, u.username, u.email ORDER BY p.created DESC LIMIT 1" => $delay->begin);
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.status='publish' GROUP BY p.id, u.username, u.email ORDER BY p.created DESC LIMIT 1" => $delay->begin);
   },
   sub {
     my ($delay, $err, $res) = @_;
@@ -76,7 +60,7 @@ sub exception_get {
 }
 
 sub not_found_get {
-  return shift->render_not_found;
+  return shift->reply->not_found;
 }
 
 sub forums_get {
@@ -89,6 +73,53 @@ sub discover {
 
 sub login {
   shift->render('website/login');
+}
+
+sub oauth {
+  my $c = shift;
+
+  my $provider = $c->param('provider');
+  my $data = $c->req->json // {};
+
+  my $rt     = $c->flash('rt');
+  my $rt_url = $rt ? $c->ub64_decode($rt) : '/';
+
+  return $c->redirect_to($rt_url) unless grep {$_ eq $provider} qw(email github);
+
+  $c->delay(
+    sub {
+      my $delay = shift;
+      my $args = {redirect_uri => $c->url_for('oauth/github')->to_abs};
+
+      $c->oauth2->get_token($provider => $args, $delay->begin);
+    },
+    sub {
+      my ($delay, $err, $token, $data) = @_;
+
+      # store token to session
+      $c->session(oauth => $data);
+      $c->flash(rt => $rt);
+
+      # abort
+      if ($err) {
+        $c->flash(page_errors => 'OAuth provider error. ' . $err);
+        return $c->redirect_to($rt_url);
+      }
+
+      # if auth'd then link oauth with existing account
+      if ($c->users->is_active) {
+        say Dumper "LINKING";
+        $c->users->oauth->link($provider, $data);
+      }
+      # else attempt auth
+      else {
+        return $c->redirect_to($rt_url) if $c->authenticate(undef, undef, $data);
+      }
+
+      # otherwise proceed to registration / profile page
+      return $c->redirect_to('activateprovider', provider => $provider);
+    }
+  );
 }
 
 sub authenticate_any {
@@ -129,215 +160,163 @@ sub deauthenticate_any {
 sub activated {
   my $c = shift;
 
-  my $username = $c->flash('username');
+  my $username = $c->flash('username') // 'foo';
 
-  return $c->redirect_to('/') unless defined $username;
+  #return $c->redirect_to('/') unless defined $username;
 
   $c->stash(username => $username);
+
   $c->render('website/activated');
 }
 
 sub activate_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $suffix = $self->param('token');
-  my $username = $self->param('username');
+  my $oauth    = $c->session('oauth');
+  my $provider = $c->param('provider');
+  my $rt       = $c->param('rt');
+  my $rt_url   = $rt ? $c->ub64_decode($rt) : '/';
+  my $username = $c->param('username') // '';
 
-  # lookup the requested account for activation
-  my $u = Canvas::Store::User->search({ username => $username })->first;
+  # email activiation
+  if ($provider eq 'email') {
+    my $token = $c->param('token');
 
-  # redirect to home unless account and activation token suffix exists
-  return $self->redirect_to('/') unless(
-    defined $u &&
-    defined $suffix
+    # lookup the requested account for activation
+    # TODO: add token confirmation check (ie we have an activation token)
+    my $u = $c->pg->db->query("SELECT * FROM users WHERE username=? LIMIT 1", $username)->hash;
+
+    # redirect to home unless account and activation token suffix exists
+    return $c->redirect_to('/') unless $u && $token;
+
+    $c->stash(username => $username, email => $u->{email});
+  }
+  elsif ($provider eq 'github' and (my $github = $oauth->{$provider})) {
+    $c->stash(
+      avatar_url => $github->{avatar_url},
+      email      => $github->{email},
+      realname   => $github->{name},
+      username   => $github->{login},
+    );
+  }
+  else {
+
+
+  }
+
+  my $error = $c->flash('error') // { code => 0, message => '' };
+
+  $c->stash(
+    error    => $error,
+    rt       => $rt,
+    rt_url   => $rt_url,
+    provider => $provider,
   );
 
-  my $error = $self->flash('error') // { code => 0, message => '' };
-
-  $self->stash(
-    username    => $username,
-    error       => $error
-  );
-
-  $self->render('website/activate');
+  $c->render('website/activate');
 }
 
 sub activate_post {
-  my $self = shift;
+  my $c = shift;
 
-  my $username = $self->param('username');
-  my $prefix = $self->param('prefix');
-  my $suffix = $self->param('token');
-  my $url = $self->param('redirect_to') // '/';
+  my $provider = $c->param('provider');
+  my $username = $c->param('username');
+  my $realname = $c->param('realname');
+  my $url = $c->param('redirect_to') // '/';
 
-  # lookup the requested account for activation
-  my $u = Canvas::Store::User->search({ username => $username })->first;
+  my $oauth = $c->session('oauth');
+  my $activation = {};
 
-  # redirect unless account and activation token prefix/suffix exists
-  return $self->redirect_to( $url ) unless(
-    defined $u &&
-    defined $prefix &&
-    defined $suffix
-  );
+  if ($provider eq 'email') {
+    my $prefix = $c->param('prefix');
+    my $suffix = $c->param('token');
 
-  # build the supplied token and fetch the stored token
-  my $token_supplied = $prefix . url_unescape( $suffix );
-  my $token = $u->metadata('activation_token') // '';
+    $activation->{email} = {
+      prefix   => $prefix,
+      realname => $realname,
+      suffix   => $suffix,
+      username => $username,
+    };
+  }
+  elsif ($provider eq 'github') {
+    if (my $github = $oauth->{github}) {
+      my $email = $c->param('email');
+      my $github = $oauth->{github};
 
-  # redirect to same page unless supplied and stored tokens match
-  unless( $token eq $token_supplied ) {
-    $self->flash( page_errors => 'Your token is invalid.' );
-    return $self->redirect_to( $self->url_with('current') );
-  };
+      $activation->{github} = {
+        email      => $email,
+        oauth_user => $github->{login},
+        realname   => $realname,
+        username   => $username,
+      };
+    }
+  }
 
-  # remove activation if account age is more than 24 hours
-  # and then return to redirect or home
-  my $now = gmtime;
-  if( ($now - $u->updated) > 86400 ) {
-    $self->flash( page_errors => 'Activation of this account has been over 24 hours.' );
-
-    # store username and email for notification before we delete
-    my $username = $u->username;
-    my $email = $u->email;
-
-    $u->metadata_clear('activation_token');
-    $u->delete;
-
+  if (my $u = $c->users->account->activate($activation)) {
     # subscribed "registration event" notifications
-    $self->notify_users(
+    $c->notify_users(
       'user_notify_on_activate',
       'admin@kororaproject.org',
-      'Korora Project - Prime Activation - Time Expiry',
-      "The following Prime account has exceeded it's activation time limit:\n" .
-      " - username: " . $username . "\n" .
-      " - email:    " . $email . "\n\n" .
-      "The account has been deleted.\n\n" .
+      'Korora Project - Prime Activation - Success',
+      "The following Prime account has successfully been activated:\n" .
+      " - username: " . $u->{username} . "\n" .
+      " - email:    " . $u->{email} . "\n\n" .
       "Regards,\n" .
       "The Korora Team.\n"
     );
 
-    return $self->redirect_to( $url );
+    $c->authenticate(undef, undef, {activated => {username => $u->{username}}});
+
+    $c->flash(username => $u->{username});
+
+    $c->redirect_to('/activated');
   }
 
-  my $status = $u->status;
-
-  $u->status('active');
-  $u->update;
-
-  $u->metadata_clear('activation_token');
-
-  # subscribed "registration event" notifications
-  $self->notify_users(
-    'user_notify_on_activate',
-    'admin@kororaproject.org',
-    'Korora Project - Prime Activation - Success',
-    "The following Prime account has successfully been activated:\n" .
-    " - username: " . $u->username . "\n" .
-    " - email:    " . $u->email . "\n\n" .
-    "Regards,\n" .
-    "The Korora Team.\n"
-  );
-
-  $self->flash( username => $username );
-
-  $self->redirect_to('/activated');
+  $c->redirect_to('/');
 }
 
 sub forgot_post {
-  my $self = shift;
+  my $c = shift;
 
-  my $email = $self->param('email');
+  my $email    = $c->param('email');
+  my $rt       = $c->param('rt');
+  my $rt_url   = $rt ? $c->ub64_decode($rt) : '/';
+  my $username = $c->param('username');
 
-  # extract the redirect url and fall back to the index
-  my $url = $self->param('redirect_to') // '/';
-
-  # validate email address
-  unless( $email =~ m/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/ ) {
-    $self->flash( page_errors => 'Your email address is invalid.' );
-
-    return $self->redirect_to( $url );
+  if ($c->users->account->forgot($username, $email)) {
+    $c->flash(page_info => 'An email with further instructions has been sent to: ' . $email);
   }
 
-  my $u = Canvas::Store::User->search({ email => $email })->first;
-
-  # validate email is available, don't reveal email account information
-  unless( defined $u ) {
-    $self->flash( page_info => 'An email with further instructions has been sent to: ' . $email );
-
-    return $self->redirect_to( $url );
-  }
-
-  # validate account is active, don't reveal email account information
-  unless( $u->is_active_account ) {
-    $self->flash( page_info => 'An email with further instructions has been sent to: ' . $email );
-
-    return $self->redirect_to( $url );
-  }
-
-  # erase existing tokens
-  $u->metadata_clear('password_reset_token');
-
-  # generate activiation token
-  my $token = create_auth_token;
-
-  my $um = Canvas::Store::UserMeta->create({
-    user_id     => $u->id,
-    meta_key    => 'password_reset_token',
-    meta_value  => $token,
-  });
-
-  my $activation_url = 'https://kororaproject.org/profile/' . $u->username . '/reset?token=' . url_escape $token;
-
-  my $message = "" .
-    "G'day,\n\n" .
-    "You (or someone else) entered this email address when trying to change the password of a Korora Prime account.\n\n".
-    "In order to reset the password for your Korora Prime account, continue on and follow the prompts at: " . $activation_url . "\n\n" .
-    "Regards,\n" .
-    "The Korora Team.\n";
-
-  # send the activiation email
-  $self->mail(
-    to      => $email,
-    from    => 'admin@kororaproject.org',
-    subject => 'Korora Project - Prime Re-activation / Lost Password',
-    data    => $message,
-  );
-
-  # subscribed "new registration event" notifications
-  $self->notify_users(
-    'user_notify_on_lostpass',
-    'admin@kororaproject.org',
-    'Korora Project - Prime Account - Lost Password',
-    "The following Prime account has just been requested lost password re-activation:\n" .
-    " - username: " . $u->username . "\n" .
-    " - email:    " . $u->email . "\n\n" .
-    "Regards,\n" .
-    "The Korora Team.\n"
-  );
-
-  $self->flash( page_info => 'An email with further instructions has been sent to: ' . $email );
-  $self->redirect_to( $url );
+  $c->redirect_to($rt_url);
 }
 
 sub registered_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $url  = $self->flash('redirect_to');
+  my $rt     = $c->param('rt') // $c->flash('rt');
+  my $rt_url = $rt ? $c->ub64_decode($rt) : '/';
 
-  return $self->redirect_to( '/' ) unless defined $url;
-
-  $self->stash( redirect_to => $url );
-  $self->render('website/registered');
+  $c->stash(rt => $rt, rt_url => $rt_url);
+  $c->render('website/registered');
 }
 
 sub register_get {
   my $c = shift;
 
-  my $error = $c->flash('error') // { code => 0, message => '' };
+  my $error  = $c->flash('error') // { code => 0, message => '' };
+  my $rt     = $c->param('rt') // $c->flash('rt');
   my $values = $c->flash('values') // { user => '', email => '' };
-  my $url = $c->param('rt') // ( $c->flash('rt') // '' );
 
-  $c->stash(error => $error, values => $values, rt => $url, rt_url => $c->ub64_decode($url));
+  $c->flash(rt => $rt);
+
+  my $rt_url = $rt ? $c->ub64_decode($rt) : '/';
+
+  $c->stash(
+    error  => $error,
+    rt     => $rt,
+    rt_url => $rt_url,
+    values => $values,
+  );
 
   $c->render('website/register');
 }
@@ -349,108 +328,27 @@ sub register_post {
   my $url = $c->param('redirect_to') // '/';
 
   # grab registration details
-  my $user  = $c->param('user');
-  my $email = $c->param('email');
-  my $pass  = $c->param('pass');
+  my $email        = $c->param('email');
+  my $pass         = $c->param('pass');
   my $pass_confirm = $c->param('confirm');
+  my $user         = $c->param('user');
 
   # flash the redirect and previous values for future redirects
   $c->flash(
     rt => $url,
-    values => { user => $user, email => $email }
+    values => {user => $user, email => $email}
   );
 
-  # validate username
-  unless( $user =~ m/^[a-zA-Z0-9_]+$/ ) {
-    $c->flash( error => { code => 1, message => 'Your username can only consist of alphanumeric characters and underscores only [A-Z, a-z, 0-9, _].' });
-
-    return $c->redirect_to('/register');
-  }
-
-  # validate user name is available
-  my $u = Canvas::Store::User->search({
-    username => $user,
-  })->first;
-
-  if (defined $u) {
-    $c->flash( error => { code => 2, message => 'That username already exists.' } );
-
-    return $c->redirect_to('/register');
-  }
-
-  # validate email address
-  unless( $email =~ m/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/ ) {
-    $c->flash( error => { code => 3, message => 'Your email address is invalid.' });
-
-    return $c->redirect_to('/register');
-  }
-
-  # validate passwords have sufficient length
-  if (length $pass < 8) {
-    $c->flash(error => { code => 5, message => 'Your password must be at least 8 characters long.' });
-
-    return $c->redirect_to('/register');
-  }
-
-  # validate passwords match
-  if ($pass ne $pass_confirm) {
-    $c->flash(error => { code => 6, message => 'Your passwords don\'t match.' } );
-
-    return $c->redirect_to('/register');
+  my $registration = {
+    email => {
+      email        => $email,
+      password     => $pass,
+      pass_confirm => $pass_confirm,
+      username     => $user,
+    }
   };
 
-  $u = Canvas::Store::User->create({
-    username  => $user,
-    email     => $email,
-  });
-
-  if (defined $u) {
-    # store password as a salted hash
-    $u->password( $u->hash_password( $pass ) );
-    $u->update;
-
-    # generate activiation token
-    my $token = create_auth_token;
-
-    my $um = Canvas::Store::UserMeta->create({
-      user_id     => $u->id,
-      meta_key    => 'activation_token',
-      meta_value  => $token,
-    });
-
-    my $activation_key = substr( $token, 0, 32 );
-    my $activation_url = 'https://kororaproject.org/activate/' . $user . '?token=' . url_escape substr( $token, 32 );
-
-    my $message = "" .
-      "G'day,\n\n" .
-      "Thank you for registering to be part of our Korora community.\n\n".
-      "Your activiation key is: " . $activation_key . "\n\n" .
-      "In order to activate your Korora Prime account, copy your activation key and follow the prompts at: " . $activation_url . "\n\n" .
-      "Please note that you must activate your account within 24 hours.\n\n" .
-#      "If you have any questions regarding his process, click 'Reply' in your email client and we'll be only too happy to help.\n\n" .
-      "Regards,\n" .
-      "The Korora Team.\n";
-
-    # send the activiation email
-    $c->mail(
-      to      => $email,
-      from    => 'admin@kororaproject.org',
-      subject => 'Korora Project - Prime Registration',
-      data    => $message,
-    );
-
-    # subscribed "new registration event" notifications
-    $c->notify_users(
-      'user_notify_on_register',
-      'admin@kororaproject.org',
-      'Korora Project - New Prime Registration',
-      "The following Prime account has just been registered:\n" .
-      " - username: " . $u->username . "\n" .
-      " - email:    " . $u->email . "\n\n" .
-      "Regards,\n" .
-      "The Korora Team.\n"
-    );
-  }
+  return $c->redirect_to('/register') unless $c->users->account->register($registration);
 
   $c->redirect_to('/registered');
 }

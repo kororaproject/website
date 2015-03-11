@@ -156,9 +156,46 @@ function NavigationController($scope, CanvasNavigation) {
 
 function ActivateController($scope, $http) {
   $scope.token = '';
+  $scope.username = '';
+  $scope.email = '';
+  $scope.password = '';
+  $scope.verify = '';
 
   $scope.error = {
+    username: 'Username is already taken.',
+    email: 'Email is invalid.',
+    password: 'Password must be at least 8 characters.',
+    verify: 'Passwords must match.',
     token: 'Token is invalid.'
+  };
+
+  $scope.usernames = {};
+  $scope._lookup_details = false;
+
+  $scope.lookupDetails = function() {
+    console.debug("Lookup: " + $scope.username + "||");
+
+    /* check for cached results */
+    if ($scope.usernames.hasOwnProperty($scope.username))
+      return;
+
+    /* check profile status */
+    $scope._lookup_details = true;
+
+    $http({
+      method: 'POST',
+      url: '/profile/status',
+      params: { name: $scope.username }
+    })
+      .success( function(data, status, headers, config) {
+        if (data.hasOwnProperty('username') ) {
+          $scope.usernames[data.username.key] = (data.username.status !== 1);
+        }
+        $scope._lookup_details = false;
+      })
+      .error( function(data, status, headers, config) {
+        $scope._lookup_details = false;
+      });
   };
 
   $scope.tokenIsValid = function() {
@@ -169,9 +206,42 @@ function ActivateController($scope, $http) {
     return $scope.token.length > 0 && ( state === $scope.tokenIsValid() );
   };
 
+  $scope.usernameIsState = function(state) {
+    var _u = $scope.username;
+    return _u.length && $scope.usernames.hasOwnProperty(_u) && (state === $scope.usernameIsValid());
+  };
 
-  $scope.canActivate = function() {
+  $scope.usernameIsValid = function() {
+    if ($scope.username.length > 0) {
+      var re = /^[A-Za-z0-9_]+$/;
+      if (re.test($scope.username)) {
+        if ($scope.usernames.hasOwnProperty($scope.username)) {
+          if ($scope.usernames[$scope.username]) {
+            $scope.error.username = '';
+            return true;
+          }
+          else {
+            $scope.error.username = 'Username is already taken.';
+          }
+        }
+        else {
+          $scope.error.username = 'Username can\'t be checked.';
+        }
+      }
+      else {
+        $scope.error.username = 'Usernames can only contain alphanumeric characters and underscores only.';
+      }
+    }
+
+    return false;
+  };
+
+  $scope.canActivateEmail = function() {
     return $scope.tokenIsValid();
+  };
+
+  $scope.canActivateOAuth = function() {
+    return $scope.usernameIsValid();
   };
 };
 

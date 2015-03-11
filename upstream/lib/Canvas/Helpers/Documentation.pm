@@ -74,7 +74,7 @@ sub register {
       ($selected == 0) ? ("None", 0, 'selected', 'selected') : ("None", 0)
     ];
 
-    my $documents = $c->pg->db->query("SELECT pm.meta_value::integer AS ho, hd.meta_value::integer AS depth, title, id FROM canvas_post JOIN canvas_postmeta AS pm ON (pm.post_id=canvas_post.id AND pm.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=canvas_post.id AND hd.meta_key='hierarchy_depth') WHERE type='document' ORDER BY ho")->hashes;
+    my $documents = $c->pg->db->query("SELECT pm.meta_value::integer AS ho, hd.meta_value::integer AS depth, title, id FROM posts JOIN postmeta AS pm ON (pm.post_id=posts.id AND pm.meta_key='hierarchy_order') JOIN postmeta AS hd ON (hd.post_id=posts.id AND hd.meta_key='hierarchy_depth') WHERE type='document' ORDER BY ho")->hashes;
 
     foreach my $d (@{$documents}) {
       my $t = ("-" x $d->{depth}) . " " . $d->{title};

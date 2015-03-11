@@ -21,7 +21,7 @@
           <div class="col-sm-6">
             <h2>Your Korora Prime account is almost ready.</h2>
             <p>A message has been sent to the email address you provided with further instructions on how to finalise the activation of your account.</p>
-            <a href="<%= $redirect_to %>" class="btn btn-success">Return</a>
+            <a href="<%= $rt_url %>" class="btn btn-success">Return</a>
             <a href="/" class="btn btn-success">Home</a>
           </div>
 

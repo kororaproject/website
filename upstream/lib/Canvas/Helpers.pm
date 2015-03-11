@@ -289,7 +289,12 @@ sub register {
 
       #
       # add "previous" marker
-      push @template, sprintf('<li class="%s"><a href="%s"><i class="fa fa-fw fa-angle-left"></i></a></li>', ($page > 1) ? '' : 'disabled', $url->query([page => $page_prev]), $page_prev);
+      if ($page > 1) {
+        push @template, sprintf('<li><a href="%s"><i class="fa fa-fw fa-angle-left"></i></a></li>', $url->query([page => $page_prev]));
+      }
+      else {
+        push @template, '<li class="disabled"><span><i class="fa fa-fw fa-angle-left"></i></span></li>';
+      }
 
       # not enough pages to bother breaking it up
       if ($page_last < 7 + ($adjacents * 2)) {
@@ -338,7 +343,12 @@ sub register {
 
 
       # add "next" marker
-      push @template, sprintf('<li class="%s"><a href="%s"><i class="fa fa-fw fa-angle-right"></i></a></li>', ($page < $p-1) ? '' : 'disabled', $url->query([page => $page_next]), $page_next);
+      if ($page < $page_last) {
+        push @template, sprintf('<li><a href="%s"><i class="fa fa-fw fa-angle-right"></i></a></li>', $url->query([page => $page_next]));
+      }
+      else {
+        push @template, '<li class="disabled"><span><i class="fa fa-fw fa-angle-right"></i></span></li>';
+      }
 
       # add "last" marker
       #push @template,'<li class="' . (($page+$page_show_max < $page_last) ? '' : 'disabled') . '"><a href="' . $url->query([ page => ($page+$page_show_max < $page_last ? $page+$page_show_max : $page_last)]) . '"><i class="fa fa-fw fa-angle-double-right"></i></a></li>';
@@ -509,7 +519,7 @@ sub register {
 
     $value //= 1;
 
-    my $emails = $c->pg->db->query("SELECT u.email FROM canvas_user u JOIN canvas_usermeta um ON (um.user_id=u.id) WHERE um.meta_key=? AND um.meta_value=?", $channel, $value)->arrays;
+    my $emails = $c->pg->db->query("SELECT u.email FROM users u JOIN usermeta um ON (um.user_id=u.id) WHERE um.meta_key=? AND um.meta_value=?", $channel, $value)->arrays;
 
     foreach my $e (@{$emails}) {
       # send the message

@@ -27,11 +27,11 @@
             <div class="text-center">
               <%== email_gravatar($user->{email}, 128) %>
             </div>
-            <div class="profile-subtitle-metadata">
-              <p class="profile-subtitle-metadata text-center">Joined on <br/><%= $user->{created} %></p>
+            <div class="profile-subtitle-meta">
+              <p class="profile-subtitle-meta text-center">Joined on <br/><%= $user->{created} %></p>
             </div>
 % if ($c->profile->can_change_password($user)) {
-            <div>
+            <div class="text-center">
               <a href="" class="btn btn-default" data-toggle="modal" data-target="#modalChangePassword">Change Password</a>
             </div>
 % }

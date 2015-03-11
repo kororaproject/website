@@ -47,7 +47,7 @@ object {
 /* border radius correction */
 .alert,
 .breadcrumb,
-.btn,
+.btn, .btn-sm, .btn-group-sm>.btn,
 .form-control,
 .label,
 .input-group-addon,
@@ -187,6 +187,11 @@ blockquote.title p {
 
 .breadcrumb > .active {
   color: #000;
+}
+
+.breadcrumb .btn {
+  border-color: transparent;
+  border-radius: 0;
 }
 
 .form-control {
@@ -918,27 +923,22 @@ blockquote p {
   margin-bottom: 12px;
 }
 
-.nav a.user-avatar {
-  padding: 9px 15px;
-}
+.user-avatar { padding: 13px 15px!important; }
+.user-avatar img { margin-left: 4px; }
 
 #page-notifications {
   position: fixed;
-
+  text-align: center;
   top: 0;
   width: 100%;
-
-  text-align: center;
-
   z-index: 999999;
 }
 
 #social {
 /*  margin: 12px 8px 0 0; */
   display: block;
-  width: 100%;
-
   text-align: right;
+  width: 100%;
 }
 
 /*
@@ -946,8 +946,8 @@ blockquote p {
 */
 
 .oauth-providers {
-  text-align: center;
   padding: 16px 0;
+  text-align: center;
 }
 
 #login .oauth-providers {
@@ -1084,6 +1084,7 @@ blockquote p {
 */
 
 .news-post-title {
+  color: #222;
   text-decoration: none!important;
 }
 
@@ -1215,10 +1216,12 @@ blockquote p {
 
 .engage-summary-meta > p,
 .reply-meta > p {
-  padding-bottom: 0;
-  margin-bottom: 0;
-
+  color: #999;
   font-size: 12px;
+  line-height: 12px;
+  margin-bottom: 0;
+  margin-top: 4px;
+  padding-bottom: 0;
 }
 
 .post-tags {
@@ -1266,15 +1269,10 @@ blockquote p {
   text-align: right;
 }
 
-.engage-detail-footer-metadata p {
+.engage-detail-footer-meta p {
   font-size: 12px;
   line-height: 12px;
   margin-bottom: 2px;
-}
-
-.engage-detail-footer-metadata img {
-  border-radius: 2px;
-  display: inline-block;
 }
 
 .engage-detail-footer-admin {
@@ -1283,7 +1281,7 @@ blockquote p {
   vertical-align: top;
 }
 
-.engage-detail-footer-metadata {
+.engage-detail-footer-meta {
   display: inline-block;
   margin-left: 2px;
   margin-top: 2px;
@@ -1371,30 +1369,29 @@ h4.step {
 }
 
 .documentation-index {
-  font-size: 12px;
-  margin-bottom: 8px;
+  font-size: 18px;
+  margin: 0;
 }
 
 .documentation-level-0:not(:first-child) {
-  margin-top: 32px;
-}
-
-.documentation-level-0 {
-  font-size: 30px;
-}
-
-.documentation-level-1 {
-  font-size: 24px;
   margin-top: 16px;
 }
 
-.documentation-level-2 {
-  font-size: 20px;
+.documentation-level-0 {
+}
+
+.documentation-level-1 {
   margin-top: 8px;
+  padding-left: 8px;
+}
+
+.documentation-level-2 {
+  margin-top: 4px;
+  padding-left: 16px;
 }
 
 .documentation-level-3 {
-  font-size: 16px;
+  padding-left: 24px;
 }
 
 /*
@@ -1494,7 +1491,7 @@ h4.step {
 ** PROFILE PAGES
 */
 
-.profile-subtitle-metadata p {
+.profile-subtitle-meta p {
   font-size: 12px;
   line-height: 16px;
 }

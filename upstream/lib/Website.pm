@@ -34,6 +34,7 @@ use Mojo::Pg;
 use Mojolicious::Plugin::Authentication;
 use Mojolicious::Plugin::Cache;
 use Mojolicious::Plugin::Mail;
+use Mojolicious::Plugin::OAuth2;
 use Mojolicious::Plugin::RenderSteps;
 
 use POSIX qw(floor);
@@ -75,7 +76,11 @@ sub startup {
 
   #
   # CACHE
-  $self->plugin('Cache' => $config->{cache} // {} );
+  $self->plugin(Cache => $config->{cache} // {} );
+
+  #
+  # OAUTH2
+  $self->plugin(OAuth2 => $config->{oauth2} // {} );
 
   # set default session expiration to 4 hours
   $self->sessions->default_expiration(14400);
@@ -89,13 +94,15 @@ sub startup {
     load_user => sub {
       my ($app, $user) = @_;
 
-      my $user_hash = $app->pg->db->query("SELECT * FROM canvas_user WHERE username=?", $user)->hash // {};
+      my $user_hash = $app->pg->db->query("SELECT * FROM users WHERE username=?", $user)->hash // {};
 
       # load metadata
       if ($user_hash->{id}) {
         $user_hash->{meta} = {};
 
-        my $key_values = $app->pg->db->query("SELECT meta_key AS key, array_agg(meta_value) AS values FROM canvas_usermeta where user_id=? GROUP BY meta_key", $user_hash->{id})->hashes // {};
+        $user_hash->{oauth} = $app->session('oauth') // {};
+
+        my $key_values = $app->pg->db->query("SELECT meta_key AS key, array_agg(meta_value) AS values FROM usermeta where user_id=? GROUP BY meta_key", $user_hash->{id})->hashes // {};
 
         $key_values->each(sub {
           my $e = shift;
@@ -108,9 +115,24 @@ sub startup {
     validate_user => sub {
       my ($app, $user, $pass, $extra) = @_;
 
-      my $u = $app->pg->db->query("SELECT * FROM canvas_user WHERE username=?", $user)->hash;
+      # check user pass
+      if ($user and $pass) {
+        my $u = $app->pg->db->query("SELECT username, password FROM users WHERE username=?", $user)->hash;
 
-      return $u->{username} if $app->users->validate($u, $pass);
+        return $u->{username} if $app->users->validate($u, $pass);
+      }
+      # check github
+      elsif (my $github = $extra->{github}) {
+        my $u = $app->pg->db->query("SELECT u.username FROM users u JOIN usermeta um ON (um.user_id=u.id) WHERE um.meta_key='oauth_github' AND um.meta_value=?", $github->{login})->hash;
+
+        return $u->{username} if $u;
+      }
+      # check activation
+      elsif (my $activated = $extra->{activated}) {
+        my $u = $app->pg->db->query("SELECT username FROM users WHERE username=?", $activated->{username})->hash;
+
+        return $u->{username} if $u;
+      }
 
       return undef;
     },
@@ -120,18 +142,16 @@ sub startup {
 
   #
   # MAIL
-  unless( $config->{mail} && ( $config->{mail}{mode} // '') eq 'production' ) {
+  unless ($config->{mail} && ($config->{mail}{mode} // '') eq 'production') {
     $self->app->log->info('Loading dummy mail handler for non-production testing.');
 
     $self->helper('mail' => sub {
-      shift->app->log->debug('Sending an email ' . join "\n", @_);
+      shift->app->log->debug('Sending MOCK email ' . join "\n", @_);
     });
   }
   else {
     $self->app->log->info('Loading production mail handler.');
-    $self->plugin('mail' => {
-      type => 'text/plain',
-    });
+    $self->plugin('mail' => {type => 'text/plain'});
   }
 
   #
@@ -142,6 +162,7 @@ sub startup {
   $self->plugin('Canvas::Helpers::Documentation');
   $self->plugin('Canvas::Helpers::Engage');
   $self->plugin('Canvas::Helpers::News');
+  $self->plugin('Canvas::Helpers::Post');
   $self->plugin('Canvas::Helpers::Profile');
   $self->plugin('Canvas::Helpers::User');
 
@@ -254,10 +275,11 @@ sub startup {
   $r->get('/register')->to('site#register_get');
   $r->post('/register')->to('site#register_post');
   $r->get('/registered')->to('site#registered_get');
-  $r->get('/activate/:username')->to('site#activate_get');
-  $r->post('/activate/:username')->to('site#activate_post');
+  $r->get('/activate/:provider')->to('site#activate_get');
+  $r->post('/activate/:provider')->to('site#activate_post');
   $r->get('/activated')->to('site#activated');
   $r->post('/forgot')->to('site#forgot_post');
+  $r->any('/oauth/:provider')->to('site#oauth');
 
 
   # profile pages
@@ -266,15 +288,6 @@ sub startup {
   $r->get('/profile/:name')->to('profile#profile_get');
   $r->get('/profile/:name/reset')->to('profile#profile_reset_password_get');
   $r->post('/profile/:name/reset')->to('profile#profile_reset_password_post');
-
-
-  # archive.* captures
-  $r->get('/help/forums')->to('site#forums_get');
-  $r->any('/20*archive')->to('site#archive_forward_any');
-  $r->any('/category*archive')->to('site#archive_forward_any');
-  $r->any('/forum*archive')->to('site#archive_forward_any');
-  $r->any('/topic*archive')->to('site#archive_forward_any');
-  $r->any('/wp-*archive')->to('site#archive_forward_any');
 
 
   #

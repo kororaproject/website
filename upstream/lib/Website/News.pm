@@ -80,20 +80,18 @@ sub index {
     my $delay = shift;
 
     # get total count
-    $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='news' AND status='publish'" => $delay->begin);
+    $c->pg->db->query("SELECT COUNT(id) FROM posts WHERE type='news' AND status='publish'" => $delay->begin);
 
     # get paged items with username and email associated
-    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.status='publish' GROUP BY p.id, u.username, u.email ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.status='publish' GROUP BY p.id, u.username, u.email ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
   },
   sub {
     my ($delay, $count_err, $count_res, $err, $res) = @_;
 
     my $count = $count_res->array->[0];
-    my $re = $res->hashes;
-    say Dumper $re;
 
     $c->stash(news => {
-      items       => $re,
+      items       => $res->hashes,
       item_count  => $count,
       page_size   => $page_size,
       page        => $page,
@@ -106,7 +104,7 @@ sub rss_get {
   my $c = shift;
 
   # get latest items paged items with username and email associated
-  my $res = $c->pg->db->query("SELECT title, name, excerpt, EXTRACT(EPOCH FROM created) AS created_epoch, EXTRACT(EPOCH FROM updated) AS updated_epoch FROM canvas_post WHERE type='news' AND status='publish' ORDER BY created DESC LIMIT 10");
+  my $res = $c->pg->db->query("SELECT title, name, excerpt, EXTRACT(EPOCH FROM created) AS created_epoch, EXTRACT(EPOCH FROM updated) AS updated_epoch FROM posts WHERE type='news' AND status='publish' ORDER BY created DESC LIMIT 10");
 
   my $rss = '<?xml version="1.0" ?><rss version="2.0"><channel>' .
             '<title>Korora Project - News</title>' .
@@ -133,7 +131,7 @@ sub news_post_get {
   $c->render_steps('website/news-post', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
@@ -166,7 +164,7 @@ sub news_post_edit_get {
   $c->render_steps('website/news-post-edit', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
@@ -197,7 +195,7 @@ sub news_post {
   my $created = $c->param('created');
 
   if ($stub ne '' && $c->news->can_edit) {
-    my $p = $c->pg->db->query("SELECT p.id, title, excerpt, content, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, author_id, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='news' AND name=?", $stub)->hash;
+    my $p = $c->pg->db->query("SELECT p.id, title, excerpt, content, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, author_id, username, email FROM posts p JOIN users u ON (u.id=p.author_id) WHERE type='news' AND name=?", $stub)->hash;
 
     # update author if changed
     if ($author ne $p->{username}) {
@@ -212,10 +210,10 @@ sub news_post {
     my $db = $c->pg->db;
     my $tx = $db->begin;
 
-    $db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, created=?, updated=? WHERE type='news' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $created, $now, $stub);
+    $db->query("UPDATE posts SET status=?, title=?, excerpt=?, content=?, author_id=?, created=?, updated=? WHERE type='news' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $created, $now, $stub);
 
     # update tags
-    my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
+    my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM posts p LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
 
     my @tags_old = $tt->{tags};
     my @tags_new = @{$c->sanitise_taglist($tag_list)};
@@ -226,15 +224,15 @@ sub news_post {
     # add tags
     foreach my $ta ( grep( ! defined $to{$_}, @tags_new ) ) {
       # find or create tag
-      my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $ta)->hash;
+      my $t = $db->query("SELECT id FROM tags WHERE name=?", $ta)->hash;
       unless ($t) {
-        $t = { id => $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $ta)->array->[0] };
+        $t = { id => $db->query("INSERT INTO tags (name) VALUES (?) RETURNING ID", $ta)->array->[0] };
       }
 
       # find or create post/tag reference
-      my $pt = $db->query("SELECT * FROM canvas_post_tag WHERE post_id=? AND tag_id=?", $p->{id}, $t->{id})->hash;
+      my $pt = $db->query("SELECT * FROM post_tag WHERE post_id=? AND tag_id=?", $p->{id}, $t->{id})->hash;
       unless ($pt) {
-        $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?)", $p->{id}, $t->{id});
+        $db->query("INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)", $p->{id}, $t->{id});
       }
     }
 
@@ -248,24 +246,24 @@ sub news_post {
     my $tx = $db->begin;
 
     # check for existing stubs and append the ID + 1 of the last
-    my $e = $db->query("SELECT id FROM canvas_post WHERE type='news' AND name=? ORDER BY id DESC LIMIT 1", $stub)->array;
+    my $e = $db->query("SELECT id FROM posts WHERE type='news' AND name=? ORDER BY id DESC LIMIT 1", $stub)->array;
     $stub .= '-' . ($e->[0] + 1) if $e;
 
     $created = $now;
 
-    my $post_id = $c->pg->db->query('INSERT INTO canvas_post (type, name, status, title, content, excerpt, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', 'news', $stub, $status, $title, $content, $excerpt, $c->auth_user->{id}, $created, $now)->array->[0];
+    my $post_id = $c->pg->db->query('INSERT INTO posts (type, name, status, title, content, excerpt, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', 'news', $stub, $status, $title, $content, $excerpt, $c->auth_user->{id}, $created, $now)->array->[0];
 
     # create the tags
     foreach my $tag (@{$c->sanitise_taglist($tag_list)}) {
       # find or create tag
-      my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $tag)->hash;
+      my $t = $db->query("SELECT id FROM tags WHERE name=?", $tag)->hash;
 
       unless ($t) {
-        $t->{id} = $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $tag)->array->[0];
+        $t->{id} = $db->query("INSERT INTO tags (name) VALUES (?) RETURNING ID", $tag)->array->[0];
       }
 
       # insert the link
-      my $pt = $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?) ", $post_id, $t->{id});
+      my $pt = $db->query("INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?) ", $post_id, $t->{id});
     }
 
     $tx->commit;
@@ -284,7 +282,7 @@ sub news_post_delete_any {
   if ($c->news->can_delete) {
     my $stub = $c->param('id');
 
-    my $r = $c->pg->db->query("DELETE FROM canvas_post WHERE type='news' AND name=?", $stub);
+    my $r = $c->pg->db->query("DELETE FROM posts WHERE type='news' AND name=?", $stub);
   };
 
   $c->redirect_to('aboutnews');
@@ -305,10 +303,10 @@ sub news_admin_get {
     my $delay = shift;
 
     # get total count
-    $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='news'" => $delay->begin);
+    $c->pg->db->query("SELECT COUNT(id) FROM posts WHERE type='news'" => $delay->begin);
 
     # get paged items with username and email associated
-    $c->pg->db->query("SELECT name, p.status, title, excerpt, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type='news' ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+    $c->pg->db->query("SELECT name, p.status, title, excerpt, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, username, email FROM posts p JOIN users u ON (u.id=p.author_id) WHERE p.type='news' ORDER BY p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
   },
   sub {
     my ($delay, $err, $count_res, $err_res, $res) = @_;

@@ -18,33 +18,84 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-sm-6">
-            <h2>Benefits of Korora Prime</h2>
-            <p>The Korora Project is aspiring to provide the best out of the box experience for new users through to power users and experts.</p>
-            <p>Right now, a Korora Prime account provides access to participate with the community via <a href="/support/engage">Engage</a>.</p>
-            <p>Down the road, a Korora Prime account will provide single sign-on access to other Korora Project services that you choose to be part of.</p>
-          </div>
-          <div class="col-sm-6 callout callout-nfo">
+          <div class="col-sm-12">
             <h2>Almost done ...</h2>
-            <p>Copy and paste the activation key you received in your email into the field below, then click <em>Activate</em> to finalise your account creation.</p>
+            <p>Please fill out the remaining items, then click <em>Activate</em> to finalise your account.</p>
             <form action="<%= url_with('current')%>" method="post" role="form">
 % if( $error->{code} ) {
               <div class="alert alert-danger">
                 <p><%= $error->{message} %></p>
               </div>
 % }
+              <input type="hidden" name="rt" value="<%= $rt %>"></input>
+              <input type="hidden" name="provider" value="<%= $provider %>"></input>
+% if ($provider eq "email") {
               <div class="form-group" ng-class="{'has-error': tokenIsState(false), 'has-success': tokenIsState(true)}">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-key"></i></span>
-                  <input type="text" name="prefix" class="form-control" placeholder="activation code" ng-model="token">
+                  <input type="text" name="prefix" class="form-control" ng-model="token">
                 </div>
-                <span class="help-block ng-hide" ng-show="tokenIsState(false)">{{error.token}}</span>
+                <span class="help-block">Paste your email activiation key here</span>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+                  <input type="text" name="username" class="form-control" value="<%= $username %>" disabled>
+                </div>
+                <span class="help-block">Your unique Prime username</span>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
+                  <input type="input" class="form-control" name="email" value="<%= $email %>" disabled>
+                </div>
+                <span class="help-block">An email address to send you account information.</span>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-star"></i></span>
+                  <input type="text" name="realname" class="form-control" value="<%= $realname %>">
+                </div>
+                <span class="help-block">Your preferred name, unless you want to just go by your username.</span>
               </div>
               <div class="form-group">
                 <div class="input-group pull-right">
-                  <button type="submit" class="btn btn-success pull-right" ng-class="{disabled: !canActivate()}">Activate</button>
+                  <button type="submit" class="btn btn-success pull-right" ng-class="{disabled: !canActivateEmail()}">Activate</button>
                 </div>
               </div>
+% } else {
+%   if ($provider eq 'github') {
+              <div>
+              </div>
+%   }
+              <div class="form-group">
+                <div class="input-group" ng-class="{'has-error': usernameIsState(false), 'has-success': usernameIsState(true)}">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+                  <input type="text" name="username" class="form-control" value="<%= $username %>" ng-model="username" ng-init="username='<%= $username %>'" ng-blur="lookupDetails()">
+                </div>
+                <span class="help-block">Your unique Prime username</span>
+              </div>
+              <div class="form-group">
+                <div class="input-group" ng-class="{'has-error': emailIsState(false), 'has-success': emailIsState(true)}">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
+                  <input type="input" class="form-control" name="email" value="<%= $email %>" ng-model="email" ng-init="email='<%= $email %>'">
+                </div>
+                <span class="help-block">An email address to send you account information.</span>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-star"></i></span>
+                  <input type="text" name="realname" class="form-control" value="<%= $realname %>">
+                </div>
+                <span class="help-block">Your preferred name, unless you want to just go by your username.</span>
+              </div>
+              <div class="form-group">
+                <div class="pull-right">
+                  <a href="<%= $rt_url %>" class="btn btn-large btn-default">Cancel</a>
+                  <button type="submit" class="btn btn-large btn-success" ng-class="{disabled: !canActivateOAuth()}"><i class="fa fa-fw fa-github"></i> Activate</button>
+                </div>
+              </div>
+% }
             </form>
           </div>
         </div>

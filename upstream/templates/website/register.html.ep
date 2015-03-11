@@ -30,9 +30,9 @@
 
             <div class="oauth-providers">
 
-              <a class="btn btn-default btn-github"><i class="fa fa-fw fa-github"></i> GitHub</a>
-              <a class="btn btn-default btn-google-plus"><i class="fa fa-fw fa-google"></i> Google</a>
-              <a class="btn btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i> Twitter</a>
+              <a href="<%= $c->oauth2->auth_url(github => {scope => "user:email", redirect_uri => url_for('oauthprovider', provider => 'github')->to_abs}) %>" class="btn btn-default btn-github"><i class="fa fa-fw fa-github"></i> GitHub</a>
+              <a class="btn btn-default btn-google-plus hide"><i class="fa fa-fw fa-google"></i> Google</a>
+              <a class="btn btn-default btn-twitter hide"><i class="fa fa-fw fa-twitter"></i> Twitter</a>
             </div>
             <h2>Or via email ...</h2>
             <form action="<%= url_for('current') %>" method="post" class="form-signin" role="form">

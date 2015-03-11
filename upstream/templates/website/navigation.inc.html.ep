@@ -27,7 +27,6 @@
             <li><a href="/about/why-fedora">Why Fedora?</a></li>
           </ul>
         </li>
-        <li class="<%= 'active' if ( $active eq 'contribute' ) %>"><a href="/contribute">Contribute</a></li>
         <li class="dropdown <%= 'active' if ( $active eq 'discover' ) %>">
           <a href="/discover" class="dropdown-toggle" data-toggle="dropdown">Discover <b class="caret"></b></a>
           <ul class="dropdown-menu" role="menu">
@@ -49,11 +48,19 @@
             <li class="hide"><a href="/support/forums">Forums</a></li>
           </ul>
         </li>
+        <li class="<%= 'active' if ( $active eq 'contribute' ) %>">
+          <a href="/contribute" class="dropdown-toggle" data-toggle="dropdown">Contribute <b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu">
+            <li class="overview"><a href="/contribute">Overview</a></li>
+            <li><a href="/contribute/donate">Donate</a></li>
+            <li><a href="/contribute/sponsor">Sponsor</a></li>
+          </ul>
+        </li>
       </ul>
 % if (is_user_authenticated) {
       <ul class="nav navbar-nav navbar-right">
         <li class="dropdown <%= 'active' if ($active eq 'user')%>">
-          <a href="" class="dropdown-toggle user-avatar" data-toggle="dropdown"><%= $c->users->name %><%== email_gravatar(auth_user->{email}) %><b class="caret"></b></a>
+          <a href="" class="dropdown-toggle user-avatar" data-toggle="dropdown"><%= $c->users->name %><%== email_gravatar(auth_user->{email}, 24) %><b class="caret"></b></a>
           <ul class="dropdown-menu" role="menu">
 %   if ($c->news->can_add) {
             <li><a href="/about/news/admin">News Admin</a></li>

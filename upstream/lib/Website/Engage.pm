@@ -123,10 +123,10 @@ sub index {
     }
 
     # build total count query
-    my $raw_count_sql = 'SELECT COUNT(DISTINCT(p.id)) FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) WHERE (' . join( ') AND (', @filter ) . ')';
+    my $raw_count_sql = 'SELECT COUNT(DISTINCT(p.id)) FROM post_tag pt LEFT JOIN posts p ON (p.id=pt.post_id) LEFT JOIN tags t ON (t.id=pt.tag_id) LEFT JOIN posts r ON (r.parent_id=p.id) WHERE (' . join( ') AND (', @filter ) . ')';
 
     # build paginated query
-    my $raw_sql = 'SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, pu.username, pu.email, ARRAY_AGG(DISTINCT t.name) AS tags, ARRAY_TO_JSON(ARRAY_AGG(DISTINCT ROW(ru.username, ru.email))) AS replies FROM canvas_post_tag pt LEFT JOIN canvas_post p ON (p.id=pt.post_id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) LEFT JOIN canvas_post r ON (r.parent_id=p.id) LEFT JOIN canvas_user pu ON (pu.id=p.author_id) LEFT JOIN canvas_user ru ON (ru.id=r.author_id) WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id, pu.id ORDER BY p.updated DESC';
+    my $raw_sql = 'SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, pu.username, pu.email, ARRAY_AGG(DISTINCT t.name) AS tags, ARRAY_TO_JSON(ARRAY_AGG(DISTINCT ROW(ru.username, ru.email))) AS replies FROM post_tag pt LEFT JOIN posts p ON (p.id=pt.post_id) LEFT JOIN tags t ON (t.id=pt.tag_id) LEFT JOIN posts r ON (r.parent_id=p.id) LEFT JOIN users pu ON (pu.id=p.author_id) LEFT JOIN users ru ON (ru.id=r.author_id) WHERE (' . join( ') AND (', @filter ) . ') GROUP BY p.id, pu.id ORDER BY p.updated DESC';
 
     $raw_sql .= ' LIMIT ' . $page_size . ' OFFSET ' . ($page_size * ($page-1));
 
@@ -235,7 +235,7 @@ sub engage_post_add_post {
   $stub = substr $stub, 0, 112 if length($stub) > 112;
 
   # check for existing stubs and append the ID + 1 of the last
-  my $e = $c->pg->db->query("SELECT MAX(id) FROM canvas_post WHERE type=? AND name=?", $type, $stub)->hash;
+  my $e = $c->pg->db->query("SELECT MAX(id) FROM posts WHERE type=? AND name=?", $type, $stub)->hash;
 
   $stub .= '-' . ($e->{max} + 1) if $e;
 
@@ -245,19 +245,19 @@ sub engage_post_add_post {
   my $created = $now;
 
   # create the post
-  my $post_id = $db->query('INSERT INTO canvas_post (type, name, status, title, content, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', $type, $stub, $status, $title, $content, $c->auth_user->{id}, $created, $now)->array->[0];
+  my $post_id = $db->query('INSERT INTO posts (type, name, status, title, content, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', $type, $stub, $status, $title, $content, $c->auth_user->{id}, $created, $now)->array->[0];
 
   # create the tags
   foreach my $tag (@{$tags}) {
     # find or create tag
-    my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $tag)->hash;
+    my $t = $db->query("SELECT id FROM tags WHERE name=?", $tag)->hash;
 
     unless ($t) {
-      $t->{id} = $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $tag)->array->[0];
+      $t->{id} = $db->query("INSERT INTO tags (name) VALUES (?) RETURNING ID", $tag)->array->[0];
     }
 
     # insert the link
-    my $pt = $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?) ", $post_id, $t->{id});
+    my $pt = $db->query("INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)", $post_id, $t->{id});
   }
 
   $tx->commit;
@@ -297,7 +297,7 @@ sub engage_post_detail_get {
   $c->render_steps('website/engage-detail', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email, ARRAY_AGG(DISTINCT t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type=? AND p.name=? GROUP BY p.id, u.username, u.email" => ($type, $stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email, ARRAY_AGG(DISTINCT t.name) AS tags FROM posts p LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) JOIN users u ON (u.id=p.author_id) WHERE p.type=? AND p.name=? GROUP BY p.id, u.username, u.email" => ($type, $stub) => $delay->begin);
   },
   sub {
     my ($delay, $p_err, $p_res) = @_;
@@ -308,11 +308,11 @@ sub engage_post_detail_get {
     my $post = $p_res->hash;
     $delay->data(post => $post);
 
-    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type='reply' AND p.status='accepted' AND p.parent_id=? GROUP BY p.id, u.username, u.email ORDER BY created" => ($post->{id}) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) WHERE p.type='reply' AND p.status='accepted' AND p.parent_id=? GROUP BY p.id, u.username, u.email ORDER BY created" => ($post->{id}) => $delay->begin);
 
-    $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='reply' AND parent_id=?" => ($post->{id}) => $delay->begin);
+    $c->pg->db->query("SELECT COUNT(id) FROM posts WHERE type='reply' AND parent_id=?" => ($post->{id}) => $delay->begin);
 
-    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type='reply' AND p.parent_id=? GROUP BY p.id, u.username, u.email ORDER BY created" => ($post->{id}) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) WHERE p.type='reply' AND p.parent_id=? GROUP BY p.id, u.username, u.email ORDER BY created" => ($post->{id}) => $delay->begin);
   },
   sub {
     my ($delay, $a_err, $a_res, $rc_err, $rc_res, $r_err, $r_res) = @_;
@@ -348,7 +348,7 @@ sub engage_post_edit_get {
   $c->render_steps('website/engage-edit', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email, ARRAY_AGG(DISTINCT t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) JOIN canvas_user u ON (u.id=p.author_id) WHERE p.type=? AND p.name=? GROUP BY p.id, u.username, u.email" => ($type, $stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email, ARRAY_AGG(DISTINCT t.name) AS tags FROM posts p LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) JOIN users u ON (u.id=p.author_id) WHERE p.type=? AND p.name=? GROUP BY p.id, u.username, u.email" => ($type, $stub) => $delay->begin);
   },
   sub {
     my ($delay, $p_err, $p_res) = @_;
@@ -371,7 +371,7 @@ sub engage_post_edit_post {
   my $stub = $c->param('stub');
   my $type = $c->param('type');
 
-  my $p = $c->pg->db->query("SELECT * FROM canvas_post WHERE type=? AND name=? LIMIT 1", $type, $stub)->hash;
+  my $p = $c->pg->db->query("SELECT * FROM posts WHERE type=? AND name=? LIMIT 1", $type, $stub)->hash;
 
   # check we found the post
   return $c->redirect_to('/support/engage') unless defined $p;
@@ -387,10 +387,10 @@ sub engage_post_edit_post {
   my $db = $c->pg->db;
   my $tx = $db->begin;
 
-  $db->query("UPDATE canvas_post SET status=?, title=?, content=?, updated=? WHERE id=?", $status, $title, $content, $now, $p->{id});
+  $db->query("UPDATE posts SET status=?, title=?, content=?, updated=? WHERE id=?", $status, $title, $content, $now, $p->{id});
 
   # update tags
-  my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
+  my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM posts p LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
 
   my @tags_old = $tt->{tags};
   my @tags_new = @{$c->sanitise_taglist($tag_list)};
@@ -401,15 +401,15 @@ sub engage_post_edit_post {
   # add tags
   foreach my $ta (grep(!defined $to{$_}, @tags_new)) {
     # find or create tag
-    my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $ta)->hash;
+    my $t = $db->query("SELECT id FROM tags WHERE name=?", $ta)->hash;
     unless ($t) {
-      $t = { id => $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $ta)->array->[0] };
+      $t = { id => $db->query("INSERT INTO tags (name) VALUES (?) RETURNING ID", $ta)->array->[0] };
     }
 
     # find or create post/tag reference
-    my $pt = $db->query("SELECT * FROM canvas_post_tag WHERE post_id=? AND tag_id=?", $p->{id}, $t->{id})->hash;
+    my $pt = $db->query("SELECT * FROM post_tag WHERE post_id=? AND tag_id=?", $p->{id}, $t->{id})->hash;
     unless ($pt) {
-      $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?)", $p->{id}, $t->{id});
+      $db->query("INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)", $p->{id}, $t->{id});
     }
   }
 
@@ -429,13 +429,13 @@ sub engage_post_subscribe_any {
   # redirect unless we're actively auth'd
   return $c->redirect_to($url) unless $c->users->is_active;
 
-  my $p = $c->pg->db->query("SELECT id FROM canvas_post WHERE type=? AND name=? LIMIT 1", $type, $stub)->hash;
+  my $p = $c->pg->db->query("SELECT id FROM posts WHERE type=? AND name=? LIMIT 1", $type, $stub)->hash;
 
   # check we found the post
   return $c->redirect_to($url) unless defined $p;
 
   # subscribe (engage_subscriptions)
-  $c->pg->db->query("INSERT INTO canvas_usermeta (user_id,meta_key,meta_value) VALUES (?,'engage_subscriptions',?)",$c->auth_user->{id}, $p->{id});
+  $c->pg->db->query("INSERT INTO usermeta (user_id,meta_key,meta_value) VALUES (?,'engage_subscriptions',?)",$c->auth_user->{id}, $p->{id});
 
   $c->redirect_to($url);
 }
@@ -448,7 +448,7 @@ sub engage_post_unsubscribe_any {
 
   # delete usermeta entry
   if ($c->users->is_active) {
-    $c->pg->db->query("DELETE FROM canvas_usermeta WHERE user_id=? AND meta_key='engage_subscriptions' AND meta_value::integer IN (SELECT id FROM canvas_post WHERE type=? AND name=?)", $c->auth_user->{id}, $type, $stub);
+    $c->pg->db->query("DELETE FROM usermeta WHERE user_id=? AND meta_key='engage_subscriptions' AND meta_value::integer IN (SELECT id FROM posts WHERE type=? AND name=?)", $c->auth_user->{id}, $type, $stub);
   }
 
   $c->redirect_to($c->url_for('supportengagetypestub', type => $type, stub => $stub));
@@ -478,7 +478,7 @@ sub engage_reply_post {
     return $c->redirect_to($rt_url);
   }
 
-  my $p = $c->pg->db->query("SELECT * FROM canvas_post WHERE id=?", $id)->hash;
+  my $p = $c->pg->db->query("SELECT * FROM posts WHERE id=?", $id)->hash;
 
   # check we found the post
   return $c->redirect_to('/support/engage') unless $p;
@@ -490,15 +490,15 @@ sub engage_reply_post {
   my $created = $now;
 
   # create the post
-  my $reply_id = $db->query("INSERT INTO canvas_post (type, name, content, author_id, created, updated, parent_id) VALUES ('reply', ?, ?, ?, ?, ?, ?) RETURNING ID", $stub, $content, $c->auth_user->{id}, $created, $now, $id)->array->[0];
+  my $reply_id = $db->query("INSERT INTO posts (type, name, content, author_id, created, updated, parent_id) VALUES ('reply', ?, ?, ?, ?, ?, ?) RETURNING ID", $stub, $content, $c->auth_user->{id}, $created, $now, $id)->array->[0];
 
   # TODO: optimise with an increment
-  $db->query("UPDATE canvas_post SET reply_count=reply_count+1 WHERE id=?", $p->{id});
+  $db->query("UPDATE posts SET reply_count=reply_count+1 WHERE id=?", $p->{id});
 
   # auto-subscribe participants (engage_subscriptions)
-  my $s = $db->query("SELECT meta_id FROM canvas_usermeta WHERE user_id=? AND meta_key='engage_subscriptions' AND meta_value=?", $c->auth_user->{id}, $p->{id})->hash;
+  my $s = $db->query("SELECT meta_id FROM usermeta WHERE user_id=? AND meta_key='engage_subscriptions' AND meta_value=?", $c->auth_user->{id}, $p->{id})->hash;
 
-  $db->query("INSERT INTO canvas_usermeta (user_id, meta_key, meta_value) VALUES (?, 'engage_subscriptions', ?)", $c->auth_user->{id}, $p->{id}) unless ($s);
+  $db->query("INSERT INTO usermeta (user_id, meta_key, meta_value) VALUES (?, 'engage_subscriptions', ?)", $c->auth_user->{id}, $p->{id}) unless ($s);
 
   $tx->commit;
 
@@ -514,7 +514,7 @@ sub engage_reply_post {
     "Regards,\n",
     "The Korora Team.\n";
 
-  $c->notify_users('engage_subscribers', $p->{id}, 'engage@kororaproject.org', $subject, $message);
+  $c->notify_users('engage_subscriptions', $p->{id}, 'engage@kororaproject.org', $subject, $message);
 
   # redirect to the detail
   $c->redirect_to($rt_url);
@@ -528,12 +528,12 @@ sub engage_reply_accept_any {
   my $id      = $c->param('id');
   my $content = $c->param('content');
 
-  my $r = $c->pg->db->query("SELECT * FROM canvas_post WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
+  my $r = $c->pg->db->query("SELECT * FROM posts WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
 
   # ensure we have edit capabilities
   return $c->redirect_to('supportengagetypestub', type => $type, stub => $stub) unless $c->engage->can_accept($r);
 
-  $c->pg->db->query("UPDATE canvas_post SET status='accepted' WHERE id=?", $id);
+  $c->pg->db->query("UPDATE posts SET status='accepted' WHERE id=?", $id);
 
   # redirect to the detail
   $c->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );
@@ -547,12 +547,12 @@ sub engage_reply_unaccept_any {
   my $id      = $c->param('id');
   my $content = $c->param('content');
 
-  my $r = $c->pg->db->query("SELECT * FROM canvas_post WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
+  my $r = $c->pg->db->query("SELECT * FROM posts WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
 
   # ensure we have edit capabilities
   return $c->redirect_to('supportengagetypestub', type => $type, stub => $stub) unless $c->engage->can_unaccept($r);
 
-  $c->pg->db->query("UPDATE canvas_post SET status='' WHERE id=?", $id);
+  $c->pg->db->query("UPDATE posts SET status='' WHERE id=?", $id);
 
   # redirect to the detail
   $c->redirect_to('supportengagetypestub', type => $type, stub => $stub);
@@ -571,7 +571,7 @@ sub engage_reply_edit_get {
   $c->render_steps('website/engage-reply-edit', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT r.content, p.title, p.type, EXTRACT(EPOCH FROM r.created) AS created_epoch, EXTRACT(EPOCH FROM r.updated) AS updated_epoch, u.username, u.email FROM canvas_post r JOIN canvas_post p ON (r.parent_id=p.id) JOIN canvas_user u ON (u.id=r.author_id) WHERE r.type='reply' AND r.id=? LIMIT 1" => ($id) => $delay->begin);
+    $c->pg->db->query("SELECT r.content, p.title, p.type, EXTRACT(EPOCH FROM r.created) AS created_epoch, EXTRACT(EPOCH FROM r.updated) AS updated_epoch, u.username, u.email FROM posts r JOIN posts p ON (r.parent_id=p.id) JOIN users u ON (u.id=r.author_id) WHERE r.type='reply' AND r.id=? LIMIT 1" => ($id) => $delay->begin);
   },
   sub {
     my ($delay, $p_err, $p_res) = @_;
@@ -610,12 +610,12 @@ sub engage_reply_edit_post {
     return $c->redirect_to( $c->url_with );
   }
 
-  my $r = $c->pg->db->query("SELECT * FROM canvas_post WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
+  my $r = $c->pg->db->query("SELECT * FROM posts WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
 
   # ensure we have edit capabilities
   return $c->redirect_to( $redirect_url ) unless $c->engage->can_edit( $r );
 
-  $c->pg->db->query("UPDATE canvas_post SET content=? WHERE id=?", $content, $id);
+  $c->pg->db->query("UPDATE posts SET content=? WHERE id=?", $content, $id);
 
   # redirect to the detail
   $c->redirect_to($redirect_url);
@@ -627,13 +627,13 @@ sub engage_post_delete_any {
   my $type = $c->param('type');
   my $stub = $c->param('stub');
 
-  my $p = $c->pg->db->query("SELECT * FROM canvas_post WHERE type=? AND name=? LIMIT 1", $type, $stub)->hash;
+  my $p = $c->pg->db->query("SELECT * FROM posts WHERE type=? AND name=? LIMIT 1", $type, $stub)->hash;
 
   # only allow authenticated and authorised users
   return $c->redirect_to('/support/engage') unless $c->engage->can_delete($p);
 
   # delete post and children
-  $c->pg->db->query("DELETE FROM canvas_post WHERE type IN ('question', 'thank', reply') AND (id=? OR parent_id=?)", $p->{id}, $p->{id});
+  $c->pg->db->query("DELETE FROM posts WHERE type IN ('question', 'thank', reply') AND (id=? OR parent_id=?)", $p->{id}, $p->{id});
 
   $c->redirect_to('/support/engage');
 }
@@ -649,7 +649,7 @@ sub engage_reply_any {
   Mojo::IOLoop->delay(sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT p.content, u.username FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE p.id=? AND p.name=? LIMIT 1" => ($id, $stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.content, u.username FROM posts p JOIN users u ON (u.id=p.author_id) WHERE p.id=? AND p.name=? LIMIT 1" => ($id, $stub) => $delay->begin);
   },
   sub {
     my ($delay, $p_err, $p_res) = @_;
@@ -670,12 +670,12 @@ sub engage_reply_delete_any {
   my $stub = $c->param('stub');
   my $id   = $c->param('id');
 
-  my $r = $c->pg->db->query("SELECT * FROM canvas_post WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
+  my $r = $c->pg->db->query("SELECT * FROM posts WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
 
   # only allow authenticated and authorised users
   return $c->redirect_to('/support/engage') unless $c->engage->can_delete($r);
 
-  $c->pg->db->query("DELETE FROM canvas_post WHERE id=?", $id);
+  $c->pg->db->query("DELETE FROM posts WHERE id=?", $id);
 
   # redirect to the detail
   $c->redirect_to( 'supportengagetypestub', type => $type, stub => $stub );

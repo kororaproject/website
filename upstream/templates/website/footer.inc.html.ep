@@ -13,12 +13,6 @@
         </ul>
       </div>
       <div class="col-xs-6 col-sm-2">
-        <h4><a href="/contribute">Contribute</a></h4>
-        <ul>
-        </ul>
-      </div>
-      <div class="clearfix visible-xs"></div>
-      <div class="col-xs-6 col-sm-2">
         <h4><a href="/discover">Discover</a></h4>
         <ul>
           <li><a href="/discover/gnome">Gnome</a></li>
@@ -28,18 +22,26 @@
           <li><a href="/discover/xfce">Xfce</a></li>
         </ul>
       </div>
+      <div class="clearfix visible-xs"></div>
       <div class="col-xs-6 col-sm-2">
         <h4><a href="/download">Download</a></h4>
         <ul>
         </ul>
       </div>
-      <div class="clearfix visible-xs"></div>
       <div class="col-xs-6 col-sm-2">
         <h4><a href="/support">Support</a></h4>
         <ul>
           <li><a href="/support/documentation">Documentation</a></li>
           <li><a href="/support/engage">Engage</a></li>
           <li class="hide"><a href="/support/forums">Forum</a></li>
+        </ul>
+      </div>
+      <div class="clearfix visible-xs"></div>
+      <div class="col-xs-6 col-sm-2">
+        <h4><a href="/contribute">Contribute</a></h4>
+        <ul>
+          <li><a href="/contribute/donate">Donate</a></li>
+          <li><a href="/contribute/sponsor">Sponsor</a></li>
         </ul>
       </div>
       <div class="col-sm-2">

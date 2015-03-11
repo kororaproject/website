@@ -45,7 +45,7 @@ sub profile_get {
     my $username = $c->param('name');
 
     # get paged items with username and email associated
-    $c->pg->db->query("SELECT * FROM canvas_user WHERE username=?" => ($username) => $delay->begin);
+    $c->pg->db->query("SELECT * FROM users WHERE username=?" => ($username) => $delay->begin);
   },
   sub {
     my ($delay, $err, $res) = @_;
@@ -65,7 +65,7 @@ sub profile_reset_password_get {
   my $token = $c->param('token');
 
   # lookup the requested account for activation
-  my $u = $c->pg->db->query("SELECT u.*, meta_key AS key FROM canvas_user u JOIN canvas_usermeta um ON (u.id=um.user_id) WHERE u.username=? AND key='password_reset_token'", $user)->hash;
+  my $u = $c->pg->db->query("SELECT u.*, um.meta_value AS token FROM users u JOIN usermeta um ON (u.id=um.user_id) WHERE u.username=? AND meta_key='password_reset_token'", $user)->hash;
 
   # redirect to home unless account and activation token suffix exists
   return $c->redirect_to('/') unless defined $u && $u->{token} eq $token;
@@ -76,73 +76,28 @@ sub profile_reset_password_get {
 }
 
 sub profile_reset_password_post {
-  my $self = shift;
+  my $c = shift;
 
   # extract the redirect url and fall back to the index
-  my $url           = $self->param('redirect_to') // '/';
+  my $url           = $c->param('redirect_to') // '/';
 
   # grab reset details
-  my $user          = $self->param('name');
-  my $pass          = $self->param('pass');
-  my $pass_confirm  = $self->param('confirm');
+  my $user          = $c->param('name');
+  my $pass          = $c->param('pass');
+  my $pass_confirm  = $c->param('confirm');
+  my $token         = $c->param('token') // '';
 
   # flash the redirect and previous values for future redirects
-  $self->flash(
+  $c->flash(
     redirect_to => $url,
     values      => { user => $user },
   );
 
-  # lookup the requested account for activation
-  my $u = Canvas::Store::User->search({ username => $user })->first;
-
-  # check for token for if we're not logged on
-  # indicates a "forgot password" invocation
-  my $token;
-
-  unless( $self->profile_can_change_password( $u ) ) {
-    $token = $u->metadata('password_reset_token');
-
-    # redirect unless account and activation token prefix/suffix exists
-    return $self->redirect_to( $url ) unless(
-      defined $u &&
-      defined $token
-    );
+  if ($c->users->account->reset($user, $pass, $pass_confirm, $token)) {
+    $c->flash(page_success => 'Your password has been reset.');
   }
 
-  # build the supplied token and fetch the stored token
-  my $token_supplied = $self->param('token') // '';
-
-  # redirect to same page unless supplied and stored tokens match
-  unless( $token eq $token_supplied ) {
-    $self->flash( page_errors => 'Your token is invalid.' );
-
-    return $self->redirect_to( $self->url_with );
-  };
-
-  # validate passwords have sufficient length
-  if( length $pass < 8 ) {
-    $self->flash( page_errors => 'Your password must be at least 8 characters long.');
-
-    return $self->redirect_to( $self->url_with );
-  }
-
-  # validate passwords match
-  if( $pass ne $pass_confirm ) {
-    $self->flash( page_errors => 'Your passwords don\'t match.' );
-
-    return $self->redirect_to( $self->url_with );
-  };
-
-  # update the password
-  $u->password( $u->hash_password( $pass ) );
-  $u->update;
-
-  # clear token if it exists
-  $u->metadata_clear('password_reset_token');
-
-  $self->flash( page_success => 'Your password has been reset.' );
-
-  $self->redirect_to( $url );
+  $c->redirect_to($url);
 }
 
 sub profile_status_post {
@@ -153,7 +108,7 @@ sub profile_status_post {
 
   my $result = {};
 
-  my $r = $c->pg->db->query("SELECT id FROM canvas_user WHERE username=?", $username);
+  my $r = $c->pg->db->query("SELECT id FROM users WHERE username=?", $username);
 
   $result->{username} = {
     key     => $username,
@@ -181,10 +136,10 @@ sub profile_admin_get {
     my $delay = shift;
 
     # get total count
-    $c->pg->db->query("SELECT COUNT(id) FROM canvas_user" => $delay->begin);
+    $c->pg->db->query("SELECT COUNT(id) FROM users" => $delay->begin);
 
     # get paged items with username and email associated
-    $c->pg->db->query("SELECT id, username, email, status, created FROM canvas_user ORDER BY created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+    $c->pg->db->query("SELECT id, username, email, status, created FROM users ORDER BY created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
   },
   sub {
     my ($delay, $count_err, $count_res, $err, $res) = @_;

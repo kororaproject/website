@@ -56,7 +56,7 @@ sub donate_get {
   $c->render_steps('website/contribute-donate', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT name, amount, EXTRACT(EPOCH FROM created) AS created_epoch FROM canvas_contribution WHERE type='donation' ORDER BY created DESC LIMIT 100" => $delay->begin);
+    $c->pg->db->query("SELECT name, amount, EXTRACT(EPOCH FROM created) AS created_epoch FROM contributions WHERE type='donation' ORDER BY created DESC LIMIT 100" => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
@@ -217,7 +217,7 @@ sub donate_confirm_post {
 
     my $created = Time::Piece->strptime( $pp_donation->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ' );
 
-    my $c->pg->db->query("INSERT INTO canvas_contribution ('type', 'merchant_id', 'transaction_id', 'amount', 'fee', 'name', 'email', 'paypal_raw', 'created') VALUES ('donation', ?, ?, ?, ?, ?, ?, ?, ?)", $pp_donation->{PAYMENTINFO_0_SECUREMERCHANTACCOUNTID}, $pp_donation->{PAYMENTINFO_0_TRANSACTIONID}, $pp_donation->{PAYMENTINFO_0_AMT}, $pp_donation->{PAYMENTINFO_0_FEEAMT}, $name, $email, json_encode($pp_donation), $created);
+    my $c->pg->db->query("INSERT INTO contributions ('type', 'merchant_id', 'transaction_id', 'amount', 'fee', 'name', 'email', 'paypal_raw', 'created') VALUES ('donation', ?, ?, ?, ?, ?, ?, ?, ?)", $pp_donation->{PAYMENTINFO_0_SECUREMERCHANTACCOUNTID}, $pp_donation->{PAYMENTINFO_0_TRANSACTIONID}, $pp_donation->{PAYMENTINFO_0_AMT}, $pp_donation->{PAYMENTINFO_0_FEEAMT}, $name, $email, json_encode($pp_donation), $created);
 
   }
   else {
@@ -242,7 +242,7 @@ sub sponsor_get {
   $c->render_steps('website/contribute-sponsor', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT name, amount, EXTRACT(EPOCH FROM created) AS created_epoch FROM canvas_contribution WHERE type='sponsorship' ORDER BY created DESC LIMIT 100" => $delay->begin);
+    $c->pg->db->query("SELECT name, amount, EXTRACT(EPOCH FROM created) AS created_epoch FROM contributions WHERE type='sponsorship' ORDER BY created DESC LIMIT 100" => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
@@ -410,7 +410,7 @@ sub sponsor_confirm_post {
     #my $created = Time::Piece->strptime( $pp_sponsorship->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ' );
     my $created = gmtime;
 
-    my $c->pg->db->query("INSERT INTO canvas_contribution ('type', 'merchant_id', 'transaction_id', 'amount', 'fee', 'name', 'email', 'paypal_raw', 'created') VALUES ('sponsorship', ?, ?, ?, ?, ?, ?, ?, ?)", $self->session('payerid'), $pp_sponsorship->{PROFILEID}, $self->session('amount'), 0, $name, $email, json_encode($pp_sponsorship), $created);
+    my $c->pg->db->query("INSERT INTO contributions ('type', 'merchant_id', 'transaction_id', 'amount', 'fee', 'name', 'email', 'paypal_raw', 'created') VALUES ('sponsorship', ?, ?, ?, ?, ?, ?, ?, ?)", $self->session('payerid'), $pp_sponsorship->{PROFILEID}, $self->session('amount'), 0, $name, $email, json_encode($pp_sponsorship), $created);
   }
   else {
     $self->flash(page_errors => "Your transaction could not be completed. Nothing has been charged to your account.");

@@ -102,7 +102,7 @@
           <div class="col-sm-12">
             <div class="engage-callout engage-summary engage-<%= $r->{type} %>">
               <div class="row">
-                <div class="col-sm-9">
+                <div class="col-sm-8">
                   <div class="engage-summary-content">
                     <h4 class="engage-summary-title">
                       <a href="<%= url_for('supportengagetypestub', type => $r->{type}, stub => $r->{name}) %>" class="engage-summary-title-link"><%= $r->{title} %> </a>
@@ -117,7 +117,7 @@
                   </div>
 % }
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   <div class="text-right">
                     <a href="<%= url_for('profilename', name => $r->{username}) %>" data-toggle="tooltip" data-original-title="<%= $r->{username} %>"><%== email_gravatar($r->{email}, 24) %></a>
 % foreach my $u (@{$r->{replies}}) {
@@ -125,8 +125,9 @@
                     <a href="<%= url_for('profilename', name => $u->{f1}) %>" data-toggle="tooltip" data-original-title="<%= $u->{f1} %>"><%== email_gravatar($u->{f2}, 24) %></a>
 % }
                   </div>
-                  <div class="post-tags text-right">
-                    <%= pluralise( $r->{reply_count}, 'reply') %>
+                  <div class="engage-summary-meta text-right">
+                    <p class="text-right"><%= $c->posts->format->created_updated($r) %></p>
+                    <p class="text-right"><%= pluralise( $r->{reply_count}, 'reply') %></p>
                   </div>
                 </div>
               </div>

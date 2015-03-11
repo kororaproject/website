@@ -238,7 +238,7 @@ sub register {
 
     return 0 unless $c->users->is_active;
 
-    my $um = $c->pg->db->query("SELECT * FROM canvas_usermeta WHERE meta_key='engage_subscriptions' AND user_id::integer=? AND meta_value::integer=?", $c->auth_user->{id}, $post->{id})->hash;
+    my $um = $c->pg->db->query("SELECT * FROM usermeta WHERE meta_key='engage_subscriptions' AND user_id::integer=? AND meta_value::integer=?", $c->auth_user->{id}, $post->{id})->hash;
 
     # determine if we're subscribed
     return ! defined $um;

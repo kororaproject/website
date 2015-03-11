@@ -54,7 +54,7 @@ sub _tree {
   my $p_id = shift // 0;
   my $depth = shift // 0;
 
-  my $docs = $c->pg->db->query("SELECT id, menu_order, title FROM canvas_post WHERE type='document' AND parent_id=?", $p_id)->hashes;
+  my $docs = $c->pg->db->query("SELECT id, menu_order, title FROM posts WHERE type='document' AND parent_id=?", $p_id)->hashes;
 
   foreach my $d (sort { $a->{menu_order} <=> $b->{menu_order} or $a->{title} cmp $b->{title} } @{$docs}) {
     push @{$t}, { data => $d, depth => $depth };
@@ -79,25 +79,25 @@ sub rebuild_index {
       $order++;
 
       # find hierarchy order
-      my $ho = $db->query("SELECT meta_id FROM canvas_postmeta WHERE post_id=? AND meta_key='hierarchy_order'", $d->{data}{id})->hash;
+      my $ho = $db->query("SELECT meta_id FROM postmeta WHERE post_id=? AND meta_key='hierarchy_order'", $d->{data}{id})->hash;
 
       # create or update
       if ($ho) {
-        $db->query("UPDATE canvas_postmeta SET meta_value=? WHERE post_id=?", $order, $ho->{meta_id});
+        $db->query("UPDATE postmeta SET meta_value=? WHERE post_id=?", $order, $ho->{meta_id});
       }
       else {
-        $db->query("INSERT INTO canvas_postmeta (post_id, meta_key, meta_value) VALUES (?, 'hierarchy_order', ?)", $d->{data}{id}, $order);
+        $db->query("INSERT INTO postmeta (post_id, meta_key, meta_value) VALUES (?, 'hierarchy_order', ?)", $d->{data}{id}, $order);
       }
 
       # find hierarchy depth
-      my $hd = $db->query("SELECT meta_id FROM canvas_postmeta WHERE post_id=? AND meta_key='hierarchy_depth'", $d->{data}{id})->hash;
+      my $hd = $db->query("SELECT meta_id FROM postmeta WHERE post_id=? AND meta_key='hierarchy_depth'", $d->{data}{id})->hash;
 
       # create or update
       if ($hd) {
-        $db->query("UPDATE canvas_postmeta SET meta_value=? WHERE meta_id=?", $d->{depth}, $hd->{meta_id});
+        $db->query("UPDATE postmeta SET meta_value=? WHERE meta_id=?", $d->{depth}, $hd->{meta_id});
       }
       else {
-        $db->query("INSERT INTO canvas_postmeta (post_id, meta_key, meta_value) VALUES (?, 'hierarchy_depth', ?)", $d->{data}{id}, $hd->{depth});
+        $db->query("INSERT INTO postmeta (post_id, meta_key, meta_value) VALUES (?, 'hierarchy_depth', ?)", $d->{data}{id}, $hd->{depth});
       }
     }
 
@@ -131,7 +131,7 @@ sub index {
     my $delay = shift;
 
     # get paged items with username and email associated
-    $c->pg->db->query("SELECT pm.meta_value::integer AS ho, hd.meta_value::integer AS depth, parent_id, name, title, id FROM canvas_post JOIN canvas_postmeta AS pm ON (pm.post_id=canvas_post.id AND pm.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=canvas_post.id AND hd.meta_key='hierarchy_depth') WHERE type='document'  AND status='publish' ORDER BY ho" => $delay->begin);
+    $c->pg->db->query("SELECT pm.meta_value::integer AS ho, hd.meta_value::integer AS depth, parent_id, name, title, id FROM posts JOIN postmeta AS pm ON (pm.post_id=posts.id AND pm.meta_key='hierarchy_order') JOIN postmeta AS hd ON (hd.post_id=posts.id AND hd.meta_key='hierarchy_depth') WHERE type='document'  AND status='publish' ORDER BY ho" => $delay->begin);
   },
   sub {
     my ($delay, $err, $res) = @_;
@@ -147,7 +147,7 @@ sub document_detail_get {
   $c->render_steps('website/document-detail', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='document' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.type='document' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
@@ -182,7 +182,7 @@ sub document_edit_get {
   $c->render_steps('website/document-edit', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.type='document' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.type='document' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
   }, sub {
     my ($delay, $err, $res) = @_;
 
@@ -216,7 +216,7 @@ sub document_post {
 
   # edit existing post
   if ($stub ne '' && $c->document->can_edit) {
-    my $p = $c->pg->db->query("SELECT p.id, title, excerpt, content, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, author_id, username, email FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) WHERE type='document' AND name=?", $stub)->hash;
+    my $p = $c->pg->db->query("SELECT p.id, title, excerpt, content, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, author_id, username, email FROM posts p JOIN users u ON (u.id=p.author_id) WHERE type='document' AND name=?", $stub)->hash;
 
     # update author if changed
     if ($author ne $p->{username}) {
@@ -231,10 +231,10 @@ sub document_post {
     my $db = $c->pg->db;
     my $tx = $db->begin;
 
-    my $r = $db->query("UPDATE canvas_post SET status=?, title=?, excerpt=?, content=?, author_id=?, parent_id=?, menu_order=?, created=?, updated=? WHERE type='document' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $parent_id, $order, $created, $now, $stub);
+    my $r = $db->query("UPDATE posts SET status=?, title=?, excerpt=?, content=?, author_id=?, parent_id=?, menu_order=?, created=?, updated=? WHERE type='document' AND name=?", $status, $title, $excerpt, $content, $p->{author_id}, $parent_id, $order, $created, $now, $stub);
 
     # update tags
-    my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM canvas_post p LEFT JOIN canvas_post_tag pt ON (pt.post_id=p.id) LEFT JOIN canvas_tag t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
+    my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM posts p LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
     say Dumper "FOO", $tt;
     my @tags_old = $tt->{tags};
     my @tags_new = @{$c->sanitise_taglist($tag_list)};
@@ -245,21 +245,21 @@ sub document_post {
     # add tags
     foreach my $ta ( grep( ! defined $to{$_}, @tags_new ) ) {
       # find or create tag
-      my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $ta)->hash;
+      my $t = $db->query("SELECT id FROM tags WHERE name=?", $ta)->hash;
       unless ($t) {
-        $t = { id => $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $ta)->array->[0] };
+        $t = { id => $db->query("INSERT INTO tags (name) VALUES (?) RETURNING ID", $ta)->array->[0] };
       }
 
       # find or create post/tag reference
-      my $pt = $db->query("SELECT * FROM canvas_post_tag WHERE post_id=? AND tag_id=?", $p->{id}, $t->{id})->hash;
+      my $pt = $db->query("SELECT * FROM post_tag WHERE post_id=? AND tag_id=?", $p->{id}, $t->{id})->hash;
       unless ($pt) {
-        $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?)", $p->{id}, $t->{id});
+        $db->query("INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)", $p->{id}, $t->{id});
       }
     }
 
     # remove tags
     foreach my $td ( grep( ! defined $tn{$_}, @tags_old ) ) {
-      $db->query("DELETE FROM canvas_post_tag WHERE tag_id IN (SELECT id FROM canvas_tag WHERE name=?) AND post_id=?", $td, $p->{id});
+      $db->query("DELETE FROM post_tag WHERE tag_id IN (SELECT id FROM tags WHERE name=?) AND post_id=?", $td, $p->{id});
     }
 
     $tx->commit;
@@ -272,24 +272,24 @@ sub document_post {
     my $tx = $db->begin;
 
     # check for existing stubs and append the ID + 1 of the last
-    my $e = $db->query("SELECT id FROM canvas_post WHERE type='document' AND name=? ORDER BY id DESC LIMIT 1", $stub)->array;
+    my $e = $db->query("SELECT id FROM posts WHERE type='document' AND name=? ORDER BY id DESC LIMIT 1", $stub)->array;
     $stub .= '-' . ($e->[0] + 1) if $e;
 
     $created = $now;
 
-    my $post_id = $db->query("INSERT INTO canvas_post (type, name, status, title, excerpt, content, author_id, parent_id, menu_order, created, updated) VALUES ('document', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID", $stub, $status, $title, $excerpt, $content, 1, $parent_id, $order, $created, $now)->array->[0];
+    my $post_id = $db->query("INSERT INTO posts (type, name, status, title, excerpt, content, author_id, parent_id, menu_order, created, updated) VALUES ('document', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID", $stub, $status, $title, $excerpt, $content, 1, $parent_id, $order, $created, $now)->array->[0];
 
     # create the tags
     foreach my $tag (@{$c->sanitise_taglist}) {
       # find or create tag
-      my $t = $db->query("SELECT id FROM canvas_tag WHERE name=?", $tag)->hash;
+      my $t = $db->query("SELECT id FROM tags WHERE name=?", $tag)->hash;
 
       unless ($t) {
-        $t->{id} = $db->query("INSERT INTO canvas_tag (name) VALUES (?) RETURNING ID", $tag)->array->[0];
+        $t->{id} = $db->query("INSERT INTO tags (name) VALUES (?) RETURNING ID", $tag)->array->[0];
       }
 
       # insert the link
-      my $pt = $db->query("INSERT INTO canvas_post_tag (post_id, tag_id) VALUES (?, ?) ", $post_id, $t->{id});
+      my $pt = $db->query("INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?) ", $post_id, $t->{id});
     }
 
     $tx->commit;
@@ -311,7 +311,7 @@ sub document_delete_any {
   # only allow authenticated users
   return $c->redirect_to('supportdocumentation') unless $c->document->can_delete;
 
-  $c->pg->db->query("DELETE FROM canvas_post WHERE name=? AND type='document'");
+  $c->pg->db->query("DELETE FROM posts WHERE name=? AND type='document'");
 
   rebuild_index($c);
 
@@ -333,10 +333,10 @@ sub document_admin_get {
     my $delay = shift;
 
     # get total count
-    $c->pg->db->query("SELECT COUNT(id) FROM canvas_post WHERE type='document'" => $delay->begin);
+    $c->pg->db->query("SELECT COUNT(id) FROM posts WHERE type='document'" => $delay->begin);
 
     # get paged items with username and email associated
-    $c->pg->db->query("SELECT name, p.status, title, excerpt, EXTRACT(EPOCH FROM p.created), EXTRACT(EPOCH FROM p.updated) AS updated_epoch, username, email, pm.meta_value::integer AS ho, hd.meta_value::integer AS depth FROM canvas_post p JOIN canvas_user u ON (u.id=p.author_id) JOIN canvas_postmeta AS pm ON (pm.post_id=p.id AND pm.meta_key='hierarchy_order') JOIN canvas_postmeta AS hd ON (hd.post_id=p.id AND hd.meta_key='hierarchy_depth') WHERE p.type='document' ORDER BY ho, p.title, p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
+    $c->pg->db->query("SELECT name, p.status, title, excerpt, EXTRACT(EPOCH FROM p.created), EXTRACT(EPOCH FROM p.updated) AS updated_epoch, username, email, pm.meta_value::integer AS ho, hd.meta_value::integer AS depth FROM posts p JOIN users u ON (u.id=p.author_id) JOIN postmeta AS pm ON (pm.post_id=p.id AND pm.meta_key='hierarchy_order') JOIN postmeta AS hd ON (hd.post_id=p.id AND hd.meta_key='hierarchy_depth') WHERE p.type='document' ORDER BY ho, p.title, p.created DESC LIMIT ? OFFSET ?" => ($page_size, ($page-1) * $page_size) => $delay->begin);
   },
   sub {
     my ($delay, $err, $count_res, $err_res, $res) = @_;

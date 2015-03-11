@@ -15,16 +15,7 @@
           <div id="login" class="tab-pane active">
 
             <div class="row">
-              <div class="col-sm-12">
-                <div class="oauth-providers">
-                  <a class="btn btn-default btn-github"><i class="fa fa-fw fa-github"></i> Log in with GitHub</a>
-                  <a class="btn btn-default btn-google-plus"><i class="fa fa-fw fa-google"></i> Log in with Google</a>
-                  <a class="btn btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i> Log in with Twitter</a>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-sm-12">
+              <div class="col-sm-6">
                 <form action="/authenticate" method="post" class="form-signin" role="form">
                   <input type="hidden" name="rt" value="<%= ub64_encode(url_for('current')) %>">
                   <div class="form-group">
@@ -40,9 +31,16 @@
                     </div>
                   </div>
                   <div>
-                    <button class="btn btn-success" type="submit">Sign In</button>
+                    <button class="btn btn-success" type="submit">Log In</button>
                   </div>
                 </form>
+              </div>
+              <div class="col-sm-6">
+                <div class="oauth-providers">
+                  <a href="<%= $c->oauth2->auth_url(github => {scope => "user:email", redirect_uri => url_for('oauthprovider', provider => 'github')->to_abs}) %>" class="btn btn-default btn-github"><i class="fa fa-fw fa-github"></i> Log in with GitHub</a>
+                  <a class="btn btn-default btn-google-plus hide"><i class="fa fa-fw fa-google"></i> Log in with Google</a>
+                  <a class="btn btn-default btn-twitter hide"><i class="fa fa-fw fa-twitter"></i> Log in with Twitter</a>
+                </div>
               </div>
             </div>
           </div>
@@ -53,8 +51,14 @@
               <input type="hidden" name="rt" value="<%= ub64_encode(url_for('current')) %>">
               <div class="form-group">
                 <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
+                  <input type="text" name="username" class="form-control" placeholder="">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
-                  <input type="email" name="email" class="form-control" placeholder="you@example.org">
+                  <input type="email" name="email" class="form-control" placeholder="">
                 </div>
               </div>
               <div class="text-right">

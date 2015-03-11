@@ -54,11 +54,11 @@
                 </div>
                 <div class="col-sm-6">
                   <div class="engage-detail-footer">
-                    <div class="engage-detail-footer-metadata">
+                    <div class="engage-detail-footer-meta">
                       <p class="text-right">asked <%= $c->users->format_time($response->{created_epoch}) %></p>
                       <p class="text-right">by <%= $response->{username} %></p>
                     </div>
-                    <div class="engage-detail-footer-metadata">
+                    <div class="engage-detail-footer-meta">
                       <%== email_gravatar($response->{email}, 24) %>
                     </div>
 
@@ -83,11 +83,11 @@
                     <span class="label label-default">accepted</span>
                   </div>
                   <div class="engage-detail-footer">
-                    <div class="engage-detail-footer-metadata">
+                    <div class="engage-detail-footer-meta">
                       <p class="text-right">replied <%= $c->users->format_time($accepted->{created_epoch}) %></p>
                       <p class="text-right">by <%= $accepted->{username} %></p>
                     </div>
-                    <div class="engage-detail-footer-metadata">
+                    <div class="engage-detail-footer-meta">
                       <%== email_gravatar($accepted->{email}, 24) %>
                     </div>
 
@@ -126,11 +126,11 @@
                   </div>
 %     }
                   <div class="engage-detail-footer">
-                    <div class="engage-detail-footer-metadata">
+                    <div class="engage-detail-footer-meta">
                       <p class="text-right">replied <%= $c->users->format_time($r->{created_epoch}) %></p>
                       <p class="text-right">by <%= $r->{username} %></p>
                     </div>
-                    <div class="engage-detail-footer-metadata">
+                    <div class="engage-detail-footer-meta">
                       <%== email_gravatar($r->{email}, 24) %>
                     </div>
 
