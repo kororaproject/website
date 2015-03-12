@@ -170,7 +170,7 @@ sub register {
 
     if (@caps) {
       $template .= qq(
-        <div class="engage-detail-footer-metadata">
+        <div class="engage-detail-footer-meta">
           <div class="dropdown">
             <button class="btn btn-default btn-engage-admin dropdown-toggle" type="button" id="post-detail-admin-dropdown" data-toggle="dropdown"><i class="fa fa-fw fa-cogs"></i></button>
             <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="post-detail-admin-dropdown"> );

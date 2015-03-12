@@ -285,14 +285,14 @@ sub engage_post_add_post {
 
 sub engage_post_detail_get {
   my $c = shift;
+
+  my $page      = $c->param('page')   // 1;
+  my $page_size = 20;
   my $stub = $c->param('stub');
   my $type = $c->param('type');
 
   # could have flashed 'content' from an attempted reply
   my $content = $c->flash('content') // '';
-
-  my $page_size = 10;
-  my $page = ($c->param('page') // 1);
 
   $c->render_steps('website/engage-detail', sub {
     my $delay = shift;
@@ -312,7 +312,7 @@ sub engage_post_detail_get {
 
     $c->pg->db->query("SELECT COUNT(id) FROM posts WHERE type='reply' AND parent_id=?" => ($post->{id}) => $delay->begin);
 
-    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) WHERE p.type='reply' AND p.parent_id=? GROUP BY p.id, u.username, u.email ORDER BY created" => ($post->{id}) => $delay->begin);
+    $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) WHERE p.type='reply' AND p.parent_id=? GROUP BY p.id, u.username, u.email ORDER BY created LIMIT ? OFFSET ?" => ($post->{id}, $page_size, ($page_size * ($page-1))) => $delay->begin);
   },
   sub {
     my ($delay, $a_err, $a_res, $rc_err, $rc_res, $r_err, $r_res) = @_;
