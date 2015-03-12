@@ -130,6 +130,7 @@ body {
   font-weight: 300;
   font-size: 16px;
   line-height: 24px;
+  min-width: 350px;
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
@@ -411,6 +412,10 @@ blockquote p {
   height: 50px;
 }
 
+.navbar-default .navbar-toggle {
+  border-color: transparent;
+}
+
 .navbar-toggle {
   padding: 4px 8px;
   border-radius: 2px;
@@ -419,6 +424,11 @@ blockquote p {
 
 .navbar-toggle:hover {
   color: #666;
+}
+
+.navbar-default .navbar-toggle:focus,
+.navbar-default .navbar-toggle:hover {
+  background-color: #3276b1;
 }
 
 .brand .title {
@@ -438,15 +448,18 @@ blockquote p {
 .error-page-brand .title,
 .navbar-brand .title {
   display: inline-block;
-  margin: 6px 0;
-  font-size: 32px;
   color: #fff;
+  font-size: 32px;
+  font-weight: 400;
+  margin: 6px 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, .3);
 }
 
 .error-page-brand .title-dark,
 .navbar-brand .title-dark {
-  color: #ccc;
+  color: #fff;
+  font-size: 31px;
+  font-weight: 300;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, .3);
 }
 
@@ -1541,6 +1554,9 @@ footer .copyright {
   line-height: 24px;
 }
 
+.copyright-left  { text-align: left; }
+.copyright-right { text-align: right; }
+
 footer .copyright > a,
 footer .copyright > a:hover,
 footer .copyright > a:active,
@@ -1709,6 +1725,8 @@ footer a:visited {
   .xhidden-xs {
     display: none;
   }
+
+  .copyright-left, .copyright-right { text-align: center; }
 }
 
 /* sm */
@@ -1726,7 +1744,7 @@ footer a:visited {
   }
 
   #register {
-    margin: 12px 0 0 0;
+    margin: 12px 8px 0 0;
   }
 
   .col-img-leader {
@@ -1743,6 +1761,8 @@ footer a:visited {
   .forum-child {
     padding-left: 16px;
   }
+
+  .copyright-left, .copyright-right { text-align: center; }
 }
 /* md */
 @media all and (min-width: 992px) {
@@ -1761,6 +1781,9 @@ footer a:visited {
     padding-left: 24px;
     border-left: 2px solid #428bca;
   }
+
+  .copyright-left  { text-align: left; }
+  .copyright-right { text-align: right; }
 }
 /* lg */
 @media all and (min-width: 1200px) {
@@ -1768,9 +1791,12 @@ footer a:visited {
     height: 32px;
   }
 
-  .h  .forum-child {
+  .h .forum-child {
     padding-left: 32px;
   }
+
+  .copyright-left  { text-align: left; }
+  .copyright-right { text-align: right; }
 }
 
 
