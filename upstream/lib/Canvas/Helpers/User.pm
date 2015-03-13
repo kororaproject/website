@@ -538,13 +538,16 @@ sub register {
     my ($self, $time) = (shift, shift);
 
     my %args = @_>1 ? @_ : ref $_[0] eq 'HASH' ? %{$_[0]} : ();
-
     $args{format} //= 'distance';
+
+    $time = Time::Piece->strptime($time, '%s') unless ref($time) eq 'Time::Piece';
 
     if ($args{format} eq 'distance') {
       return $app->distance_of_time_in_words($time); 
     }
-
+    else {
+      return $time->strftime($args{format});
+    }
   });
 
   $app->helper('users.oauth.link' => sub {
