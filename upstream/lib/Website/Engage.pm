@@ -245,7 +245,7 @@ sub engage_post_add_post {
   my $created = $now;
 
   # create the post
-  my $post_id = $db->query('INSERT INTO posts (type, name, status, title, content, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', $type, $stub, $status, $title, $content, $c->auth_user->{id}, $created, $now)->array->[0];
+  my $post_id = $db->query('INSERT INTO posts (type, name, status, title, content, author_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID', $type, $stub, $status, $title, $content, $c->auth_user->{id}, $created, $now)->array->[0];
 
   # create the tags
   foreach my $tag (@{$tags}) {
