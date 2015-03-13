@@ -189,7 +189,7 @@ sub activate_get {
     # redirect to home unless account and activation token suffix exists
     return $c->redirect_to('/') unless $u && $token;
 
-    $c->stash(username => $username, email => $u->{email});
+    $c->stash(username => $username, email => $u->{email}, realname => '');
   }
   elsif ($provider eq 'github' and (my $github = $oauth->{$provider})) {
     $c->stash(
