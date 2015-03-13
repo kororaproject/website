@@ -403,7 +403,6 @@ function RegisterController($scope, $http) {
 
   $scope.canRegister = function() {
     return $scope.usernameIsValid() &&
-           $scope.emailIsValid()    &&
            $scope.passwordIsValid() &&
            $scope.verifyIsValid();
   };
