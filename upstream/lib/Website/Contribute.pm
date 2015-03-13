@@ -170,40 +170,40 @@ sub donate_confirm_get {
 }
 
 sub donate_confirm_post {
-  my $self = shift;
+  my $c = shift;
 
-  my $token   = $self->param('token');
-  my $payerid = $self->param('payerid');
-  my $amount  = $self->param('amount');
-  my $name    = $self->param('name');
-  my $email   = $self->param('email');
+  my $token   = $c->param('token');
+  my $payerid = $c->param('payerid');
+  my $amount  = $c->param('amount');
+  my $name    = $c->param('name');
+  my $email   = $c->param('email');
 
   # validate the token
   unless( length $token == 20 ) {
-    $self->flash(page_errors => "Invalid TOKEN supplied by PayPal.");
-    return $self->redirect_to('contributedonate');
+    $c->flash(page_errors => "Invalid TOKEN supplied by PayPal.");
+    return $c->redirect_to('contributedonate');
   }
 
   # validate the payerid
   unless( $payerid =~ /[A-Za-z0-9]{13}/ ) {
-    $self->flash(page_errors => "Invalid PAYER ID supplied by PayPal.");
-    return $self->redirect_to('contributedonate');
+    $c->flash(page_errors => "Invalid PAYER ID supplied by PayPal.");
+    return $c->redirect_to('contributedonate');
   }
 
   # retrieve the PayPal transaction information from the cache
   # and rebuild as required
-  my $pp_context = $self->cache->get('pp_context');
+  my $pp_context = $c->cache->get('pp_context');
 
   unless( ref $pp_context eq 'Canvas::Util::PayPal' ) {
-    $self->app->log->debug('Rebuilding PayPal context ...');
+    $c->app->log->debug('Rebuilding PayPal context ...');
     $pp_context = Canvas::Util::PayPal->new(
-      caller_user      => $self->config->{paypal}{caller_user},
-      caller_password  => $self->config->{paypal}{caller_password},
-      caller_signature => $self->config->{paypal}{caller_signature},
-      mode             => $self->config->{paypal}{mode},
+      caller_user      => $c->config->{paypal}{caller_user},
+      caller_password  => $c->config->{paypal}{caller_password},
+      caller_signature => $c->config->{paypal}{caller_signature},
+      mode             => $c->config->{paypal}{mode},
     );
 
-    $self->cache->set(pp_context => $pp_context);
+    $c->cache->set(pp_context => $pp_context);
   };
 
   my $pp_donation = $pp_context->donate_commit( $token, $payerid, $amount );
@@ -212,8 +212,8 @@ sub donate_confirm_post {
   if( lc $pp_donation->{ACK} eq 'success' &&
       lc $pp_donation->{PAYMENTINFO_0_ACK} eq 'success' ) {
     # reset flash values
-    #$self->flash( values => {} );
-    $self->flash(page_success => "Thank you for your donation. Korora will only get better with your contribution.");
+    #$c->flash( values => {} );
+    $c->flash(page_success => "Thank you for your donation. Korora will only get better with your contribution.");
 
     my $created = Time::Piece->strptime( $pp_donation->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ' );
 
@@ -221,13 +221,13 @@ sub donate_confirm_post {
 
   }
   else {
-    $self->flash(page_errors => "Your transaction could not be completed. Nothing has been charged to your account.");
+    $c->flash(page_errors => "Your transaction could not be completed. Nothing has been charged to your account.");
 
     # TODO: remove
     say Dumper $pp_donation;
   }
 
-  $self->redirect_to('contributedonate');
+  $c->redirect_to('contributedonate');
 }
 
 sub sponsor_get {
@@ -362,40 +362,40 @@ sub sponsor_confirm_get {
 }
 
 sub sponsor_confirm_post {
-  my $self = shift;
+  my $c = shift;
 
-  my $token   = $self->param('token');
-  my $payerid = $self->param('payerid');
-  my $amount  = $self->param('amount');
-  my $name    = $self->param('name');
-  my $email   = $self->param('email');
+  my $token   = $c->param('token');
+  my $payerid = $c->param('payerid');
+  my $amount  = $c->param('amount');
+  my $name    = $c->param('name');
+  my $email   = $c->param('email');
 
   # validate the token
   unless( length $token == 20 ) {
-    $self->flash(page_errors => "Invalid TOKEN supplied by PayPal.");
-    return $self->redirect_to('contributesponsor');
+    $c->flash(page_errors => "Invalid TOKEN supplied by PayPal.");
+    return $c->redirect_to('contributesponsor');
   }
 
   # validate the payerid
   unless( $payerid =~ /[A-Za-z0-9]{13}/ ) {
-    $self->flash(page_errors => "Invalid PAYER ID supplied by PayPal.");
-    return $self->redirect_to('contributesponsor');
+    $c->flash(page_errors => "Invalid PAYER ID supplied by PayPal.");
+    return $c->redirect_to('contributesponsor');
   }
 
   # retrieve the PayPal transaction information from the cache
   # and rebuild as required
-  my $pp_context = $self->cache->get('pp_context');
+  my $pp_context = $c->cache->get('pp_context');
 
   unless( ref $pp_context eq 'Canvas::Util::PayPal' ) {
-    $self->app->log->debug('Rebuilding PayPal context ...');
+    $c->app->log->debug('Rebuilding PayPal context ...');
     $pp_context = Canvas::Util::PayPal->new(
-      caller_user      => $self->config->{paypal}{caller_user},
-      caller_password  => $self->config->{paypal}{caller_password},
-      caller_signature => $self->config->{paypal}{caller_signature},
-      mode             => $self->config->{paypal}{mode},
+      caller_user      => $c->config->{paypal}{caller_user},
+      caller_password  => $c->config->{paypal}{caller_password},
+      caller_signature => $c->config->{paypal}{caller_signature},
+      mode             => $c->config->{paypal}{mode},
     );
 
-    $self->cache->set(pp_context => $pp_context);
+    $c->cache->set(pp_context => $pp_context);
   };
 
   my $pp_sponsorship = $pp_context->sponsor_commit( $token, $payerid, $amount );
@@ -404,22 +404,22 @@ sub sponsor_confirm_post {
   if( lc $pp_sponsorship->{ACK} eq 'success' &&
       lc $pp_sponsorship->{PROFILESTATUS} eq 'activeprofile' ) {
     # reset flash values
-    #$self->flash( values => {} );
-    $self->flash(page_success => "Thank you for your sponsorship. Korora will only get better with your contribution. We will follow up with you shortly.");
+    #$c->flash( values => {} );
+    $c->flash(page_success => "Thank you for your sponsorship. Korora will only get better with your contribution. We will follow up with you shortly.");
 
     #my $created = Time::Piece->strptime( $pp_sponsorship->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ' );
     my $created = gmtime;
 
-    my $c->pg->db->query("INSERT INTO contributions ('type', 'merchant_id', 'transaction_id', 'amount', 'fee', 'name', 'email', 'paypal_raw', 'created') VALUES ('sponsorship', ?, ?, ?, ?, ?, ?, ?, ?)", $self->session('payerid'), $pp_sponsorship->{PROFILEID}, $self->session('amount'), 0, $name, $email, json_encode($pp_sponsorship), $created);
+    my $c->pg->db->query("INSERT INTO contributions ('type', 'merchant_id', 'transaction_id', 'amount', 'fee', 'name', 'email', 'paypal_raw', 'created') VALUES ('sponsorship', ?, ?, ?, ?, ?, ?, ?, ?)", $c->session('payerid'), $pp_sponsorship->{PROFILEID}, $c->session('amount'), 0, $name, $email, json_encode($pp_sponsorship), $created);
   }
   else {
-    $self->flash(page_errors => "Your transaction could not be completed. Nothing has been charged to your account.");
+    $c->flash(page_errors => "Your transaction could not be completed. Nothing has been charged to your account.");
 
     # TODO: remove
     say Dumper $pp_sponsorship;
   }
 
-  $self->redirect_to('contributesponsor');
+  $c->redirect_to('contributesponsor');
 }
 
 1;
