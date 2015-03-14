@@ -200,8 +200,7 @@ sub activate_get {
     );
   }
   else {
-
-
+    return $c->redirect_to('/');
   }
 
   my $error = $c->flash('error') // { code => 0, message => '' };
