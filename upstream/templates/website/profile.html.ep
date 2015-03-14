@@ -33,7 +33,14 @@
 % if ($c->profile->can_change_password($user)) {
             <div class="profile-toolbox">
               <a href="" class="btn btn-default" data-toggle="modal" data-target="#modalChangePassword"><i class="fa fa-fw fa-lock"></i> Change Password</a>
+
+%   if ($c->profile->oauth->has_link('github')) {
+              <span><i class="fa fa-fw fa-github"></i> Linked: <%= join ',', @{$c->profile->oauth->linked_account('github')} %></span>
+
+%   } else {
               <a href="<%= $c->oauth2->auth_url(github => {scope => "user:email", redirect_uri => url_for('oauthprovider', provider => 'github')->to_abs}) %>" class="btn btn-default btn-github"><i class="fa fa-fw fa-github"></i> Link with GitHub</a>
+%   }
+
             </div>
 % }
           </div>

@@ -1513,7 +1513,9 @@ h4.step {
   text-align: center;
 }
 
-.profile-toolbox > .btn {
+.profile-toolbox > .btn,
+.profile-toolbox > span {
+  font-size: 14px;
   margin-bottom: 8px;
   min-width: 160px;
 }

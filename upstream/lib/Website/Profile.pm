@@ -52,6 +52,8 @@ sub profile_get {
 
     my $u = $res->hash;
 
+    say Dumper $c->auth_user;
+
     $delay->emit(redirect => '/') unless defined $u;
 
     $c->stash(user => $u);

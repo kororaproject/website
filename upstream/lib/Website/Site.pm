@@ -33,8 +33,6 @@ use Time::HiRes qw(gettimeofday);
 #
 # LOCAL INCLUDES
 #
-use Canvas::Store::User;
-use Canvas::Store::UserMeta;
 
 #
 # controller handlers

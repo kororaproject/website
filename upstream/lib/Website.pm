@@ -43,7 +43,6 @@ use Time::Piece;
 #
 # LOCAL INCLUDES
 #
-use Canvas::Store::User;
 use Canvas::Util::PayPal;
 
 #
