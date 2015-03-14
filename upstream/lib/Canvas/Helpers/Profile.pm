@@ -22,12 +22,24 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app) = @_;
 
-  $app->helper('profile.oauth.can_link' => sub {
+  $app->helper('profile.oauth.linked_account' => sub {
+    my ($c, $provider) = @_;
+
+    return undef unless $c->users->is_active($c->auth_user);
+
+    my $op = sprintf 'oauth_%s', $provider;
+
+    return $c->auth_user->{meta}{$op};
+  });
+
+  $app->helper('profile.oauth.has_link' => sub {
     my ($c, $provider) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);
 
-    return 1 if $c->users->is_admin($c->auth_user);;
+    my $op = sprintf 'oauth_%s', $provider;
+
+    return 1 if exists $c->auth_user->{meta}{$op};
 
     return 0;
   });
