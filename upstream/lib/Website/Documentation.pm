@@ -235,7 +235,6 @@ sub document_post {
 
     # update tags
     my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM posts p LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
-    say Dumper "FOO", $tt;
     my @tags_old = $tt->{tags};
     my @tags_new = @{$c->sanitise_taglist($tag_list)};
 

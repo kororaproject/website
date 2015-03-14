@@ -104,7 +104,6 @@ sub profile_status_post {
   my $c = shift;
 
   my $username = $c->param('name')   // '';
-  my $email    = $c->param('email')  // '';
 
   my $result = {};
 
@@ -114,8 +113,6 @@ sub profile_status_post {
     key     => $username,
     status  => $r->rows,
   };
-
-  say Dumper $result;
 
   $c->render(json => $result);
 }

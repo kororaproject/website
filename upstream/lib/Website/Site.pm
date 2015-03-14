@@ -108,8 +108,8 @@ sub oauth {
 
       # if auth'd then link oauth with existing account
       if ($c->users->is_active) {
-        say Dumper "LINKING";
         $c->users->oauth->link($provider, $data);
+        return $c->redirect_to($rt_url);
       }
       # else attempt auth
       else {

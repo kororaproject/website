@@ -31,8 +31,9 @@
               <p class="profile-subtitle-meta text-center">Joined on <br/><%= $user->{created} %></p>
             </div>
 % if ($c->profile->can_change_password($user)) {
-            <div class="text-center">
-              <a href="" class="btn btn-default" data-toggle="modal" data-target="#modalChangePassword">Change Password</a>
+            <div class="profile-toolbox">
+              <a href="" class="btn btn-default" data-toggle="modal" data-target="#modalChangePassword"><i class="fa fa-fw fa-lock"></i> Change Password</a>
+              <a href="<%= $c->oauth2->auth_url(github => {scope => "user:email", redirect_uri => url_for('oauthprovider', provider => 'github')->to_abs}) %>" class="btn btn-default btn-github"><i class="fa fa-fw fa-github"></i> Link with GitHub</a>
             </div>
 % }
           </div>

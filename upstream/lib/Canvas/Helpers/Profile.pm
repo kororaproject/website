@@ -22,6 +22,16 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app) = @_;
 
+  $app->helper('profile.oauth.can_link' => sub {
+    my ($c, $provider) = @_;
+
+    return 0 unless $c->users->is_active($c->auth_user);
+
+    return 1 if $c->users->is_admin($c->auth_user);;
+
+    return 0;
+  });
+
   $app->helper('profile.can_change_password' => sub {
     my ($c, $user) = @_;
 

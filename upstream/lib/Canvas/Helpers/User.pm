@@ -565,9 +565,17 @@ sub register {
 
     # check for duplicates
     unless (grep {$_->{meta_value} eq $mv} @{$op}) {
-      say Dumper "REALLY LINKING";
+      # look for existing link
+      my $found = $c->pg->db->query("SELECT meta_value FROM usermeta WHERE user_id=? AND meta_key=? AND meta_value=?", $c->auth_user->{id}, $mk, $mv)->hash;
 
-      $c->pg->db->query("INSERT INTO usermeta (user_id,meta_key,meta_value) VALUES (?,?,?)", $c->auth_user->{id}, $mk, $mv);
+      # insert if not found
+      if ($found) {
+        $c->flash(page_errors => 'Profile already registered with OAuth provider account.');
+      }
+      else {
+        $c->flash(page_info => 'Profile registered with OAuth provider account.');
+        $c->pg->db->query("INSERT INTO usermeta (user_id,meta_key,meta_value) VALUES (?,?,?)", $c->auth_user->{id}, $mk, $mv);
+      }
     };
   });
 }

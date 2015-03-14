@@ -1509,6 +1509,15 @@ h4.step {
   line-height: 16px;
 }
 
+.profile-toolbox {
+  text-align: center;
+}
+
+.profile-toolbox > .btn {
+  margin-bottom: 8px;
+  min-width: 160px;
+}
+
 /*
 ** FOOTER
 */
