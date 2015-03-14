@@ -371,7 +371,7 @@ sub engage_post_edit_post {
   my $stub = $c->param('stub');
   my $type = $c->param('type');
 
-  my $p = $c->pg->db->query("SELECT * FROM posts WHERE type=? AND name=? LIMIT 1", $type, $stub)->hash;
+  my $p = $c->pg->db->query("SELECT * FROM posts WHERE type=? AND name=? LIMIT 1", $type, $stub)->expand->hash;
 
   # check we found the post
   return $c->redirect_to('/support/engage') unless defined $p;
@@ -387,7 +387,10 @@ sub engage_post_edit_post {
   my $db = $c->pg->db;
   my $tx = $db->begin;
 
-  $db->query("UPDATE posts SET status=?, title=?, content=?, updated=? WHERE id=?", $status, $title, $content, $now, $p->{id});
+  my $meta = $p->{meta};
+  $meta->{updated} = $c->auth_user->{id};
+
+  $db->query("UPDATE posts SET status=?,meta=?::jsonb,title=?,content=?,updated=? WHERE id=?", $status, {json => $meta}, $title, $content, $now, $p->{id});
 
   # update tags
   my $tt = $db->query("SELECT ARRAY_AGG(t.name) AS tags FROM posts p LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.id=? GROUP BY p.id", $p->{id})->hash;
@@ -610,12 +613,26 @@ sub engage_reply_edit_post {
     return $c->redirect_to( $c->url_with );
   }
 
-  my $r = $c->pg->db->query("SELECT * FROM posts WHERE type='reply' AND id=? LIMIT 1", $id)->hash;
+  my $r = $c->pg->db->query("SELECT * FROM posts WHERE type='reply' AND id=? LIMIT 1", $id)->expand->hash;
 
   # ensure we have edit capabilities
   return $c->redirect_to( $redirect_url ) unless $c->engage->can_edit( $r );
 
-  $c->pg->db->query("UPDATE posts SET content=? WHERE id=?", $content, $id);
+  my $now = gmtime;
+
+  my $db = $c->pg->db;
+  my $tx = $db->begin;
+
+  my $meta = $r->{meta};
+  $meta->{updated} = $c->auth_user->{id};
+
+  # update the reply
+  $db->query("UPDATE posts SET content=?,meta=?::jsonb,updated=? WHERE id=?", $content, {json => $meta},$now, $id);
+
+  # update the parent timestamp
+  $db->query("UPDATE posts SET updated=? WHERE id=?", $now, $r->{parent_id});
+
+  $tx->commit;
 
   # redirect to the detail
   $c->redirect_to($redirect_url);
