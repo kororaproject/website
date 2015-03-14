@@ -493,7 +493,7 @@ sub engage_reply_post {
   my $reply_id = $db->query("INSERT INTO posts (type, name, content, author_id, created, updated, parent_id) VALUES ('reply', ?, ?, ?, ?, ?, ?) RETURNING ID", $stub, $content, $c->auth_user->{id}, $created, $now, $id)->array->[0];
 
   # TODO: optimise with an increment
-  $db->query("UPDATE posts SET reply_count=reply_count+1,updated=current_timestamp WHERE id=?", $p->{id});
+  $db->query("UPDATE posts SET reply_count=reply_count+1,updated=? WHERE id=?", $now, $p->{id});
 
   # auto-subscribe participants (engage_subscriptions)
   my $s = $db->query("SELECT meta_id FROM usermeta WHERE user_id=? AND meta_key='engage_subscriptions' AND meta_value=?", $c->auth_user->{id}, $p->{id})->hash;
