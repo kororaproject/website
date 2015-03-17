@@ -86,7 +86,7 @@ sub register {
     return 0;
   });
 
-  $app->helper('profile.user_can_delete' => sub {
+  $app->helper('profile.can_delete' => sub {
     my ($c, $user) = @_;
 
     return 0 unless $c->users->is_active($c->auth_user);

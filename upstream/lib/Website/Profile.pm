@@ -123,10 +123,7 @@ sub profile_admin_get {
   my $c = shift;
 
   # only allow authenticated and authorised users
-  return $c->redirect_to('/') unless (
-    $c->profile->can_add ||
-    $c->profile->can_delete
-  );
+  return $c->redirect_to('/') unless $c->profile->can_add || $c->profile->can_delete;
 
   my $page_size = 100;
   my $page = ($c->param('page') // 1);
