@@ -215,9 +215,9 @@ sub donate_confirm_post {
     #$c->flash( values => {} );
     $c->flash(page_success => "Thank you for your donation. Korora will only get better with your contribution.");
 
-    my $created = Time::Piece->strptime( $pp_donation->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ' );
+    my $created = Time::Piece->strptime($pp_donation->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ');
 
-    $c->pg->db->query("INSERT INTO contributions ('type', 'merchant_id', 'transaction_id', 'amount', 'fee', 'name', 'email', 'paypal_raw', 'created') VALUES ('donation', ?, ?, ?, ?, ?, ?, ?, ?)", $pp_donation->{PAYMENTINFO_0_SECUREMERCHANTACCOUNTID}, $pp_donation->{PAYMENTINFO_0_TRANSACTIONID}, $pp_donation->{PAYMENTINFO_0_AMT}, $pp_donation->{PAYMENTINFO_0_FEEAMT}, $name, $email, encode_json($pp_donation), $created);
+    $c->pg->db->query("INSERT INTO contributions (type, merchant_id, transaction_id, amount, fee, name, email, paypal_raw, created) VALUES ('donation', ?, ?, ?, ?, ?, ?, ?, ?)", $pp_donation->{PAYMENTINFO_0_SECUREMERCHANTACCOUNTID}, $pp_donation->{PAYMENTINFO_0_TRANSACTIONID}, $pp_donation->{PAYMENTINFO_0_AMT}, $pp_donation->{PAYMENTINFO_0_FEEAMT}, $name, $email, encode_json($pp_donation), $created);
 
   }
   else {
@@ -410,7 +410,7 @@ sub sponsor_confirm_post {
     #my $created = Time::Piece->strptime( $pp_sponsorship->{PAYMENTINFO_0_ORDERTIME}, '%Y-%m-%dT%H:%M:%SZ' );
     my $created = gmtime;
 
-    $c->pg->db->query("INSERT INTO contributions ('type', 'merchant_id', 'transaction_id', 'amount', 'fee', 'name', 'email', 'paypal_raw', 'created') VALUES ('sponsorship', ?, ?, ?, ?, ?, ?, ?, ?)", $c->session('payerid'), $pp_sponsorship->{PROFILEID}, $c->session('amount'), 0, $name, $email, encode_json($pp_sponsorship), $created);
+    $c->pg->db->query("INSERT INTO contributions (type, merchant_id, transaction_id, amount, fee, name, email, paypal_raw, created) VALUES ('sponsorship', ?, ?, ?, ?, ?, ?, ?, ?)", $c->session('payerid'), $pp_sponsorship->{PROFILEID}, $c->session('amount'), 0, $name, $email, encode_json($pp_sponsorship), $created);
   }
   else {
     $c->flash(page_errors => "Your transaction could not be completed. Nothing has been charged to your account.");
