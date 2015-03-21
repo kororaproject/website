@@ -220,9 +220,9 @@ sub document_post {
 
     # update author if changed
     if ($author ne $p->{username}) {
-      my $u = $c->pg->db->query("SELECT id, username WHERE username=?", $author)->hash;
+      my $u = $c->pg->db->query("SELECT id, username FROM users WHERE username=?", $author)->hash;
 
-      $p->{author_id} = $u->{id} if $u->{id};
+      $p->{author_id} = $u->{id} if $u;
     }
 
     # TODO: update created if changed
@@ -276,7 +276,7 @@ sub document_post {
 
     $created = $now;
 
-    my $post_id = $db->query("INSERT INTO posts (type, name, status, title, excerpt, content, author_id, parent_id, menu_order, created, updated) VALUES ('document', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID", $stub, $status, $title, $excerpt, $content, 1, $parent_id, $order, $created, $now)->array->[0];
+    my $post_id = $db->query("INSERT INTO posts (type, name, status, title, excerpt, content, author_id, parent_id, menu_order, created, updated) VALUES ('document', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID", $stub, $status, $title, $excerpt, $content, $c->auth_user->{id}, $parent_id, $order, $created, $now)->array->[0];
 
     # create the tags
     foreach my $tag (@{$c->sanitise_taglist}) {
