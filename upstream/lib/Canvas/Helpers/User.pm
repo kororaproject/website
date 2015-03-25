@@ -234,7 +234,7 @@ sub register {
       'user_notify_on_register',
       1,
       'admin@kororaproject.org',
-      'Korora Project - New Prime Registration',
+      'Korora Project - A new Prime email registration',
       "The following Prime account has just been registered:\n" .
       " - username: " . $user . "\n" .
       " - email:    " . $email . "\n\n" .
@@ -248,13 +248,17 @@ sub register {
   $app->helper('users.account.activate' => sub {
     my ($c, $data) = @_;
 
+    my ($provider, $u, $username);
+
     if (my $ed = $data->{email}) {
+      $provider = 'Email';
+      $username = $ed->{username};
+
       my $prefix   = $ed->{prefix};
       my $suffix   = $ed->{suffix};
-      my $username = $ed->{username};
 
       # check the username is available
-      my $u = $c->pg->db->query("SELECT u.*, um.meta_value AS activation_token, EXTRACT(EPOCH FROM u.updated)::int AS updated_epoch FROM users u JOIN usermeta um ON (um.user_id=u.id AND um.meta_key='activation_token') WHERE username=? LIMIT 1", $username)->hash;
+      $u = $c->pg->db->query("SELECT u.*, um.meta_value AS activation_token, EXTRACT(EPOCH FROM u.updated)::int AS updated_epoch FROM users u JOIN usermeta um ON (um.user_id=u.id AND um.meta_key='activation_token') WHERE username=? LIMIT 1", $username)->hash;
 
       # redirect unless account and activation token prefix/suffix exists
       return undef unless $u && $prefix && $suffix;
@@ -291,8 +295,9 @@ sub register {
         # subscribed "registration event" notifications
         $c->notify_users(
           'user_notify_on_activate',
+          1,
           'admin@kororaproject.org',
-          'Korora Project - Prime Activation - Time Expiry',
+          'Korora Project - Prime email activation - Time Expiry',
           "The following Prime account has exceeded it's activation time limit:\n" .
           " - username: " . $username . "\n" .
           " - email:    " . $email . "\n\n" .
@@ -315,13 +320,13 @@ sub register {
       $db->query("DELETE FROM usermeta WHERE meta_key='activation_token' AND user_id=?", $u->{id});
 
       $tx->commit;
-
-      return $u;
     }
     elsif (my $gd = $data->{github}) {
+      $provider = 'GitHub';
+      $username     = $gd->{username};
+
       # OAuth activation duplicates some steps from email registration
       my $realname     = $gd->{realname};
-      my $username     = $gd->{username};
       my $email        = $gd->{email};
       my $pass         = $gd->{pass};
       my $pass_confirm = $gd->{pass_confirm};
@@ -333,7 +338,7 @@ sub register {
       }
 
       # check the username is available
-      my $u = $c->pg->db->query("SELECT * FROM users WHERE username=? LIMIT 1", $username)->hash;
+      $u = $c->pg->db->query("SELECT * FROM users WHERE username=? LIMIT 1", $username)->hash;
 
       if ($u) {
         $c->flash(page_errors => 'Username is unavailable.');
@@ -352,14 +357,26 @@ sub register {
       $u = $db->query("SELECT * FROM users WHERE id=?", $user_id)->hash;
 
       $tx->commit;
-
-      return $u;
     }
     else {
       $c->flash(page_errors => 'OAuth provider is not supported.');
+
+      return undef;
     }
 
-    return undef;
+    # subscribed "new activation event" notifications
+    $c->notify_users(
+      'user_notify_on_activate',
+      1,
+      'admin@kororaproject.org',
+      'Korora Project - A new Prime activation via ' . $provider,
+      "The following Prime account has just been activated:\n" .
+      " - username: " . $username . "\n" .
+      "Regards,\n" .
+      "The Korora Team.\n"
+    );
+
+    return $u;
   });
 
   $app->helper('users.account.forgot' => sub {
@@ -540,7 +557,7 @@ sub register {
     my %args = @_>1 ? @_ : ref $_[0] eq 'HASH' ? %{$_[0]} : ();
     $args{format} //= 'distance';
 
-    $time = Time::Piece->strptime($time, '%s') unless ref($time) eq 'Time::Piece';
+    $time = gmtime($time) unless ref($time) eq 'Time::Piece';
 
     if ($args{format} eq 'distance') {
       return $app->distance_of_time_in_words($time); 
