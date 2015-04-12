@@ -36,7 +36,7 @@ sub register {
             }
             else {
               $self->render_maybe($template)
-                or $self->render_not_found
+                or $self->reply->not_found
             }
           }
 
