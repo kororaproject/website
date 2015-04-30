@@ -574,7 +574,7 @@ sub engage_reply_edit_get {
   $c->render_steps('website/engage-reply-edit', sub {
     my $delay = shift;
 
-    $c->pg->db->query("SELECT r.content, p.title, p.type, EXTRACT(EPOCH FROM r.created) AS created_epoch, EXTRACT(EPOCH FROM r.updated) AS updated_epoch, u.username, u.email FROM posts r JOIN posts p ON (r.parent_id=p.id) JOIN users u ON (u.id=r.author_id) WHERE r.type='reply' AND r.id=? LIMIT 1" => ($id) => $delay->begin);
+    $c->pg->db->query("SELECT r.content, r.author_id, p.title, p.type, EXTRACT(EPOCH FROM r.created) AS created_epoch, EXTRACT(EPOCH FROM r.updated) AS updated_epoch, u.username, u.email FROM posts r JOIN posts p ON (r.parent_id=p.id) JOIN users u ON (u.id=r.author_id) WHERE r.type='reply' AND r.id=? LIMIT 1" => ($id) => $delay->begin);
   },
   sub {
     my ($delay, $p_err, $p_res) = @_;
