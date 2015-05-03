@@ -125,6 +125,30 @@ use constant DOWNLOAD_MAP => {
             },
           },
         },
+        mate => {
+          i386 => {
+            url => {
+              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-i386-mate-live.iso/download',
+#              torrent => '/download/torrents/korora-21-i386-mate-live-iso.torrent'
+            },
+            checksum => {
+              md5     => 'e40d088cd651e1cabe8e9c7d00aa54cd',
+              sha1    => '66a5febbfcc9dd8b9be946cac628f4ab9b733360',
+              sha256  => 'c1055da14129ef6bfd4f2a52831adefc24a540b5b31e90b294f1bcbbfbb7fe52',
+            },
+          },
+          x86_64 => {
+            url => {
+              http    => 'http://sourceforge.net/projects/kororaproject/files/21/korora-21-x86_64-mate-live.iso/download',
+#              torrent => '/download/torrents/korora-21-x86_64-mate-live-iso.torrent'
+            },
+            checksum => {
+              md5     => '14f99f028066071309b242da6686bb7a',
+              sha1    => '401768ee437c5e0472944763e1b22999de751d0b',
+              sha256  => 'fdfb88bc86de4b8eec5e92b6d1ca49ba473d30438184d93be4c14ec726585644'
+            },
+          },
+        },
         xfce => {
           i386 => {
             url => {
