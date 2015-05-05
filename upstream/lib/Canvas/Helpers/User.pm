@@ -287,8 +287,8 @@ sub register {
         my $db = $c->pg->db;
         my $tx = $db->begin;
 
-        $db->query("DELETE FROM users WHERE id=?", $u->{id});
         $db->query("DELETE FROM usermeta WHERE user_id=?", $u->{id});
+        $db->query("DELETE FROM users WHERE id=?", $u->{id});
 
         $tx->commit;
 
