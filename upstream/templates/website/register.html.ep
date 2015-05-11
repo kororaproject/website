@@ -36,7 +36,7 @@
             </div>
             <h2>Or via email ...</h2>
             <form action="<%= url_for('current') %>" method="post" class="form-signin" role="form">
-              <input type="hidden" name="rt" value="<%= $rt %>"></input>
+              <input type="hidden" name="rt" value="<%= $rt %>">
 % if ($error->{code}) {
               <div class="alert alert-danger">
                 <p><%= $error->{message} %></p>
