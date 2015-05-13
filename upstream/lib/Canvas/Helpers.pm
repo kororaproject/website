@@ -395,7 +395,7 @@ sub register {
     $size   //= 32;
     $class  //= '';
 
-    return sprintf('<img src="//www.gravatar.com/avatar/%s.jpg?s=%d&d=retro" class="%s"></img>', md5_sum($email), $size, $class);
+    return sprintf('<img src="//www.gravatar.com/avatar/%s.jpg?s=%d&amp;d=retro" class="%s" alt="">', md5_sum($email), $size, $class);
   });
 
   $app->helper(pluralise => sub {

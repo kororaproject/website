@@ -52,7 +52,7 @@
         <p class="copyright copyright-left">Derived from <a href="http://www.fedoraproject.org">Fedora</a> | Powered by <a href="http://en.wiktionary.org/wiki/freedom">Freedom</a>, <a href="http://en.wiktionary.org/wiki/dedication">Dedication</a> and the pursuit of <a href="http://en.wiktionary.org/wiki/perfection">Perfection</a></p>
       </div>
       <div class="col-md-6">
-        <p class="copyright copyright-right">All published content is licensed under the <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC&#8209;BY&#8209;SA 4.0</a> International license. <a href="http://creativecommons.org/licenses/by-sa/4.0/"><img src="/img/cc-by-sa-logo.png" class="cc-by-sa"></img></a></p>
+        <p class="copyright copyright-right">All published content is licensed under the <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC&#8209;BY&#8209;SA 4.0</a> International license. <a href="http://creativecommons.org/licenses/by-sa/4.0/"><img src="/img/cc-by-sa-logo.png" class="cc-by-sa" alt='License'></a></p>
       </div>
     </div>
   </div>

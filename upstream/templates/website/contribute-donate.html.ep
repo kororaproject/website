@@ -50,7 +50,7 @@
                     <label class="sr-only" for="donor_name">Your name</label>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-fw fa-user"></i></span>
-                      <input type="text" class="form-control" name="donor_name" placeholder="" value="<%= $v->{donor_name} %>"></input>
+                      <input type="text" class="form-control" name="donor_name" placeholder="" value="<%= $v->{donor_name} %>">
                     </div>
                     <span class="help-block">We use this name on our public donor list (leave blank if you'd prefer to be anonymous).</span>
                   </div>
@@ -62,7 +62,7 @@
                     <label class="sr-only" for="donor_email">Email address</label>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-fw fa-envelope"></i></span>
-                      <input type="text" class="form-control" name="donor_email" data-rule-required="true" placeholder="" ng-model="donor_email" value="<%= $v->{donor_email} %>" ng-init="donor_email='<%= $v->{donor_email} %>'"></input>
+                      <input type="text" class="form-control" name="donor_email" data-rule-required="true" placeholder="" ng-model="donor_email" value="<%= $v->{donor_email} %>" ng-init="donor_email='<%= $v->{donor_email} %>'">
                     </div>
                     <span class="help-block">We use this email address to correlate multiple donations made by the same person.</span>
                   </div>
@@ -74,7 +74,7 @@
                     <label class="sr-only" for="donor_amount">Amount</label>
                     <div class="input-group">
                       <span class="input-group-addon"><i class="fa fa-fw fa-usd"></i></span>
-                      <input type="text" class="form-control" name="donor_amount" value="00" ng-model="donor_amount" value="<%= $v->{donor_amount} %>" ng-init="donor_amount='<%= $v->{donor_amount} %>'"></input>
+                      <input type="text" class="form-control" name="donor_amount" value="00" ng-model="donor_amount" value="<%= $v->{donor_amount} %>" ng-init="donor_amount='<%= $v->{donor_amount} %>'">
                       <span class="input-group-addon">USD</span>
                     </div>
                     <span class="help-block">How much would you like to donate to the Korora Project?</span>
