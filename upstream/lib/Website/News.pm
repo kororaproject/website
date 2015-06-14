@@ -26,7 +26,7 @@ use strict;
 use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Pg;
-use Mojo::Util qw(trim);
+use Mojo::Util qw(trim xml_escape);
 use POSIX qw(ceil);
 use Time::Piece;
 
@@ -112,10 +112,10 @@ sub rss_get {
 
   foreach my $n (@{$res->hashes}) {
     $rss .= '<item>' .
-            '<title>' . $n->{title} . '</title>' .
+            '<title>' . xml_escape($n->{title}) . '</title>' .
             '<link>http://kororaproject.org/about/news/' . $n->{name} . '</link>' .
-            '<description>' . $n->{excerpt} . '</description>' .
-            '<pubDate>' . $n->{created} . '</pubDate>' .
+            '<description>' . xml_escape($n->{excerpt}) . '</description>' .
+            '<pubDate>' . xml_escape($n->{created}) . '</pubDate>' .
             '</item>';
   }
 
