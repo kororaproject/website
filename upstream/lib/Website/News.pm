@@ -111,11 +111,12 @@ sub rss_get {
             '<link>http://kororaproject.org/about/news</link>';
 
   foreach my $n (@{$res->hashes}) {
+    my $created = gmtime($n->{created_epoch})->strftime();
     $rss .= '<item>' .
             '<title>' . xml_escape($n->{title}) . '</title>' .
             '<link>http://kororaproject.org/about/news/' . $n->{name} . '</link>' .
             '<description>' . xml_escape($n->{excerpt}) . '</description>' .
-            '<pubDate>' . xml_escape($n->{created}) . '</pubDate>' .
+            '<pubDate>' . $created . '</pubDate>' .
             '</item>';
   }
 
