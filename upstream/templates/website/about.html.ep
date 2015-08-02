@@ -100,7 +100,7 @@
             <h2>Default applications</h2>
             <p>Korora sets the default applications to those that we believe end users typically want. For example, <a href="http://www.mozilla.org/firefox">Firefox</a> is the default web browser (instead of Konqueror in KDE and Epiphany in GNOME, for example) and <a href="http://www.videolan.org/vlc/">VLC</a> is the default media player (instead of Dragon Player in KDE and Totem in GNOME, for example). There is generally one popular program installed for each task, although alternatives (such as the <a href="http://www.google.com/chrome/"
              >Google Chrome</a> web browser) are available via the package manager for a quick install.</p>
-            <p>We have a license to distribute Adobe Flash so this is now included by default.</p>
+            <p>We have a license to distribute Adobe Flash, however we no-longer include it by default due to the continued high number of security flaws. It can be installed via the package manager, however.</p>
           </div>
         </div>
         <div class="row">
@@ -109,7 +109,6 @@
             <p>Korora also pre-configures a number of third party repositories, making it easier to install the additional software that most people use. These include:</p>
             <ul>
               <li>Adobe Flash</li>
-              <li>DropBox</li>
               <li>Google Chrome, Google Earth and Google Talkplugin</li>
               <li>RPMFusion</li>
               <li>VirtualBox</li>
@@ -120,7 +119,7 @@
         <div class="row">
           <div class="col-sm-12">
             <h2>Third party driver support</h2>
-            <p>Korora includes a tool called Pharlap (Jockey in release 19 and earlier) for simple installation of third party drivers such as those for NVIDIA graphics cards and certain wireless devices.</p>
+            <p>Korora includes a tool called Pharlap for simple installation of third party drivers such as those for NVIDIA graphics cards and certain wireless devices.</p>
             <p>Korora also comes with all the development tools and kernel headers you need to easily install out of tree kernel modules, such as those required by VirtualBox. These modules are automatically built when you get a new kernel update thanks to Dynamic Kernel Module Support.</p>
           </div>
         </div>

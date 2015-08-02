@@ -35,7 +35,7 @@
             <p><a href="#opensource"></a></p>
             <h2>We're open source</h2>
             <p>Firstly, <em>all our code is open source and freely available</em> to anyone via <a href="http://github.com/kororaproject">our GitHub account</a>. We also provide a tool called <a href="https://github.com/kororaproject/kp">kp</a> which will let anyone rebuild all of our packages and an entire Korora image, or modify these to build their own variation. That's the tool we use to build all of the Korora packages and images.</p>
-            <p>We do however ship some software that is proprietary, such as Adobe Flash, and others are installable, such as Google Chrome. We don't have source code for these as they are not open source; however, anything <em>we</em> create, or modify <em>is</em>.</p>
+            <p>We do however ship some software that is proprietary, such as Adobe Flash (in version 21 and earlier) and others are installable, such as Google Chrome. We don't have source code for these as they are not open source; however, anything <em>we</em> create, or modify <em>is</em>.</p>
             <p><a href="#kickstarts"></a></p>
             <h2>Kickstart templates</h2>
             <p>Kickstarts are files that define how to build a system and include things like:</p>
@@ -145,7 +145,7 @@
             <p>So if we hardly change anything on the system in the kickstarts, where do we make the changes to the system? Regular old RPM packages. The reason we make changes in RPMs is because we want them to be persistent. If we change things in the kickstarts (like editing a configuration file) then when you get an upstream package update our settings can be lost.</p>
             <p>So what exactly are you installing from our repositories? The best way to see what we make is to take a look at our <a href="http://dl.kororaproject.org/pub/korora/releases/">source repository</a>.</p>
             <p>Many of the RPMs are replacements for Fedora packages such as anaconda, fedora-release and fedora-logos, because Remixes are not allowed to ship Fedora branded packages. We also have our own backgrounds and plymouth theme.</p>
-            <p>We ship several other "release" RPMs which provide the repositories and GPG keys for things like Adobe Flash, Dropbox, Google Chrome and VirtualBox. These are what allow users to install those packages out of the box via the regular package manager without having to trawl the Internet.</p>
+            <p>We ship several other "release" RPMs which provide the repositories and GPG keys for things like Adobe Flash, Google Chrome and VirtualBox. These are what allow users to install those packages out of the box via the regular package manager without having to trawl the Internet.</p>
             <p>We also replace some Fedora packages so that we can make desktop specific changes, such as kde-settings (for KDE configuration) and shared-mime-info (that handles default applications). We have korora-settings packages for the desktops which deliver more custom settings including the default Firefox profile and <a
               href="https://github.com/kororaproject/kp-korora-settings-gnome/blob/master/upstream/org.korora.gschema.override">GNOME settings</a>.</p>
             <p>Next, there are several Mozilla plugins that we package up as they aren't included in Fedora but we enable them in the default Firefox profile.</p>

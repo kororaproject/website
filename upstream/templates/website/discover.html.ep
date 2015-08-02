@@ -83,11 +83,11 @@
             <p>Each desktop version is similarly focused, being aimed at making Linux easier to use and pre-configuring the system for end users. As such, they include:</p>
             <ul class="fa-ul">
               <li><i class="fa fa-li fa-check-square-o"></i>Tweaked desktops with custom extensions and configuration</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>Third party repositories such as Adobe Flash, Dropbox, Google Chrome, RPMFusion<a href="#footnote"><sup>1</sup></a>, VirtualBox and more</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>Third party repositories such as Adobe Flash, Google Chrome, RPMFusion<a href="#footnote"><sup>1</sup></a>, VirtualBox and more</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Firefox as the default web browser</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>Firefox extensions included (Adblock Plus, DownThemAll, Flashblock, Xclear)</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>Firefox extensions included (Adblock Plus, DownThemAll, Xclear)</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Microblogging client</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>Full multimedia support, including Adobe Flash</li>
+              <li><i class="fa fa-li fa-check-square-o"></i>Full multimedia support, including Adobe Flash (Korora 21 only)</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Pharlap device manager to handle drivers such as NVIDIA and wireless</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Video editor</li>
               <li><i class="fa fa-li fa-check-square-o"></i>VLC as the default media player</li>
