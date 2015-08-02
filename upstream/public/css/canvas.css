@@ -346,6 +346,14 @@ blockquote p {
 .radio-inline+.radio-inline {
   margin-left: 0;
 }
+
+.input-group-xs>.form-control, .input-group-xs>.input-group-addon, .input-group-xs>.input-group-btn>.btn {
+  height: 26px;
+  padding: 2px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 2px;
+}
 /*
 ** MODALS
 */
@@ -575,6 +583,7 @@ blockquote p {
   border-radius: 1px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
   display: inline-block;
+  margin-bottom: 16px;
 }
 
 .img-desktop-logo {
@@ -1593,6 +1602,34 @@ footer a:visited {
 /*
 ** CANVAS PAGES - TEMPLATES
 */
+
+.toolbar-left {
+  margin: 8px 0;
+  text-align: left;
+}
+
+.toolbar-right {
+  margin: 8px 0;
+  text-align: right;
+}
+
+.search-filter {
+
+}
+
+.table-pager {
+  margin-top: -1px;
+}
+
+.table-pager > .table-pager-label {
+  display: inline-block;
+  font-size: 12px;
+}
+
+
+.template-description {
+  margin-bottom: 32px;
+}
 
 /*
 ** ALERTS
