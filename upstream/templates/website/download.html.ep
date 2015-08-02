@@ -166,7 +166,7 @@
             <p>Feel free to grab the source that was used to build Korora.</p>
             <ul>
               <li>Korora scripts (including kickstarts) and files are <a href="https://github.com/kororaproject">available on GitHub</a>.</li>
-              <li>Installed packages are available via the <a href="http://linux.die.net/man/1/yumdownloader">yumdownloader</a> command.</li>
+              <li>Installed packages are available via the <a href="http://dnf-plugins-core.readthedocs.org/en/latest/download.html">dnf download</a> command.</li>
             </ul>
           </div>
         </div>
