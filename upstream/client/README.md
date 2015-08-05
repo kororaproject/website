@@ -4,7 +4,6 @@
 
 
 ## Component Overview
-
 The broad components understood to Canvas are:
 
  * Packages
@@ -43,26 +42,34 @@ cnv template sync [user:]template [--clean]
 ```
 
 #### Adding Templates:
-Adding a new blank template identifed as "htpc" to the canvas user "firnsy".
+Adding a new blank template identifed as "htpc" to the Canvas user "firnsy".
 ```
 cnv template add firnsy:htpc
 ```
 
-Adding a new template identifed as "htpc" to the canvas user "firnsy" that is based on the "core" template from canvas user "kororaproject".
+Adding a new template identifed as "htpc" to the Canvas user "firnsy" that is based on the "core" template from canvas user "kororaproject".
 ```
 cnv template add firnsy:htpc --includes kororaproject:core
 ```
 
+
+#### Modifying Templates:
+Modifying the name and description of existing template "htpc" of Canvas user "firnsy".
+```
+cnv template mod firnsy:htpc --name="Firnsy's HTPC" --description="Ultimate HTPC recipe!"
+```
+
 #### Deleting Templates:
+Deleting the existing template "htpc" from Canvas user "firnsy".
 ```
 cnv template del firnsy:htpc
-cnv template mod firnsy:htpc --description= --includes kororaproject:gnome
 ```
 
 #### Synchronising Templates:
 Synchronising templates with the existing system.
 ```
-cnv template sync [user:]template [--clean]
+cnv template pull [user:]template [--clean]
+cnv template push [user:]template
 ```
 
 ### Template Packages
@@ -75,10 +82,9 @@ cnv package add|del[ete] [user:]template package1 package2 ... packageN
 ```
 
 #### Adding Packages
-
 ```
 cnv package add firnsy:htpc foo @bar baz
-cnv package add firnsy:htpc foo
+cnv package add firnsy:htpc buz
 ```
 
 #### Deleting Packages
@@ -118,4 +124,33 @@ cvn machine sync [user:]name
 cvn machine cmd [user:]name command arg1 arg2 ... argN
 ```
 
+#### Adding Machines
+```
+cvn machine add firnsy:odin --template firnsy:htpc
+```
+
+#### Modifying Machines
+```
+cvn machine mod firnsy:odin --template firnsy:steam
+```
+
+
+#### Synchronising Machines
+```
+cvn machine sync firnsy:odin
+```
+
+
+#### Commanding Machines
+```
+cvn machine cmd firnsy:odin cat /etc/passwd
+cvn machine cmd firnsy:odin ls /home
+cvn machine cmd firnsy:odin shutdown -h now
+```
+
+
+#### Deleting Machines
+```
+cvn machine del firnsy:odin
+```
 
