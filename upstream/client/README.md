@@ -34,11 +34,12 @@ The following options are global to all commands:
 The following commands allow creating, deleting and modifying Canvas templates.
 
 ##### Usage:
-The general form for adding, deleting, modifying and synchronising templates is described as:
+The general form for adding, deleting, modifying, pushing and pulling (revert) templates is described as:
 ```
 cnv template add|mod[ify] [user:]template [--name] [--description] [--includes]
 cnv template del[ete] [user:]template
-cnv template sync [user:]template [--clean]
+cnv template pull [user:]template [--clean]
+cnv template push [user:]template
 ```
 
 #### Adding Templates:
