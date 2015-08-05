@@ -26,8 +26,8 @@ The Canvas command line provides the necessary tools to create, modify, synchron
 ##### Global Options
 The following options are global to all commands:
 ```
--u|--user user
--h|--host canvas server
+-u|--user  # specify canvas user
+-h|--host  # specify canvas server host
 ```
 
 ### Templates
@@ -36,41 +36,48 @@ The following commands allow creating, deleting and modifying Canvas templates.
 ##### Usage:
 The general form for adding, deleting, modifying, pushing and pulling (revert) templates is described as:
 ```
-cnv template add|mod[ify] [user:]template [--name] [--description] [--includes]
-cnv template del[ete] [user:]template
-cnv template pull [user:]template [--clean]
-cnv template push [user:]template
+cnvs template add|mod[ify] [user:]template [--name] [--description] [--includes]
+cnvs template del[ete] [user:]template
+cnvs template push [user:]template
+cnvs template pull [user:]template [--clean]
+cnvs template diff [user:]template
 ```
 
 #### Adding Templates:
 Adding a new blank template identifed as "htpc" to the Canvas user "firnsy".
 ```
-cnv template add firnsy:htpc
+cnvs template add firnsy:htpc
 ```
 
 Adding a new template identifed as "htpc" to the Canvas user "firnsy" that is based on the "core" template from canvas user "kororaproject".
 ```
-cnv template add firnsy:htpc --includes kororaproject:core
+cnvs template add firnsy:htpc --includes kororaproject:core
 ```
 
 
 #### Modifying Templates:
 Modifying the name and description of existing template "htpc" of Canvas user "firnsy".
 ```
-cnv template mod firnsy:htpc --name="Firnsy's HTPC" --description="Ultimate HTPC recipe!"
+cnvs template mod firnsy:htpc --name="Firnsy's HTPC" --description="Ultimate HTPC recipe!"
 ```
 
 #### Deleting Templates:
 Deleting the existing template "htpc" from Canvas user "firnsy".
 ```
-cnv template del firnsy:htpc
+cnvs template del firnsy:htpc
 ```
 
 #### Synchronising Templates:
 Synchronising templates with the existing system.
 ```
-cnv template pull [user:]template [--clean]
-cnv template push [user:]template
+cnvs template pull firnsy:htpc --clean
+cnvs template push firnsy:htpc
+```
+
+#### Diff Templates:
+Diff the specified template with current system.
+```
+cnvs template diff firnsy:htpc
 ```
 
 ### Template Packages
@@ -79,19 +86,19 @@ The following commands allow adding and deleting of packages from specified Temp
 ##### Usage:
 The general usage for adding and removing packages from templates is described as:
 ```
-cnv package add|del[ete] [user:]template package1 package2 ... packageN
+cnvs package add|del[ete] [user:]template package1 package2 ... packageN
 ```
 
 #### Adding Packages
 ```
-cnv package add firnsy:htpc foo @bar baz
-cnv package add firnsy:htpc buz
+cnvs package add firnsy:htpc foo @bar baz
+cnvs package add firnsy:htpc buz
 ```
 
 #### Deleting Packages
 ```
-cnv package del firnsy:htpc @bar
-cnv package del firnsy:htpc foo baz
+cnvs package del firnsy:htpc @bar
+cnvs package del firnsy:htpc foo baz
 ```
 
 #### Package Definition
@@ -118,40 +125,40 @@ The following commands allow creating, deleting and modifying Canvas machines th
 ##### Usage:
 The general usage for adding, deleting, modifying, synchronising and commanding your machines is described as:
 ```
-cvn machine add|del[ete] [user:]name [--description=] [--template=]
-cvn machine mod[ify] [--description=] [--template=]
+cnvs machine add|del[ete] [user:]name [--description=] [--template=]
+cnvs machine mod[ify] [--description=] [--template=]
 
-cvn machine sync [user:]name
-cvn machine cmd [user:]name command arg1 arg2 ... argN
+cnvs machine sync [user:]name
+cnvs machine cmd [user:]name command arg1 arg2 ... argN
 ```
 
 #### Adding Machines
 ```
-cvn machine add firnsy:odin --template firnsy:htpc
+cnvs machine add firnsy:odin --template firnsy:htpc
 ```
 
 #### Modifying Machines
 ```
-cvn machine mod firnsy:odin --template firnsy:steam
+cnvs machine mod firnsy:odin --template firnsy:steam
 ```
 
 
 #### Synchronising Machines
 ```
-cvn machine sync firnsy:odin
+cnvs machine sync firnsy:odin
 ```
 
 
 #### Commanding Machines
 ```
-cvn machine cmd firnsy:odin cat /etc/passwd
-cvn machine cmd firnsy:odin ls /home
-cvn machine cmd firnsy:odin shutdown -h now
+cnvs machine cmd firnsy:odin cat /etc/passwd
+cnvs machine cmd firnsy:odin ls /home
+cnvs machine cmd firnsy:odin shutdown -h now
 ```
 
 
 #### Deleting Machines
 ```
-cvn machine del firnsy:odin
+cnvs machine del firnsy:odin
 ```
 
