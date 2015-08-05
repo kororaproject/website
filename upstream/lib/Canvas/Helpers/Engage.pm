@@ -33,8 +33,8 @@ use constant TYPE_STATUS_MAP => {
     [ 'Need Answer' => 'need-answer'],
   ],
   thank => [
-    [ ''            => ''     ],
-    [ 'Noted'       => 'noted'],
+    [ 'Voiced'  => 'voiced' ],
+    [ 'Noted'   => 'noted'  ],
   ],
 };
 
