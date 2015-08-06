@@ -81,6 +81,7 @@ cnvs template rm [user:]template
 cnvs template push [user:]template
 cnvs template pull [user:]template [--clean]
 cnvs template diff [user:]template
+cnvs template copy [user_from:]template_from [[user_to:]template_to]
 ```
 
 #### Adding Templates
@@ -153,6 +154,22 @@ cnvs template diff [user:]template
 For example, the following command would show the diff between the current system to the template `htpc` from Canvas user `firnsy`.
 ```
 cnvs template diff firnsy:htpc
+```
+
+#### Copying Templates
+The general usage for copying an existing template of a Canvas user to a new one is described as:
+```
+cnvs template copy [user_to:]template_from [[user_to:]template_to]
+```
+
+For example the following command would copy the `htpc` template from `kororaproject` to the template `my-htpc` for the Canvas user `firnsy`.
+```
+cnvs template copy kororaproject:htpc firnsy:my-htpc
+```
+
+If `firnsy` wanted to retain the same template name he could have  abbreviated to:
+```
+cnvs template copy kororaproject:htpc
 ```
 
 ### Template Packages
@@ -270,12 +287,27 @@ cnvs machine diff firnsy:odin
 #### Synchronising Machines
 The general usage for synchronising an existing managed machine of a Canvas user is described as:
 ```
-cnvs machine sync [user:]name
+cnvs machine sync [user:]name [--pull [[user:]template]] | --push [user:]template]
 ```
 
-For example to synchronise machine `odin` of Canvas user `firnsy` relative to its assigned template can be done with the following command:
+For example to synchronise machine `odin` of Canvas user `firnsy` is done with the following command:
 ```
 cnvs machine sync firnsy:odin
+```
+
+To create a new template `custom`  from machine `odin` of Canvas user `firnsy` to the same account, you can do:
+```
+cnvs machine sync firnsy:odin --push firnsy:custom
+```
+
+To revert the machine `odin` of Canvas user `firnsy` to the time of last sync, you can do:
+```
+cnvs machine sync firnsy:odin --pull
+```
+
+To reset the machine `odin` of Canvas user `firnsy` to the template `htpc` of Canvas user `firnsy`, simply:
+```
+cnvs machine sync firnsy:odin --pull firnsy:htpc
 ```
 
 #### Commanding Machines
