@@ -227,14 +227,13 @@ The following commands allow adding, removing and updating Canvas machines that 
 
 Machines have a 1-to-1 link with a Canvas template. For example you may assign your HTPC to a personalised template called `htpc`. Alternatively you may assign your laptop and desktop to your `all-my-favourite-things` template, any changes you make to the template would then be easily reflected on both your laptop and desktop computer.
 
-
 #### Command Overview
 The following commands are available for the management of Canvas machines:
 ```
 cnvs machine add|update [user:]name [--description=] [--name=] [--template=]
 cnvs machine rm [user:]name
 cnvs machine diff [user:]name
-cnvs machine sync [user:]name
+cnvs machine sync [user:]name [--pull [[user:]template]] | --push [user:]template]
 cnvs machine cmd [user:]name command arg1 arg2 ... argN
 ```
 
@@ -295,7 +294,7 @@ For example to synchronise machine `odin` of Canvas user `firnsy` is done with t
 cnvs machine sync firnsy:odin
 ```
 
-To create a new template `custom`  from machine `odin` of Canvas user `firnsy` to the same account, you can do:
+To create a new template `custom` from machine `odin` of Canvas user `firnsy` to the same account, you can do:
 ```
 cnvs machine sync firnsy:odin --push firnsy:custom
 ```
