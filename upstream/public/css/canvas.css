@@ -44,6 +44,8 @@ object {
   max-width: 100%;
 }
 
+.img-responsive { width: 100%; }
+
 /* border radius correction */
 .alert,
 .breadcrumb,
