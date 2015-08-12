@@ -170,8 +170,6 @@ sub startup {
   # ROUTES
   my $r = $self->routes;
 
-  $r->get('/')->to('core#index');
-
   #
   # CANVAS API ROUTES
   my $r_api = $r->under('/api');
@@ -200,18 +198,26 @@ sub startup {
 
   #
   # exception/not_found
-  $r->get('/404')->to('core#not_found_get');
-  $r->get('/500')->to('core#exception_get');
+  if (0) {
+    $r->get('/')->to('core#index');
 
-  $r->get('/templates')->to('template#index_get');
+    $r->get('/404')->to('core#not_found_get');
+    $r->get('/500')->to('core#exception_get');
 
-  $r->get('/:user/template')->to('template#summary_get');
-  $r->get('/:user/template/:name')->to('template#detail_get');
+    $r->get('/templates')->to('template#index_get');
+
+    $r->get('/:user/template')->to('template#summary_get');
+    $r->get('/:user/template/:name')->to('template#detail_get');
 
 
-  # authentication and registration
-  $r->any('/authenticate')->to('core#authenticate_any');
-  $r->any('/deauthenticate')->to('core#deauthenticate_any');
+    # authentication and registration
+    $r->any('/authenticate')->to('core#authenticate_any');
+    $r->any('/deauthenticate')->to('core#deauthenticate_any');
+  }
+  else {
+    $r->get('/')->to('core#alpha');
+    $r->any('/*trap' => {trap => ''} => sub { shift->redirect_to('/'); });
+  }
 
 
 }

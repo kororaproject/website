@@ -50,6 +50,8 @@ sub resolve_includes {
   return $template;
 }
 
+sub alpha { shift->render('canvas/alpha'); }
+
 sub index {
   my $c = shift;
 

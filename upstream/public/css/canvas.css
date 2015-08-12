@@ -515,10 +515,10 @@ blockquote p {
   min-width: 48px;
   padding-left: 48px;
 
-  background-image: url('/img/canvas-logo.png');
-  background-size: 40px 40px;
+  background-image: url('/img/canvas-logo-32.png');
+  background-size: 32px 32px;
   background-repeat: no-repeat;
-  background-position: 4px center;
+  background-position: 8px center;
 }
 
 .canvas-logo h1 {
@@ -1604,6 +1604,27 @@ footer a:visited {
 /*
 ** CANVAS PAGES - TEMPLATES
 */
+
+.topbar {
+  margin: 12px;
+}
+.topbar > .btn {
+  font-family: "Roboto Condensed";
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 16px;
+  padding: 5px 8px 3px;
+  text-transform: uppercase;
+}
+
+.alpha-block h1 {
+  font-size: 48px;
+}
+.alpha-block p {
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 18px;
+}
 
 .toolbar-left {
   margin: 8px 0;
