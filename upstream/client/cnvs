@@ -83,6 +83,7 @@ def buildCommandLineParser():
   template_add_parser.add_argument('--description', type=str)
   template_add_parser.add_argument('--includes', type=str)
   template_add_parser.add_argument('--name', type=str)
+  template_add_parser.add_argument('--public', type=str, choices=['0', '1', 'false', 'true'])
 
   # template update arguments
   template_update_parser = subparsers_template.add_parser('update', add_help=False)
@@ -90,6 +91,7 @@ def buildCommandLineParser():
   template_update_parser.add_argument('--description', type=str)
   template_update_parser.add_argument('--includes', type=str)
   template_update_parser.add_argument('--name', type=str)
+  template_update_parser.add_argument('--public', type=str, choices=['0', '1', 'false', 'true'])
 
   # template list arguments
   template_list_parser = subparsers_template.add_parser('list', add_help=False)

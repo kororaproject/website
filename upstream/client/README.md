@@ -69,25 +69,36 @@ The default user is the name of the system user account invoking the `cnvs` comm
 
 The default host is the Korora Project canvas server located at https://canvas.kororaproject.org/. The default host can also be specified in the `~/.config/canvas.conf`.
 
+### Configuration
+
+#### Command Overview
+The following commands are available for the management of Canvas templates:
+```
+cnvs config [--unset] name [value]
+```
+
+You can query/set/replace/unset options with this command. The `name` is actually the section and the key separated by a dot, and the value will be escaped.
+
 ### Templates
 The following commands allow adding, removing and updating and synchronising Canvas templates.
 
 #### Command Overview
 The following commands are available for the management of Canvas templates:
 ```
-cnvs template add [user:]template [--name] [--description] [--includes]
-cnvs template update [user:]template [--name] [--description] [--includes]
+cnvs template add [user:]template [--name] [--description] [--includes] [--public]
+cnvs template update [user:]template [--name] [--description] [--includes] [--public]
 cnvs template rm [user:]template
 cnvs template push [user:]template
 cnvs template pull [user:]template [--clean]
 cnvs template diff [user:]template
 cnvs template copy [user_from:]template_from [[user_to:]template_to]
+cnvs template list
 ```
 
 #### Adding Templates
 The general usage for adding a new template to a Canvas user is described as:
 ```
-cnvs template add [user:]template [--name] [--description] [--includes]
+cnvs template add [user:]template [--name] [--description] [--includes] [--public]
 ```
 
 For example, adding a new blank template identifed as `htpc` to the Canvas user `firnsy`.
@@ -100,11 +111,12 @@ Adding a new template identifed as `htpc` to the Canvas user `firnsy` that is ba
 cnvs template add firnsy:htpc --includes kororaproject:core
 ```
 
+When adding new templates they will be private by default. If you wish to make your templates available for others to see then set the `--public` flag to a value of `true` or `1`.
 
 #### Updating Templates
 The general usage for updating an existing template of a Canvas user is described as:
 ```
-cnvs template update [user:]template [--name] [--description] [--includes]
+cnvs template update [user:]template [--name] [--description] [--includes] [--public]
 ```
 
 Updating the name and description of existing template `htpc` of Canvas user `firnsy`.
@@ -172,6 +184,16 @@ If `firnsy` wanted to retain the same template name he could have  abbreviated t
 cnvs template copy kororaproject:htpc
 ```
 
+#### Listing Templates
+The general usage for listing templates that are accessible is described as:
+```
+cnvs template list
+```
+
+```
+cnvs template list
+```
+
 ### Template Packages
 The following commands allow management of packages from specified Templates.
 
@@ -195,9 +217,9 @@ Note that a `version` and `release` must be specified together and can not be sp
 Examples of package definitions include:
 ```
 foo                   # name only
-foo!x86_64            # name and arch
-foo:2.1-3             # name, version and release
-foo#1:2.1-3!x86_64    # name, epoch, version, release and arch
+foo:x86_64            # name and arch
+foo@2.1-3             # name, version and release
+foo#1@2.1-3:x86_64    # name, epoch, version, release and arch
 ```
 
 
@@ -335,7 +357,7 @@ Machines have a 1-to-1 link with a Canvas template. For example you may assign y
 #### Command Overview
 The following commands are available for the management of Canvas machines:
 ```
-cnvs machine add|update [user:]name [--description=] [--name=] [--template=]
+cnvs machine add|update [user:]name [--description=] [--location=] [--name=] [--template=]
 cnvs machine rm [user:]name
 cnvs machine diff [user:]name
 cnvs machine sync [user:]name [--pull [[user:]template]] | --push [user:]template]
@@ -345,7 +367,7 @@ cnvs machine cmd [user:]name command arg1 arg2 ... argN
 #### Adding Machines
 The general usage for adding a new managed machine to a Canvas user is described as:
 ```
-cnvs machine add [user:]name [--description=] [--name=] [--template=]
+cnvs machine add [user:]name [--description=] [--location=] [--name=] [--template=]
 ```
 
 To add the current system as a managed machine named `odin` to the Canvas user `firnsy` linked to the `htpc` template from the same Canvas user is as follows:
