@@ -21,14 +21,14 @@
         <li class="dropdown <%= 'active' if ( $active eq 'templates' )%>">
           <a href="/templates">Templates</a>
         </li>
-% if( is_user_authenticated ) {
+% if (is_user_authenticated) {
         <li><a href="/machines">Machines</a></li>
 % }
     </ul>
-% if( is_user_authenticated ) {
+% if (is_user_authenticated) {
       <ul class="nav navbar-nav navbar-right">
         <li class="dropdown <%= 'active' if ( $active eq 'user' )%>">
-          <a href="" class="dropdown-toggle user-avatar" data-toggle="dropdown"><%== user_gravatar( auth_user) %><b class="caret"></b></a>
+          <a href="" class="dropdown-toggle user-avatar" data-toggle="dropdown"><%= $c->users->name %><%== email_gravatar(auth_user->{email}, 24) %><b class="caret"></b></a>
           <ul class="dropdown-menu" role="menu">
           </ul>
         </li>
@@ -47,26 +47,26 @@
 
 <!-- NOTIFICATIONS -->
 <div id="page-notifications">
-% if( defined flash('page_errors') ) {
+% if (my $errors = flash('page_errors') ) {
   <div class="alert alert-danger alert-dismissable">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <%= flash('page_errors') %>
+    <%= $errors %>
   </div>
 % }
 
-% if( defined flash('page_success') ) {
+% if (my $success = flash('page_success') ) {
 <!-- ERROR BAR -->
   <div class="alert alert-success alert-dismissable">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <%= flash('page_success') %>
+    <%= $success %>
   </div>
 % }
 
-% if( defined flash('page_info') ) {
+% if (my $info = flash('page_info') ) {
 <!-- ERROR BAR -->
   <div class="alert alert-info alert-dismissable">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <%= flash('page_info') %>
+    <%= $info %>
   </div>
 % }
 </div>

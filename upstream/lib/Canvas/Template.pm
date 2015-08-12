@@ -21,74 +21,70 @@ package Canvas::Template;
 # PERL INCLUDES
 #
 use Data::Dumper;
-use Mango;
-use Mango::BSON;
 use Mojo::Base 'Mojolicious::Controller';
-use Mojo::JSON qw(j);
+use Mojo::JSON qw(j encode_json);
 use Mojo::Util qw(trim);
 use Time::Piece;
 
 #
 # LOCAL INCLUDES
 #
-use Canvas::Store::User;
 
 #
 # TEMPLATES
 #
 
 sub index_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $mango = Mango->new('mongodb://localhost:27017');
-  my $collection = $mango->db('canvas')->collection('templates');
+  $c->render_steps('canvas/template', sub {
+    my $delay = shift;
 
-  # find or create new template
-  my $tc = $collection->find( {}, {
-    name => 1,
-    stub => 1,
-    user => 1,
+    # get total count
+    $c->pg->db->query("SELECT COUNT(id) FROM templates" => $delay->begin);
+
+    $c->pg->db->query("SELECT t.name, t.stub, u.username AS user FROM templates t JOIN users u ON (u.id=t.owner_id)" => $delay->begin);
+  },
+  sub {
+    my ($delay, $count_err, $count_res, $err, $res) = @_;
+
+    my $count = $count_res->array->[0];
+    my $results = $res->expand->hashes;
+
+    $c->stash(
+      total     => $count,
+      responses => $results
+    );
   });
-
-  my $total = $tc->count;
-
-  my $cache = $tc->all;
-
-  $self->stash(
-    total => $total,
-    responses => $cache,
-  );
-
-  $self->render('canvas/template');
 }
 
 sub detail_get {
-  my $self = shift;
+  my $c = shift;
 
-  my $user = Canvas::Store::User->search( { username => $self->param('user') } )->first;
+  my $username      = $c->param('user');
+  my $template_name = $c->param('name');
 
-  return $self->redirect_to('/templates') unless $user;
+  $c->render_steps('canvas/template-detail', sub {
+    my $delay = shift;
 
-  my $mango = Mango->new('mongodb://localhost:27017');
-  my $collection = $mango->db('canvas')->collection('templates');
+    # get total count
+    $c->pg->db->query("SELECT t.* FROM templates t JOIN users u ON (u.id=t.owner_id) WHERE u.username=? AND t.stub=?" => ($username, $template_name) => $delay->begin);
+  },
+  sub {
+    my ($delay, $err, $res) = @_;
 
-  # find or create new template
-  my $template = $collection->find_one({
-    user => $user->username,
-    stub => $self->param('name')
+    my $template = $res->expand->hash;
+
+    return $c->redirect_to('/templates') unless $template;
+
+    # TODO: ensure we have visibility rights
+
+    #$template->{_id} = $template->{_id}->to_string;
+    $c->stash(
+      canvas      => $template,
+      canvas_json => encode_json($template),
+    );
   });
-
-  return $self->redirect_to('/templates') unless $template;
-
-  # TODO: ensure we have visibility rights
-
-  #$template->{_id} = $template->{_id}->to_string;
-  $self->stash(
-    canvas      => $template,
-    canvas_json => j($template),
-  );
-
-  $self->render('canvas/template-detail');
 }
 
 1;
