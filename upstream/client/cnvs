@@ -27,9 +27,12 @@ import os
 import signal
 import sys
 
+logger = logging.getLogger('canvas')
+
 # TODO: REMOVE
 sys.path.append('./lib')
 
+import canvas.config
 import canvas.cli.commands
 import canvas.cli.commands.config
 import canvas.cli.commands.machine
@@ -40,22 +43,26 @@ import canvas.cli.commands.template
 PROG_VERSION='1.0'
 PROG_NAME='Canvas';
 
+#CANVAS_HOST='https://canvas.kororaproject.org'
+CANVAS_HOST='http://localhost:3000'
+
 class ArgumentParserError(Exception): pass
 
 class ErrorRaisingArgumentParser(argparse.ArgumentParser):
   def error(self, message):
+    print(message)
     raise ArgumentParserError(message)
 
 
-def buildCommandLineParser():
+def buildCommandLineParser(config):
   parser = ErrorRaisingArgumentParser(prog='cnvs', add_help=False)
   subparsers = parser.add_subparsers(dest='command')
 
   # general arguments
   general_parser = argparse.ArgumentParser(add_help=False)
   general_parser.add_argument('-h', '--help', '-?', action='store_true', dest='help')
-  general_parser.add_argument('-U', '--user', type=str, dest='username')
-  general_parser.add_argument('-H', '--host', type=str, dest='host')
+  general_parser.add_argument('-U', '--user', type=str, dest='username', default=config.get('user', 'name'))
+  general_parser.add_argument('-H', '--host', type=str, dest='host', default=config.get('core', 'host', CANVAS_HOST))
   general_parser.add_argument('-v', '--verbose', action="store_true", dest='verbose')
   general_parser.add_argument('-V', '--version', action='version', version='{0} - {1}'.format(PROG_NAME, PROG_VERSION))
 
@@ -78,7 +85,7 @@ def buildCommandLineParser():
   template_parser.add_argument('-n', '--dry-run', action="store_true", dest='dry_run')
 
   # template add arguments
-  template_add_parser = subparsers_template.add_parser('add', add_help=False)
+  template_add_parser = subparsers_template.add_parser('add', add_help=False, parents=[general_parser])
   template_add_parser.add_argument('template', type=str)
   template_add_parser.add_argument('--description', type=str)
   template_add_parser.add_argument('--includes', type=str)
@@ -86,7 +93,7 @@ def buildCommandLineParser():
   template_add_parser.add_argument('--public', type=str, choices=['0', '1', 'false', 'true'])
 
   # template update arguments
-  template_update_parser = subparsers_template.add_parser('update', add_help=False)
+  template_update_parser = subparsers_template.add_parser('update', add_help=False, parents=[general_parser])
   template_update_parser.add_argument('template', type=str)
   template_update_parser.add_argument('--description', type=str)
   template_update_parser.add_argument('--includes', type=str)
@@ -94,28 +101,27 @@ def buildCommandLineParser():
   template_update_parser.add_argument('--public', type=str, choices=['0', '1', 'false', 'true'])
 
   # template list arguments
-  template_list_parser = subparsers_template.add_parser('list', add_help=False)
-  template_list_parser.add_argument('template', type=str)
+  template_list_parser = subparsers_template.add_parser('list', add_help=False, parents=[general_parser])
 
   # template remove arguments
-  template_remove_parser = subparsers_template.add_parser('rm', add_help=False)
+  template_remove_parser = subparsers_template.add_parser('rm', add_help=False, parents=[general_parser])
   template_remove_parser.add_argument('template', type=str)
 
   # template pull arguments
-  template_pull_parser = subparsers_template.add_parser('pull', add_help=False)
+  template_pull_parser = subparsers_template.add_parser('pull', add_help=False, parents=[general_parser])
   template_pull_parser.add_argument('template', type=str)
   template_pull_parser.add_argument('--clean', action='store_true', dest='pull_clean')
 
   # template push arguments
-  template_push_parser = subparsers_template.add_parser('push', add_help=False)
+  template_push_parser = subparsers_template.add_parser('push', add_help=False, parents=[general_parser])
   template_push_parser.add_argument('template', type=str)
 
   # template diff arguments
-  template_diff_parser = subparsers_template.add_parser('delete', add_help=False)
+  template_diff_parser = subparsers_template.add_parser('delete', add_help=False, parents=[general_parser])
   template_diff_parser.add_argument('template', type=str)
 
   # template copy arguments
-  template_copy_parser = subparsers_template.add_parser('delete', add_help=False)
+  template_copy_parser = subparsers_template.add_parser('delete', add_help=False, parents=[general_parser])
   template_copy_parser.add_argument('template_from', type=str)
   template_copy_parser.add_argument('template_to', type=str, nargs='?')
 
@@ -127,16 +133,16 @@ def buildCommandLineParser():
   subparsers_package = package_parser.add_subparsers(dest='action', title='Package Commands')
 
   # package add arguments
-  package_add_parser = subparsers_package.add_parser('add', add_help=False)
+  package_add_parser = subparsers_package.add_parser('add', add_help=False, parents=[general_parser])
   package_add_parser.add_argument('template', type=str)
   package_add_parser.add_argument('package', type=str, nargs='+')
 
   # package list arguments
-  package_list_parser = subparsers_package.add_parser('list', add_help=False)
+  package_list_parser = subparsers_package.add_parser('list', add_help=False, parents=[general_parser])
   package_list_parser.add_argument('template', type=str)
 
   # package remove arguments
-  package_remove_parser = subparsers_package.add_parser('rm', add_help=False)
+  package_remove_parser = subparsers_package.add_parser('rm', add_help=False, parents=[general_parser])
   package_remove_parser.add_argument('template', type=str)
   package_remove_parser.add_argument('package', type=str, nargs='+')
 
@@ -148,19 +154,19 @@ def buildCommandLineParser():
   subparsers_repo = repo_parser.add_subparsers(dest='action', title='repo Commands')
 
   # repo add arguments
-  repo_add_parser = subparsers_repo.add_parser('add', add_help=False)
+  repo_add_parser = subparsers_repo.add_parser('add', add_help=False, parents=[general_parser])
   repo_add_parser.add_argument('repo', type=str)
 
   # repo update arguments
-  repo_update_parser = subparsers_repo.add_parser('update', add_help=False)
+  repo_update_parser = subparsers_repo.add_parser('update', add_help=False, parents=[general_parser])
   repo_update_parser.add_argument('repo', type=str)
 
   # repo list arguments
-  repo_list_parser = subparsers_package.add_parser('list', add_help=False)
+  repo_list_parser = subparsers_package.add_parser('list', add_help=False, parents=[general_parser])
   repo_list_parser.add_argument('template', type=str)
 
   # repo remove arguments
-  repo_remove_parser = subparsers_repo.add_parser('rm', add_help=False)
+  repo_remove_parser = subparsers_repo.add_parser('rm', add_help=False, parents=[general_parser])
   repo_remove_parser.add_argument('repo', type=str)
 
   #
@@ -173,36 +179,36 @@ def buildCommandLineParser():
   subparsers_machine = machine_parser.add_subparsers(dest='action', title='Machine Commands')
 
   # machine add arguments
-  machine_add_parser = subparsers_machine.add_parser('add', add_help=False)
+  machine_add_parser = subparsers_machine.add_parser('add', add_help=False, parents=[general_parser])
   machine_add_parser.add_argument('machine', type=str)
   machine_add_parser.add_argument('--description', type=str)
   machine_add_parser.add_argument('--location', type=str)
   machine_add_parser.add_argument('--template', type=str)
 
   # machine update arguments
-  machine_update_parser = subparsers_machine.add_parser('update', add_help=False)
+  machine_update_parser = subparsers_machine.add_parser('update', add_help=False, parents=[general_parser])
   machine_update_parser.add_argument('machine', type=str)
   machine_update_parser.add_argument('--description', type=str)
   machine_update_parser.add_argument('--location', type=str)
   machine_update_parser.add_argument('--template', type=str)
 
   # machine remove arguments
-  machine_remove_parser = subparsers_machine.add_parser('rm', add_help=False)
+  machine_remove_parser = subparsers_machine.add_parser('rm', add_help=False, parents=[general_parser])
   machine_remove_parser.add_argument('machine', type=str)
 
   # machine diff arguments
-  machine_diff_parser = subparsers_machine.add_parser('diff', add_help=False)
+  machine_diff_parser = subparsers_machine.add_parser('diff', add_help=False, parents=[general_parser])
   machine_diff_parser.add_argument('machine', type=str)
 
   # machine sync arguments
-  machine_sync_parser = subparsers_machine.add_parser('sync', add_help=False)
+  machine_sync_parser = subparsers_machine.add_parser('sync', add_help=False, parents=[general_parser])
   machine_sync_parser.add_argument('machine', type=str)
   machine_sync_parser_group = machine_sync_parser.add_mutually_exclusive_group()
   machine_sync_parser_group.add_argument('pull', type=str, nargs='?')
   machine_sync_parser_group.add_argument('push', type=str, nargs='?')
 
   # machine command arguments
-  machine_command_parser = subparsers_machine.add_parser('cmd', add_help=False)
+  machine_command_parser = subparsers_machine.add_parser('cmd', add_help=False, parents=[general_parser])
   machine_command_parser.add_argument('machine', type=str)
   machine_command_parser.add_argument('cmd', type=str)
   machine_command_parser.add_argument('args', type=str, nargs='*')
@@ -219,7 +225,10 @@ if __name__ == '__main__':
   # trap ctrl+c, it's polish
   signal.signal(signal.SIGINT, signal_handler)
 
-  parser = buildCommandLineParser()
+  # read config file
+  config = canvas.config.Config()
+
+  parser = buildCommandLineParser(config)
 
   # parse known commands printing general usage on any error
   try:
@@ -228,7 +237,6 @@ if __name__ == '__main__':
   except:
     canvas.cli.commands.general_usage()
     sys.exit(1)
-
 
   cli = None
 
@@ -253,8 +261,8 @@ if __name__ == '__main__':
     canvas.cli.commands.general_usage()
     sys.exit(1)
 
-  if not cli.configure(args, args_extra):
+  if not cli.configure(config, args, args_extra):
     cli.help()
     sys.exit(1)
 
-  cli.run()
+  sys.exit(cli.run())
