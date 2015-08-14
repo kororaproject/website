@@ -35,8 +35,8 @@ class Command(object):
   def __init__(self):
     pass
 
-  def configure(self, args):
-    return True
+  def configure(self, config, args, args_extra):
+    pass
 
   def help(self):
     pass
