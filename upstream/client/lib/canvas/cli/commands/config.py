@@ -18,13 +18,51 @@
 
 import logging
 
-from .. import commands
+from canvas.cli.commands import Command
 
 logger = logging.getLogger('canvas')
 
-class ConfigCommand(commands.Command):
-  def configure(self, args, args_extra):
-    print("CONFIG CONFIGURE")
+class ConfigCommand(Command):
+  def configure(self, config, args, args_extra):
+    # store loaded config
+    self.config = config
+
+    # store args for additional processing
+    self.args = args
+
+    # return false if any error, help, or usage needs to be shown
+    return not args.help
+
+  def help(self):
+    print("General usage: {0} [--version] [--help] [--verbose] [--unset] name [value]\n"
+          "\n"
+          "\n".format(self.PROG_NAME))
 
   def run(self):
-    print("CONFIG RUN")
+    parts = self.args.name.split('.')
+
+    # one part indicates a key without section
+    if len(parts) == 1:
+      print("error: key does not contain a section: {0}".format(parts[0]))
+      return 1
+
+    # user needs some help
+    elif len(parts) != 2:
+      self.help()
+      return 1
+
+    if self.args.unset:
+      # save if key was unset
+      if self.config.unset(parts[0], parts[1])
+        self.config.save()
+
+    elif self.args.value is not None:
+      self.config.set(parts[0], parts[1], self.args.value)
+      self.config.save()
+
+    else:
+      value = self.config.get(parts[0], parts[1])
+      if value is not None:
+        print(value)
+
+    return 0
