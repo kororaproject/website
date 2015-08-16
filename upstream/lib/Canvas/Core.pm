@@ -164,19 +164,17 @@ sub deauthenticate_any {
 sub templates_get {
   my $c = shift;
 
-  # construct search query as appropriate
-  my $q = {};
-
   my $user = $c->param('user');
   my $name = $c->param('name');
-
-  my $templates = $c->pg->db->query('SELECT t.id, t.stub, t.description, t.name, t.owner_id, u.username FROM templates t JOIN users u ON (u.id=t.owner_id) WHERE (t.stub=$1 OR $1 IS NULL) AND (u.username=$2 OR $2 IS NULL)', $name, $user)->hashes;
 
   # get auth'd user
   my $cu = $c->auth_user // { id => -1 };
 
-  # filter out private and non-owned templates
-  $templates = $templates->grep(sub { !!($_->{meta}{public} // 0) || ($_->{owner_id} == $cu->{id}) });
+  my $templates = $c->canvas->templates->find(
+    name      => $name,
+    user_name => $user,
+    user_id   => $cu->{id}
+  );
 
   $c->render(
     status  => 200,
@@ -229,11 +227,11 @@ sub templates_post {
   my $t = $c->pg->db->query('SELECT * FROM templates WHERE stub=?', $template->{stub})->hash;
 
   if ($t) {
-    say "EXISTS";
+    my $msg = sprintf('template user:name already exists.', $template->{user}, $template->{stub});
     return $c->render(
-      status  => 500,
-      text    => 'Template already exists.',
-      json    => { error => 'Template already exists.' },
+      status  => 409,
+      text    => $msg,
+      json    => { error => $msg },
     );
   }
 
@@ -271,30 +269,16 @@ sub template_id_get {
   my $id = $c->param('id');
   my $resolve = $c->param('resolve') // 1;
 
-  my $template = $c->pg->db->query('SELECT t.id, t.name, t.description, t.stub, t.includes, t.repos, t.packages, t.meta, u.username AS owner, EXTRACT(EPOCH FROM t.created) AS created, EXTRACT(EPOCH FROM t.updated) AS updated FROM templates t JOIN users u ON (u.id=t.owner_id) WHERE t.id=?', $id)->expand->hash;
-
-  # check we actually received a valid template
-  unless ($template) {
-    return $c->render(
-      status  => 404,
-      json    => { error => 'not found' },
-    );
-  }
-
   # get auth'd user
   my $cu = $c->auth_user // { id => -1 };
 
-  # skip if private and not owned by us
-  if (!$template->{meta}{public} && $template->{owner_id} != $cu->{id}) {
-    return $c->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
+  my $template = $c->canvas->templates->find(
+    id      => $id,
+    user_id => $cu->{id}
+  );
 
   if (!!$resolve) {
-    $c->resolve_includes( $template );
+    $c->resolve_includes($template);
   }
 
   $c->render(json => $template);
@@ -303,29 +287,14 @@ sub template_id_get {
 sub template_id_includes_get {
   my $c = shift;
   my $id = $c->param('id');
-  my $resolve = 1; #$c->param('resolve') // 1;
-
-  my $template = $c->pg->db->query('SELECT t.id, t.name, t.description, t.stub, t.includes, t.repos, t.packages, t.meta, t.owner_id, u.username AS owner, EXTRACT(EPOCH FROM t.created) AS created, EXTRACT(EPOCH FROM t.updated) AS updated FROM templates t JOIN users u ON (u.id=t.owner_id) WHERE t.id=?', $id)->expand->hash;
-
-  # check we actually received a valid template
-  unless ($template) {
-    return $c->render(
-      status  => 404,
-      json    => { error => 'not found' },
-    );
-  }
 
   # get auth'd user
   my $cu = $c->auth_user // { id => -1 };
 
-  # skip if private and not owned by us
-  if (!$template->{meta}{public} && $template->{owner_id} != $cu->{id}) {
-    return $c->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
+  my $template = $c->canvas->templates->find(
+    id      => $id,
+    user_id => $cu->{id}
+  );
 
   $c->resolve_includes($template);
 
@@ -402,15 +371,13 @@ sub template_id_update {
   my $t = $c->pg->db->query('SELECT * FROM templates WHERE stub=?', $updated->{stub})->hash;
 
   if ($t && ($t->{id} ne $template->{id})) {
-    say "EXISTS";
+    my $msg = sprintf('template user:name already exists.', $template->{user}, $template->{stub});
     return $c->render(
-      status  => 500,
-      text    => 'Template already exists.',
-      json    => { error => 'Template already exists.' },
+      status  => 409,
+      text    => $msg,
+      json    => { error => $msg },
     );
   }
-
-  #$updated->{includes} = ['korora-core'];
 
   $c->pg->db->query('UPDATE templates SET name=?, stub=?, description=?, packages=?, repos=?, includes=?, meta=? WHERE id=?', $updated->{name}, $updated->{stub}, $updated->{description}, {json => $updated->{packages}}, {json => $updated->{repos}}, {json => $updated->{includes}}, {json => $updated->{meta}}, $id);
 
