@@ -210,7 +210,7 @@
   <script>
     $(document).ready( function() {
       /* activate quote buttons if exists */
-      $("[id^=quote-]").each( function( i ) {
+      $("[id^=quote-]").each(function(i) {
         $(this).on('click', function() {
           var id = '#reply-' + $(this).attr('id').substr(6);
           var url = $(location).attr('pathname') + '/reply/' + $(this).attr('id').substr(6);
@@ -231,7 +231,7 @@
           });
         });
       });
-      $("a.engage-post-delete").each( function( i ) {
+      $("a.engage-post-delete").each(function(i) {
         $(this).on('click', function() {
           $('#modalEngagePostDeleteUrl').attr('href', $(this).attr('href'));
           $('#modalEngagePostDelete').modal('show');

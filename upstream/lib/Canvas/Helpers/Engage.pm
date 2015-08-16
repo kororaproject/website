@@ -143,7 +143,7 @@ sub register {
         $url .= '/reply/' . $post->{id};
 
         # add self-link
-        push @caps, sprintf '<li><a id="quote-%d" href="%s#quote-%d" class="text-left"><i class="fa fa-fwl fa-link"></i> Link</a></li>', $post->{id}, $c->url_for, $post->{id};
+        push @caps, sprintf '<li><a id="link-quote-%d" href="%s#quote-%d" class="text-left"><i class="fa fa-fwl fa-link"></i> Link</a></li>', $post->{id}, $c->url_for, $post->{id};
       }
 
       # add quote button
