@@ -1,6 +1,6 @@
 # Canvas
 
-The Canvas project is a Korora Project initiative to simplify distribution and management of customised Korora (and Fedora) systems. Canvas draws inspiration from a number of existing solutions that provide OS customisation and building including:
+Canvas is a Korora Project initiative to simplify the composition, distribution and management of customised Korora (and Fedora) systems. Canvas draws inspiration from a number of existing solutions that provide OS customisation and building including:
 
 * [openSUSE Build Service](https://build.opensuse.org/)
 * [Revisor](https://fedorahosted.org/revisor/), and
@@ -9,7 +9,7 @@ The Canvas project is a Korora Project initiative to simplify distribution and m
 Some fundamental goals of the Canvas project include:
 
 * To provide a simple and intuitive interface for system composition,
-* ProFitted for extensibility, and
+* Fitted for extensibility, and
 * Allow trivial management of your Mum's install.
 
 ## Component Overview
@@ -85,8 +85,8 @@ The following commands allow adding, removing and updating and synchronising Can
 #### Command Overview
 The following commands are available for the management of Canvas templates:
 ```
-cnvs template add [user:]template [--name] [--description] [--includes] [--public]
-cnvs template update [user:]template [--name] [--description] [--includes] [--public]
+cnvs template add [user:]template [--name] [--title] [--description] [--includes] [--public]
+cnvs template update [user:]template [--name] [--title] [--description] [--includes] [--public]
 cnvs template rm [user:]template
 cnvs template push [user:]template
 cnvs template pull [user:]template [--clean]
@@ -98,7 +98,7 @@ cnvs template list
 #### Adding Templates
 The general usage for adding a new template to a Canvas user is described as:
 ```
-cnvs template add [user:]template [--name] [--description] [--includes] [--public]
+cnvs template add [user:]template [--name] [--title] [--description] [--includes] [--public]
 ```
 
 For example, adding a new blank template identifed as `htpc` to the Canvas user `firnsy`.
@@ -116,7 +116,7 @@ When adding new templates they will be private by default. If you wish to make y
 #### Updating Templates
 The general usage for updating an existing template of a Canvas user is described as:
 ```
-cnvs template update [user:]template [--name] [--description] [--includes] [--public]
+cnvs template update [user:]template [--name] [--title] [--description] [--includes] [--public]
 ```
 
 Updating the name and description of existing template `htpc` of Canvas user `firnsy`.

@@ -53,7 +53,7 @@ class ConfigCommand(Command):
 
     if self.args.unset:
       # save if key was unset
-      if self.config.unset(parts[0], parts[1])
+      if self.config.unset(parts[0], parts[1]):
         self.config.save()
 
     elif self.args.value is not None:

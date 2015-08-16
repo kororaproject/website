@@ -32,12 +32,14 @@ TEMPLATE_USER_DEFAULT = "firnsy"
 #
 
 class Template(object):
-  def __init__(self, template=''):
+  def __init__(self, template=None, user=None):
     self._name = None
-    self._user = None
+    self._user = user
     self._id = None
-    self._description = None
+    self._title = ''
+    self._description = ''
 
+    self._includes = []
     self._meta = {}
 
     self._repos = []
@@ -49,11 +51,10 @@ class Template(object):
     return 'Template: %s (owner: %s) - R: %d, P: %d' % (self._name, self._user, len(self._repos), len(self._packages))
 
   def _parse_template(self, template):
-    if isinstance( template, str ):
+    if isinstance(template, str):
       parts = template.split(':')
 
       if len(parts) == 1:
-        self._user = TEMPLATE_USER_DEFAULT
         self._name = parts[0]
 
       elif len(parts) == 2:
@@ -64,8 +65,10 @@ class Template(object):
       self._id = template.get('id', None)
       self._user = template.get('user', template.get('owner', None))
       self._name = template.get('name', None)
+      self._title = template.get('title', self._name)
       self._description = template.get('description', None)
 
+      self._includes = template.get('includes', [])
       self._meta = template.get('meta', {})
 
       self._repos = [Repository(r) for r in template.get('repos', [])]
@@ -74,40 +77,79 @@ class Template(object):
       if self._id is not None:
         self._id = int(self._id)
 
-  def set(self, template):
-    self._parse_template(template)
+  #
+  # PROPERTIES
+  @property
+  def description(self):
+    return self._description
+
+  @description.setter
+  def description(self, value):
+    if value is None or len(str(value)) == 0:
+      return
+
+    self._description = str(value)
 
   @property
   def id(self):
     return self._id
 
   @property
+  def includes(self):
+    return self._includes
+
+  @includes.setter
+  def includes(self, value):
+    if ',' in value:
+      value = value.split(',')
+
+    self._includes = value
+
+  @property
   def name(self):
     return self._name
-
-  @property
-  def user(self):
-    return self._user
-
-  @property
-  def description(self):
-    return self._description
 
   @property
   def packages(self):
     return self._packages
 
   @property
+  def public(self):
+    return self._meta.get('public', False)
+
+  @public.setter
+  def public(self, state):
+    if state:
+      self._meta['public'] = True
+
+    else:
+      self._meta.pop('public', None)
+
+  @property
   def repos(self):
     return self._repos
 
-  def addPackage(self, package):
+  @property
+  def title(self):
+    return self._title
+
+  @title.setter
+  def title(self, value):
+    self._title = value
+
+  @property
+  def user(self):
+    return self._user
+
+  #
+  # PUBLIC METHODS
+  def add_package(self, package):
     if not isinstance( package, Package ):
       raise TypeError('Not a Package object')
 
     self._packages.append( package )
 
-  def addRepo(self, repo):
+  def add_repo(self, repo):
     if not isinstance(repo, Repository):
       raise TypeError('Not a Repository object')
 
@@ -119,6 +161,9 @@ class Template(object):
         return p
 
     return None
+
+  def set(self, template):
+    self._parse_template(template)
 
   def union(self, template):
     if not isinstance(template, Template):
@@ -177,8 +222,12 @@ class Template(object):
   def toObject(self):
     return { 'name': self._name,
              'user': self._user,
-             'repos':    [r.toObject() for r in self._repos],
-             'packages': [p.toObject() for p in self._packages]
+             'title': self._title,
+             'description': self._description,
+             'includes': self._includes,
+             'meta':     self._meta,
+             'packages': [p.toObject() for p in self._packages],
+             'repos':    [r.toObject() for r in self._repos]
            }
 
   def toJSON(self):

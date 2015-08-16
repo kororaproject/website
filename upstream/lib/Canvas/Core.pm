@@ -170,15 +170,19 @@ sub templates_get {
   # get auth'd user
   my $cu = $c->auth_user // { id => -1 };
 
-  my $templates = $c->canvas->templates->find(
+  $c->render_later;
+
+  $c->canvas->templates->find(
     name      => $name,
     user_name => $user,
-    user_id   => $cu->{id}
-  );
+    user_id   => $cu->{id},
+    sub {
+      my ($err, $templates) = @_;
 
-  $c->render(
-    status  => 200,
-    json    => $templates->to_array,
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+
+      $c->render(status  => 200, json => $templates->to_array);
+    }
   );
 };
 
@@ -199,53 +203,29 @@ sub templates_post {
   my $c = shift;
 
   unless ($c->users->is_active) {
-    return $c->render(
-      status  => 403,
-      text    => 'Not authenticated.',
-      json    => { error => 'Not authenticated.' },
-    );
+    my $msg = 'not authenticated.';
+    return $c->render(status => 403, text => $msg, json => {error => $msg});
   };
+
+  # get auth'd user
+  my $cu = $c->auth_user // { id => -1 };
 
   my $template = $c->req->json;
 
-  # find the user requested
-  my $u = $c->pg->db->query('SELECT * FROM users WHERE username=?', $template->{user})->hash;
+  warn dumper $template;
 
-  # bail if the user doesn't exist
-  unless ($u) {
-    return $c->render(
-      status  => 500,
-      text    => 'No user with that name.',
-      json    => { error => 'No user with that user.' },
-    );
-  }
+  $c->render_later;
 
-  # generate sanitised unique stub based on template name
-  $template->{stub} = $c->sanitise_with_dashes($template->{name});
+  $c->canvas->templates->add(
+    template => $template,
+    user_id  => $cu->{id},
+    sub {
+      my ($err, $id) = @_;
 
-  # check if template already exists
-  my $t = $c->pg->db->query('SELECT * FROM templates WHERE stub=?', $template->{stub})->hash;
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
 
-  if ($t) {
-    my $msg = sprintf('template user:name already exists.', $template->{user}, $template->{stub});
-    return $c->render(
-      status  => 409,
-      text    => $msg,
-      json    => { error => $msg },
-    );
-  }
-
-  $template->{description} //= '';
-  $template->{meta}        //= {};
-  $template->{packages}    //= {};
-  $template->{repos}       //= {};
-
-  my $id = $c->pg->db->query('INSERT INTO templates (owner_id, name, stub, description, packages, repos, meta) VALUES (?,?,?,?,?,?,?) RETURNING ID', $u->{id}, $template->{name}, $template->{stub}, $template->{description}, {json => $template->{packages}}, {json => $template->{repos}}, {json => $template->{meta}})->array->[0];
-
-  $c->render(
-    status  => 200,
-    text    => 'id: ' . $id,
-    json    => { id => $id },
+      $c->render(status => 200, text => "id: $id", json => {id => $id});
+    }
   );
 };
 
@@ -272,16 +252,21 @@ sub template_id_get {
   # get auth'd user
   my $cu = $c->auth_user // { id => -1 };
 
-  my $template = $c->canvas->templates->find(
+  $c->render_later;
+
+  $c->canvas->templates->find(
     id      => $id,
-    user_id => $cu->{id}
+    user_id => $cu->{id},
+    sub {
+      my ($err, $template) = @_;
+
+      if (!!$resolve) {
+        $c->resolve_includes($template);
+      }
+
+      $c->render(json => $template);
+    }
   );
-
-  if (!!$resolve) {
-    $c->resolve_includes($template);
-  }
-
-  $c->render(json => $template);
 }
 
 sub template_id_includes_get {

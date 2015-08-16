@@ -21,7 +21,19 @@ import urllib.request, urllib.parse, urllib.error
 
 from canvas.template import Template
 
-class CanvasService(object):
+class ServiceException(Exception):
+  def __init__(self, reason, code=0):
+    self.reason = reason.lower()
+    self.code = code
+
+  def __repr__(self):
+    return str(self)
+
+  def __str__(self):
+    return 'error: {0} ({1})'.format(str(self.reason), int(self.code))
+
+
+class Service(object):
   def __init__(self, host='https://canvas.kororaproject.org'):
     self._host = host
     self._urlbase = host
@@ -32,8 +44,7 @@ class CanvasService(object):
     self._authenticated = False
 
   def authenticate(self, username='', password='', force=False):
-
-    print(('Authenticating to %s' % ( self._urlbase )))
+    print('debug: authenticating to {0}'.format(self._urlbase))
 
     if self._authenticated and not self._force:
       return self._authenticated
@@ -43,14 +54,16 @@ class CanvasService(object):
     self._authenticated = False
 
     try:
-      r = urllib.request.Request(self._urlbase + '/authenticate.json', auth)
+      r = urllib.request.Request('{0}/authenticate.json'.format(self._urlbase), auth)
       u = self._opener.open(r)
       self._authenticated = True
 
     except urllib.error.URLError as e:
-      print(e)
+      #print(e)
+      pass
     except urllib.error.HTTPError as e:
-      print(e)
+      #print(e)
+      pass
 
     return self._authenticated
 
@@ -59,7 +72,7 @@ class CanvasService(object):
       return self._authenticated
 
     try:
-      r = urllib.request.Request('%s/deauthenticate.json' % ( self._urlbase ))
+      r = urllib.request.Request('%s/deauthenticate.json' % (self._urlbase))
       u = self._opener.open(r)
 
     except urllib.error.URLError as e:
@@ -78,19 +91,21 @@ class CanvasService(object):
       TypeError('template is not of type Template')
 
     try:
-      r = urllib.request.Request('%s/api/templates.json' % ( self._urlbase ), template.toJSON().encode('utf-8'))
+      r = urllib.request.Request('{0}/api/templates.json'.format(self._urlbase), template.toJSON().encode('utf-8'))
       u = self._opener.open(r)
-      print(( u.read() ))
+      res = json.loads(u.read().decode('utf-8'))
 
-      return True
+      return res
 
     except urllib.error.URLError as e:
-      print(e)
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
+
     except urllib.error.HTTPError as e:
-      print(e)
+      print(e.fp.read())
+      raise ServiceException('CREATE HTTP ERROR')
 
-    return False
-
+    raise ServiceException('error: unable to add template.')
 
   def template_delete(self, template):
     if not isinstance(template, Template):
@@ -102,17 +117,19 @@ class CanvasService(object):
       r = urllib.request.Request('%s/api/template/%d.json' % ( self._urlbase, template.id ))
       r.get_method = lambda: 'DELETE'
       u = self._opener.open(r)
-      o = json.loads( u.read().decode('utf-8') )
+      res = json.loads(u.read().decode('utf-8'))
 
-      return True
+      return res
 
     except urllib.error.URLError as e:
       print(e)
+      raise ServiceException('CREATE ERROR')
+
     except urllib.error.HTTPError as e:
       print(e)
+      raise ServiceException('CREATE ERROR')
 
-    return False
-
+    raise ServiceException('error: unable to delete template.')
 
   def template_update(self, template):
     if not isinstance(template, Template):
@@ -122,16 +139,16 @@ class CanvasService(object):
       r = urllib.request.Request('%s/api/template/%d.json' % (self._urlbase, template.id), template.toJSON().encode('utf-8'))
       r.get_method = lambda: 'PUT'
       u = self._opener.open(r)
-      print(( u.read() ))
+      res = json.loads(u.read().decode('utf-8'))
 
-      return True
+      return res
 
     except urllib.error.URLError as e:
       print(e)
     except urllib.error.HTTPError as e:
       print(e)
 
-    return False
+    raise ServiceException('error: unable to update template.')
 
 
   def template_get(self, template):
@@ -155,20 +172,20 @@ class CanvasService(object):
         return Template(template=data)
 
     except urllib.error.URLError as e:
-      print(e)
+      raise ServiceException('FIX ME')
     except urllib.error.HTTPError as e:
-      print(e)
+      raise ServiceException('FIX ME')
 
-    return None
+    raise ServiceException('error: unable to get template.')
 
   def template_list(self):
-    """ Check if the korora template exists
-    """
     try:
       r = urllib.request.Request('%s/api/templates.json' % ( self._urlbase ))
       u = self._opener.open(r)
 
-      return json.loads(u.read().decode('utf-8'))
+      res = json.loads(u.read().decode('utf-8'))
+
+      return res
 
     except urllib.error.URLError as e:
       print(e)
