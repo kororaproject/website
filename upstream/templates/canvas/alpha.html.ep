@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="canvas">
+<head>
+  %= include 'header.inc', title => 'Korora Project'
+  <link href="/css/layerslider.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  %= include 'noscript.inc'
+
+  <div class="page-container">
+
+    <nav id="korobar" class="navbar navbar-default" role="navigation">
+      <div class="navbar-container">
+        <div class="navbar-header">
+          <a href="/" class="navbar-brand">
+            <div class="canvas-logo-48">
+              <h1 class="title">KORORA<span class="title-dark">CANVAS</span></h1>
+            </div>
+          </a>
+        </div>
+        <!-- navigation content for toggling -->
+        <div class="collapse navbar-collapse navbar-primary-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <div class="topbar navbar-btn btn-group btn-group-sm">
+              <a href="https://kororaproject.org" class="btn btn-default">KORORA Home</a>
+            </div>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="page-content">
+      <!-- CONTENT -->
+
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12 col-sm-offset-1 col-sm-4 center vcenter">
+            <div class="laptop">
+              <img src="/img/canvas-alpha.png"/>
+            </div>
+          </div><!--
+       --><div class="col-sm-6 center vcenter">
+            <div class="alpha-block">
+              <h1><b>Coming Soon</b></h1>
+              <p>Reduce your post-install setup time, share your dedicated Steam/Gaming configuration or start up your own HTPC or re-sync with the latest Korora releases as if you just installed it.</p>
+              <p>Korora's <b>Canvas</b> will introduce simplified composition, synchronisation and management of all your Korora systems &ndash; including your Mum's.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- END CONTENT -->
+    </div>
+  </div>
+
+  %= include 'canvas/footer.inc'
+
+  <!-- MODALS -->
+  %= include 'authenticate.inc'
+
+  <!-- SCRIPTS -->
+  %= include 'scripts.inc'
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 # Canvas
 
-The Canvas project is a Korora Project initiative to simplify distribution and management of customised Korora (and Fedora) systems. Canvas draws inspiration from a number of existing solutions that provide OS customisation and building including:
+Canvas is a Korora Project initiative to simplify the composition, distribution and management of customised Korora (and Fedora) systems. Canvas draws inspiration from a number of existing solutions that provide OS customisation and building including:
 
 * [openSUSE Build Service](https://build.opensuse.org/)
 * [Revisor](https://fedorahosted.org/revisor/), and
@@ -9,7 +9,7 @@ The Canvas project is a Korora Project initiative to simplify distribution and m
 Some fundamental goals of the Canvas project include:
 
 * To provide a simple and intuitive interface for system composition,
-* ProFitted for extensibility, and
+* Fitted for extensibility, and
 * Allow trivial management of your Mum's install.
 
 ## Component Overview
@@ -69,25 +69,36 @@ The default user is the name of the system user account invoking the `cnvs` comm
 
 The default host is the Korora Project canvas server located at https://canvas.kororaproject.org/. The default host can also be specified in the `~/.config/canvas.conf`.
 
+### Configuration
+
+#### Command Overview
+The following commands are available for the management of Canvas templates:
+```
+cnvs config [--unset] name [value]
+```
+
+You can query/set/replace/unset options with this command. The `name` is actually the section and the key separated by a dot, and the value will be escaped.
+
 ### Templates
 The following commands allow adding, removing and updating and synchronising Canvas templates.
 
 #### Command Overview
 The following commands are available for the management of Canvas templates:
 ```
-cnvs template add [user:]template [--name] [--description] [--includes]
-cnvs template update [user:]template [--name] [--description] [--includes]
+cnvs template add [user:]template [--name] [--title] [--description] [--includes] [--public]
+cnvs template update [user:]template [--name] [--title] [--description] [--includes] [--public]
 cnvs template rm [user:]template
 cnvs template push [user:]template
 cnvs template pull [user:]template [--clean]
 cnvs template diff [user:]template
 cnvs template copy [user_from:]template_from [[user_to:]template_to]
+cnvs template list
 ```
 
 #### Adding Templates
 The general usage for adding a new template to a Canvas user is described as:
 ```
-cnvs template add [user:]template [--name] [--description] [--includes]
+cnvs template add [user:]template [--name] [--title] [--description] [--includes] [--public]
 ```
 
 For example, adding a new blank template identifed as `htpc` to the Canvas user `firnsy`.
@@ -100,11 +111,12 @@ Adding a new template identifed as `htpc` to the Canvas user `firnsy` that is ba
 cnvs template add firnsy:htpc --includes kororaproject:core
 ```
 
+When adding new templates they will be private by default. If you wish to make your templates available for others to see then set the `--public` flag to a value of `true` or `1`.
 
 #### Updating Templates
 The general usage for updating an existing template of a Canvas user is described as:
 ```
-cnvs template update [user:]template [--name] [--description] [--includes]
+cnvs template update [user:]template [--name] [--title] [--description] [--includes] [--public]
 ```
 
 Updating the name and description of existing template `htpc` of Canvas user `firnsy`.
@@ -172,13 +184,24 @@ If `firnsy` wanted to retain the same template name he could have  abbreviated t
 cnvs template copy kororaproject:htpc
 ```
 
+#### Listing Templates
+The general usage for listing templates that are accessible is described as:
+```
+cnvs template list
+```
+
+```
+cnvs template list
+```
+
 ### Template Packages
-The following commands allow adding and removing of packages from specified Templates.
+The following commands allow management of packages from specified Templates.
 
 #### Command Overview
 The following commands are available for the management of Canvas template packages:
 ```
 cnvs package add [user:]template package1 package2 ... packageN
+cnvs package list [user:]template
 cnvs package rm [user:]template package1 package2 ... packageN
 ```
 
@@ -194,9 +217,9 @@ Note that a `version` and `release` must be specified together and can not be sp
 Examples of package definitions include:
 ```
 foo                   # name only
-foo!x86_64            # name and arch
-foo:2.1-3             # name, version and release
-foo#1:2.1-3!x86_64    # name, epoch, version, release and arch
+foo:x86_64            # name and arch
+foo@2.1-3             # name, version and release
+foo#1@2.1-3:x86_64    # name, epoch, version, release and arch
 ```
 
 
@@ -222,6 +245,110 @@ cnvs package rm firnsy:htpc @bar
 cnvs package rm firnsy:htpc foo baz
 ```
 
+#### Listing Packages
+The general usage for listing packages in templates is described as:
+```
+cnvs package list [user:]template
+```
+
+```
+cnvs package list firnsy:htpc
+```
+
+### Template Repos
+The following commands allow management of repos from specified Templates.
+
+#### Command Overview
+The following commands are available for the management of Canvas template repos:
+```
+cnvs repo add [user:]template repo --baseurl=|--metalink=|--mirrorlist= [--cost=] [--enabled=] [--gpgkey=] [--name=] [--priority=]
+cnvs repo update [user:]template repo --baseurl=|--metalink=|--mirrorlist= [--cost=] [--enabled=] [--gpgkey=] [--name=] [--priority=]
+cnvs repo list [user:] template
+cnvs repo rm [user:]template repo
+```
+
+#### Repos Definitions
+
+The allowed characters of the `repo` ID string are lower and upper case alphabetic letters, digits, `-`, `_`, `.` and `:`.
+
+##### Repo Options
+`cost` (integer)
+
+The relative cost of accessing this repository, defaulting to 1000. This value is compared when the priorities of two repositories are the same. The repository with the lowest cost is picked. It is useful to make the library prefer on-disk repositories to remote ones.
+
+`baseurl` (list)
+
+URLs for the repository.
+
+`enabled` (boolean)
+
+Include this repository as a package source. The default is True.
+
+`gpgkey` (list of strings)
+
+URLs of a GPG key files that can be used for signing metadata and packages of this repository, empty by default. If a file can not be verified using the already imported keys, import of keys from this option is attempted and the keys are then used for verification.
+
+`metalink` (string)
+
+URL of a metalink for the repository.
+
+`mirrorlist` (string)
+
+URL of a mirrorlist for the repository.
+
+`name` (string)
+
+A human-readable name of the repository. Defaults to the ID of the repository.
+
+`priority` (integer)
+
+The priority value of this repository, default is 99. If there is more than one candidate package for a particular operation, the one from a repo with the lowest priority value is picked, possibly despite being less convenient otherwise (e.g. by being a lower version).
+
+`skip_if_unavailable` (boolean)
+
+If enabled, DNF will continue running and disable the repository that couldn’t be contacted for any reason when downloading metadata. This option doesn’t affect skipping of unavailable packages after dependency resolution. To check inaccessibility of repository use it in combination with refresh command line option. The default is True.
+
+#### Adding Repos
+The general usage for adding repos from templates is described as:
+```
+cnvs repo add [user:]template repo --baseurl=|--metalink=|--mirrorlist= [--cost=] [--enabled=] [--gpgkey=] [--name=] [--priority=]
+```
+
+```
+cnvs repo add firnsy:htpc rpmfusion --mirrorlist='http://mirrors.rpmfusion.org/mirrorlist?repo=nonfree-fedora-$releasever&arch=$basearch'
+```
+
+#### Updating Repos
+The general usage for updating repos from templates is described as:
+```
+cnvs repo update [user:]template repo --baseurl=|--metalink=|--mirrorlist= [--cost=] [--enabled=] [--gpgkey=] [--name=] [--priority=]
+```
+
+```
+cnvs repo update firnsy:htpc rpmfusion --priority=50
+```
+
+#### Listing Repos
+The general usage for listing repos in templates is described as:
+```
+cnvs repo list [user:]template
+```
+
+```
+cnvs repo list firnsy:htpc
+```
+
+#### Removing Repos
+The general usage for removing repos from templates is described as:
+```
+cnvs repo rm [user:]template repo
+```
+
+```
+cnvs repo rm firnsy:htpc rpmfusion
+```
+
+
 ### Machines
 The following commands allow adding, removing and updating Canvas machines that are assigned templates. Machines are your configured Canvas systems that can be managed and easily synchronised with your latest configurations.
 
@@ -230,7 +357,7 @@ Machines have a 1-to-1 link with a Canvas template. For example you may assign y
 #### Command Overview
 The following commands are available for the management of Canvas machines:
 ```
-cnvs machine add|update [user:]name [--description=] [--name=] [--template=]
+cnvs machine add|update [user:]name [--description=] [--location=] [--name=] [--template=]
 cnvs machine rm [user:]name
 cnvs machine diff [user:]name
 cnvs machine sync [user:]name [--pull [[user:]template]] | --push [user:]template]
@@ -240,7 +367,7 @@ cnvs machine cmd [user:]name command arg1 arg2 ... argN
 #### Adding Machines
 The general usage for adding a new managed machine to a Canvas user is described as:
 ```
-cnvs machine add [user:]name [--description=] [--name=] [--template=]
+cnvs machine add [user:]name [--description=] [--location=] [--name=] [--template=]
 ```
 
 To add the current system as a managed machine named `odin` to the Canvas user `firnsy` linked to the `htpc` template from the same Canvas user is as follows:
