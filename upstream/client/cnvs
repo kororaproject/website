@@ -98,7 +98,7 @@ def buildCommandLineParser(config):
   template_update_parser.add_argument('--title', type=str)
   template_update_parser.add_argument('--description', type=str)
   template_update_parser.add_argument('--includes', type=str)
-  template_update_parser.add_argument('--name', type=str)
+#  template_update_parser.add_argument('--name', type=str)
   template_update_parser.add_argument('--public', type=str, choices=['0', '1', 'false', 'true'])
 
   # template list arguments
