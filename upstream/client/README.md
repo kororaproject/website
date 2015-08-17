@@ -20,7 +20,7 @@ The broad components understood to Canvas are:
  * Templates, and
  * Machines
 
-Packages and Repos are the traditional representations as you know them. A package is an installing piece of software that provides a level of functionality for your system. Your OS is typically compsed of 100s to possibly 1000s of individual packages. Repos are the store for where Packages can be fetched from and installed.
+Packages and Repos are the traditional representations as you know them. A package is an installable piece of software that provides a level of functionality for your system. Your OS is typically compsed of 100s to possibly 1000s of individual packages. Repos are the store for where Packages can be fetched from and installed.
 
 Templates are the recipes for how particular systems are to be composed. They will specify the Repos available and the Packages to be installed to make the final compositions.
 
@@ -80,7 +80,7 @@ cnvs config [--unset] name [value]
 You can query/set/replace/unset options with this command. The `name` is actually the section and the key separated by a dot, and the value will be escaped.
 
 ### Templates
-The following commands allow adding, removing and updating and synchronising Canvas templates.
+The following commands allow adding, removing, modifying, querying and synchronising Canvas templates.
 
 #### Command Overview
 The following commands are available for the management of Canvas templates:
@@ -136,7 +136,7 @@ cnvs template rm firnsy:htpc
 ```
 
 #### Synchronising Templates
-The general usage for synchronising existing templates of a Canvas user is described as:
+The general usage for synchronising an existing template of a Canvas user is described as:
 ```
 cnvs template push [user:]template
 cnvs template pull [user:]template [--clean]
@@ -158,7 +158,7 @@ cnvs template push firnsy:htpc
 ```
 
 #### Diff Templates:
-The general usage for viewing the diff between the current system and an existing template of a Canvas user is described as:
+The general usage for viewing the differences between the current system's configuration and an existing template of a Canvas user is described as:
 ```
 cnvs template diff [user:]template
 ```
@@ -179,13 +179,13 @@ For example the following command would copy the `htpc` template from `kororapro
 cnvs template copy kororaproject:htpc firnsy:my-htpc
 ```
 
-If `firnsy` wanted to retain the same template name he could have  abbreviated to:
+If `firnsy` wanted to retain the same template name he could have abbreviated to:
 ```
 cnvs template copy kororaproject:htpc
 ```
 
 #### Listing Templates
-The general usage for listing templates that are accessible is described as:
+The general usage for listing templates that are currently accessible is described as:
 ```
 cnvs template list
 ```
@@ -208,11 +208,15 @@ cnvs package rm [user:]template package1 package2 ... packageN
 #### Package Definition
 When specifying packages it is possible to be as generic or explicit as you wish with regard to epoch, version, release and arch.
 
-The package definition described as:
+The syntax for package definitions is described as:
 ```
-name[[#epoch]:version-release][!arch]
+name[[#epoch]@version-release][:arch]
 ```
-Note that a `version` and `release` must be specified together and can not be specified individually.
+When `#epoch` is omitted, the latest epoch will be used.
+When `@version-release` is omitted, the latest version and release number will be used.
+When `:arch` is omitted, the architecture will be decided during installation according to the architecture of the target system and the architectures available for the package.
+
+Note that a `version` and `release` must be specified together and can not be specified individually, and an `#epoch` cannot be specified without them.
 
 Examples of package definitions include:
 ```
@@ -387,7 +391,7 @@ cnvs machine update firnsy:odin --template firnsy:steam
 ```
 
 #### Removing Machines
-The general usage for adding a new managed machine to a Canvas user is described as:
+The general usage for removing an existing managed machine to a Canvas user is described as:
 ```
 cnvs machine rm [user:]name
 ```
@@ -416,7 +420,7 @@ The general usage for synchronising an existing managed machine of a Canvas user
 cnvs machine sync [user:]name [--pull [[user:]template]] | --push [user:]template]
 ```
 
-For example to synchronise machine `odin` of Canvas user `firnsy` is done with the following command:
+For example syncronizing machine `odin` of Canvas user `firnsy` is done with the following command:
 ```
 cnvs machine sync firnsy:odin
 ```
@@ -437,7 +441,7 @@ cnvs machine sync firnsy:odin --pull firnsy:htpc
 ```
 
 #### Commanding Machines
-The general usage for synchronising an existing managed machine of a Canvas user is described as:
+The general usage for sending a command to an existing managed machine of a Canvas user is described as:
 ```
 cnvs machine cmd [user:]name command arg1 arg2 ... argN
 ```
