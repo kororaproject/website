@@ -212,8 +212,8 @@ The syntax for package definitions is described as:
 ```
 name[[#epoch]@version-release][:arch]
 ```
-When `#epoch` is omitted, the latest epoch will be used.
-When `@version-release` is omitted, the latest version and release number will be used.
+When `#epoch` is omitted, the latest epoch will be used.  
+When `@version-release` is omitted, the latest version and release number will be used.  
 When `:arch` is omitted, the architecture will be decided during installation according to the architecture of the target system and the architectures available for the package.
 
 Note that a `version` and `release` must be specified together and can not be specified individually, and an `#epoch` cannot be specified without them.
