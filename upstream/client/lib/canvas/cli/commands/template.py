@@ -40,6 +40,13 @@ class TemplateCommand(Command):
     except:
       pass
 
+    # eval public
+    try:
+      if args.public is not None:
+        args.public = (args.public in ['1', 'true'])
+    except:
+      pass
+
     # store args for additional processing
     self.args = args
 
@@ -72,8 +79,6 @@ class TemplateCommand(Command):
   def run_add(self):
     t = Template(self.args.template, user=self.args.username)
 
-    print(self.args)
-
     if self.args.username:
       if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
         print('error: unable to authenticate with canvas service.')
@@ -99,11 +104,47 @@ class TemplateCommand(Command):
       print(e)
       return 1
 
-    print('info: template added ({0})'.format(res['id']))
+    print('info: template added.')
     return 0
 
   def run_update(self):
-    print("TEMPLATE UPDATE NOT YET IMPLEMENTED")
+    t = Template(self.args.template, user=self.args.username)
+
+    if self.args.username:
+      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
+        print('error: unable to authenticate with canvas service.')
+        return 1
+
+    try:
+      t = self.cs.template_get(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    # add template bits that are specified for update
+    if self.args.title is not None:
+      t.title = self.args.title
+
+    if self.args.description is not None:
+      t.description = self.args.description
+
+    if self.args.includes is not None:
+      t.includes = self.args.includes
+
+    if self.args.public is not None:
+      t.public = self.args.public
+
+    try:
+      res = self.cs.template_update(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    print('info: template updated.')
+    return 0
+
 
   def run_remove(self):
     print("TEMPLATE RM NOT YET IMPLEMENTED")
