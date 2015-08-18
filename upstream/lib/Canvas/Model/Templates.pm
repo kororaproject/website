@@ -131,7 +131,10 @@ sub find {
             (t.id=$1 or $1 IS NULL) AND
             (t.stub=$2 or $2 IS NULL) AND
             (u.username=$3 or $3 IS NULL) AND
-            (t.owner_id=$4 OR (t.meta @> \'{"public": true}\'::jsonb))' => (
+            (t.owner_id=$4 OR
+              (u.meta->\'members\' @> $4) OR
+              (t.meta @> \'{"public": true}\'::jsonb)
+            )' => (
               $args->{id}, $args->{name},
               $args->{user_name}, $args->{user_id}) => $d->begin);
       },
@@ -147,21 +150,46 @@ sub find {
 }
 
 sub remove {
-  my ($self, $id, $user) = @_;
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  my $self = shift;
+  my $args = @_%2 ? shift : {@_};
 
-  return $self->pg->db->query('
-    SELECT
-      t.id, t.name, t.description, t.stub, t.includes,
-      t.repos, t.packages, t.meta, t.owner_id,
-      u.username AS owner,
-      EXTRACT(EPOCH FROM t.created) AS created,
-      EXTRACT(EPOCH FROM t.updated) AS updated
-    FROM templates t
-    JOIN users u ON
-      (u.id=t.owner_id)
-    WHERE
-      t.id=? AND
-      (t.owner_id=? OR (t.meta @> \'{"public": true}\'::jsonb))', $id, $user->{id})->expand->hash;
+  if ($cb) {
+    return Mojo::IOLoop->delay(
+      sub {
+        my $d = shift;
+
+        # check for existing template we can modify/remove
+        $self->pg->db->query('
+          SELECT t.id
+          FROM templates t
+          JOIN users u ON
+            (u.id=t.owner_id)
+          WHERE
+            t.id=$1 AND
+            (u.id=$2 OR (u.meta->\'members\' @> $2))
+          ' => ($args->{id}, $args->{user_id}) => $d->begin);
+      },
+      sub {
+        my ($d, $err, $res) = @_;
+
+        # abort on error or results (ie already exists)
+        return $cb->('internal server error', undef) if $err;
+        return $cb->('template doesn\'t exist', undef) if $res->rows == 0;
+
+        # insert if we're the owner or member of owner's group
+        $self->pg->db->query('DELETE FROM templatemeta WHERE template_id=$1' => ($args->{id}) => $d->begin);
+        $self->pg->db->query('DELETE FROM templates WHERE id=$1' => ($args->{id}) => $d->begin);
+      },
+      sub {
+        my ($d, $err_meta, $res_meta, $err, $res) = @_;
+
+        return $cb->('internal server error', undef) if $err or $err_meta;
+
+        return $cb->(undef, $res->rows == 1);
+      }
+    );
+  }
 }
 
 sub update {
@@ -210,8 +238,6 @@ sub update {
         return $cb->('internal server error', undef) if $err;
         return $cb->('template doesn\'t exist', undef) if $res->rows == 0;
 
-        $self->pg->db->dbh->trace('SQL');
-
         # insert if we're the owner or member of owner's group
         $self->pg->db->query('
           UPDATE templates
@@ -233,8 +259,6 @@ sub update {
         my ($d, $err, $res) = @_;
 
         return $cb->('internal server error', undef) if $err;
-
-        warn dumper $res;
 
         return $cb->(undef, $res->rows == 1);
       }

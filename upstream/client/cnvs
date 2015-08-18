@@ -50,7 +50,6 @@ class ArgumentParserError(Exception): pass
 
 class ErrorRaisingArgumentParser(argparse.ArgumentParser):
   def error(self, message):
-    print(message)
     raise ArgumentParserError(message)
 
 
@@ -237,8 +236,9 @@ if __name__ == '__main__':
 
   except:
     # TODO: determine best help instead of general
-    args.command = sys.args[1]
-    args.action  = sys.args[2]
+    args = argparse.Namespace()
+    args.command = sys.argv[1]
+    args.action  = sys.argv[2]
     args.help = True
 
   cli = None

@@ -65,13 +65,14 @@ class TemplateCommand(Command):
           "{0} template diff [user:]template\n"
           "{0} template copy [user_from:]template_from [[user_to:]template_to]\n"
           "{0} template list\n"
-          "\n".format(self.PROG_NAME))
+          "\n".format(self.prog_name))
 
   def run(self):
     # search for our function based on the specified action
     command = getattr(self, 'run_{0}'.format(self.args.action))
 
     if not command:
+      print('error: action is not reachable.')
       return
 
     return command()
@@ -146,8 +147,22 @@ class TemplateCommand(Command):
     return 0
 
 
-  def run_remove(self):
-    print("TEMPLATE RM NOT YET IMPLEMENTED")
+  def run_rm(self):
+    t = Template(self.args.template, user=self.args.username)
+
+    if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
+      print('error: unable to authenticate with canvas service.')
+      return 1
+
+    try:
+      res = self.cs.template_delete(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    print('info: template removed.')
+    return 0
 
   def run_push(self):
     print("TEMPLATE PUSH NOT YET IMPLEMENTED")
@@ -213,16 +228,20 @@ class TemplateCommand(Command):
     if self.args.username:
       self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username)))
 
-    tl = self.cs.template_list()
+    try:
+      templates = self.cs.template_list()
 
-    if len(tl):
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    if len(templates):
       print('Templates:')
 
-      for t in tl:
+      for t in templates:
         print('  - {0} ({1}) - {2}'.format(t['stub'], t['username'], t['name']))
 
-      print
-      print('%d template(s) found.' % ( len(tl) ))
+      print('\n{0} template(s) found.'.format(len(templates)))
 
     else:
       print('0 templates found.')

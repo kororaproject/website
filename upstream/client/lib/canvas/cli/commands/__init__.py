@@ -32,8 +32,8 @@ def general_usage(prog_name='canvas'):
         "   config     Clone a repository into a new directory\n".format(prog_name))
 
 class Command(object):
-  def __init__(self):
-    pass
+  def __init__(self, prog_name='canvas'):
+    self.prog_name = prog_name
 
   def configure(self, config, args, args_extra):
     pass
