@@ -221,7 +221,34 @@ class TemplateCommand(Command):
     print("TEMPLATE DIFF NOT YET IMPLEMENTED")
 
   def run_copy(self):
-    print("TEMPLATE COPY NOT YET IMPLEMENTED")
+    t = Template(self.args.template_from, user=self.args.username)
+
+    if self.args.username:
+      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
+        print('error: unable to authenticate with canvas service.')
+        return 1
+
+    try:
+      t = self.cs.template_get(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    # reparse for template destination
+    t.parse(self.args.template_to)
+
+    try:
+      res = self.cs.template_create(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    print('info: template copied.')
+    return 0
+
+
 
   def run_list(self):
     # authentication is optional

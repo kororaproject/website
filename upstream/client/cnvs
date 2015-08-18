@@ -117,11 +117,11 @@ def buildCommandLineParser(config):
   template_push_parser.add_argument('template', type=str)
 
   # template diff arguments
-  template_diff_parser = subparsers_template.add_parser('delete', add_help=False, parents=[general_parser])
+  template_diff_parser = subparsers_template.add_parser('diff', add_help=False, parents=[general_parser])
   template_diff_parser.add_argument('template', type=str)
 
   # template copy arguments
-  template_copy_parser = subparsers_template.add_parser('delete', add_help=False, parents=[general_parser])
+  template_copy_parser = subparsers_template.add_parser('copy', add_help=False, parents=[general_parser])
   template_copy_parser.add_argument('template_from', type=str)
   template_copy_parser.add_argument('template_to', type=str, nargs='?')
 
