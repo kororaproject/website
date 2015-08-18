@@ -18,6 +18,7 @@
 
 import getpass
 import logging
+import prettytable
 
 from canvas.cli.commands import Command
 from canvas.service import Service, ServiceException
@@ -263,10 +264,16 @@ class TemplateCommand(Command):
       return 1
 
     if len(templates):
-      print('Templates:')
+      l = prettytable.PrettyTable(["user:name", "title"])
+      l.hrules = prettytable.HEADER
+      l.vrules = prettytable.NONE
+      l.align = 'l'
+      l.padding_witdth = 1
 
       for t in templates:
-        print('  - {0} ({1}) - {2}'.format(t['stub'], t['username'], t['name']))
+        l.add_row(["{0}:{1}".format(t['username'], t['stub']), t['name']])
+
+      print(l)
 
       print('\n{0} template(s) found.'.format(len(templates)))
 
