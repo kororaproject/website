@@ -50,7 +50,6 @@ class ArgumentParserError(Exception): pass
 
 class ErrorRaisingArgumentParser(argparse.ArgumentParser):
   def error(self, message):
-    print(message)
     raise ArgumentParserError(message)
 
 
@@ -98,7 +97,7 @@ def buildCommandLineParser(config):
   template_update_parser.add_argument('--title', type=str)
   template_update_parser.add_argument('--description', type=str)
   template_update_parser.add_argument('--includes', type=str)
-  template_update_parser.add_argument('--name', type=str)
+#  template_update_parser.add_argument('--name', type=str)
   template_update_parser.add_argument('--public', type=str, choices=['0', '1', 'false', 'true'])
 
   # template list arguments
@@ -118,11 +117,11 @@ def buildCommandLineParser(config):
   template_push_parser.add_argument('template', type=str)
 
   # template diff arguments
-  template_diff_parser = subparsers_template.add_parser('delete', add_help=False, parents=[general_parser])
+  template_diff_parser = subparsers_template.add_parser('diff', add_help=False, parents=[general_parser])
   template_diff_parser.add_argument('template', type=str)
 
   # template copy arguments
-  template_copy_parser = subparsers_template.add_parser('delete', add_help=False, parents=[general_parser])
+  template_copy_parser = subparsers_template.add_parser('copy', add_help=False, parents=[general_parser])
   template_copy_parser.add_argument('template_from', type=str)
   template_copy_parser.add_argument('template_to', type=str, nargs='?')
 
@@ -237,8 +236,9 @@ if __name__ == '__main__':
 
   except:
     # TODO: determine best help instead of general
-    args.command = sys.args[1]
-    args.action  = sys.args[2]
+    args = argparse.Namespace()
+    args.command = sys.argv[1]
+    args.action  = sys.argv[2]
     args.help = True
 
   cli = None

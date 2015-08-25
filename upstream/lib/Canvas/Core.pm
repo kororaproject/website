@@ -212,8 +212,6 @@ sub templates_post {
 
   my $template = $c->req->json;
 
-  warn dumper $template;
-
   $c->render_later;
 
   $c->canvas->templates->add(
@@ -258,7 +256,17 @@ sub template_id_get {
     id      => $id,
     user_id => $cu->{id},
     sub {
-      my ($err, $template) = @_;
+      my ($err, $templates) = @_;
+
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+
+      if ($templates->size != 1) {
+        $err = 'too many template found.';
+        return $c->render(status => 500, text => $err, json => {error => $err});
+      }
+
+      # only expect one template
+      my $template = $templates->first;
 
       if (!!$resolve) {
         $c->resolve_includes($template);
@@ -304,72 +312,28 @@ sub template_id_update {
   my $c = shift;
   my $id = $c->param('id');
 
-  my $template = $c->pg->db->query('SELECT t.id, t.name, t.description, t.stub, t.repos, t.packages, t.meta, t.owner_id, u.username AS owner, EXTRACT(EPOCH FROM t.created) AS created, EXTRACT(EPOCH FROM t.updated) AS updated FROM templates t JOIN users u ON (u.id=t.owner_id) WHERE t.id=?', $id)->expand->hash;
-
-  # check we actually received a valid template
-  unless ($template) {
-    return $c->render(
-      status  => 404,
-      json    => { error => 'not found' },
-    );
-  }
-
   unless ($c->users->is_active) {
-    return $c->render(
-      status  => 403,
-      text    => 'Not authenticated.',
-      json    => { error => 'Not authenticated.' },
-    );
+    my $msg = 'not authenticated.';
+    return $c->render(status => 403, text => $msg, json => {error => $msg});
   };
 
-  my $updated = $c->req->json;
-
-  # find the user requested
-  my $u = $c->pg->db->query('SELECT * FROM users WHERE username=?', $updated->{user})->hash;
-
-  # bail if the user doesn't exist
-  unless ($u) {
-    say "NO USER";
-    return $c->render(
-      status  => 500,
-      text    => 'No user with that name.',
-      json    => { error => 'No user with that user.' },
-    );
-  }
+  my $template = $c->req->json;
 
   # get auth'd user
   my $cu = $c->auth_user // { id => -1 };
 
-  # skip if private and not owned by us
-  if (!$template->{meta}{public} && $template->{owner_id} != $cu->{id}) {
-    return $c->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
+  $c->render_later;
 
-  # generate sanitised unique stub based on template name
-  $updated->{stub} = $c->sanitise_with_dashes($updated->{name});
+  $c->canvas->templates->update(
+    id       => $id,
+    template => $template,
+    user_id  => $cu->{id},
+    sub {
+      my ($err, $id) = @_;
 
-  # check if template already exists
-  my $t = $c->pg->db->query('SELECT * FROM templates WHERE stub=?', $updated->{stub})->hash;
-
-  if ($t && ($t->{id} ne $template->{id})) {
-    my $msg = sprintf('template user:name already exists.', $template->{user}, $template->{stub});
-    return $c->render(
-      status  => 409,
-      text    => $msg,
-      json    => { error => $msg },
-    );
-  }
-
-  $c->pg->db->query('UPDATE templates SET name=?, stub=?, description=?, packages=?, repos=?, includes=?, meta=? WHERE id=?', $updated->{name}, $updated->{stub}, $updated->{description}, {json => $updated->{packages}}, {json => $updated->{repos}}, {json => $updated->{includes}}, {json => $updated->{meta}}, $id);
-
-  $c->render(
-    status  => 200,
-    text    => "id: $id",
-    json    => { id => $id },
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+      $c->render(status => 200, text => "id: $id", json => {id => $id});
+    }
   );
 }
 
@@ -387,38 +351,27 @@ sub template_id_del {
   my $c = shift;
   my $id = $c->param('id');
 
-  my $template = $c->pg->db->query('SELECT t.name, t.description, t.stub, t.repos, t.packages, t.meta, t.owner_id, u.username AS owner, EXTRACT(EPOCH FROM t.created) AS created, EXTRACT(EPOCH FROM t.updated) AS updated FROM templates t JOIN users u ON (u.id=t.owner_id) WHERE t.id=?', $id)->expand->hash;
+  unless ($c->users->is_active) {
+    my $msg = 'not authenticated.';
+    return $c->render(status => 403, text => $msg, json => {error => $msg});
+  };
 
-  # check we actually received a valid template
-  unless ($template) {
-    return $c->render(
-      status  => 404,
-      json    => { error => 'not found' },
-    );
-  }
+  my $template = $c->req->json;
 
   # get auth'd user
   my $cu = $c->auth_user // { id => -1 };
 
-  # skip if private and not owned by us
-  if (!$template->{meta}{public} && $template->{owner_id} != $cu->{id}) {
-    return $c->render(
-      status  => 403,
-      text    => 'denied',
-      json    => { error => 'denied' },
-    );
-  }
+  $c->render_later;
 
-  my $db = $c->pg->db;
-  my $tx = $db->begin;
-  $db->query('DELETE FROM templatemeta WHERE template_id=?', $id);;
-  $db->query('DELETE FROM templates WHERE id=?', $id);;
-  $tx->commit;
+  $c->canvas->templates->remove(
+    id       => $id,
+    user_id  => $cu->{id},
+    sub {
+      my ($err, $id) = @_;
 
-  $c->render(
-    status  => 200,
-    text    => 'ok',
-    json    => { message => 'ok' },
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+      $c->render(status => 200, text => "id: $id", json => {id => $id});
+    }
   );
 }
 

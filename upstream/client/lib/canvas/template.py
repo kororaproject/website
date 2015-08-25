@@ -63,9 +63,9 @@ class Template(object):
 
     if isinstance(template, dict):
       self._id = template.get('id', None)
-      self._user = template.get('user', template.get('owner', None))
-      self._name = template.get('name', None)
-      self._title = template.get('title', self._name)
+      self._user = template.get('user', template.get('username', None))
+      self._name = template.get('stub', None)
+      self._title = template.get('name', self._name)
       self._description = template.get('description', None)
 
       self._includes = template.get('includes', [])
@@ -73,9 +73,6 @@ class Template(object):
 
       self._repos = [Repository(r) for r in template.get('repos', [])]
       self._packages = [Package(p) for p in template.get('packages', [])]
-
-      if self._id is not None:
-        self._id = int(self._id)
 
   #
   # PROPERTIES
@@ -162,7 +159,7 @@ class Template(object):
 
     return None
 
-  def set(self, template):
+  def parse(self, template):
     self._parse_template(template)
 
   def union(self, template):

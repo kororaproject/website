@@ -13,7 +13,13 @@ sub add {
   my $template = $args->{template};
 
   # name => stub
-  $template->{stub} = $template->{name};
+  $template->{stub} //= $template->{name};
+
+  # sanitise name to [A-Za-z0-9_-]
+  $template->{stub} =~ s/[^\w-]+//g;
+
+  # ensure we have a stub
+  return $cb->('invalid name defined.', undef) unless length $template->{stub};
 
   $template->{description} //= '';
   $template->{includes}    //= [];
@@ -113,8 +119,8 @@ sub find {
 
         $self->pg->db->query('
           SELECT
-            t.id, t.name, t.description, t.stub, t.includes,
-            t.repos, t.packages, t.meta, t.owner_id,
+            t.id::int, t.name, t.description, t.stub, t.includes,
+            t.repos, t.packages, t.meta, t.owner_id::int,
             u.username,
             EXTRACT(EPOCH FROM t.created) AS created,
             EXTRACT(EPOCH FROM t.updated) AS updated
@@ -123,9 +129,12 @@ sub find {
             (u.id=t.owner_id)
           WHERE
             (t.id=$1 or $1 IS NULL) AND
-            (t.name=$2 or $2 IS NULL) AND
+            (t.stub=$2 or $2 IS NULL) AND
             (u.username=$3 or $3 IS NULL) AND
-            (t.owner_id=$4 OR (t.meta @> \'{"public": true}\'::jsonb))' => (
+            (t.owner_id=$4 OR
+              (u.meta->\'members\' @> $4) OR
+              (t.meta @> \'{"public": true}\'::jsonb)
+            )' => (
               $args->{id}, $args->{name},
               $args->{user_name}, $args->{user_id}) => $d->begin);
       },
@@ -141,25 +150,120 @@ sub find {
 }
 
 sub remove {
-  my ($self, $id, $user) = @_;
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  my $self = shift;
+  my $args = @_%2 ? shift : {@_};
 
-  return $self->pg->db->query('
-    SELECT
-      t.id, t.name, t.description, t.stub, t.includes,
-      t.repos, t.packages, t.meta, t.owner_id,
-      u.username AS owner,
-      EXTRACT(EPOCH FROM t.created) AS created,
-      EXTRACT(EPOCH FROM t.updated) AS updated
-    FROM templates t
-    JOIN users u ON
-      (u.id=t.owner_id)
-    WHERE
-      t.id=? AND
-      (t.owner_id=? OR (t.meta @> \'{"public": true}\'::jsonb))', $id, $user->{id})->expand->hash;
+  if ($cb) {
+    return Mojo::IOLoop->delay(
+      sub {
+        my $d = shift;
+
+        # check for existing template we can modify/remove
+        $self->pg->db->query('
+          SELECT t.id
+          FROM templates t
+          JOIN users u ON
+            (u.id=t.owner_id)
+          WHERE
+            t.id=$1 AND
+            (u.id=$2 OR (u.meta->\'members\' @> $2))
+          ' => ($args->{id}, $args->{user_id}) => $d->begin);
+      },
+      sub {
+        my ($d, $err, $res) = @_;
+
+        # abort on error or results (ie already exists)
+        return $cb->('internal server error', undef) if $err;
+        return $cb->('template doesn\'t exist', undef) if $res->rows == 0;
+
+        # insert if we're the owner or member of owner's group
+        $self->pg->db->query('DELETE FROM templatemeta WHERE template_id=$1' => ($args->{id}) => $d->begin);
+        $self->pg->db->query('DELETE FROM templates WHERE id=$1' => ($args->{id}) => $d->begin);
+      },
+      sub {
+        my ($d, $err_meta, $res_meta, $err, $res) = @_;
+
+        return $cb->('internal server error', undef) if $err or $err_meta;
+
+        return $cb->(undef, $res->rows == 1);
+      }
+    );
+  }
 }
 
 sub update {
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  my $self = shift;
+  my $args = @_%2 ? shift : {@_};
 
+  my $template = $args->{template};
+
+  # name => stub
+  $template->{stub} //= $template->{name};
+
+  # sanitise name to [A-Za-z0-9_-]
+  $template->{stub} =~ s/[^\w-]+//g;
+
+  # ensure we have a stub
+  return $cb->('invalid name defined.', undef) unless length $template->{stub};
+
+  $template->{title}       //= '';
+  $template->{description} //= '';
+  $template->{includes}    //= [];
+  $template->{meta}        //= {};
+  $template->{packages}    //= {};
+  $template->{repos}       //= {};
+
+  if ($cb) {
+    return Mojo::IOLoop->delay(
+      sub {
+        my $d = shift;
+
+        # check for existing template we can modify
+        $self->pg->db->query('
+          SELECT t.id
+          FROM templates t
+          JOIN users u ON
+            (u.id=t.owner_id)
+          WHERE
+            t.id=$1 AND
+            (u.id=$2 OR (u.meta->\'members\' @> $2))
+          ' => ($args->{id}, $args->{user_id}) => $d->begin);
+      },
+      sub {
+        my ($d, $err, $res) = @_;
+
+        # abort on error or results (ie already exists)
+        return $cb->('internal server error', undef) if $err;
+        return $cb->('template doesn\'t exist', undef) if $res->rows == 0;
+
+        # insert if we're the owner or member of owner's group
+        $self->pg->db->query('
+          UPDATE templates
+            SET
+              name=$1, stub=$2, description=$3,
+              includes=$4, packages=$5, repos=$6, meta=$7
+          WHERE
+            id=$8' => (
+            $template->{title},
+            $template->{stub}, $template->{description},
+            {json => $template->{includes}},
+            {json => $template->{packages}},
+            {json => $template->{repos}},
+            {json => $template->{meta}},
+            $args->{id},
+          ) => $d->begin);
+      },
+      sub {
+        my ($d, $err, $res) = @_;
+
+        return $cb->('internal server error', undef) if $err;
+
+        return $cb->(undef, $res->rows == 1);
+      }
+    );
+  }
 }
 
 1;

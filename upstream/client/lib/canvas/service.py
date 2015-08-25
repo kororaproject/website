@@ -30,7 +30,7 @@ class ServiceException(Exception):
     return str(self)
 
   def __str__(self):
-    return 'error: {0} ({1})'.format(str(self.reason), int(self.code))
+    return 'error: {0}'.format(str(self.reason))
 
 
 class Service(object):
@@ -103,33 +103,39 @@ class Service(object):
 
     except urllib.error.HTTPError as e:
       print(e.fp.read())
-      raise ServiceException('CREATE HTTP ERROR')
+      raise ServiceException('unknown service response')
 
-    raise ServiceException('error: unable to add template.')
+    raise ServiceException('unable to add template.')
 
   def template_delete(self, template):
     if not isinstance(template, Template):
       TypeError('template is not of type Template')
 
+    query = {'user': template.user, 'name': template.name}
+
     try:
-      print(template)
-
-      r = urllib.request.Request('%s/api/template/%d.json' % ( self._urlbase, template.id ))
-      r.get_method = lambda: 'DELETE'
+      r = urllib.request.Request('%s/api/templates.json?%s' % (self._urlbase, urllib.parse.urlencode(query)))
       u = self._opener.open(r)
-      res = json.loads(u.read().decode('utf-8'))
 
-      return res
+      template_summary = json.loads(u.read().decode('utf-8'))
+
+      if len(template_summary):
+        r = urllib.request.Request('%s/api/template/%s.json' % (self._urlbase, template_summary[0]['id']))
+        r.get_method = lambda: 'DELETE'
+        u = self._opener.open(r)
+        res = json.loads(u.read().decode('utf-8'))
+
+        return res
 
     except urllib.error.URLError as e:
-      print(e)
-      raise ServiceException('CREATE ERROR')
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
 
     except urllib.error.HTTPError as e:
       print(e)
-      raise ServiceException('CREATE ERROR')
+      raise ServiceException('unknown service response')
 
-    raise ServiceException('error: unable to delete template.')
+    raise ServiceException('unable to delete template.')
 
   def template_update(self, template):
     if not isinstance(template, Template):
@@ -144,12 +150,14 @@ class Service(object):
       return res
 
     except urllib.error.URLError as e:
-      print(e)
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
+
     except urllib.error.HTTPError as e:
       print(e)
+      raise ServiceException('unknown service response')
 
-    raise ServiceException('error: unable to update template.')
-
+    raise ServiceException('unable to update template.')
 
   def template_get(self, template):
     if not isinstance(template, Template):
@@ -161,7 +169,7 @@ class Service(object):
       r = urllib.request.Request('%s/api/templates.json?%s' % (self._urlbase, urllib.parse.urlencode(query)))
       u = self._opener.open(r)
 
-      template_summary = json.loads( u.read().decode('utf-8') )
+      template_summary = json.loads(u.read().decode('utf-8'))
 
       if len(template_summary):
         # we only have one returned since template names are unique per account
@@ -172,11 +180,14 @@ class Service(object):
         return Template(template=data)
 
     except urllib.error.URLError as e:
-      raise ServiceException('FIX ME')
-    except urllib.error.HTTPError as e:
-      raise ServiceException('FIX ME')
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
 
-    raise ServiceException('error: unable to get template.')
+    except urllib.error.HTTPError as e:
+      print(e)
+      raise ServiceException('unknown service response')
+
+    raise ServiceException('unable to get template.')
 
   def template_list(self):
     try:
@@ -188,9 +199,12 @@ class Service(object):
       return res
 
     except urllib.error.URLError as e:
-      print(e)
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
+
     except urllib.error.HTTPError as e:
       print(e)
+      raise ServiceException('unknown service response')
 
     return []
 
