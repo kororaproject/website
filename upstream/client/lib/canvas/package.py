@@ -17,6 +17,7 @@
 #
 
 import dnf
+import hawkey
 
 from json import dumps as json_encode
 from json import loads as json_decode
@@ -42,8 +43,10 @@ class Package(object):
     self.arch     = kwargs.get('arch', None)
     self.action   = kwargs.get('action', ACTION_INCLUDE)
 
+    # parse all args package defined objects
     for arg in args:
-      if isinstance(arg, dnf.package.Package):
+      if isinstance(arg, dnf.package.Package) or \
+         isinstance(arg, hawkey.Package):
         self.name    = arg.name
         self.epoch   = arg.epoch
         self.version = arg.version
@@ -74,6 +77,12 @@ class Package(object):
           self.release = parts[2]
           self.arch = parts[3]
 
+    # strip evr information as appropriate
+    if not kwargs.get('evr', True):
+      self.epoch = None
+      self.version = None
+      self.release = None
+
   def __eq__(self, other):
     if isinstance(other, Package):
       return (self.name == other.name)
@@ -81,7 +90,13 @@ class Package(object):
       return False
 
   def __hash__(self):
-    return hash(self.name)
+    # package uniqueness is based on name and arch
+    # this allows packages with different archs to be
+    # specified in a template
+    if self.arch is None:
+      return hash(self.name)
+
+    return hash('{0}.{1}'.format(self.name, self.arch))
 
   def __ne__(self, other):
     return (not self.__eq__(other))
@@ -90,9 +105,49 @@ class Package(object):
     return 'Package: %s' % (self.name)
 
   def __str__(self):
-    return 'Package: %s ' % ( json_encode( self.toObject(), separators=(',',':') ) )
+    return 'Package: %s ' % ( json_encode( self.to_object(), separators=(',',':') ) )
 
-  def toObject(self):
+  def excluded(self):
+    return self.action & (ACTION_EXCLUDE)
+
+  def included(self):
+    return self.action & (ACTION_INCLUDE)
+
+  def pinned(self):
+    return self.action & (ACTION_PIN)
+
+  def to_pkg_spec(self):
+    # return empty string if no name (should never happen)
+    if self.name is None:
+      return ''
+
+    f = self.name
+
+    # calculate evr
+    evr = None
+
+    if self.epoch is not None:
+      evr = self.epoch + ':'
+
+    if self.version is not None and self.release is not None:
+      evr += '{0}-{1}'.format(self.version, self.release)
+    elif self.version is not None:
+      evr += self.version
+
+    # append evr if appropriate
+    if evr is not None:
+      f += evr
+
+    # append arch if appropriate
+    if self.arch is not None:
+      f += '.' + self.arch
+
+    return f
+
+  def to_json(self):
+    return json_encode( self.to_object(), separators=(',',':') )
+
+  def to_object(self):
     o = {
       "n": self.name,
       "e": self.epoch,
@@ -102,19 +157,8 @@ class Package(object):
       "z": self.action,
     }
 
+    # only build with non-None values
     return {k: v for k, v in o.items() if v != None}
-
-  def isPinned(self):
-    return self.action & (ACTION_PIN)
-
-  def isIncluded(self):
-    return self.action & (ACTION_INCLUDE)
-
-  def isExcluded(self):
-    return self.action & (ACTION_EXCLUDE)
-
-  def toJSON(self):
-    return json_encode( self.toObject(), separators=(',',':') )
 
 
 
@@ -175,15 +219,18 @@ class Repository(object):
       return False
 
   def __hash__(self):
-    return hash(self.name)
+    return hash(self.stub)
 
   def __ne__(self, other):
     return (not self.__eq__(other))
 
   def __str__(self):
-    return 'Repository: %s ' % ( json_encode( self.toObject(), separators=(',',':') ) )
+    return 'Repository: %s ' % ( json_encode( self.to_object(), separators=(',',':') ) )
 
-  def toObject(self):
+  def to_json(self):
+    return json_encode(self.to_object(), separators=(',',':'))
+
+  def to_object(self):
     o = {
       's':  self.stub,
       'n':  self.name,
@@ -198,8 +245,45 @@ class Repository(object):
       'x':  self.exclude,
     }
 
+    # only build with non-None values
     return {k: v for k, v in o.items() if v != None}
 
-  def toJSON(self):
-    return json_encode(self.toObject(), separators=(',',':'))
+  def to_repo(self, cache_dir=None):
+    print(cache_dir)
+    if cache_dir is None:
+      cli_cache = dnf.conf.CliCache('/var/tmp')
+      cache_dir = cli_cache.cachedir
 
+    r = dnf.repo.Repo('canvas_{0}'.format(self.stub), cache_dir)
+
+    if self.name is not None:
+      r.name = self.name
+
+    if self.baseurl is not None:
+      r.baseurl = self.baseurl
+
+    if self.mirrorlist is not None:
+      r.mirrorlist = self.mirrorlist
+
+    if self.metalink is not None:
+      r.metalink = self.metalink
+
+    if self.gpgcheck is not None:
+      r.gpgcheck = self.gpgcheck
+
+    if self.gpgkey is not None:
+      r.gpgkey = self.gpgkey
+
+    if self.cost is not None:
+      r.cost = self.cost
+
+    if self.exclude is not None:
+      r.exclude = self.exclude
+
+    if self.meta_expired is not None:
+      r.meta_expired = self.meta_expired
+
+    if self.enabled is not None and not self.enabled:
+      r.disable()
+
+    return r

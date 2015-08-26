@@ -88,7 +88,7 @@ The following commands are available for the management of Canvas templates:
 cnvs template add [user:]template [--name] [--title] [--description] [--includes] [--public]
 cnvs template update [user:]template [--name] [--title] [--description] [--includes] [--public]
 cnvs template rm [user:]template
-cnvs template push [user:]template
+cnvs template push [user:]template [--all]
 cnvs template pull [user:]template [--clean]
 cnvs template diff [user:]template
 cnvs template copy [user_from:]template_from [[user_to:]template_to]
@@ -138,7 +138,7 @@ cnvs template rm firnsy:htpc
 #### Synchronising Templates
 The general usage for synchronising existing templates of a Canvas user is described as:
 ```
-cnvs template push [user:]template
+cnvs template push [user:]template [--all]
 cnvs template pull [user:]template [--clean]
 ```
 
@@ -147,15 +147,21 @@ For example the following command would install all packages and repos specified
 cnvs template pull firnsy:htpc
 ```
 
-To ensure the package and repos matched the specified template exactly, just add the `--clean` option. This will remove any packages and repos from the current system that are not specified in the template.
+To ensure the package and repos matched the specified template exactly, just add the `--clean` option. This will remove any packages and repos from the current system that are not specified in the template. For example:
 ```
 cnvs template pull firnsy:htpc --clean
 ```
 
-To add the current packages and repos of the current system to the template.
+In order to add the current repos and any packages installed by the user of the current system to the template, simply invoke:
 ```
 cnvs template push firnsy:htpc
 ```
+
+Alternatively if you want to include all packages on the system (including dependencies of user installed packages) then simply add the `--all` option:
+```
+cnvs template push firnsy:htpc --all
+```
+
 
 #### Diff Templates:
 The general usage for viewing the diff between the current system and an existing template of a Canvas user is described as:

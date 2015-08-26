@@ -38,12 +38,19 @@ sub resolve_includes {
   my $includes = $template->{includes};
 
   if (@{$includes}) {
-    $template->{includes} = [];
+    $template->{includes_resolved} = [];
 
-    for my $stub (@{$includes}) {
-      my $t = $c->pg->db->query('SELECT t.id, t.name, t.description, t.stub, t.repos, t.packages, t.meta, u.username AS owner, EXTRACT(EPOCH FROM t.created) AS created, EXTRACT(EPOCH FROM t.updated) AS updated FROM templates t JOIN users u ON (u.id=t.owner_id) WHERE t.stub=?', $stub)->expand->hash;
+    for my $template_name (@{$includes}) {
+      my ($user, $name) = split /:/, $template_name;
 
-      push @{$template->{includes}}, $t if $t;
+      # TODO: ensure include is also "visible" to user
+      my $t = $c->pg->db->query('SELECT t.id, t.name, t.description, t.stub, t.includes, t.repos, t.packages, t.meta, u.username, EXTRACT(EPOCH FROM t.created) AS created, EXTRACT(EPOCH FROM t.updated) AS updated FROM templates t JOIN users u ON (u.id=t.owner_id) WHERE t.stub=? AND u.username=?', $name, $user)->expand->hash;
+
+      # recursively resolve
+      if ($t) {
+        $t = resolve_includes($c, $t);
+        push @{$template->{includes_resolved}}, $t;
+      }
     }
   }
 

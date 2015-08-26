@@ -91,7 +91,7 @@ class Service(object):
       TypeError('template is not of type Template')
 
     try:
-      r = urllib.request.Request('{0}/api/templates.json'.format(self._urlbase), template.toJSON().encode('utf-8'))
+      r = urllib.request.Request('{0}/api/templates.json'.format(self._urlbase), template.to_json().encode('utf-8'))
       u = self._opener.open(r)
       res = json.loads(u.read().decode('utf-8'))
 
@@ -142,7 +142,7 @@ class Service(object):
       TypeError('template is not of type Template')
 
     try:
-      r = urllib.request.Request('%s/api/template/%d.json' % (self._urlbase, template.id), template.toJSON().encode('utf-8'))
+      r = urllib.request.Request('%s/api/template/%d.json' % (self._urlbase, template.id), template.to_json().encode('utf-8'))
       r.get_method = lambda: 'PUT'
       u = self._opener.open(r)
       res = json.loads(u.read().decode('utf-8'))

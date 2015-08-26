@@ -192,6 +192,34 @@ sub remove {
   }
 }
 
+sub resolve {
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  my $self = shift;
+  my $args = @_%2 ? shift : {@_};
+
+  my $template = $args->{template};
+  my $includes = $template->{includes};
+
+  if (@{$includes}) {
+    $template->{includes} = [];
+
+    for my $template_name (@{$includes}) {
+      my ($user, $name) = split /:/, $template_name;
+
+      # TODO: ensure include is also "visible" to user
+      my $t = $self->pg->db->query('SELECT t.id, t.name, t.description, t.stub, t.includes, t.repos, t.packages, t.meta, u.username, EXTRACT(EPOCH FROM t.created) AS created, EXTRACT(EPOCH FROM t.updated) AS updated FROM templates t JOIN users u ON (u.id=t.owner_id) WHERE t.stub=? AND u.username=?', $name, $user)->expand->hash;
+
+      # recursively resolve
+      if ($t) {
+        $t = resolve_includes($self, template => $t);
+        push @{$template->{includes_resolved}}, $t;
+      }
+    }
+  }
+
+  return $template;
+}
+
 sub update {
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   my $self = shift;

@@ -16,16 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from canvas.package import Package, Repository
-
+import dnf
 from json import dumps as json_encode
 from json import loads as json_decode
 
-#
-# CONSTANTS
-#
-
-TEMPLATE_USER_DEFAULT = "firnsy"
+from canvas.package import Package, Repository
 
 #
 # CLASS DEFINITIONS / IMPLEMENTATIONS
@@ -39,18 +34,33 @@ class Template(object):
     self._title = ''
     self._description = ''
 
-    self._includes = []
+    self._includes = []             # includes in template
+    self._includes_resolved = []    # data structs for all includes in template
     self._meta = {}
 
-    self._repos = []
-    self._packages = []
+    self._repos = set()             # repos in template
+    self._includes_repos = set()    # repos from includes in template
+    self._delta_repos = set()       # repos to add/remove in template
+
+    self._packages = set()          # packages in template
+    self._includes_packages = set() # packages from includes in template
+    self._delta_packages = set()    # packages to add/remove in template
 
     self._parse_template(template)
 
   def __str__(self):
     return 'Template: %s (owner: %s) - R: %d, P: %d' % (self._name, self._user, len(self._repos), len(self._packages))
 
+  def _flatten(self):
+    for tr in self._includes_resolved:
+      t = Template(tr)
+
+      self._includes_repos.update(t.repos_all)
+      self._includes_packages.update(t.packages_all)
+
   def _parse_template(self, template):
+
+    # parse the string short form
     if isinstance(template, str):
       parts = template.split(':')
 
@@ -61,7 +71,9 @@ class Template(object):
         self._user = parts[0]
         self._name = parts[1]
 
-    if isinstance(template, dict):
+    # parse the dict form, the most common form and directly
+    # relates to the json structures returned by canvas server
+    elif isinstance(template, dict):
       self._id = template.get('id', None)
       self._user = template.get('user', template.get('username', None))
       self._name = template.get('stub', None)
@@ -69,10 +81,14 @@ class Template(object):
       self._description = template.get('description', None)
 
       self._includes = template.get('includes', [])
+      self._includes_resolved = template.get('includes_resolved', [])
       self._meta = template.get('meta', {})
 
-      self._repos = [Repository(r) for r in template.get('repos', [])]
-      self._packages = [Package(p) for p in template.get('packages', [])]
+      self._repos = {Repository(r) for r in template.get('repos', [])}
+      self._packages = {Package(p) for p in template.get('packages', [])}
+
+      # resolve includes
+      self._flatten()
 
   #
   # PROPERTIES
@@ -108,7 +124,15 @@ class Template(object):
 
   @property
   def packages(self):
-    return self._packages
+    return self._packages.union(self._delta_packages)
+
+  @property
+  def packages_all(self):
+    return self._packages.union(self._includes_packages).union(self._delta_packages)
+
+  @property
+  def packages_delta(self):
+    return self._delta_packages
 
   @property
   def public(self):
@@ -124,7 +148,15 @@ class Template(object):
 
   @property
   def repos(self):
-    return self._repos
+    return self._repos.union(self._delta_repos)
+
+  @property
+  def repos_all(self):
+    return self._repos.union(self._includes_repos).union(self._delta_repos)
+
+  @property
+  def repos_delta(self):
+    return self._delta_repos
 
   @property
   def title(self):
@@ -141,26 +173,64 @@ class Template(object):
   #
   # PUBLIC METHODS
   def add_package(self, package):
-    if not isinstance( package, Package ):
+    if not isinstance(package, Package):
       raise TypeError('Not a Package object')
 
-    self._packages.append( package )
+    if package not in self.packages_all:
+      self._delta_packages.add(package)
 
   def add_repo(self, repo):
     if not isinstance(repo, Repository):
       raise TypeError('Not a Repository object')
 
-    self._repos.append( repo )
+    if repo not in self.repos_all:
+      self._delta_repos.add(repo)
 
-  def package(self, name):
-    for p in self._packages:
-      if p.name == name:
-        return p
+  def diff(self, template):
+    if not isinstance(template, Template):
+      TypeError('template is not of type Template')
 
-    return None
+    if self._id is None:
+      self._id = template.id
+
+    if self._name is None:
+      self._name = template.name
+
+    if self._user is None:
+      self._user = template.user
+
+    if self._description is None:
+      self._description = template.description
+
+    self._repos.difference(template.repos)
+    self._packages.difference(template.packages)
+
+  def find_package(self, name):
+    return [p for p in self._packages if p.name == name]
+
+  def find_repo(self, name):
+    return [r for r in self._repos if r.name == name]
 
   def parse(self, template):
     self._parse_template(template)
+
+  def repos_to_repodict(self, cache_dir=None):
+    rd = dnf.repodict.RepoDict()
+
+    if cache_dir is None:
+      cli_cache = dnf.conf.CliCache('/var/tmp')
+      cache_dir = cli_cache.cachedir
+
+    for r in self.repos_all:
+      dr = r.to_repo(cache_dir)
+
+      # load the repo
+      dr.load()
+
+      # add it to the dict
+      rd.add(dr)
+
+    return rd
 
   def union(self, template):
     if not isinstance(template, Template):
@@ -178,60 +248,19 @@ class Template(object):
     if self._description is None:
       self._description = template.description
 
-    r = set(self.repos)
-    p = set(self.packages)
+    self._repos.update(template.repos)
+    self._packages.update(template.packages)
 
-    r.update(template.repos)
-    p.update(template.packages)
-
-    self._repos = list(r)
-    self._packages = list(p)
-
-  def difference(self, template):
-    if not isinstance(template, Template):
-      TypeError('template is not of type Template')
-
-    if self._id is None:
-      self._id = template.id
-
-    if self._name is None:
-      self._name = template.name
-
-    if self._user is None:
-      self._user = template.user
-
-    if self._description is None:
-      self._description = template.description
-
-    r = set(self.repos)
-    p = set(self.packages)
-
-    r_remove = set(template.repos)
-    p_remove = set(template.packages)
-
-    r = r.difference(r_remove)
-    p = p.difference(p_remove)
-
-    self._repos = list(r)
-    self._packages = list(p)
-
-
-  def toObject(self):
+  def to_object(self):
     return { 'name': self._name,
              'user': self._user,
              'title': self._title,
              'description': self._description,
              'includes': self._includes,
              'meta':     self._meta,
-             'packages': [p.toObject() for p in self._packages],
-             'repos':    [r.toObject() for r in self._repos]
+             'packages': [p.toObject() for p in self.packages],
+             'repos':    [r.toObject() for r in self.repos]
            }
 
-  def toJSON(self):
-    return json_encode(self.toObject(), separators=(',',':'))
-
-
-  def writeCanvasRepo(self):
-    pass
-
-
+  def to_json(self):
+    return json_encode(self.to_object(), separators=(',',':'))

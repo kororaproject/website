@@ -57,10 +57,13 @@ def buildCommandLineParser(config):
   parser = ErrorRaisingArgumentParser(prog='cnvs', add_help=False)
   subparsers = parser.add_subparsers(dest='command')
 
+  # establish invoking user
+  username = os.environ.get('SUDO_USER', os.getlogin())
+
   # general arguments
   general_parser = argparse.ArgumentParser(add_help=False)
   general_parser.add_argument('-h', '--help', '-?', action='store_true', dest='help')
-  general_parser.add_argument('-U', '--user', type=str, dest='username', default=config.get('user', 'name'))
+  general_parser.add_argument('-U', '--user', type=str, dest='username', default=config.get('user', 'name', username))
   general_parser.add_argument('-H', '--host', type=str, dest='host', default=config.get('core', 'host', CANVAS_HOST))
   general_parser.add_argument('-v', '--verbose', action='store_true', dest='verbose')
   general_parser.add_argument('-V', '--version', action='version', version='{0} - {1}'.format(PROG_NAME, PROG_VERSION))
@@ -115,6 +118,7 @@ def buildCommandLineParser(config):
   # template push arguments
   template_push_parser = subparsers_template.add_parser('push', add_help=False, parents=[general_parser])
   template_push_parser.add_argument('template', type=str)
+  template_push_parser.add_argument('--all', action='store_true', dest='push_all')
 
   # template diff arguments
   template_diff_parser = subparsers_template.add_parser('diff', add_help=False, parents=[general_parser])
@@ -136,6 +140,10 @@ def buildCommandLineParser(config):
   package_add_parser = subparsers_package.add_parser('add', add_help=False, parents=[general_parser])
   package_add_parser.add_argument('template', type=str)
   package_add_parser.add_argument('package', type=str, nargs='+')
+
+  package_update_parser = subparsers_package.add_parser('update', add_help=False, parents=[general_parser])
+  package_update_parser.add_argument('template', type=str)
+  package_update_parser.add_argument('package', type=str)
 
   # package list arguments
   package_list_parser = subparsers_package.add_parser('list', add_help=False, parents=[general_parser])
