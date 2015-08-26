@@ -219,7 +219,7 @@ If one or more filters are provided, any public templates and templates you own 
 
 Multiple filters and multiple items per filter can be specified. Searching may take longer depending on the query provided.
 ```
-cnvs template list kororaproject --filter-name=foo --filter-description=bar --filter-package=baz,buz
+cnvs template list kororaproject --filter-name=foo --filter-description=bar
 ```
 
 ### Template Packages
@@ -229,7 +229,7 @@ The following commands allow management of packages from specified Templates.
 The following commands are available for the management of Canvas template packages:
 ```
 cnvs package add [user:]template [--nodeps] package1 packagelist1 package2 ... packageN
-cnvs package list [user:]template [-n|--filter-name] [-s|--filter-summary] [-d|--filter-description] [-a|--filter-arch]
+cnvs package list [user:]template [-n|--filter-name] [-s|--filter-summary] [-d|--filter-description] [-a|--filter-arch] [-r|--filter-repo] [-o|--output=file_path]
 cnvs package rm [user:]template [--nodeps] package1 package2 ... packageN
 ```
 
@@ -285,7 +285,13 @@ cnvs package rm firnsy:htpc --nodeps foo baz
 #### Listing Packages
 The general usage for listing packages in templates is described as:
 ```
-cnvs package list [user:]template [-o=file_path|--output=file_path]
+cnvs package list [user:]template [-n|--filter-name] [-s|--filter-summary] [-d|--filter-description] [-a|--filter-arch] [-r|--filter-repo] [-o=file_path|--output=file_path]
+```
+If one or more filters are provided, any public templates and templates you own matching all of the provided filters will be shown. If a user is specified, only templates owned by that user (and matching given filters) will be shown.
+
+Multiple filters and multiple items per filter can be specified. Searching may take longer depending on the query provided.
+```
+cnvs package list firnsy:htpc --filter-name=foo --filter-summary=bar --filter-description=baz --filter-arch=i386 --filter-repo=rpmfusion
 ```
 
 You can use the `--output` option to save the package list to a file in the specified path. If the file already exists, it will be replaced.
