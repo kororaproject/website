@@ -186,33 +186,45 @@ class Template(object):
     if repo not in self.repos_all:
       self._delta_repos.add(repo)
 
-  def diff(self, template):
-    if not isinstance(template, Template):
-      TypeError('template is not of type Template')
-
-    if self._id is None:
-      self._id = template.id
-
-    if self._name is None:
-      self._name = template.name
-
-    if self._user is None:
-      self._user = template.user
-
-    if self._description is None:
-      self._description = template.description
-
-    self._repos.difference(template.repos)
-    self._packages.difference(template.packages)
-
   def find_package(self, name):
     return [p for p in self._packages if p.name == name]
 
   def find_repo(self, name):
     return [r for r in self._repos if r.name == name]
 
+  def from_system(self, all=False):
+    db = dnf.Base()
+    try:
+      db.fill_sack()
+
+    except OSError as e:
+      pass
+
+    p_list = db.iter_userinstalled()
+
+    if all:
+      p_list = db.sack.query().installed()
+
+    for p in p_list:
+      self.add_package(Package(p, evr=False))
+
+    for r in db.repos.enabled():
+      self.add_repo(Repository(r))
+
+  def package_diff(self, packages):
+    l_packages = self.packages_all
+    r_packages = set(packages)
+
+    return (
+      l_packages.difference(set(r_packages)),
+      r_packages.difference(set(l_packages))
+    )
+
   def parse(self, template):
     self._parse_template(template)
+
+  def repo_diff(self, repos):
+    return self.repos_all.difference(set(repos))
 
   def repos_to_repodict(self, cache_dir=None):
     rd = dnf.repodict.RepoDict()

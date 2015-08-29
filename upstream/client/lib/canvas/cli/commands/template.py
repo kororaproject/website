@@ -141,7 +141,38 @@ class TemplateCommand(Command):
     return 0
 
   def run_diff(self):
-    print("TEMPLATE DIFF NOT YET IMPLEMENTED")
+    t = Template(self.args.template, user=self.args.username)
+
+    if self.args.username:
+      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
+        print('error: unable to authenticate with canvas service.')
+        return 1
+
+    # grab the template we're pushing to
+    try:
+      t = self.cs.template_get(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    ts = Template()
+    ts.from_system()
+
+    (l_r, r_l) = t.package_diff(ts.packages_all)
+
+    print("In template not in system:")
+
+    for p in l_r:
+      print(" - {0}".format(p.name))
+
+    print()
+    print("On system not in template:")
+
+    for p in r_l:
+      print(" + {0}".format(p.name))
+
+    print()
 
   def run_list(self):
     # authentication is optional
