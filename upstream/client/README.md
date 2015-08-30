@@ -20,7 +20,7 @@ The broad components understood to Canvas are:
  * Templates, and
  * Machines
 
-Packages and Repos are the traditional representations as you know them. A package is an installing piece of software that provides a level of functionality for your system. Your OS is typically compsed of 100s to possibly 1000s of individual packages. Repos are the store for where Packages can be fetched from and installed.
+Packages and Repos are the traditional representations as you know them. A package is an installable piece of software that provides a level of functionality for your system. Your OS is typically compsed of 100s to possibly 1000s of individual packages. Repos are the store for where Packages can be fetched from and installed.
 
 Templates are the recipes for how particular systems are to be composed. They will specify the Repos available and the Packages to be installed to make the final compositions.
 
@@ -74,31 +74,31 @@ The default host is the Korora Project canvas server located at https://canvas.k
 #### Command Overview
 The following commands are available for the management of Canvas templates:
 ```
-cnvs config [--unset] name [value]
+cnvs config [-u|--unset] option.name [value]
 ```
 
-You can query/set/replace/unset options with this command. The `name` is actually the section and the key separated by a dot, and the value will be escaped.
+You can query/set/replace/unset options with this command. The `option.name` argument is actually the section and the key separated by a dot, and the value will be escaped.
 
 ### Templates
-The following commands allow adding, removing and updating and synchronising Canvas templates.
+The following commands allow adding, removing, modifying, querying, and synchronising Canvas templates.
 
 #### Command Overview
 The following commands are available for the management of Canvas templates:
 ```
-cnvs template add [user:]template [--name] [--title] [--description] [--includes] [--public]
-cnvs template update [user:]template [--name] [--title] [--description] [--includes] [--public]
+cnvs template add [user:]template [-n|--name] [-t|--title] [-d|--description] [-i|--includes] [-p|--public]
+cnvs template update [user:]template [-n|--name] [-t|--title] [-d|--description] [-i|--includes] [-p|--public]
 cnvs template rm [user:]template
 cnvs template push [user:]template [--all]
-cnvs template pull [user:]template [--clean]
-cnvs template diff [user:]template
+cnvs template pull [user:]template [-c|--clean]
+cnvs template diff [user:][template1|file_path] [template2|file_path] [-o=file_path|--output=file_path]
 cnvs template copy [user_from:]template_from [[user_to:]template_to]
-cnvs template list
+cnvs template list [user] [-n|--filter-name] [-d|--filter-description]
 ```
 
 #### Adding Templates
 The general usage for adding a new template to a Canvas user is described as:
 ```
-cnvs template add [user:]template [--name] [--title] [--description] [--includes] [--public]
+cnvs template add [user:]template [-n|--name] [-t|--title] [-d|--description] [-i|--includes] [-p|--public]
 ```
 
 For example, adding a new blank template identifed as `htpc` to the Canvas user `firnsy`.
@@ -113,10 +113,12 @@ cnvs template add firnsy:htpc --includes kororaproject:core
 
 When adding new templates they will be private by default. If you wish to make your templates available for others to see then set the `--public` flag to a value of `true` or `1`.
 
+The name of a template may contain hyphens, underscores, and alphanumeric characters (Ab-Xy_1234), but cannot contain any spaces or other special characters.
+
 #### Updating Templates
 The general usage for updating an existing template of a Canvas user is described as:
 ```
-cnvs template update [user:]template [--name] [--title] [--description] [--includes] [--public]
+cnvs template update [user:]template [-n|--name] [-t|--title] [-d|--description] [-i|--includes] [-p|--public]
 ```
 
 Updating the name and description of existing template `htpc` of Canvas user `firnsy`.
@@ -136,10 +138,10 @@ cnvs template rm firnsy:htpc
 ```
 
 #### Synchronising Templates
-The general usage for synchronising existing templates of a Canvas user is described as:
+The general usage for synchronising an existing template of a Canvas user is described as:
 ```
 cnvs template push [user:]template [--all]
-cnvs template pull [user:]template [--clean]
+cnvs template pull [user:]template [-c|--clean]
 ```
 
 For example the following command would install all packages and repos specified in the template `htpc` from the Canvas user `firnsy` to the current system. No packages would be removed from the current system.
@@ -147,7 +149,7 @@ For example the following command would install all packages and repos specified
 cnvs template pull firnsy:htpc
 ```
 
-To ensure the package and repos matched the specified template exactly, just add the `--clean` option. This will remove any packages and repos from the current system that are not specified in the template. For example:
+To ensure the package and repos matched the specified template exactly, just add the `--clean` option. This will remove any packages and repos from the current system that are not specified in the template. You should ensure you have any important data backed up first in case of any issues with the template.
 ```
 cnvs template pull firnsy:htpc --clean
 ```
@@ -162,16 +164,33 @@ Alternatively if you want to include all packages on the system (including depen
 cnvs template push firnsy:htpc --all
 ```
 
-
-#### Diff Templates:
-The general usage for viewing the diff between the current system and an existing template of a Canvas user is described as:
+#### Diff Templates
+The general usage for viewing the differences between existing templates and/or the current system configuration is:
 ```
-cnvs template diff [user:]template
+cnvs template diff [user:][template1|file_path] [template2|file_path] [-o=file_path|--output=file_path]
 ```
 
-For example, the following command would show the diff between the current system to the template `htpc` from Canvas user `firnsy`.
+Either an existing template or the path to a file on the current system can be specified as arguments. Specifying one argument will compare it to the current system configuration. For example, the following command would show the diff between the current system to the template `htpc` from Canvas user `firnsy`:
 ```
 cnvs template diff firnsy:htpc
+```
+
+Specifying two arguments will compare them to eachother only instead of to the current system configuration. You may specify either templates or files for one or both arguments. If a file path is specified, it must be the full path to the file.
+```
+cnvs template diff firnsy:htpc kororaproject:htpc
+cnvs template diff firnsy:htpc /home/templates/foo
+cnvs template diff /mnt/ssd/bar firnsy:htpc
+cnvs template diff /run/media/firnsy/floppydrive/baz /dev/disk/by-label/flashdrive/buz
+```
+
+Specifying no arguments will find the difference between the current canvas configuration and the packages that are already present on the system itself.
+```
+cnvs template diff
+```
+
+You can use the `--output` option to save the diff information to a file in the specified path. If the file already exists, it will be replaced.
+```
+cnvs template diff firnsy:htpc --output=/home/firnsy/templates/foo
 ```
 
 #### Copying Templates
@@ -185,19 +204,35 @@ For example the following command would copy the `htpc` template from `kororapro
 cnvs template copy kororaproject:htpc firnsy:my-htpc
 ```
 
-If `firnsy` wanted to retain the same template name he could have  abbreviated to:
+If `firnsy` wanted to retain the same template name he could have abbreviated to:
 ```
 cnvs template copy kororaproject:htpc
 ```
 
 #### Listing Templates
-The general usage for listing templates that are accessible is described as:
+The general usage for listing templates that are currently accessible is described as:
+```
+cnvs template list [user] [-n|--filter-name] [-d|--filter-description]
+```
+
+If no filters are provided, all public templates and any that belong to you will be listed:
 ```
 cnvs template list
 ```
 
+If a user is specified, only templates owned by that user (and matching given filters) will be shown.
 ```
-cnvs template list
+cnvs template list firnsy
+```
+
+If one or more filters are provided, any public templates and templates you own matching all of the provided filters will be shown. 
+```
+cnvs template list --filter-description="media center"
+```
+
+Multiple filters and multiple items per filter can be specified. Specifying a user as well limits the list to packages matching the filters that belong to that user only. Searching may take longer depending on the query provided.
+```
+cnvs template list kororaproject --filter-name=*workstation* --filter-description=office
 ```
 
 ### Template Packages
@@ -206,19 +241,22 @@ The following commands allow management of packages from specified Templates.
 #### Command Overview
 The following commands are available for the management of Canvas template packages:
 ```
-cnvs package add [user:]template package1 package2 ... packageN
-cnvs package list [user:]template
-cnvs package rm [user:]template package1 package2 ... packageN
+cnvs package add [user:]template [--nodeps] package1 packagelist1 package2 ... packageN
+cnvs package list [user:]template [-n|--filter-name] [-s|--filter-summary] [-d|--filter-description] [-a|--filter-arch] [-r|--filter-repo] [-o=_file_path|--output=file_path]
+cnvs package rm [user:]template [--nodeps] package1 package2 ... packageN
 ```
 
 #### Package Definition
+The syntax for package definitions is described as:
+```
+name[[#epoch]@version-release][:arch]
+```
+
 When specifying packages it is possible to be as generic or explicit as you wish with regard to epoch, version, release and arch.
 
-The package definition described as:
-```
-name[[#epoch]:version-release][!arch]
-```
-Note that a `version` and `release` must be specified together and can not be specified individually.
+The version and epoch will default to the latest available if not specified.
+When arch isn't specified and there is more than one available, the target system's default architecture will be used.
+Note that a `version` and `release`, if specified, must be specified together, and an `#epoch` cannot be specified without them.
 
 Examples of package definitions include:
 ```
@@ -228,37 +266,58 @@ foo@2.1-3             # name, version and release
 foo#1@2.1-3:x86_64    # name, epoch, version, release and arch
 ```
 
-
 #### Adding Packages
 The general usage for adding packages from templates is described as:
 ```
-cnvs package add [user:]template package1 package2 ... packageN
+cnvs package add [user:]template [--nodeps] package1 packagelist1 package2 ... packageN
 ```
 
+One or multiple packages can be listed, or one or more package file lists can be specified in place of or in addition to the packages. The file must contain a space- or newline-separated list of packages and be specified using the full filesystem path.
 ```
-cnvs package add firnsy:htpc foo @bar baz
-cnvs package add firnsy:htpc buz
+cnvs package add firnsy:htpc foo bar:i686 baz#1@2.1-3:x86_64
+cnvs package add firnsy:htpc buz@2.1-3 /home/templates/bim /home/templates/bam
+```
+
+If `--nodeps` is specified, the dependencies of any listed packages will not be automatically added.
+```
+cnvs package add firnsy:htpc --nodeps boom    #boom's dependencies won't be pulled in
 ```
 
 #### Removing Packages
 The general usage for removing packages from templates is described as:
 ```
-cnvs package rm [user:]template package1 package2 ... packageN
+cnvs package rm [user:]template [--nodeps] package1 package2 ... packageN
 ```
 
+If `--nodeps` is specified, the dependencies of any listed packages will not be automatically removed.
 ```
-cnvs package rm firnsy:htpc @bar
-cnvs package rm firnsy:htpc foo baz
+cnvs package rm firnsy:htpc bar
+cnvs package rm firnsy:htpc --nodeps foo baz
 ```
 
 #### Listing Packages
 The general usage for listing packages in templates is described as:
 ```
-cnvs package list [user:]template
+cnvs package list [user:]template [-n|--filter-name] [-s|--filter-summary] [-d|--filter-description] [-a|--filter-arch] [-r|--filter-repo] [-o=file_path|--output=file_path]
 ```
-
+If no filters are provided, all packages belonging to the specified template will be listed.
 ```
 cnvs package list firnsy:htpc
+```
+
+If one or more filters are provided, only packages belonging to that template which match all of the specified filters will be listed.
+```
+cnvs package list firnsy:htpc --filter-arch=x86_64
+```
+
+Multiple filters and multiple items per filter can be specified. Searching may take longer depending on the query provided.
+```
+cnvs package list firnsy:htpc --filter-name=foo --filter-summary=bar --filter-description=baz,buz --filter-arch=i386 --filter-repo=rpmfusion
+```
+
+You can use the `--output` option to save the package list to a file in the specified path. If the file already exists, it will be replaced.
+```
+cnvs package list firnsy:htpc --output=/home/firnsy/templates/boom
 ```
 
 ### Template Repos
@@ -267,10 +326,10 @@ The following commands allow management of repos from specified Templates.
 #### Command Overview
 The following commands are available for the management of Canvas template repos:
 ```
-cnvs repo add [user:]template repo --baseurl=|--metalink=|--mirrorlist= [--cost=] [--enabled=] [--gpgkey=] [--name=] [--priority=]
-cnvs repo update [user:]template repo --baseurl=|--metalink=|--mirrorlist= [--cost=] [--enabled=] [--gpgkey=] [--name=] [--priority=]
+cnvs repo add [user:]template repo_name --filepath|--baseurl|--metalink|--mirrorlist [--cost] [--enabled] [--gpgkey] [--name] [--priority]
+cnvs repo update [user:]template repo_name --baseurl|--metalink|--mirrorlist [--cost] [--enabled] [--gpgkey] [--name] [--priority]
 cnvs repo list [user:] template
-cnvs repo rm [user:]template repo
+cnvs repo rm [user:]template repo_name
 ```
 
 #### Repos Definitions
@@ -317,17 +376,19 @@ If enabled, DNF will continue running and disable the repository that couldn’t
 #### Adding Repos
 The general usage for adding repos from templates is described as:
 ```
-cnvs repo add [user:]template repo --baseurl=|--metalink=|--mirrorlist= [--cost=] [--enabled=] [--gpgkey=] [--name=] [--priority=]
+cnvs repo add [user:]template repo_name --repofile|--baseurl|--metalink|--mirrorlist [--cost] [--enabled] [--gpgkey] [--name] [--priority]
 ```
 
+The following commands would add the `rpmfusion` repo to the `htpc` template of user `firnsy`:
 ```
 cnvs repo add firnsy:htpc rpmfusion --mirrorlist='http://mirrors.rpmfusion.org/mirrorlist?repo=nonfree-fedora-$releasever&arch=$basearch'
+cnvs repo add firnsy:htpc rpmfusion --repofile=/etc/yum.repos.d/rpmfusion.repo
 ```
 
 #### Updating Repos
 The general usage for updating repos from templates is described as:
 ```
-cnvs repo update [user:]template repo --baseurl=|--metalink=|--mirrorlist= [--cost=] [--enabled=] [--gpgkey=] [--name=] [--priority=]
+cnvs repo update [user:]template repo_name --baseurl|--metalink|--mirrorlist [--cost] [--enabled] [--gpgkey] [--name] [--priority]
 ```
 
 ```
@@ -347,25 +408,24 @@ cnvs repo list firnsy:htpc
 #### Removing Repos
 The general usage for removing repos from templates is described as:
 ```
-cnvs repo rm [user:]template repo
+cnvs repo rm [user:]template repo_name
 ```
 
 ```
 cnvs repo rm firnsy:htpc rpmfusion
 ```
 
-
 ### Machines
 The following commands allow adding, removing and updating Canvas machines that are assigned templates. Machines are your configured Canvas systems that can be managed and easily synchronised with your latest configurations.
 
-Machines have a 1-to-1 link with a Canvas template. For example you may assign your HTPC to a personalised template called `htpc`. Alternatively you may assign your laptop and desktop to your `all-my-favourite-things` template, any changes you make to the template would then be easily reflected on both your laptop and desktop computer.
+Machines have a 1-to-1 link with a Canvas template. For example, you may assign your HTPC to a personalised template called `htpc`. Alternatively you may assign your laptop and desktop to your `all-my-favourite-things` template, any changes you make to the template would then be easily reflected on both your laptop and desktop computer.
 
 #### Command Overview
 The following commands are available for the management of Canvas machines:
 ```
 cnvs machine add|update [user:]name [--description=] [--location=] [--name=] [--template=]
 cnvs machine rm [user:]name
-cnvs machine diff [user:]name
+cnvs machine diff [user:]name [-o=file_path|--output=file_path]
 cnvs machine sync [user:]name [--pull [[user:]template]] | --push [user:]template]
 cnvs machine cmd [user:]name command arg1 arg2 ... argN
 ```
@@ -393,7 +453,7 @@ cnvs machine update firnsy:odin --template firnsy:steam
 ```
 
 #### Removing Machines
-The general usage for adding a new managed machine to a Canvas user is described as:
+The general usage for removing an existing managed machine to a Canvas user is described as:
 ```
 cnvs machine rm [user:]name
 ```
@@ -408,12 +468,17 @@ To determine the state of a machine with respect to it's assigned template. Can 
 
 The general usage for diff'ing an existing managed machine of a Canvas user is described as:
 ```
-cnvs machine diff [user:]name
+cnvs machine diff [user:]name [-o=file_path|--output=file_path]
 ```
 
 For example to view the diff status of the machine `odin` of Canvas user `firnsy` relative to its assigned template can be done with the following command:
 ```
 cnvs machine diff firnsy:odin
+```
+
+You can use the `--output` option to save the diff information to a file in the specified path. If the file already exists, it will be replaced.
+```
+cnvs machine diff firnsy:odin --output=/home/firnsy/templates/odin
 ```
 
 #### Synchronising Machines
@@ -422,7 +487,7 @@ The general usage for synchronising an existing managed machine of a Canvas user
 cnvs machine sync [user:]name [--pull [[user:]template]] | --push [user:]template]
 ```
 
-For example to synchronise machine `odin` of Canvas user `firnsy` is done with the following command:
+For example syncronizing machine `odin` of Canvas user `firnsy` is done with the following command:
 ```
 cnvs machine sync firnsy:odin
 ```
@@ -443,7 +508,7 @@ cnvs machine sync firnsy:odin --pull firnsy:htpc
 ```
 
 #### Commanding Machines
-The general usage for synchronising an existing managed machine of a Canvas user is described as:
+The general usage for sending a command to an existing managed machine of a Canvas user is described as:
 ```
 cnvs machine cmd [user:]name command arg1 arg2 ... argN
 ```
@@ -455,5 +520,3 @@ cnvs machine cmd firnsy:odin ls /home
 cnvs machine cmd firnsy:odin shutdown -h now
 cnvs machine cmd firnsy:odin bash
 ```
-
-
