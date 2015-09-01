@@ -189,9 +189,18 @@ class Service(object):
 
     raise ServiceException('unable to get template.')
 
-  def template_list(self):
+  def template_list(self, user=None, name=None, description=None):
+    params = {
+      'user': user,
+      'name': name,
+      'description': description
+    }
+
+    params = urllib.parse.urlencode({k: v for k, v in params.items() if v != None})
+    print(params)
+
     try:
-      r = urllib.request.Request('%s/api/templates.json' % ( self._urlbase ))
+      r = urllib.request.Request('{0}/api/templates.json?{1}'.format(self._urlbase, params))
       u = self._opener.open(r)
 
       res = json.loads(u.read().decode('utf-8'))
