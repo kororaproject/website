@@ -18,6 +18,7 @@
 
 import dnf
 import hawkey
+import re
 
 from json import dumps as json_encode
 from json import loads as json_decode
@@ -29,6 +30,8 @@ from json import loads as json_decode
 ACTION_PIN     = 0x80
 ACTION_EXCLUDE = 0x02
 ACTION_INCLUDE = 0x01
+
+RE_PACKAGE = re.compile("(~)?([^#@:\s]+)(?:(?:#(\d+))?@([^-]+)-([^:]))?(?::(\w+))?")
 
 #
 # CLASS DEFINITIONS / IMPLEMENTATIONS
@@ -62,20 +65,20 @@ class Package(object):
         self.action  = arg.get('z', ACTION_INCLUDE)
 
       elif isinstance(arg, str):
-        parts = arg.split(':')
+        m = RE_PACKAGE.match(arg)
 
-        if len(parts) == 1:
-          self.name = parts[0]
+        if m is not None:
+          if m.group(1) == '~':
+            self.action  = ACTION_EXCLUDE
 
-        elif len(parts) == 2:
-          self.name = parts[0]
-          self.version = parts[1]
+          else:
+            self.action  = ACTION_INCLUDE
 
-        elif len(parts) == 3:
-          self.name = parts[0]
-          self.version = parts[1]
-          self.release = parts[2]
-          self.arch = parts[3]
+          self.name = m.group(2)
+          self.epoch = m.group(3)
+          self.version = m.group(4)
+          self.release = m.group(5)
+          self.arch = m.group(6)
 
     # strip evr information as appropriate
     if not kwargs.get('evr', True):
@@ -176,6 +179,8 @@ class Repository(object):
     self.gpgcheck   = kwargs.get('gpg_check', None)
     self.cost       = kwargs.get('cost', None)
     self.exclude    = kwargs.get('exclude', None)
+
+    self.priority   = kwargs.get('priority', None)
 
     self.meta_expired = kwargs.get('meta_expired', None)
 
