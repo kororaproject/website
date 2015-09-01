@@ -141,7 +141,7 @@ class TemplateCommand(Command):
     return 0
 
   def run_diff(self):
-    t = Template(self.args.template, user=self.args.username)
+    t = Template(self.args.template_from, user=self.args.username)
 
     if self.args.username:
       if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
@@ -156,8 +156,21 @@ class TemplateCommand(Command):
       print(e)
       return 1
 
-    ts = Template()
-    ts.from_system()
+    # fetch template to compare to
+    if self.args.template_to is not None:
+      ts = Template(self.args.template_to, user=self.args.username)
+
+      try:
+        ts = self.cs.template_get(ts)
+
+      except ServiceException as e:
+        print(e)
+        return 1
+
+    # otherwise build from system
+    else:
+      ts = Template('system')
+      ts.from_system()
 
     (l_r, r_l) = t.package_diff(ts.packages_all)
 
@@ -180,7 +193,11 @@ class TemplateCommand(Command):
       self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username)))
 
     try:
-      templates = self.cs.template_list()
+      templates = self.cs.template_list(
+        user=self.args.filter_user,
+        name=self.args.filter_name,
+        description=self.args.filter_description
+      )
 
     except ServiceException as e:
       print(e)
