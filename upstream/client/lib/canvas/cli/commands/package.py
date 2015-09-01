@@ -141,8 +141,59 @@ class PackageCommand(Command):
       print('0 packages defined.')
 
   def run_rm(self):
-    print('PACKAGE REMOVE')
-    print(self.args)
+    t = Template(self.args.template, user=self.args.username)
+
+    if self.args.username:
+      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
+        print('error: unable to authenticate with canvas service.')
+        return 1
+
+    try:
+      t = self.cs.template_get(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    packages = []
+
+    for p in self.args.package:
+      p = Package(p)
+      if t.remove_package(p):
+        packages.append(p)
+
+    packages.sort(key=lambda x: x.name)
+
+    # describe process for dry runs
+    if self.args.dry_run:
+      if len(packages):
+        print('The following would be removed from the template: {0}'.format(t.name))
+
+        for p in packages:
+          print('  - ' + str(p))
+
+        print()
+        print('Summary:')
+        print('  - Package(s): %d' % ( len(packages) ))
+        print()
+
+      else:
+        print('No template changes required.')
+
+      print('No action peformed during this dry-run.')
+      return 0
+
+    if not len(packages):
+      print('info: no changes detected, template up to date.')
+      return 0
+
+    # push our updated template
+    try:
+      res = self.cs.template_update(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
 
   def run_update(self):
     print('PACKAGE UPDATE')

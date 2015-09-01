@@ -88,7 +88,7 @@ class Package(object):
 
   def __eq__(self, other):
     if isinstance(other, Package):
-      return (self.name == other.name)
+      return (self.name == other.name) and (self.arch == other.arch)
     else:
       return False
 
@@ -185,7 +185,10 @@ class Repository(object):
     self.meta_expired = kwargs.get('meta_expired', None)
 
     for arg in args:
-      if isinstance(arg, dnf.repo.Repo):
+      if isinstance(arg, str):
+        self.stub = arg
+
+      elif isinstance(arg, dnf.repo.Repo):
         self.name     = arg.name
         self.stub     = arg.id
 
@@ -197,6 +200,7 @@ class Repository(object):
         self.enabled    = arg.enabled
         self.gpgcheck   = arg.gpgcheck
         self.cost       = arg.cost
+        self.priority   = arg.priority
         self.exclude    = arg.exclude
 
 #        self.meta_expired = arg.meta_expired
@@ -213,13 +217,14 @@ class Repository(object):
         self.enabled    = arg.get('e', None)
         self.gpgcheck   = arg.get('gc', None)
         self.cost       = arg.get('c', None)
+        self.priority   = arg.get('p', None)
         self.exclude    = arg.get('x', None)
 
         self.meta_expired = arg.get('me', None)
 
   def __eq__(self, other):
     if isinstance(other, Repository):
-      return (self.name == other.name)
+      return (self.stub == other.stub)
     else:
       return False
 
@@ -247,6 +252,7 @@ class Repository(object):
       'gk': self.gpgkey,
       'me': self.meta_expired,
       'c':  self.cost,
+      'p':  self.priority,
       'x':  self.exclude,
     }
 

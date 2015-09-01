@@ -244,6 +244,34 @@ class Template(object):
 
     return rd
 
+  def remove_package(self, package):
+    if not isinstance(package, Package):
+      raise TypeError('Not a Package object')
+
+    if package in self._delta_packages:
+      self._packages.remove(package)
+      return True
+
+    elif package in self._packages:
+      self._packages.remove(package)
+      return True
+
+    return False
+
+  def remove_repo(self, repo):
+    if not isinstance(repo, Repository):
+      raise TypeError('Not a Repository object')
+
+    if repo in self._delta_repos:
+      self._delta_repos.remove(repo)
+      return True
+
+    elif repo in self._repos:
+      self._repos.remove(repo)
+      return True
+
+    return False
+
   def union(self, template):
     if not isinstance(template, Template):
       TypeError('template is not of type Template')
@@ -270,8 +298,8 @@ class Template(object):
              'description': self._description,
              'includes': self._includes,
              'meta':     self._meta,
-             'packages': [p.toObject() for p in self.packages],
-             'repos':    [r.toObject() for r in self.repos]
+             'packages': [p.to_object() for p in self.packages],
+             'repos':    [r.to_object() for r in self.repos]
            }
 
   def to_json(self):

@@ -25,8 +25,8 @@ logger = logging.getLogger('canvas')
 PROG_VERSION='1.0'
 PROG_NAME='Canvas';
 
-#CANVAS_HOST='https://canvas.kororaproject.org'
-CANVAS_HOST='http://localhost:3000'
+CANVAS_HOST='https://canvas.kororaproject.org'
+#CANVAS_HOST='http://localhost:3000'
 
 class ArgumentParserError(Exception):
   pass
@@ -154,6 +154,8 @@ def buildCommandLineParser(config):
   repo_parser = subparsers.add_parser('repo', add_help=False, parents=[general_parser])
   subparsers_repo = repo_parser.add_subparsers(dest='action', title='repo Commands')
 
+  repo_parser.add_argument('-n', '--dry-run', action="store_true", dest='dry_run')
+
   # repo add arguments
   repo_add_parser = subparsers_repo.add_parser('add', add_help=False, parents=[general_parser])
   repo_add_parser.add_argument('repo', type=str)
@@ -181,12 +183,13 @@ def buildCommandLineParser(config):
   repo_update_parser.add_argument('--skip-if-unavailable', type=bool)
 
   # repo list arguments
-  repo_list_parser = subparsers_package.add_parser('list', add_help=False, parents=[general_parser])
+  repo_list_parser = subparsers_repo.add_parser('list', add_help=False, parents=[general_parser])
   repo_list_parser.add_argument('template', type=str)
 
   # repo remove arguments
   repo_remove_parser = subparsers_repo.add_parser('rm', add_help=False, parents=[general_parser])
-  repo_remove_parser.add_argument('repo', type=str)
+  repo_remove_parser.add_argument('template', type=str)
+  repo_remove_parser.add_argument('repo', type=str, nargs='+')
 
   #
   # MACHINE COMMANDS

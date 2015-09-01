@@ -72,21 +72,18 @@ class RepoCommand(Command):
       print(e)
       return 1
 
-    packages = list(t.packages_all)
-    packages.sort(key=lambda x: x.name)
-
     repos = list(t.repos_all)
     repos.sort(key=lambda x: x.name)
 
     if len(repos):
-      l = prettytable.PrettyTable(['repo', 'priority', 'cost', 'enabled'])
+      l = prettytable.PrettyTable(['id', 'repo', 'priority', 'cost', 'enabled'])
       l.hrules = prettytable.HEADER
       l.vrules = prettytable.NONE
       l.align = 'l'
       l.padding_witdth = 1
 
       for r in repos:
-        l.add_row([r.name, r.priority, r.cost, r.enabled])
+        l.add_row([r.stub, r.name, r.priority, r.cost, r.enabled])
 
       print(l)
       print()
@@ -95,4 +92,57 @@ class RepoCommand(Command):
       print('0 repos defined.')
 
   def run_rm(self):
-    print('REPO REMOVE')
+    t = Template(self.args.template, user=self.args.username)
+
+    if self.args.username:
+      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
+        print('error: unable to authenticate with canvas service.')
+        return 1
+
+    try:
+      t = self.cs.template_get(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    repos = []
+
+    for r in self.args.repo:
+      r = Repository(r)
+      if t.remove_repo(r):
+        repos.append(r)
+
+    repos.sort(key=lambda x: x.stub)
+
+    # describe process for dry runs
+    if self.args.dry_run:
+      if len(repos):
+        print('The following would be removed from the template: {0}'.format(t.name))
+
+        for r in repos:
+          print('  - ' + str(r))
+
+        print()
+        print('Summary:')
+        print('  - Repo(s): %d' % ( len(repos) ))
+        print()
+
+      else:
+        print('No template changes required.')
+
+      print('No action peformed during this dry-run.')
+      return 0
+
+    if not len(repos):
+      print('info: no changes detected, template up to date.')
+      return 0
+
+    # push our updated template
+    try:
+      res = self.cs.template_update(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
