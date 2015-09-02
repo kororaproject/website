@@ -35,7 +35,7 @@ class TemplateCommand(Command):
     self.config = config
 
     # create our canvas service object
-    self.cs = Service(host=args.host)
+    self.cs = Service(host=args.host, username=args.username)
 
     try:
       # expand includes
@@ -47,7 +47,7 @@ class TemplateCommand(Command):
     # eval public
     try:
       if args.public is not None:
-        args.public = (args.public in ['1', 'true'])
+        args.public = (args.public.lower() in ['1', 'true'])
     except:
       pass
 
@@ -115,11 +115,6 @@ class TemplateCommand(Command):
   def run_copy(self):
     t = Template(self.args.template_from, user=self.args.username)
 
-    if self.args.username:
-      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-        print('error: unable to authenticate with canvas service.')
-        return 1
-
     try:
       t = self.cs.template_get(t)
 
@@ -142,11 +137,6 @@ class TemplateCommand(Command):
 
   def run_diff(self):
     t = Template(self.args.template_from, user=self.args.username)
-
-    if self.args.username:
-      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-        print('error: unable to authenticate with canvas service.')
-        return 1
 
     # grab the template we're pushing to
     try:
@@ -188,9 +178,9 @@ class TemplateCommand(Command):
     print()
 
   def run_list(self):
-    # authentication is optional
-    if self.args.username:
-      self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username)))
+    # don't auth if looking for public only
+    if not self.args.public_only:
+      self.cs.authenticate()
 
     try:
       templates = self.cs.template_list(
@@ -224,11 +214,6 @@ class TemplateCommand(Command):
 
   def run_pull(self):
     t = Template(self.args.template, user=self.args.username)
-
-    if self.args.username:
-      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-        print('error: unable to authenticate with canvas service.')
-        return 1
 
     try:
       t = self.cs.template_get(t)
@@ -332,11 +317,6 @@ class TemplateCommand(Command):
   def run_push(self):
     t = Template(self.args.template, user=self.args.username)
 
-    if self.args.username:
-      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-        print('error: unable to authenticate with canvas service.')
-        return 1
-
     # grab the template we're pushing to
     try:
       t = self.cs.template_get(t)
@@ -418,10 +398,6 @@ class TemplateCommand(Command):
   def run_rm(self):
     t = Template(self.args.template, user=self.args.username)
 
-    if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-      print('error: unable to authenticate with canvas service.')
-      return 1
-
     try:
       res = self.cs.template_delete(t)
 
@@ -434,11 +410,6 @@ class TemplateCommand(Command):
 
   def run_update(self):
     t = Template(self.args.template, user=self.args.username)
-
-    if self.args.username:
-      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-        print('error: unable to authenticate with canvas service.')
-        return 1
 
     try:
       t = self.cs.template_get(t)

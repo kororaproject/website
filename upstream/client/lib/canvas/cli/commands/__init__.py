@@ -90,6 +90,7 @@ def buildCommandLineParser(config):
   # template list arguments
   template_list_parser = subparsers_template.add_parser('list', add_help=False, parents=[general_parser])
   template_list_parser.add_argument('filter_user', type=str, nargs='?')
+  template_list_parser.add_argument('--public', action='store_true', dest='public_only')
   template_list_parser.add_argument('--filter-name', type=str, dest='filter_name')
   template_list_parser.add_argument('--filter-description', type=str, dest='filter_description')
 
@@ -158,29 +159,35 @@ def buildCommandLineParser(config):
 
   # repo add arguments
   repo_add_parser = subparsers_repo.add_parser('add', add_help=False, parents=[general_parser])
+  repo_add_parser.add_argument('template', type=str)
   repo_add_parser.add_argument('repo', type=str)
+  repo_add_parser.add_argument('--name', type=str)
   repo_add_parser.add_argument('--cost', type=int)
   repo_add_parser.add_argument('--baseurl', type=str, nargs='+')
-  repo_add_parser.add_argument('--enabled', type=bool)
+  repo_add_parser.add_argument('--enabled', type=str, choices=['0', '1', 'false', 'true'])
   repo_add_parser.add_argument('--gpgkey', type=str, nargs='+')
   repo_add_parser.add_argument('--metalink', type=str, nargs='+')
   repo_add_parser.add_argument('--mirrorlist', type=str, nargs='+')
+  repo_add_parser.add_argument('--gpgcheck', type=bool)
   repo_add_parser.add_argument('--priority', type=int)
-  repo_add_parser.add_argument('--skip-if-unavailable', type=bool)
-
-
+  repo_add_parser.add_argument('--exclude', type=str, nargs='+')
+  repo_add_parser.add_argument('--skip-if-unavailable', type=bool, dest='skip')
 
   # repo update arguments
   repo_update_parser = subparsers_repo.add_parser('update', add_help=False, parents=[general_parser])
+  repo_update_parser.add_argument('template', type=str)
   repo_update_parser.add_argument('repo', type=str)
+  repo_update_parser.add_argument('--name', type=str)
   repo_update_parser.add_argument('--cost', type=int)
   repo_update_parser.add_argument('--baseurl', type=str, nargs='+')
-  repo_update_parser.add_argument('--enabled', type=bool)
+  repo_update_parser.add_argument('--enabled', type=str, choices=['0', '1', 'false', 'true'])
   repo_update_parser.add_argument('--gpgkey', type=str, nargs='+')
   repo_update_parser.add_argument('--metalink', type=str, nargs='+')
   repo_update_parser.add_argument('--mirrorlist', type=str, nargs='+')
+  repo_update_parser.add_argument('--gpgcheck', type=bool)
   repo_update_parser.add_argument('--priority', type=int)
-  repo_update_parser.add_argument('--skip-if-unavailable', type=bool)
+  repo_update_parser.add_argument('--exclude', type=str, nargs='+')
+  repo_update_parser.add_argument('--skip-if-unavailable', type=bool, dest='skip')
 
   # repo list arguments
   repo_list_parser = subparsers_repo.add_parser('list', add_help=False, parents=[general_parser])

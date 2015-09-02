@@ -33,7 +33,7 @@ class PackageCommand(Command):
     self.config = config
 
     # create our canvas service object
-    self.cs = Service(host=args.host)
+    self.cs = Service(host=args.host, username=args.username)
 
     # store args for additional processing
     self.args = args
@@ -53,11 +53,6 @@ class PackageCommand(Command):
 
   def run_add(self):
     t = Template(self.args.template, user=self.args.username)
-
-    if self.args.username:
-      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-        print('error: unable to authenticate with canvas service.')
-        return 1
 
     try:
       t = self.cs.template_get(t)
@@ -106,11 +101,6 @@ class PackageCommand(Command):
   def run_list(self):
     t = Template(self.args.template, user=self.args.username)
 
-    if self.args.username:
-      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-        print('error: unable to authenticate with canvas service.')
-        return 1
-
     try:
       t = self.cs.template_get(t)
 
@@ -142,11 +132,6 @@ class PackageCommand(Command):
 
   def run_rm(self):
     t = Template(self.args.template, user=self.args.username)
-
-    if self.args.username:
-      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-        print('error: unable to authenticate with canvas service.')
-        return 1
 
     try:
       t = self.cs.template_get(t)

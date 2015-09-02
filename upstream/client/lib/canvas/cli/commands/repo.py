@@ -33,7 +33,15 @@ class RepoCommand(Command):
     self.config = config
 
     # create our canvas service object
-    self.cs = Service(host=args.host)
+    self.cs = Service(host=args.host, username=args.username)
+
+    # eval enabled
+    try:
+      if args.enabled is not None:
+        args.enabled = (args.enabled.lower() in ['1', 'true'])
+
+    except:
+      pass
 
     # store args for additional processing
     self.args = args
@@ -52,18 +60,99 @@ class RepoCommand(Command):
     return command()
 
   def run_add(self):
-    print('REPO ADD')
+    t = Template(self.args.template, user=self.args.username)
+
+    try:
+      t = self.cs.template_get(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    # default enabled
+    if self.args.enabled is None:
+      self.args.enabled = True
+
+    r = Repository(
+      stub        = self.args.repo,
+      name        = self.args.name,
+      baseurl     = self.args.baseurl,
+      mirrorlist  = self.args.mirrorlist,
+      metalink    = self.args.metalink,
+      enabled     = self.args.enabled,
+      cost        = self.args.cost,
+      priority    = self.args.priority,
+      gpgkey      = self.args.gpgkey,
+      gpgcheck    = self.args.gpgcheck,
+      exclude     = self.args.exclude
+    )
+
+    t.add_repo(r)
+
+    # push our updated template
+    try:
+      res = self.cs.template_update(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    print('info: repo added.')
+    return 0
+
 
   def run_update(self):
-    print('REPO UPDATE')
+    t = Template(self.args.template, user=self.args.username)
+
+    try:
+      t = self.cs.template_get(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    r = t.find_repo(self.args.repo)
+
+    if len(r) != 1:
+      print('error: repo is not defined in template.')
+      return 1
+
+    r = r[0]
+    o = {
+      'n':  self.args.name,
+      'bu': self.args.baseurl,
+      'ml': self.args.mirrorlist,
+      'ma': self.args.metalink,
+      'e':  self.args.enabled,
+      'c':  self.args.cost,
+      'p':  self.args.priority,
+      'gc': self.args.gpgcheck,
+      'gk': self.args.gpgkey,
+      'sk': self.args.skip,
+      'x':  self.args.exclude
+    }
+
+    o = {k: v for k, v in o.items() if v != None}
+
+    r.parse(o)
+
+    if not t.update_repo(r):
+      print('error: no changes detected.')
+      return 0
+
+    # push our updated template
+    try:
+      res = self.cs.template_update(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    print('info: repo updated.')
+    return 0
 
   def run_list(self):
     t = Template(self.args.template, user=self.args.username)
-
-    if self.args.username:
-      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-        print('error: unable to authenticate with canvas service.')
-        return 1
 
     try:
       t = self.cs.template_get(t)
@@ -73,7 +162,7 @@ class RepoCommand(Command):
       return 1
 
     repos = list(t.repos_all)
-    repos.sort(key=lambda x: x.name)
+    repos.sort(key=lambda x: x.stub)
 
     if len(repos):
       l = prettytable.PrettyTable(['id', 'repo', 'priority', 'cost', 'enabled'])
@@ -83,6 +172,18 @@ class RepoCommand(Command):
       l.padding_witdth = 1
 
       for r in repos:
+        if r.cost is None:
+          r.cost = '-';
+
+        if r.priority is None:
+          r.priority = '-';
+
+        if r.enabled:
+          r.enabled = 'Y'
+
+        else:
+          r.enabled = 'N'
+
         l.add_row([r.stub, r.name, r.priority, r.cost, r.enabled])
 
       print(l)
@@ -93,11 +194,6 @@ class RepoCommand(Command):
 
   def run_rm(self):
     t = Template(self.args.template, user=self.args.username)
-
-    if self.args.username:
-      if not self.cs.authenticate(self.args.username, getpass.getpass('Password ({0}): '.format(self.args.username))):
-        print('error: unable to authenticate with canvas service.')
-        return 1
 
     try:
       t = self.cs.template_get(t)
