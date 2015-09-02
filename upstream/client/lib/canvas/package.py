@@ -174,9 +174,9 @@ class Repository(object):
     self.mirrorlist = kwargs.get('mirrorlist', None)
     self.metalink   = kwargs.get('metalink', None)
 
-    self.gpgkey     = kwargs.get('gpg_key', None)
+    self.gpgkey     = kwargs.get('gpgkey', None)
     self.enabled    = kwargs.get('enabled', None)
-    self.gpgcheck   = kwargs.get('gpg_check', None)
+    self.gpgcheck   = kwargs.get('gpgcheck', None)
     self.cost       = kwargs.get('cost', None)
     self.exclude    = kwargs.get('exclude', None)
 
@@ -185,42 +185,7 @@ class Repository(object):
     self.meta_expired = kwargs.get('meta_expired', None)
 
     for arg in args:
-      if isinstance(arg, str):
-        self.stub = arg
-
-      elif isinstance(arg, dnf.repo.Repo):
-        self.name     = arg.name
-        self.stub     = arg.id
-
-        self.baseurl    = arg.baseurl
-        self.mirrorlist = arg.mirrorlist
-        self.metalink   = arg.metalink
-
-        self.gpgkey     = arg.gpgkey
-        self.enabled    = arg.enabled
-        self.gpgcheck   = arg.gpgcheck
-        self.cost       = arg.cost
-        self.priority   = arg.priority
-        self.exclude    = arg.exclude
-
-#        self.meta_expired = arg.meta_expired
-
-      elif isinstance(arg, dict):
-        self.name     = arg.get('n', None)
-        self.stub     = arg.get('s', None)
-
-        self.baseurl    = arg.get('bu', None)
-        self.mirrorlist = arg.get('ml', None)
-        self.metalink   = arg.get('ma', None)
-
-        self.gpgkey     = arg.get('gk', None)
-        self.enabled    = arg.get('e', None)
-        self.gpgcheck   = arg.get('gc', None)
-        self.cost       = arg.get('c', None)
-        self.priority   = arg.get('p', None)
-        self.exclude    = arg.get('x', None)
-
-        self.meta_expired = arg.get('me', None)
+      self.parse(arg)
 
   def __eq__(self, other):
     if isinstance(other, Repository):
@@ -236,6 +201,44 @@ class Repository(object):
 
   def __str__(self):
     return 'Repository: %s ' % ( json_encode( self.to_object(), separators=(',',':') ) )
+
+  def parse(self, data):
+    if isinstance(data, str):
+      self.stub = data
+
+    elif isinstance(data, dnf.repo.Repo):
+      self.name     = data.name
+      self.stub     = data.id
+
+      self.baseurl    = data.baseurl
+      self.mirrorlist = data.mirrorlist
+      self.metalink   = data.metalink
+
+      self.gpgkey     = data.gpgkey
+      self.enabled    = data.enabled
+      self.gpgcheck   = data.gpgcheck
+      self.cost       = data.cost
+      self.priority   = data.priority
+      self.exclude    = data.exclude
+
+#        self.meta_expired = data.meta_expired
+
+    elif isinstance(data, dict):
+      self.name     = data.get('n', self.name)
+      self.stub     = data.get('s', self.stub)
+
+      self.baseurl    = data.get('bu', self.baseurl)
+      self.mirrorlist = data.get('ml', self.mirrorlist)
+      self.metalink   = data.get('ma', self.metalink)
+
+      self.gpgkey     = data.get('gk', self.gpgkey)
+      self.enabled    = data.get('e', self.enabled)
+      self.gpgcheck   = data.get('gc', self.gpgcheck)
+      self.cost       = data.get('c', self.cost)
+      self.priority   = data.get('p', self.priority)
+      self.exclude    = data.get('x', self.exclude)
+
+      self.meta_expired = data.get('me', self.meta_expired)
 
   def to_json(self):
     return json_encode(self.to_object(), separators=(',',':'))
