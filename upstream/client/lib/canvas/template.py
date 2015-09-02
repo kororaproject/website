@@ -187,10 +187,10 @@ class Template(object):
       self._delta_repos.add(repo)
 
   def find_package(self, name):
-    return [p for p in self._packages if p.name == name]
+    return [p for p in self.packages if p.name == name]
 
-  def find_repo(self, name):
-    return [r for r in self._repos if r.name == name]
+  def find_repo(self, repo_id):
+    return [r for r in self.repos if r.stub == repo_id]
 
   def from_system(self, all=False):
     db = dnf.Base()
@@ -268,6 +268,22 @@ class Template(object):
 
     elif repo in self._repos:
       self._repos.remove(repo)
+      return True
+
+    return False
+
+  def update_repo(self, repo):
+    if not isinstance(repo, Repository):
+      raise TypeError('Not a Repository object')
+
+    if repo in self._delta_repos:
+      self._delta_repos.remove(repo)
+      self._delta_repos.add(repo)
+      return True
+
+    elif repo in self._repos:
+      self._repos.remove(repo)
+      self._repos.add(repo)
       return True
 
     return False
