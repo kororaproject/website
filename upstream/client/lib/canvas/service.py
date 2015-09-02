@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+import getpass
 import http.cookiejar
 import json
 import urllib.request, urllib.parse, urllib.error
@@ -34,20 +35,32 @@ class ServiceException(Exception):
 
 
 class Service(object):
-  def __init__(self, host='https://canvas.kororaproject.org'):
+  def __init__(self, host='https://canvas.kororaproject.org', username=None):
     self._host = host
     self._urlbase = host
+
+    self._username = username
 
     self._cookiejar = http.cookiejar.CookieJar()
     self._opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self._cookiejar))
 
     self._authenticated = False
 
-  def authenticate(self, username='', password='', force=False):
-    print('debug: authenticating to {0}'.format(self._urlbase))
+  def authenticate(self, username=None, password=None, prompt=None, force=False):
+    #print('debug: authenticating to {0}'.format(self._urlbase))
 
-    if self._authenticated and not self._force:
+    if self._authenticated and not force:
       return self._authenticated
+
+    # set default user
+    if username is None:
+      username = self._username
+
+    if password is None:
+      if prompt is None:
+        prompt = 'Password ({0}): '.format(username)
+
+      password = getpass.getpass(prompt)
 
     auth = json.dumps({'u':username, 'p':password}, separators=(',',':')).encode('utf-8')
 
@@ -89,6 +102,9 @@ class Service(object):
   def template_create(self, template):
     if not isinstance(template, Template):
       TypeError('template is not of type Template')
+
+    if not self.authenticate():
+      raise ServiceException('unable to authenticate')
 
     try:
       r = urllib.request.Request('{0}/api/templates.json'.format(self._urlbase), template.to_json().encode('utf-8'))
@@ -137,39 +153,23 @@ class Service(object):
 
     raise ServiceException('unable to delete template.')
 
-  def template_update(self, template):
-    if not isinstance(template, Template):
-      TypeError('template is not of type Template')
-
-    try:
-      r = urllib.request.Request('%s/api/template/%d.json' % (self._urlbase, template.id), template.to_json().encode('utf-8'))
-      r.get_method = lambda: 'PUT'
-      u = self._opener.open(r)
-      res = json.loads(u.read().decode('utf-8'))
-
-      return res
-
-    except urllib.error.URLError as e:
-      res = json.loads(e.fp.read().decode('utf-8'))
-      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
-
-    except urllib.error.HTTPError as e:
-      print(e)
-      raise ServiceException('unknown service response')
-
-    raise ServiceException('unable to update template.')
-
   def template_get(self, template):
     if not isinstance(template, Template):
       TypeError('template is not of type Template')
 
     query = {'user': template.user, 'name': template.name}
+    r = urllib.request.Request('%s/api/templates.json?%s' % (self._urlbase, urllib.parse.urlencode(query)))
 
     try:
-      r = urllib.request.Request('%s/api/templates.json?%s' % (self._urlbase, urllib.parse.urlencode(query)))
       u = self._opener.open(r)
-
       template_summary = json.loads(u.read().decode('utf-8'))
+
+      # nothing returned, so authenticate and retry
+      if len(template_summary) == 0 and not self._authenticated:
+        self.authenticate()
+
+        u = self._opener.open(r)
+        template_summary = json.loads(u.read().decode('utf-8'))
 
       if len(template_summary):
         # we only have one returned since template names are unique per account
@@ -179,6 +179,8 @@ class Service(object):
 
         return Template(template=data)
 
+      raise ServiceException('unable to get template')
+
     except urllib.error.URLError as e:
       res = json.loads(e.fp.read().decode('utf-8'))
       raise ServiceException('{0}'.format(res.get('error', 'unknown')))
@@ -186,8 +188,6 @@ class Service(object):
     except urllib.error.HTTPError as e:
       print(e)
       raise ServiceException('unknown service response')
-
-    raise ServiceException('unable to get template.')
 
   def template_list(self, user=None, name=None, description=None):
     params = {
@@ -221,4 +221,31 @@ class Service(object):
     if not isinstance(template, Template):
       TypeError('template is not of type Template')
 
+    if not self.authenticate():
+      raise ServiceException('unable to authenticate')
 
+
+  def template_update(self, template):
+    if not isinstance(template, Template):
+      TypeError('template is not of type Template')
+
+    if not self.authenticate():
+      raise ServiceException('unable to authenticate')
+
+    try:
+      r = urllib.request.Request('%s/api/template/%d.json' % (self._urlbase, template.id), template.to_json().encode('utf-8'))
+      r.get_method = lambda: 'PUT'
+      u = self._opener.open(r)
+      res = json.loads(u.read().decode('utf-8'))
+
+      return res
+
+    except urllib.error.URLError as e:
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
+
+    except urllib.error.HTTPError as e:
+      print(e)
+      raise ServiceException('unknown service response')
+
+    raise ServiceException('unable to update template.')
