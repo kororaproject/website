@@ -48,37 +48,7 @@ class Package(object):
 
     # parse all args package defined objects
     for arg in args:
-      if isinstance(arg, dnf.package.Package) or \
-         isinstance(arg, hawkey.Package):
-        self.name    = arg.name
-        self.epoch   = arg.epoch
-        self.version = arg.version
-        self.release = arg.release
-        self.arch    = arg.arch
-
-      elif isinstance(arg, dict):
-        self.name    = arg.get('n', None)
-        self.epoch   = arg.get('e', None)
-        self.version = arg.get('v', None)
-        self.release = arg.get('r', None)
-        self.arch    = arg.get('a', None)
-        self.action  = arg.get('z', ACTION_INCLUDE)
-
-      elif isinstance(arg, str):
-        m = RE_PACKAGE.match(arg)
-
-        if m is not None:
-          if m.group(1) == '~':
-            self.action  = ACTION_EXCLUDE
-
-          else:
-            self.action  = ACTION_INCLUDE
-
-          self.name = m.group(2)
-          self.epoch = m.group(3)
-          self.version = m.group(4)
-          self.release = m.group(5)
-          self.arch = m.group(6)
+      self.parse(arg)
 
     # strip evr information as appropriate
     if not kwargs.get('evr', True):
@@ -115,6 +85,39 @@ class Package(object):
 
   def included(self):
     return self.action & (ACTION_INCLUDE)
+
+  def parse(self, data):
+    if isinstance(data, dnf.package.Package) or \
+        isinstance(data, hawkey.Package):
+      self.name    = data.name
+      self.epoch   = data.epoch
+      self.version = data.version
+      self.release = data.release
+      self.arch    = data.arch
+
+    elif isinstance(data, dict):
+      self.name    = data.get('n', self.name)
+      self.epoch   = data.get('e', self.epoch)
+      self.version = data.get('v', self.version)
+      self.release = data.get('r', self.release)
+      self.arch    = data.get('a', self.arch)
+      self.action  = data.get('z', ACTION_INCLUDE)
+
+    elif isinstance(data, str):
+      m = RE_PACKAGE.match(data)
+
+      if m is not None:
+        if m.group(1) == '~':
+          self.action  = ACTION_EXCLUDE
+
+        else:
+          self.action  = ACTION_INCLUDE
+
+        self.name    = m.group(2)
+        self.epoch   = m.group(3)
+        self.version = m.group(4)
+        self.release = m.group(5)
+        self.arch    = m.group(6)
 
   def pinned(self):
     return self.action & (ACTION_PIN)
