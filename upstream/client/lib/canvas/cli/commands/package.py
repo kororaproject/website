@@ -41,6 +41,41 @@ class PackageCommand(Command):
     # return false if any error, help, or usage needs to be shown
     return not args.help
 
+  def help(self):
+    # check for action specific help first
+    if self.args.action is not None:
+      try:
+        command = getattr(self, 'help_{0}'.format(self.args.action))
+
+        # show action specific if available
+        if command:
+          return command()
+
+      except:
+        pass
+
+    # fall back to general usage
+    print("General usage: {0} [--version] [--help] [--verbose] package [<args>]\n"
+          "\n"
+          "Specific usage:\n"
+          "{0} package add [user:]template [--nodeps] package1 packagelist1 package2 ... packageN\n"
+          "{0} package list [user:]template [--filter-name] [--filter-summary] [--filter-description] [--filter-arch] [--filter-repo] [--output=path]\n"
+          "{0} package rm [user:]template [--nodeps] package1 package2 ... packageN\n"
+          "{0} template list\n"
+          "\n".format(self.prog_name))
+
+  def help_add(self):
+    print("Usage: {0} template add [user:]template [--name] [--title] [--description]\n"
+          "                           [--includes] [--public]\n"
+          "\n"
+          "Options:\n"
+          "  --name         NAME      Define the pretty NAME of template\n"
+          "  --title        TITLE     Define the pretty TITLE of template\n"
+          "  --description  TEXT      Define descriptive TEXT of the template\n"
+          "  --includes     TEMPLATE  Define descriptive TEXT of the template\n"
+          "\n"
+          "\n".format(self.prog_name))
+
   def run(self):
     # search for our function based on the specified action
     command = getattr(self, 'run_{0}'.format(self.args.action))
@@ -115,14 +150,32 @@ class PackageCommand(Command):
     repos.sort(key=lambda x: x.name)
 
     if len(packages):
-      l = prettytable.PrettyTable(["package", "arch"])
+      l = prettytable.PrettyTable(['package', 'epoch', 'version', 'release', 'arch', 'action'])
       l.hrules = prettytable.HEADER
       l.vrules = prettytable.NONE
       l.align = 'l'
       l.padding_witdth = 1
 
       for p in packages:
-        l.add_row([p.name, p.arch])
+        if p.epoch is None:
+          p.epoch = '-'
+
+        if p.version is None:
+          p.version = '-'
+
+        if p.release is None:
+          p.release = '-'
+
+        if p.arch is None:
+          p.arch = '-'
+
+        if p.included():
+          p.action = '+'
+
+        else:
+          p.action = '-'
+
+        l.add_row([p.name, p.epoch, p.version, p.release, p.arch, p.action])
 
       print(l)
       print()
@@ -181,5 +234,45 @@ class PackageCommand(Command):
       return 1
 
   def run_update(self):
-    print('PACKAGE UPDATE')
-    print(self.args)
+    t = Template(self.args.template, user=self.args.username)
+
+    try:
+      t = self.cs.template_get(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    # track updates to determine server update
+    updated = False
+
+    for p in self.args.package:
+
+      # parse new and find old
+      pn = Package(p)
+
+      print(pn)
+
+      if pn not in t.packages:
+        print('warn: package is not defined in template.')
+        continue
+
+      # update with new and track
+      if t.update_package(pn):
+        updated = True
+
+    if not updated:
+      print('info: no changes detected.')
+      return 0
+
+    # push our updated template
+    try:
+      res = self.cs.template_update(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    print('info: package(s) updated.')
+    return 0
+

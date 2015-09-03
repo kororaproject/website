@@ -31,7 +31,7 @@ ACTION_PIN     = 0x80
 ACTION_EXCLUDE = 0x02
 ACTION_INCLUDE = 0x01
 
-RE_PACKAGE = re.compile("(~)?([^#@:\s]+)(?:(?:#(\d+))?@([^-]+)-([^:]))?(?::(\w+))?")
+RE_PACKAGE = re.compile("([+~])?([^#@:\s]+)(?:(?:#(\d+))?@([^-]+)-([^:]))?(?::(\w+))?")
 
 #
 # CLASS DEFINITIONS / IMPLEMENTATIONS

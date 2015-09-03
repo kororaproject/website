@@ -272,6 +272,22 @@ class Template(object):
 
     return False
 
+  def update_package(self, package):
+    if not isinstance(package, Package):
+      raise TypeError('Not a Package object')
+
+    if package in self._delta_packages:
+      self._delta_packages.remove(package)
+      self._delta_packages.add(package)
+      return True
+
+    elif package in self._packages:
+      self._packages.remove(package)
+      self._packages.add(package)
+      return True
+
+    return False
+
   def update_repo(self, repo):
     if not isinstance(repo, Repository):
       raise TypeError('Not a Repository object')
