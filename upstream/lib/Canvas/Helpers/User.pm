@@ -203,7 +203,7 @@ sub register {
 
     # prepare activation email if email provider
     if (my $ed = $data->{email}) {
-      # generate activiation token
+      # generate activation token
       my $token = create_auth_token;
 
       my $um = $c->pg->db->query("INSERT INTO usermeta (user_id,meta_key,meta_value) VALUES (?,'activation_token',?)", $user_id, $token);
@@ -213,14 +213,19 @@ sub register {
 
       my $message = "" .
         "G'day,\n\n" .
-        "Thank you for registering to be part of our Korora community.\n\n".
-        "Your activiation key is: " . $activation_key . "\n\n" .
-        "In order to activate your Korora Prime account, copy your activation key and follow the prompts at: " . $activation_url . "\n\n" .
+        "Thank you for registering to be part of our Korora community!\n\n" .
+        "Please follow the steps below to activate your account.\n\n"
+        "Step 1) This is your activation key, please highlight and copy it:\n" .
+        "" . $activation_key . "\n\n" .
+        "Step 2) Visit the following Korora webpage:\n" .
+        "" . $activation_url . "\n\n" .
+        "Step 3) Paste your activation key and click Activate.\n\n" .
         "Please note that you must activate your account within 24 hours.\n\n" .
+        "If you run into trouble, please contact webmaster@kororaproject.org\n\n" .
         "Regards,\n" .
         "The Korora Team.\n";
 
-      # send the activiation email
+      # send the activation email
       $c->mail(
         to      => $email,
         from    => 'admin@kororaproject.org',
@@ -399,7 +404,7 @@ sub register {
       return undef;
     }
 
-    # generate activiation token
+    # generate activation token
     my $token = create_auth_token;
 
     my $db = $c->pg->db;
@@ -417,10 +422,11 @@ sub register {
       "G'day,\n\n" .
       "You (or someone else) entered this email address when trying to change the password of a Korora Prime account.\n\n".
       "In order to reset the password for your Korora Prime account, continue on and follow the prompts at: " . $activation_url . "\n\n" .
+      "If you did not request this password reset, simply ignore this email.\n\n" .
       "Regards,\n" .
       "The Korora Team.\n";
 
-    # send the activiation email
+    # send the activation email
     $c->mail(
       to      => $email,
       from    => 'admin@kororaproject.org',
