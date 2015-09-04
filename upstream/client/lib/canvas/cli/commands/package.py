@@ -77,8 +77,14 @@ class PackageCommand(Command):
           "\n".format(self.prog_name))
 
   def run(self):
+    command = None
     # search for our function based on the specified action
-    command = getattr(self, 'run_{0}'.format(self.args.action))
+    try:
+      command = getattr(self, 'run_{0}'.format(self.args.action))
+
+    except:
+      print('command: not implemented')
+      return 1
 
     if not command:
       print('error: action is not reachable.')
@@ -145,9 +151,6 @@ class PackageCommand(Command):
 
     packages = list(t.packages_all)
     packages.sort(key=lambda x: x.name)
-
-    repos = list(t.repos_all)
-    repos.sort(key=lambda x: x.name)
 
     if len(packages):
       l = prettytable.PrettyTable(['package', 'epoch', 'version', 'release', 'arch', 'action'])
