@@ -18,10 +18,8 @@
 
 import dnf
 import hawkey
+import json
 import re
-
-from json import dumps as json_encode
-from json import loads as json_decode
 
 #
 # CONSTANTS
@@ -78,7 +76,7 @@ class Package(object):
     return 'Package: %s' % (self.name)
 
   def __str__(self):
-    return 'Package: %s ' % ( json_encode( self.to_object(), separators=(',',':') ) )
+    return 'Package: %s ' % (json.dumps(self.to_object(), separators=(',',':')))
 
   def excluded(self):
     return self.action & (ACTION_EXCLUDE)
@@ -151,7 +149,7 @@ class Package(object):
     return f
 
   def to_json(self):
-    return json_encode( self.to_object(), separators=(',',':') )
+    return json.dumps(self.to_object(), separators=(',',':'))
 
   def to_object(self):
     o = {
@@ -203,7 +201,7 @@ class Repository(object):
     return (not self.__eq__(other))
 
   def __str__(self):
-    return 'Repository: %s ' % ( json_encode( self.to_object(), separators=(',',':') ) )
+    return 'Repository: %s ' % (json.dumps(self.to_object(), separators=(',',':')))
 
   def parse(self, data):
     if isinstance(data, str):
@@ -244,7 +242,7 @@ class Repository(object):
       self.meta_expired = data.get('me', self.meta_expired)
 
   def to_json(self):
-    return json_encode(self.to_object(), separators=(',',':'))
+    return json.dumps(self.to_object(), separators=(',',':'))
 
   def to_object(self):
     o = {
