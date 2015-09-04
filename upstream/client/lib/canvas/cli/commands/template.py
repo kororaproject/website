@@ -58,6 +58,19 @@ class TemplateCommand(Command):
     return not args.help
 
   def help(self):
+    # check for action specific help first
+    if self.args.action is not None:
+      try:
+        command = getattr(self, 'help_{0}'.format(self.args.action))
+
+        # show action specific if available
+        if command:
+          return command()
+
+      except:
+        pass
+
+    # fall back to general usage
     print("General usage: {0} [--version] [--help] [--verbose] template [<args>]\n"
           "\n"
           "Specific usage:\n"
@@ -69,6 +82,18 @@ class TemplateCommand(Command):
           "{0} template diff [user:]template\n"
           "{0} template copy [user_from:]template_from [[user_to:]template_to]\n"
           "{0} template list\n"
+          "\n".format(self.prog_name))
+
+  def help_add(self):
+    print("Usage: {0} template add [user:]template [--name] [--title] [--description]\n"
+          "                           [--includes] [--public]\n"
+          "\n"
+          "Options:\n"
+          "  --name         NAME      Define the pretty NAME of template\n"
+          "  --title        TITLE     Define the pretty TITLE of template\n"
+          "  --description  TEXT      Define descriptive TEXT of the template\n"
+          "  --includes     TEMPLATE  Define descriptive TEXT of the template\n"
+          "\n"
           "\n".format(self.prog_name))
 
   def run(self):
