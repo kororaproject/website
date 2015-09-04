@@ -173,10 +173,10 @@ class RepoCommand(Command):
 
       for r in repos:
         if r.cost is None:
-          r.cost = '-';
+          r.cost = '-'
 
         if r.priority is None:
-          r.priority = '-';
+          r.priority = '-'
 
         if r.enabled:
           r.enabled = 'Y'
