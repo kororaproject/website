@@ -50,8 +50,15 @@ class RepoCommand(Command):
     return not args.help
 
   def run(self):
+    command = None
+
     # search for our function based on the specified action
-    command = getattr(self, 'run_{0}'.format(self.args.action))
+    try:
+      command = getattr(self, 'run_{0}'.format(self.args.action))
+
+    except:
+      print('command: not implemented')
+      return 1
 
     if not command:
       print('error: action is not reachable.')
@@ -165,7 +172,7 @@ class RepoCommand(Command):
     repos.sort(key=lambda x: x.stub)
 
     if len(repos):
-      l = prettytable.PrettyTable(['id', 'repo', 'priority', 'cost', 'enabled'])
+      l = prettytable.PrettyTable(['repo', 'name', 'priority', 'cost', 'enabled'])
       l.hrules = prettytable.HEADER
       l.vrules = prettytable.NONE
       l.align = 'l'
