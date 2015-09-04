@@ -17,8 +17,8 @@
 #
 
 import dnf
-from json import dumps as json_encode
-from json import loads as json_decode
+import json
+import yaml
 
 from canvas.package import Package, Repository
 
@@ -323,16 +323,27 @@ class Template(object):
     self._repos.update(template.repos)
     self._packages.update(template.packages)
 
-  def to_object(self):
-    return { 'name': self._name,
-             'user': self._user,
-             'title': self._title,
-             'description': self._description,
-             'includes': self._includes,
-             'meta':     self._meta,
-             'packages': [p.to_object() for p in self.packages],
-             'repos':    [r.to_object() for r in self.repos]
-           }
-
   def to_json(self):
-    return json_encode(self.to_object(), separators=(',',':'))
+    return json.dumps(self.to_object(), separators=(',',':'))
+
+  def to_object(self):
+    # sort packages and repos
+    packages = list(self.packages)
+    packages.sort(key=lambda x: x.name)
+
+    repos = list(self.repos)
+    repos.sort(key=lambda x: x.stub)
+
+    return {
+      'name':        self._name,
+      'user':        self._user,
+      'title':       self._title,
+      'description': self._description,
+      'includes':    self._includes,
+      'meta':        self._meta,
+      'packages':    [p.to_object() for p in packages],
+      'repos':       [r.to_object() for r in repos]
+    }
+
+  def to_yaml(self):
+    return yaml.dump(self.to_object())

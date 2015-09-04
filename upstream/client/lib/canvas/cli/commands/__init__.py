@@ -19,6 +19,7 @@
 import argparse
 import logging
 import os
+import sys
 
 logger = logging.getLogger('canvas')
 
@@ -28,6 +29,9 @@ PROG_NAME='Canvas';
 CANVAS_HOST='https://canvas.kororaproject.org'
 #CANVAS_HOST='http://localhost:3000'
 
+# establish invoking user
+CANVAS_USER = os.environ.get('SUDO_USER', os.getlogin())
+
 class ArgumentParserError(Exception):
   pass
 
@@ -36,18 +40,14 @@ class ErrorRaisingArgumentParser(argparse.ArgumentParser):
   def error(self, message):
     raise ArgumentParserError(message)
 
-
 def buildCommandLineParser(config):
   parser = ErrorRaisingArgumentParser(prog='cnvs', add_help=False)
   subparsers = parser.add_subparsers(dest='command')
 
-  # establish invoking user
-  username = os.environ.get('SUDO_USER', os.getlogin())
-
   # general arguments
   general_parser = argparse.ArgumentParser(add_help=False)
   general_parser.add_argument('-h', '--help', '-?', action='store_true', dest='help')
-  general_parser.add_argument('-U', '--user', type=str, dest='username', default=config.get('user', 'name', username))
+  general_parser.add_argument('-U', '--user', type=str, dest='username', default=config.get('user', 'name', CANVAS_USER))
   general_parser.add_argument('-H', '--host', type=str, dest='host', default=config.get('core', 'host', CANVAS_HOST))
   general_parser.add_argument('-v', '--verbose', action='store_true', dest='verbose')
   general_parser.add_argument('-V', '--version', action='version', version='{0} - {1}'.format(PROG_NAME, PROG_VERSION))
@@ -119,6 +119,12 @@ def buildCommandLineParser(config):
   template_copy_parser.add_argument('template_from', type=str)
   template_copy_parser.add_argument('template_to', type=str, nargs='?')
 
+  # template dump arguments
+  template_dump_parser = subparsers_template.add_parser('dump', add_help=False, parents=[general_parser])
+  template_dump_parser.add_argument('template', type=str)
+  template_dump_parser.add_argument('--json', action='store_true')
+  template_dump_parser.add_argument('--yaml', action='store_true')
+
   #
   # PACKAGE COMMANDS
   #
@@ -136,7 +142,7 @@ def buildCommandLineParser(config):
 
   package_update_parser = subparsers_package.add_parser('update', add_help=False, parents=[general_parser])
   package_update_parser.add_argument('template', type=str)
-  package_update_parser.add_argument('package', type=str)
+  package_update_parser.add_argument('package', type=str, nargs='+')
 
   # package list arguments
   package_list_parser = subparsers_package.add_parser('list', add_help=False, parents=[general_parser])
@@ -245,16 +251,37 @@ def buildCommandLineParser(config):
 
   return parser
 
+def parseCommandLine(config):
+  parser = buildCommandLineParser(config)
+
+  args = None
+  args_extra = None
+
+  # parse known commands printing general usage on any error
+  try:
+    args, args_extra = parser.parse_known_args()
+
+  except:
+    # TODO: determine best help instead of general
+    args = argparse.Namespace()
+    args.command = sys.argv[1]
+    args.action  = sys.argv[2]
+    args.host = config.get('core', 'host', CANVAS_HOST)
+    args.username = config.get('user', 'name', CANVAS_USER)
+    args.help = True
+
+  return (args, args_extra)
+
 
 def general_usage(prog_name='canvas'):
   print("usage: {0} [--version] [--help] [--verbose] <command> [<args>]\n"
         "\n"
         "The available canvas commands are:\n"
-        "   template   Add file contents to the index\n"
-        "   package    Find by binary search the change that introduced a bug\n"
-        "   repo       List, create, or delete branches\n"
-        "   machine    Checkout a branch or paths to the working tree\n"
-        "   config     Clone a repository into a new directory\n".format(prog_name))
+        "  template  Add file contents to the index\n"
+        "  package   Find by binary search the change that introduced a bug\n"
+        "  repo      List, create, or delete branches\n"
+        "  machine   Checkout a branch or paths to the working tree\n"
+        "  config    Clone a repository into a new directory\n".format(prog_name))
 
 
 class Command(object):

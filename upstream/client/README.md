@@ -90,6 +90,7 @@ cnvs template pull [user:]template [--clean]
 cnvs template diff [user_from:][template_from|path_from] [[user_to:]template_to|path_to] [--output=path]
 cnvs template copy [user_from:]template_from [[user_to:]template_to]
 cnvs template list [user] [--filter-name] [--filter-description]
+cnvs template dump [user:]template [--json|--yaml]
 ```
 
 #### Adding Templates
@@ -232,6 +233,14 @@ Multiple filters and multiple items per filter can be specified. Specifying a us
 cnvs template list kororaproject --filter-name=*workstation* --filter-description=office
 ```
 
+#### Dumping Templates
+The general usage for dumping (or viewing) templates that are currently accessible is described as:
+```
+cnvs template dump [user:]template [--json|--yaml]
+```
+
+By default the template will be dumped in a human readable format. You dump to a machine readable `json` or `yaml` encoded format by adding the `--json` or `--yaml` options respectively.
+
 ### Template Packages
 The following commands allow management of packages from specified Templates.
 
@@ -275,7 +284,17 @@ cnvs package add firnsy:htpc foo bar:i686 baz#1@2.1-3:x86_64
 cnvs package add firnsy:htpc buz@2.1-3 ~/templates/htpc.packages /tmp/foo.packages
 ```
 
-If `--with-deps` is specified, the dependencies of any listed packages will also be added.
+##### Included and Excluded Packages
+By default a package is assumed to be an `included` package for at template. That is it will be installed (i.e. `included`) when synchronised to a system. You can specify that a package should be `excluded` by prefixing the package definition with `~`. This will ensure that a package is removed (if installed) from a system when synchronised with the template.
+
+For example:
+```
+cnvs package add firnsy:htpc kodi ~totem ~vlc
+```
+
+##### Adding Dependencies
+
+If `--with-deps` is specified, the immediate dependencies of any listed packages will also be added.
 ```
 cnvs package add firnsy:htpc --with-deps kodi    #kodi's dependencies will also be pulled in
 ```

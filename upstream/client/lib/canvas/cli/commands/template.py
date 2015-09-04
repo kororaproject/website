@@ -18,8 +18,11 @@
 
 import dnf
 import getpass
+import json
 import logging
 import prettytable
+import yaml
+
 from functools import reduce
 
 from canvas.cli.commands import Command
@@ -97,8 +100,15 @@ class TemplateCommand(Command):
           "\n".format(self.prog_name))
 
   def run(self):
+    command = None
+
     # search for our function based on the specified action
-    command = getattr(self, 'run_{0}'.format(self.args.action))
+    try:
+      command = getattr(self, 'run_{0}'.format(self.args.action))
+
+    except:
+      print('command: not implemented')
+      return 1
 
     if not command:
       print('error: action is not reachable.')
@@ -201,6 +211,102 @@ class TemplateCommand(Command):
       print(" + {0}".format(p.name))
 
     print()
+
+  def run_dump(self):
+    t = Template(self.args.template, user=self.args.username)
+
+    try:
+      t = self.cs.template_get(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    if self.args.yaml:
+      print(yaml.dump(t.to_object(), indent=4))
+      return 0
+
+    elif self.args.json:
+      print(json.dumps(t.to_object(), indent=4))
+      return 0
+
+    # pretty general information
+    print('Name: {0} ({1})'.format(t.name, t.user))
+    print('Description:\n{0}\n'.format(t.description))
+
+    # pretty print includes
+    if len(t.includes):
+      print('Includes:')
+      for i in t.includes:
+        print(' - {0}'.format(i))
+
+    # pretty print packages
+    repos = list(t.repos_all)
+    repos.sort(key=lambda x: x.stub)
+
+    if len(repos):
+      l = prettytable.PrettyTable(['repo', 'name', 'priority', 'cost', 'enabled'])
+      l.min_table_width=120
+      l.hrules = prettytable.HEADER
+      l.vrules = prettytable.NONE
+      l.align = 'l'
+      l.padding_witdth = 1
+
+      for r in repos:
+        if r.cost is None:
+          r.cost = '-'
+
+        if r.priority is None:
+          r.priority = '-'
+
+        if r.enabled:
+          r.enabled = 'Y'
+
+        else:
+          r.enabled = 'N'
+
+        l.add_row([r.stub, r.name, r.priority, r.cost, r.enabled])
+
+      print(l)
+      print()
+
+    # pretty print packages
+    packages = list(t.packages_all)
+    packages.sort(key=lambda x: x.name)
+
+    if len(packages):
+      l = prettytable.PrettyTable(['package', 'epoch', 'version', 'release', 'arch', 'action'])
+      l.min_table_width=120
+      l.hrules = prettytable.HEADER
+      l.vrules = prettytable.NONE
+      l.align = 'l'
+      l.padding_witdth = 1
+
+      for p in packages:
+        if p.epoch is None:
+          p.epoch = '-'
+
+        if p.version is None:
+          p.version = '-'
+
+        if p.release is None:
+          p.release = '-'
+
+        if p.arch is None:
+          p.arch = '-'
+
+        if p.included():
+          p.action = '+'
+
+        else:
+          p.action = '-'
+
+        l.add_row([p.name, p.epoch, p.version, p.release, p.arch, p.action])
+
+      print(l)
+      print()
+
+    return 0
 
   def run_list(self):
     # don't auth if looking for public only
