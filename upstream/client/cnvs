@@ -47,18 +47,7 @@ if __name__ == '__main__':
   # read config file
   config = canvas.config.Config()
 
-  parser = canvas.cli.commands.buildCommandLineParser(config)
-
-  # parse known commands printing general usage on any error
-  try:
-    args, args_extra = parser.parse_known_args()
-
-  except:
-    # TODO: determine best help instead of general
-    args = argparse.Namespace()
-    args.command = sys.argv[1]
-    args.action  = sys.argv[2]
-    args.help = True
+  args, args_extra = canvas.cli.commands.parseCommandLine(config)
 
   cli = None
 
