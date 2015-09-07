@@ -3,3 +3,4 @@ assets/
 cache/
 canvas.conf
 website.conf
+.vagrant/
