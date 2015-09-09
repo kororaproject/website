@@ -207,7 +207,7 @@ sub remove {
 
         # check for existing machine we can modify/remove
         $self->pg->db->query('
-          SELECT t.id
+          SELECT m.id
           FROM machines m
           JOIN users u ON
             (u.id=m.owner_id)
@@ -223,9 +223,11 @@ sub remove {
         return $cb->('internal server error', undef) if $err;
         return $cb->('machine doesn\'t exist', undef) if $res->rows == 0;
 
+        my $id = $res->array->[0];
+
         # insert if we're the owner or member of owner's group
-        $self->pg->db->query('DELETE FROM machinemeta WHERE machine_id=$1' => ($args->{id}) => $d->begin);
-        $self->pg->db->query('DELETE FROM machines WHERE id=$1' => ($args->{id}) => $d->begin);
+        $self->pg->db->query('DELETE FROM machinemeta WHERE machine_id=$1' => ($id) => $d->begin);
+        $self->pg->db->query('DELETE FROM machines WHERE id=$1' => ($id) => $d->begin);
       },
       sub {
         my ($d, $err_meta, $res_meta, $err, $res) = @_;

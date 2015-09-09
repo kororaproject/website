@@ -83,20 +83,11 @@ class MachineCommand(Command):
 
   def run_add(self):
     m = Machine(self.args.machine, user=self.args.username)
-
-    if self.args.username:
-      try:
-        self.cs.authenticate(self.args.username)
-
-      except ServiceException as e:
-        print(e)
-        return 1
-
     t = Template(self.args.template, user=self.args.username)
 
     # grab the template we're associating to the machine
     try:
-      t = self.cs.template_get(t)
+      t = self.cs.template_get(t, auth=True)
 
     except ServiceException as e:
       print(e)
@@ -128,14 +119,6 @@ class MachineCommand(Command):
     print('MACHINE DIFF')
 
   def run_list(self):
-    # always auth
-    try:
-      self.cs.authenticate()
-
-    except ServiceException as e:
-      print(e)
-      return 1
-
     # fetch all accessible/available templates
     try:
       machines = self.cs.machine_list(
@@ -167,9 +150,18 @@ class MachineCommand(Command):
     else:
       print('0 machines found.')
 
-
   def run_rm(self):
-    print('MACHINE REMOVE')
+    m = Machine(self.args.machine, user=self.args.username)
+
+    try:
+      res = self.cs.machine_delete(m)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    print('info: machine removed.')
+    return 0
 
   def run_sync(self):
     print('MACHINE SYNC')

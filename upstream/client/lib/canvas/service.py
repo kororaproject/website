@@ -104,8 +104,8 @@ class Service(object):
     if not isinstance(machine, Machine):
       TypeError('machine is not of type Machine')
 
-    if not self.authenticate():
-      raise ServiceException('unable to authenticate')
+    # always auth
+    self.authenticate()
 
     try:
       r = urllib.request.Request('{0}/api/machines.json'.format(self._urlbase), machine.to_json().encode('utf-8'))
@@ -130,14 +130,17 @@ class Service(object):
 
     query = {'user': machine.user, 'name': machine.name}
 
+    # always auth
+    self.authenticate()
+
     try:
-      r = urllib.request.Request('%s/api/machines.json?%s' % (self._urlbase, urllib.parse.urlencode(query)))
+      r = urllib.request.Request('{0}/api/machines.json?{1}'.format(self._urlbase, urllib.parse.urlencode(query)))
       u = self._opener.open(r)
 
       machine_summary = json.loads(u.read().decode('utf-8'))
 
       if len(machine_summary):
-        r = urllib.request.Request('%s/api/machine/%s.json' % (self._urlbase, machine_summary[0]['id']))
+        r = urllib.request.Request('{0}/api/machine/{1}.json'.format(self._urlbase, machine_summary[0]['uuid']))
         r.get_method = lambda: 'DELETE'
         u = self._opener.open(r)
         res = json.loads(u.read().decode('utf-8'))
@@ -198,7 +201,9 @@ class Service(object):
     }
 
     params = urllib.parse.urlencode({k: v for k, v in params.items() if v != None})
-    print(params)
+
+    # always auth
+    self.authenticate()
 
     try:
       r = urllib.request.Request('{0}/api/machines.json?{1}'.format(self._urlbase, params))
@@ -243,8 +248,8 @@ class Service(object):
     if not isinstance(machine, Machine):
       TypeError('machine is not of type Machine')
 
-    if not self.authenticate():
-      raise ServiceException('unable to authenticate')
+    # always auth
+    self.authenticate()
 
     try:
       r = urllib.request.Request('{0}/api/machine/{1}.json'.format(self._urlbase, machine.uuid), machine.to_json().encode('utf-8'))
@@ -320,9 +325,13 @@ class Service(object):
 
     raise ServiceException('unable to delete template.')
 
-  def template_get(self, template):
+  def template_get(self, template, auth=False):
     if not isinstance(template, Template):
       TypeError('template is not of type Template')
+
+    # check of force auth
+    if auth:
+      self.authenticate()
 
     query = {'user': template.user, 'name': template.name}
     r = urllib.request.Request('%s/api/templates.json?%s' % (self._urlbase, urllib.parse.urlencode(query)))
