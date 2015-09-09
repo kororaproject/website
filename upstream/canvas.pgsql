@@ -142,7 +142,9 @@ CREATE TABLE contributions (
 
 CREATE TABLE templates (
   id            BIGSERIAL     PRIMARY KEY,
-  owner_id      BIGINT        REFERENCES users(id),
+  owner_id      BIGINT        REFERENCES users(id)      NOT NULL,
+
+  uuid          VARCHAR(64),
 
   name          TEXT,
   stub          VARCHAR(128)  NOT NULL,
@@ -155,7 +157,9 @@ CREATE TABLE templates (
   meta          JSONB         NOT NULL  DEFAULT '{}',
 
   created       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc'),
-  updated       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc')
+  updated       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc'),
+
+  UNIQUE(uuid)
 );
 
 CREATE TABLE templatemeta (
@@ -167,9 +171,10 @@ CREATE TABLE templatemeta (
 
 CREATE TABLE machines (
   id            BIGSERIAL     PRIMARY KEY,
-  owner_id      BIGINT        REFERENCES users(id),
+  owner_id      BIGINT        REFERENCES users(id)      NOT NULL,
   template_id   BIGINT        REFERENCES templates(id),
 
+  uuid          VARCHAR(64),
   key           VARCHAR(128),
 
   name          TEXT,
@@ -183,7 +188,9 @@ CREATE TABLE machines (
   meta          JSONB         NOT NULL  DEFAULT '{}',
 
   created       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc'),
-  updated       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc')
+  updated       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc'),
+
+  UNIQUE(uuid)
 );
 
 CREATE TABLE machinemeta (
