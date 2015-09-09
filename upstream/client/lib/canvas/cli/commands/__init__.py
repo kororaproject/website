@@ -229,6 +229,13 @@ def buildCommandLineParser(config):
   machine_update_parser.add_argument('--description', type=str)
   machine_update_parser.add_argument('--template', type=str)
 
+  # machine list arguments
+  machine_list_parser = subparsers_machine.add_parser('list', add_help=False, parents=[general_parser])
+  machine_list_parser.add_argument('filter_user', type=str, nargs='?')
+  machine_list_parser.add_argument('--public', action='store_true', dest='public_only')
+  machine_list_parser.add_argument('--filter-name', type=str, dest='filter_name')
+  machine_list_parser.add_argument('--filter-description', type=str, dest='filter_description')
+
   # machine remove arguments
   machine_remove_parser = subparsers_machine.add_parser('rm', add_help=False, parents=[general_parser])
   machine_remove_parser.add_argument('machine', type=str)

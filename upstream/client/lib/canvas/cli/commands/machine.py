@@ -16,7 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import json
 import logging
+import prettytable
+import yaml
 
 from canvas.cli.commands import Command
 from canvas.package import Package, Repository
@@ -125,7 +128,45 @@ class MachineCommand(Command):
     print('MACHINE DIFF')
 
   def run_list(self):
-    print('MACHINE LIST')
+    # always auth
+    try:
+      self.cs.authenticate()
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    # fetch all accessible/available templates
+    try:
+      machines = self.cs.machine_list(
+        user=self.args.filter_user,
+        name=self.args.filter_name,
+        description=self.args.filter_description
+      )
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    if len(machines):
+      l = prettytable.PrettyTable(["user:name", "title"])
+      l.hrules = prettytable.HEADER
+      l.vrules = prettytable.NONE
+      l.align = 'l'
+      l.padding_witdth = 1
+
+      # add table items and print
+      for m in machines:
+        l.add_row(["{0}:{1}".format(m['username'], m['stub']), m['name']])
+
+      print(l)
+
+      # print summary
+      print('\n{0} machine(s) found.'.format(len(machines)))
+
+    else:
+      print('0 machines found.')
+
 
   def run_rm(self):
     print('MACHINE REMOVE')
