@@ -159,7 +159,7 @@ class Service(object):
       TypeError('machine is not of type Machine')
 
     query = {'user': machine.user, 'name': machine.name}
-    r = urllib.request.Request('%s/api/machines.json?%s' % (self._urlbase, urllib.parse.urlencode(query)))
+    r = urllib.request.Request('{0}/api/machines.json?{1}'.format(self._urlbase, urllib.parse.urlencode(query)))
 
     try:
       u = self._opener.open(r)
@@ -174,7 +174,7 @@ class Service(object):
 
       if len(machine_summary):
         # we only have one returned since machine names are unique per account
-        r = urllib.request.Request('%s/api/machine/%s.json' % (self._urlbase, machine_summary[0]['id']))
+        r = urllib.request.Request('{0}/api/machine/{1}.json'.format(self._urlbase, machine_summary[0]['uuid']))
         u = self._opener.open(r)
         data = json.loads(u.read().decode('utf-8'))
 

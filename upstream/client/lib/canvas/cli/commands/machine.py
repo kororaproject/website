@@ -31,21 +31,7 @@ class MachineCommand(Command):
     self.config = config
 
     # create our canvas service object
-    self.cs = Service(host=args.host)
-
-    try:
-      # expand includes
-      if args.includes is not None:
-        args.includes = args.includes.split(',')
-    except:
-      pass
-
-    # eval public
-    try:
-      if args.public is not None:
-        args.public = (args.public in ['1', 'true'])
-    except:
-      pass
+    self.cs = Service(host=args.host, username=args.username)
 
     # store args for additional processing
     self.args = args

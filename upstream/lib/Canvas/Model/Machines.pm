@@ -165,11 +165,13 @@ sub find {
 
         $self->pg->db->query('
           SELECT
-            m.uuid, m.name, m.description, m.stub, m.includes,
-            m.repos, m.packages, m.meta, u.username,
+            m.uuid, m.name, m.description, m.stub,
+            t.uuid AS template, m.meta, u.username,
             EXTRACT(EPOCH FROM m.created) AS created,
             EXTRACT(EPOCH FROM m.updated) AS updated
           FROM machines m
+          JOIN templates t ON
+            (t.id=m.template_id)
           JOIN users u ON
             (u.id=m.owner_id)
           WHERE
@@ -310,15 +312,17 @@ sub update {
           UPDATE machines
             SET
               name=$1, stub=$2, description=$3,
-              includes=$4, packages=$5, repos=$6, meta=$7
+              stores=$4, archives=$5, history=$6, meta=$7,
+              template_id=$8
           WHERE
-            uuid=$8' => (
+            uuid=$9' => (
             $machine->{title},
             $machine->{stub}, $machine->{description},
             {json => $machine->{stores}},
             {json => $machine->{archives}},
             {json => $machine->{history}},
             {json => $machine->{meta}},
+            $d->data('template'),
             $args->{uuid},
           ) => $d->begin);
       },
