@@ -214,14 +214,14 @@ sub register {
       my $message = "" .
         "G'day,\n\n" .
         "Thank you for registering to be part of our Korora community!\n\n" .
-        "Please follow the steps below to activate your account.\n\n"
+        "Please follow the steps below to activate your account.\n\n" .
         "Step 1) This is your activation key, please highlight and copy it:\n" .
         "" . $activation_key . "\n\n" .
         "Step 2) Visit the following Korora webpage:\n" .
         "" . $activation_url . "\n\n" .
         "Step 3) Paste your activation key and click Activate.\n\n" .
         "Please note that you must activate your account within 24 hours.\n\n" .
-        "If you run into trouble, please contact webmaster@kororaproject.org\n\n" .
+        "If you run into trouble, please contact webmaster\@kororaproject.org\n\n" .
         "Regards,\n" .
         "The Korora Team.\n";
 
