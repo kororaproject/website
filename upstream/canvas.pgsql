@@ -159,6 +159,7 @@ CREATE TABLE templates (
   created       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc'),
   updated       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc'),
 
+  UNIQUE(owner_id, name),
   UNIQUE(uuid)
 );
 
@@ -190,6 +191,7 @@ CREATE TABLE machines (
   created       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc'),
   updated       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc'),
 
+  UNIQUE(owner_id, name),
   UNIQUE(uuid)
 );
 
