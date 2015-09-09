@@ -93,7 +93,7 @@ class MachineCommand(Command):
     return command()
 
   def run_add(self):
-    m = Machine(self.args.template, user=self.args.username)
+    m = Machine(self.args.machine, user=self.args.username)
 
     if self.args.username:
       try:
