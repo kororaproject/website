@@ -311,8 +311,14 @@ class TemplateCommand(Command):
   def run_list(self):
     # don't auth if looking for public only
     if not self.args.public_only:
-      self.cs.authenticate()
+      try:
+        self.cs.authenticate()
 
+      except ServiceException as e:
+        print(e)
+        return 1
+
+    # fetch all accessible/available templates
     try:
       templates = self.cs.template_list(
         user=self.args.filter_user,

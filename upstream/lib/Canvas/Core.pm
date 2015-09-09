@@ -124,17 +124,24 @@ sub authenticate_any {
   my $c = shift;
   my $data = $c->req->json;
 
+  my $format = $c->stash('format') // 'html';
+
   # collect first out of the parameters and then json decoded body
   my $user = $c->param('u') // $data->{u} // '';
   my $pass = $c->param('p') // $data->{p} // '';
+
 
   # extract the redirect url and fall back to the index
   my $url = $c->param('rt') // $data->{rt};
   $url = defined $url ? $c->ub64_decode($url) : '/';
 
   unless ($c->authenticate($user, $pass)) {
+    return $c->render(status => 403, json => '') if $format eq 'json';
+
     $c->flash( page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?' );
   }
+
+  return $c->render(status => 200, json => '') if $format eq 'json';
 
   return $c->redirect_to($url);
 };
@@ -171,6 +178,7 @@ sub deauthenticate_any {
 sub templates_get {
   my $c = shift;
 
+  my $uuid = $c->param('uuid');
   my $user = $c->param('user');
   my $name = $c->param('name');
 
@@ -180,6 +188,7 @@ sub templates_get {
   $c->render_later;
 
   $c->canvas->templates->find(
+    uuid      => $uuid,
     name      => $name,
     user_name => $user,
     user_id   => $cu->{id},
@@ -225,11 +234,11 @@ sub templates_post {
     template => $template,
     user_id  => $cu->{id},
     sub {
-      my ($err, $id) = @_;
+      my ($err, $uuid) = @_;
 
       return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
 
-      $c->render(status => 200, text => "id: $id", json => {id => $id});
+      $c->render(status => 200, text => "uuid: $uuid", json => {uuid => $uuid});
     }
   );
 };
@@ -249,9 +258,9 @@ sub templates_post {
 #  - 404 if template doesn't exist
 #  - 500 if template owner doesn't exist or is invalid
 #
-sub template_id_get {
+sub template_get {
   my $c = shift;
-  my $id = $c->param('id');
+  my $uuid = $c->param('uuid');
   my $resolve = $c->param('resolve') // 1;
 
   # get auth'd user
@@ -260,7 +269,7 @@ sub template_id_get {
   $c->render_later;
 
   $c->canvas->templates->find(
-    id      => $id,
+    uuid    => $uuid,
     user_id => $cu->{id},
     sub {
       my ($err, $templates) = @_;
@@ -275,24 +284,22 @@ sub template_id_get {
       # only expect one template
       my $template = $templates->first;
 
-      if (!!$resolve) {
-        $c->resolve_includes($template);
-      }
+      $c->resolve_includes($template) if !!$resolve;
 
       $c->render(json => $template);
     }
   );
 }
 
-sub template_id_includes_get {
+sub template_includes_get {
   my $c = shift;
-  my $id = $c->param('id');
+  my $uuid = $c->param('uuid');
 
   # get auth'd user
   my $cu = $c->auth_user // { id => -1 };
 
   my $template = $c->canvas->templates->find(
-    id      => $id,
+    uuid    => $uuid,
     user_id => $cu->{id}
   );
 
@@ -315,9 +322,9 @@ sub template_id_includes_get {
 #  - 404 if template doesn't exist
 #  - 500 if template owner doesn't exist or is invalid
 #
-sub template_id_update {
+sub template_update {
   my $c = shift;
-  my $id = $c->param('id');
+  my $uuid = $c->param('uuid');
 
   unless ($c->users->is_active) {
     my $msg = 'not authenticated.';
@@ -332,14 +339,14 @@ sub template_id_update {
   $c->render_later;
 
   $c->canvas->templates->update(
-    id       => $id,
+    uuid     => $uuid,
     template => $template,
     user_id  => $cu->{id},
     sub {
-      my ($err, $id) = @_;
+      my ($err, $uuid) = @_;
 
       return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
-      $c->render(status => 200, text => "id: $id", json => {id => $id});
+      $c->render(status => 200, text => "uuid: $uuid", json => {uuid => $uuid});
     }
   );
 }
@@ -354,9 +361,9 @@ sub template_id_update {
 #  - 403 if entity exists and you don't have sufficient privileges to modify
 #  - 404 if template doesn't exist
 #
-sub template_id_del {
+sub template_del {
   my $c = shift;
-  my $id = $c->param('id');
+  my $uuid = $c->param('uuid');
 
   unless ($c->users->is_active) {
     my $msg = 'not authenticated.';
@@ -371,13 +378,255 @@ sub template_id_del {
   $c->render_later;
 
   $c->canvas->templates->remove(
-    id       => $id,
+    uuid     => $uuid,
     user_id  => $cu->{id},
     sub {
-      my ($err, $id) = @_;
+      my ($err, $uuid) = @_;
 
       return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
-      $c->render(status => 200, text => "id: $id", json => {id => $id});
+      $c->render(status => 200, text => "uuid: $uuid", json => {uuid => $uuid});
+    }
+  );
+}
+
+#
+# MACHINES
+#
+
+#
+# GET /api/machines
+#
+# Returns all available machines
+#
+# Returns:
+#  - 200 on success
+#  - 404 if repository does not exist
+#
+sub machines_get {
+  my $c = shift;
+
+  my $uuid = $c->param('uuid');
+  my $user = $c->param('user');
+  my $name = $c->param('name');
+
+  # get auth'd user
+  my $cu = $c->auth_user // { id => -1 };
+
+  $c->render_later;
+
+  $c->canvas->machines->find(
+    uuid      => $uuid,
+    name      => $name,
+    user_name => $user,
+    user_id   => $cu->{id},
+    sub {
+      my ($err, $machines) = @_;
+
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+
+      $c->render(status  => 200, json => $machines->to_array);
+    }
+  );
+};
+
+#
+# POST /api/machines
+#
+# Add a new machine
+#
+# Expected body contents is JSON encoded structure defining the machine
+# repositories and packages to be added.
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 500 if machine owner doesn't exist or is invalid
+#
+sub machines_post {
+  my $c = shift;
+
+  unless ($c->users->is_active) {
+    my $msg = 'not authenticated.';
+    return $c->render(status => 403, text => $msg, json => {error => $msg});
+  };
+
+  # get auth'd user
+  my $cu = $c->auth_user // { id => -1 };
+
+  my $machine = $c->req->json;
+
+  $c->render_later;
+
+  $c->canvas->machines->add(
+    machine => $machine,
+    user_id  => $cu->{id},
+    sub {
+      my ($err, $uuid, $key) = @_;
+
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+
+      $c->render(status => 200, text => "uuid: $uuid, key: $key", json => {uuid => $uuid, key => $key});
+    }
+  );
+};
+
+
+#
+# GET /api/machine/:id
+#
+# Returns the machine identified by :id
+#
+# Returned body contents is an JSON encoded structure defining the machine
+# repositories and packages contained within.
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 404 if machine doesn't exist
+#  - 500 if machine owner doesn't exist or is invalid
+#
+sub machine_get {
+  my $c = shift;
+  my $uuid = $c->param('uuid');
+
+  # get auth'd user
+  my $cu = $c->auth_user // { id => -1 };
+
+  $c->render_later;
+
+  $c->canvas->machines->find(
+    uuid      => $uuid,
+    user_id => $cu->{id},
+    sub {
+      my ($err, $machines) = @_;
+
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+
+      if ($machines->size != 1) {
+        $err = 'too many machine found.';
+        return $c->render(status => 500, text => $err, json => {error => $err});
+      }
+
+      # only expect one machine
+      my $machine = $machines->first;
+
+      $c->render(json => $machine);
+    }
+  );
+}
+
+sub machine_sync {
+  my $c = shift;
+  my $uuid = $c->param('uuid');
+
+  # get request headers
+  my $user  = $c->req->headers->header('X-Canvas-User');
+  my $hash  = $c->req->headers->header('X-Canvas-Hash');
+  my $nonce = $c->req->headers->header('X-Canvas-Nonce');
+
+  # get auth'd user
+  my $cu = $c->auth_user // { id => -1 };
+
+  $c->render_later;
+
+  $c->canvas->machines->find(
+    uuid    => $uuid,
+    user_id => $cu->{id},
+    sub {
+      my ($err, $machines) = @_;
+
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+
+      if ($machines->size != 1) {
+        $err = 'too many machine found.';
+        return $c->render(status => 500, text => $err, json => {error => $err});
+      }
+
+      # only expect one machine
+      my $machine = $machines->first;
+
+      $c->render(json => $machine);
+    }
+  );
+}
+
+#
+# PUT /api/machine/:id
+#
+# Update existing machine
+#
+# Expected body contents is JSON encoded structure defining the machine
+# repositories and packages to be added (or removed).
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 404 if machine doesn't exist
+#  - 500 if machine owner doesn't exist or is invalid
+#
+sub machine_update {
+  my $c = shift;
+  my $uuid = $c->param('uuid');
+
+  unless ($c->users->is_active) {
+    my $msg = 'not authenticated.';
+    return $c->render(status => 403, text => $msg, json => {error => $msg});
+  };
+
+  my $machine = $c->req->json;
+
+  # get auth'd user
+  my $cu = $c->auth_user // { id => -1 };
+
+  $c->render_later;
+
+  $c->canvas->machines->update(
+    uuid    => $uuid,
+    machine => $machine,
+    user_id => $cu->{id},
+    sub {
+      my ($err, $uuid) = @_;
+
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+      $c->render(status => 200, text => "uuid: $uuid", json => {uuid => $uuid});
+    }
+  );
+}
+
+#
+# DELETE /api/machine/:id
+#
+# Delete machine identified by :id
+#
+# Returns:
+#  - 200 on success
+#  - 403 if entity exists and you don't have sufficient privileges to modify
+#  - 404 if machine doesn't exist
+#
+sub machine_del {
+  my $c = shift;
+  my $uuid = $c->param('uuid');
+
+  unless ($c->users->is_active) {
+    my $msg = 'not authenticated.';
+    return $c->render(status => 403, text => $msg, json => {error => $msg});
+  };
+
+  my $machine = $c->req->json;
+
+  # get auth'd user
+  my $cu = $c->auth_user // { id => -1 };
+
+  $c->render_later;
+
+  $c->canvas->machines->remove(
+    uuid    => $uuid,
+    user_id => $cu->{id},
+    sub {
+      my ($err, $uuid) = @_;
+
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+      $c->render(status => 200, text => "uuid: $uuid", json => {uuid => $uuid});
     }
   );
 }

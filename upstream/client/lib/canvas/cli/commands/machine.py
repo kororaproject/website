@@ -18,13 +18,177 @@
 
 import logging
 
-from .. import commands
+from canvas.cli.commands import Command
+from canvas.package import Package, Repository
+from canvas.service import Service, ServiceException
+from canvas.template import Machine, Template
 
 logger = logging.getLogger('canvas')
 
-class MachineCommand(commands.Command):
-  def configure(self, args, args_extra):
-    print("MACHINE CONFIGURE")
+class MachineCommand(Command):
+  def configure(self, config, args, args_extra):
+    # store loaded config
+    self.config = config
+
+    # create our canvas service object
+    self.cs = Service(host=args.host)
+
+    try:
+      # expand includes
+      if args.includes is not None:
+        args.includes = args.includes.split(',')
+    except:
+      pass
+
+    # eval public
+    try:
+      if args.public is not None:
+        args.public = (args.public in ['1', 'true'])
+    except:
+      pass
+
+    # store args for additional processing
+    self.args = args
+
+    # return false if any error, help, or usage needs to be shown
+    return not args.help
+
+  def help(self):
+    # check for action specific help first
+    if self.args.action is not None:
+      try:
+        command = getattr(self, 'help_{0}'.format(self.args.action))
+
+        # show action specific if available
+        if command:
+          return command()
+
+      except:
+        pass
+
+    # fall back to general usage
+    print("General usage: {0} [--version] [--help] [--verbose] machine [<args>]\n"
+          "{0} machine list\n"
+          "\n".format(self.prog_name))
+
+  def help_add(self):
+    print("Usage: {0} machine add [user:]machine [user:]template [--title] [--description]\n"
+          "\n".format(self.prog_name))
 
   def run(self):
-    print("MACHING RUN")
+    command = None
+
+    # search for our function based on the specified action
+    try:
+      command = getattr(self, 'run_{0}'.format(self.args.action))
+
+    except:
+      print('command: not implemented')
+      return 1
+
+    if not command:
+      print('error: action is not reachable.')
+      return
+
+    return command()
+
+  def run_add(self):
+    m = Machine(self.args.template, user=self.args.username)
+
+    if self.args.username:
+      try:
+        self.cs.authenticate(self.args.username)
+
+      except ServiceException as e:
+        print(e)
+        return 1
+
+    t = Template(self.args.template, user=self.args.username)
+
+    # grab the template we're associating to the machine
+    try:
+      t = self.cs.template_get(t)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    # add template uuid to machine
+    m.template = t.uuid
+
+    # add machine bits that are specified
+    if self.args.description is not None:
+      m.description = self.args.description
+
+    try:
+      res = self.cs.machine_create(m)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    print(res)
+
+    print('info: machine added.')
+    return 0
+
+  def run_cmd(self):
+    print('MACHINE CMD')
+
+  def run_diff(self):
+    print('MACHINE DIFF')
+
+  def run_list(self):
+    print('MACHINE LIST')
+
+  def run_rm(self):
+    print('MACHINE REMOVE')
+
+  def run_sync(self):
+    print('MACHINE SYNC')
+
+  def run_update(self):
+    m = Machine(self.args.machine, user=self.args.username)
+
+    try:
+      m = self.cs.machine_get(m)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    # add machine bits that are specified for update
+    if self.args.template:
+      t = Template(self.args.template, user=self.args.username)
+
+      try:
+        t = self.cs.template_get(t)
+
+      except ServiceException as e:
+        print(e)
+        return 1
+
+      m.template = t.uuid
+
+    if self.args.name is not None:
+      m.name = self.args.name
+
+    if self.args.title is not None:
+      m.title = self.args.title
+
+    if self.args.title is not None:
+      m.title = self.args.title
+
+    if self.args.description is not None:
+      m.description = self.args.description
+
+    try:
+      res = self.cs.machine_update(m)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    print('info: machine updated.')
+    return 0
+

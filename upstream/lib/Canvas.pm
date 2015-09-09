@@ -43,6 +43,7 @@ use Time::Piece;
 #
 # LOCAL INCLUDES
 #
+use Canvas::Model::Machines;
 use Canvas::Model::Templates;
 
 #
@@ -166,6 +167,9 @@ sub startup {
   #
   # MODEL
   $self->helper(pg => sub { state $pg = Mojo::Pg->new($config->{database}{uri}); });
+  $self->helper('canvas.machines' => sub {
+    state $posts = Canvas::Model::Machines->new(pg => shift->pg)
+  });
   $self->helper('canvas.templates' => sub {
     state $posts = Canvas::Model::Templates->new(pg => shift->pg)
   });
@@ -178,23 +182,20 @@ sub startup {
   # CANVAS API ROUTES
   my $r_api = $r->under('/api');
 
-  $r_api->get('/packages')->to('core#packages_get');
-  $r_api->get('/packages/latest')->to('core#packages_latest_get');
-  $r_api->get('/package/:id')->to('core#package_id_get');
-  $r_api->put('/package/:id')->to('core#package_id_put');
-  $r_api->delete('/package/:id')->to('core#package_id_del');
-
-  $r_api->get('/repositories')->to('core#repositories_get');
-  $r_api->post('/repositories')->to('core#repositories_post');
-  $r_api->get('/repository/:id')->to('core#repository_id_get');
-
   $r_api->get('/templates')->to('core#templates_get');
   $r_api->post('/templates')->to('core#templates_post');
-  $r_api->get('/template/:id')->to('core#template_id_get');
-  $r_api->put('/template/:id')->to('core#template_id_update');
-  $r_api->delete('/template/:id')->to('core#template_id_del');
-  $r_api->get('/template/:id/includes')->to('core#template_id_includes_get');
+  $r_api->get('/template/:uuid')->to('core#template_get');
+  $r_api->put('/template/:uuid')->to('core#template_update');
+  $r_api->delete('/template/:uuid')->to('core#template_del');
+  $r_api->get('/template/:uuid/includes')->to('core#template_includes_get');
 
+
+  $r_api->get('/machines')->to('core#machines_get');
+  $r_api->post('/machines')->to('core#machines_post');
+  $r_api->get('/machine/:uuid')->to('core#machine_get');
+  $r_api->get('/machine/:uuid/sync')->to('core#machine_sync');
+  $r_api->put('/machine/:uuid')->to('core#machine_update');
+  $r_api->delete('/machine/:uuid')->to('core#machine_del');
 
 
   #

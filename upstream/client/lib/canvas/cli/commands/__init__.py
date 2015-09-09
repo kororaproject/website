@@ -217,15 +217,16 @@ def buildCommandLineParser(config):
   # machine add arguments
   machine_add_parser = subparsers_machine.add_parser('add', add_help=False, parents=[general_parser])
   machine_add_parser.add_argument('machine', type=str)
+  machine_add_parser.add_argument('template', type=str)
+  machine_add_parser.add_argument('--title', type=str)
   machine_add_parser.add_argument('--description', type=str)
-  machine_add_parser.add_argument('--location', type=str)
-  machine_add_parser.add_argument('--template', type=str)
 
   # machine update arguments
   machine_update_parser = subparsers_machine.add_parser('update', add_help=False, parents=[general_parser])
   machine_update_parser.add_argument('machine', type=str)
+  machine_update_parser.add_argument('--name', type=str)
+  machine_update_parser.add_argument('--title', type=str)
   machine_update_parser.add_argument('--description', type=str)
-  machine_update_parser.add_argument('--location', type=str)
   machine_update_parser.add_argument('--template', type=str)
 
   # machine remove arguments

@@ -20,7 +20,7 @@ import http.cookiejar
 import json
 import urllib.request, urllib.parse, urllib.error
 
-from canvas.template import Template
+from canvas.template import Machine, Template
 
 class ServiceException(Exception):
   def __init__(self, reason, code=0):
@@ -69,16 +69,16 @@ class Service(object):
     try:
       r = urllib.request.Request('{0}/authenticate.json'.format(self._urlbase), auth)
       u = self._opener.open(r)
+
       self._authenticated = True
+      return self._authenticated
 
     except urllib.error.URLError as e:
-      #print(e)
       pass
     except urllib.error.HTTPError as e:
-      #print(e)
       pass
 
-    return self._authenticated
+    raise ServiceException('unable to authenticate')
 
   def deauthenticate(self, username='', password='', force=False):
     if not self._authenticated and not self._force:
@@ -98,7 +98,174 @@ class Service(object):
 
     return self._authenticated
 
+  #
+  # MACHINE METHODS
+  def machine_create(self, machine):
+    if not isinstance(machine, Machine):
+      TypeError('machine is not of type Machine')
 
+    if not self.authenticate():
+      raise ServiceException('unable to authenticate')
+
+    try:
+      r = urllib.request.Request('{0}/api/machines.json'.format(self._urlbase), machine.to_json().encode('utf-8'))
+      u = self._opener.open(r)
+      res = json.loads(u.read().decode('utf-8'))
+
+      return res
+
+    except urllib.error.URLError as e:
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
+
+    except urllib.error.HTTPError as e:
+      print(e.fp.read())
+      raise ServiceException('unknown service response')
+
+    raise ServiceException('unable to add machine.')
+
+  def machine_delete(self, machine):
+    if not isinstance(machine, Machine):
+      TypeError('machine is not of type Machine')
+
+    query = {'user': machine.user, 'name': machine.name}
+
+    try:
+      r = urllib.request.Request('%s/api/machines.json?%s' % (self._urlbase, urllib.parse.urlencode(query)))
+      u = self._opener.open(r)
+
+      machine_summary = json.loads(u.read().decode('utf-8'))
+
+      if len(machine_summary):
+        r = urllib.request.Request('%s/api/machine/%s.json' % (self._urlbase, machine_summary[0]['id']))
+        r.get_method = lambda: 'DELETE'
+        u = self._opener.open(r)
+        res = json.loads(u.read().decode('utf-8'))
+
+        return res
+
+    except urllib.error.URLError as e:
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
+
+    except urllib.error.HTTPError as e:
+      print(e)
+      raise ServiceException('unknown service response')
+
+    raise ServiceException('unable to delete machine.')
+
+  def machine_get(self, machine):
+    if not isinstance(machine, Machine):
+      TypeError('machine is not of type Machine')
+
+    query = {'user': machine.user, 'name': machine.name}
+    r = urllib.request.Request('%s/api/machines.json?%s' % (self._urlbase, urllib.parse.urlencode(query)))
+
+    try:
+      u = self._opener.open(r)
+      machine_summary = json.loads(u.read().decode('utf-8'))
+
+      # nothing returned, so authenticate and retry
+      if len(machine_summary) == 0 and not self._authenticated:
+        self.authenticate()
+
+        u = self._opener.open(r)
+        machine_summary = json.loads(u.read().decode('utf-8'))
+
+      if len(machine_summary):
+        # we only have one returned since machine names are unique per account
+        r = urllib.request.Request('%s/api/machine/%s.json' % (self._urlbase, machine_summary[0]['id']))
+        u = self._opener.open(r)
+        data = json.loads(u.read().decode('utf-8'))
+
+        return Machine(machine=data)
+
+      raise ServiceException('unable to get machine')
+
+    except urllib.error.URLError as e:
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
+
+    except urllib.error.HTTPError as e:
+      print(e)
+      raise ServiceException('unknown service response')
+
+  def machine_list(self, user=None, name=None, description=None):
+    params = {
+      'user': user,
+      'name': name,
+      'description': description
+    }
+
+    params = urllib.parse.urlencode({k: v for k, v in params.items() if v != None})
+    print(params)
+
+    try:
+      r = urllib.request.Request('{0}/api/machines.json?{1}'.format(self._urlbase, params))
+      u = self._opener.open(r)
+
+      res = json.loads(u.read().decode('utf-8'))
+
+      return res
+
+    except urllib.error.URLError as e:
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
+
+    except urllib.error.HTTPError as e:
+      print(e)
+      raise ServiceException('unknown service response')
+
+    return []
+
+  def machine_sync(self, machine):
+    if not isinstance(machine, Machine):
+      TypeError('machine is not of type Machine')
+
+    try:
+      r = urllib.request.Request('{0}/api/machine/{1}/sync.json'.format(self._urlbase, machine.id))
+      u = self._opener.open(r)
+      res = json.loads(u.read().decode('utf-8'))
+
+      return res
+
+    except urllib.error.URLError as e:
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
+
+    except urllib.error.HTTPError as e:
+      print(e)
+      raise ServiceException('unknown service response')
+
+    raise ServiceException('unable to update machine.')
+
+  def machine_update(self, machine):
+    if not isinstance(machine, Machine):
+      TypeError('machine is not of type Machine')
+
+    if not self.authenticate():
+      raise ServiceException('unable to authenticate')
+
+    try:
+      r = urllib.request.Request('{0}/api/machine/{1}.json'.format(self._urlbase, machine.uuid), machine.to_json().encode('utf-8'))
+      r.get_method = lambda: 'PUT'
+      u = self._opener.open(r)
+      res = json.loads(u.read().decode('utf-8'))
+
+      return res
+
+    except urllib.error.URLError as e:
+      res = json.loads(e.fp.read().decode('utf-8'))
+      raise ServiceException('{0}'.format(res.get('error', 'unknown')))
+
+    except urllib.error.HTTPError as e:
+      print(e)
+      raise ServiceException('unknown service response')
+
+    raise ServiceException('unable to update machine.')
+
+  #
+  # TEMPLATE METHODS
   def template_create(self, template):
     if not isinstance(template, Template):
       TypeError('template is not of type Template')
@@ -173,7 +340,8 @@ class Service(object):
 
       if len(template_summary):
         # we only have one returned since template names are unique per account
-        r = urllib.request.Request('%s/api/template/%s.json' % (self._urlbase, template_summary[0]['id']))
+        r = urllib.request.Request('{0}/api/template/{1}.json'.format(self._urlbase,
+          template_summary[0]['uuid']))
         u = self._opener.open(r)
         data = json.loads(u.read().decode('utf-8'))
 
@@ -217,14 +385,6 @@ class Service(object):
 
     return []
 
-  def template_remove(self, template):
-    if not isinstance(template, Template):
-      TypeError('template is not of type Template')
-
-    if not self.authenticate():
-      raise ServiceException('unable to authenticate')
-
-
   def template_update(self, template):
     if not isinstance(template, Template):
       TypeError('template is not of type Template')
@@ -233,7 +393,7 @@ class Service(object):
       raise ServiceException('unable to authenticate')
 
     try:
-      r = urllib.request.Request('%s/api/template/%d.json' % (self._urlbase, template.id), template.to_json().encode('utf-8'))
+      r = urllib.request.Request('{0}/api/template/{1}.json'.format(self._urlbase, template.uuid), template.to_json().encode('utf-8'))
       r.get_method = lambda: 'PUT'
       u = self._opener.open(r)
       res = json.loads(u.read().decode('utf-8'))
