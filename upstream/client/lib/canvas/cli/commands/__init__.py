@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import argcomplete
 import argparse
 import logging
 import os
@@ -259,6 +260,7 @@ def parseCommandLine(config):
 
   # parse known commands printing general usage on any error
   try:
+    argcomplete.autocomplete(parser)
     args, args_extra = parser.parse_known_args()
 
   except:
