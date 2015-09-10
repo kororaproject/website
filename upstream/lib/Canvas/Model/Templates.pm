@@ -68,7 +68,7 @@ sub add {
           WHERE
             u.username=$9 AND
             (u.id=$10 OR
-              (u.meta->\'members\' @> $10))
+              (u.meta->\'members\' @> CAST($10 AS text)::jsonb))
           LIMIT 1' => (
             $template->{uuid},
             $template->{title},
@@ -140,7 +140,7 @@ sub find {
             (t.stub=$2 or $2 IS NULL) AND
             (u.username=$3 or $3 IS NULL) AND
             (t.owner_id=$4 OR
-              (u.meta->\'members\' @> $4) OR
+              (u.meta->\'members\' @> CAST($4 AS text)::jsonb) OR
               (t.meta @> \'{"public": true}\'::jsonb)
             )' => (
               $args->{uuid}, $args->{name},
@@ -149,6 +149,7 @@ sub find {
       sub {
         my ($d, $err, $res) = @_;
 
+        warn dumper $err;
         return $cb->('internal server error', undef) if $err;
 
         return $cb->(undef, $res->expand->hashes);
@@ -175,7 +176,7 @@ sub remove {
             (u.id=t.owner_id)
           WHERE
             t.uuid=$1 AND
-            (u.id=$2 OR (u.meta->\'members\' @> $2))
+            (u.id=$2 OR (u.meta->\'members\' @> CAST($2 AS text)::jsonb))
           ' => ($args->{uuid}, $args->{user_id}) => $d->begin);
       },
       sub {
@@ -263,7 +264,7 @@ sub update {
             (u.id=t.owner_id)
           WHERE
             t.uuid=$1 AND
-            (u.id=$2 OR (u.meta->\'members\' @> $2))
+            (u.id=$2 OR (u.meta->\'members\' @> CAST($2 AS text)::jsonb))
           ' => ($template->{uuid}, $args->{user_id}) => $d->begin);
       },
       sub {

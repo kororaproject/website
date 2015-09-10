@@ -1,7 +1,7 @@
 package Canvas::Model::Machines;
 use Mojo::Base -base;
 
-use Digest::SHA qw(sha256_hex sha512_hex);
+use Digest::SHA qw(hmac_sha512_hex sha256_hex sha512_hex);
 use Mojo::Util qw(dumper);
 use Time::Piece;
 
@@ -65,7 +65,7 @@ sub add {
           WHERE
             t.uuid=$1 AND
             (t.owner_id=$2 OR
-              (u.meta->\'members\' @> $2) OR
+              (u.meta->\'members\' @> CAST($2 AS text)::jsonb) OR
               (t.meta @> \'{"public": true}\'::jsonb)
             )' => (
               $machine->{template}, $args->{user_id}) => $d->begin);
@@ -104,7 +104,7 @@ sub add {
           WHERE
             u.username=$11 AND
             (u.id=$12 OR
-              (u.meta->\'members\' @> $12))
+              (u.meta->\'members\' @> CAST($12 AS text)::jsonb))
           LIMIT 1' => (
             $d->data('template'),
             $machine->{uuid},
@@ -179,10 +179,63 @@ sub find {
             (m.stub=$2 or $2 IS NULL) AND
             (u.username=$3 or $3 IS NULL) AND
             (m.owner_id=$4 OR
-              (u.meta->\'members\' @> $4)
+              (u.meta->\'members\' @> CAST($4 AS text)::jsonb)
             )' => (
               $args->{uuid}, $args->{name},
               $args->{user_name}, $args->{user_id}) => $d->begin);
+      },
+      sub {
+        my ($d, $err, $res) = @_;
+
+        return $cb->('internal server error', undef) if $err;
+
+        return $cb->(undef, $res->expand->hashes);
+      }
+    );
+  }
+}
+
+sub get_by_uuid {
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  my $self = shift;
+
+  my $args = @_%2 ? shift : {@_};
+
+  # TODO: page
+  if ($cb) {
+    return Mojo::IOLoop->delay(
+      sub {
+        my $d = shift;
+
+        $self->pg->db->query('SELECT key FROM machines WHERE uuid=$1' => ($args->{uuid}) => $d->begin);
+      },
+      sub {
+        my ($d, $err, $res) = @_;
+
+        return $cb->('internal server error', undef) if $err;
+        return $cb->('machine doesn\'t exist', undef) if $res->rows == 0;
+
+        my $key = pack('H*', $res->array->[0]);
+
+        # calculate nonce
+        my $hmac = hmac_sha512_hex($args->{nonce}.$args->{uuid}, $key);
+
+        return $cb->('access denied', undef) unless $args->{hash} eq $hmac;
+
+        $self->pg->db->query('
+          SELECT
+            m.uuid, m.name, m.description, m.stub,
+            t.uuid AS template, m.meta, u.username,
+            m.stores, m.archives, m.history,
+            EXTRACT(EPOCH FROM m.created) AS created,
+            EXTRACT(EPOCH FROM m.updated) AS updated
+          FROM machines m
+          JOIN templates t ON
+            (t.id=m.template_id)
+          JOIN users u ON
+            (u.id=m.owner_id)
+          WHERE
+            m.uuid=$1' => ($args->{uuid}) => $d->begin);
       },
       sub {
         my ($d, $err, $res) = @_;
@@ -213,7 +266,7 @@ sub remove {
             (u.id=m.owner_id)
           WHERE
             m.uuid=$1 AND
-            (u.id=$2 OR (u.meta->\'members\' @> $2))
+            (u.id=$2 OR (u.meta->\'members\' @> CAST($2 AS text)::jsonb))
           ' => ($args->{uuid}, $args->{user_id}) => $d->begin);
       },
       sub {
@@ -277,7 +330,7 @@ sub update {
           WHERE
             t.uuid=$1 AND
             (t.owner_id=$2 OR
-              (u.meta->\'members\' @> $2) OR
+              (u.meta->\'members\' @> CAST($2 AS text)::jsonb) OR
               (t.meta @> \'{"public": true}\'::jsonb)
             )' => (
               $machine->{template}, $args->{user_id}) => $d->begin);
@@ -299,7 +352,7 @@ sub update {
             (u.id=m.owner_id)
           WHERE
             m.uuid=$1 AND
-            (u.id=$2 OR (u.meta->\'members\' @> $2))
+            (u.id=$2 OR (u.meta->\'members\' @> CAST($2 AS text)::jsonb))
           ' => ($args->{uuid}, $args->{user_id}) => $d->begin);
       },
       sub {
