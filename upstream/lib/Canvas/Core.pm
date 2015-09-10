@@ -138,7 +138,7 @@ sub authenticate_any {
   unless ($c->authenticate($user, $pass)) {
     return $c->render(status => 403, json => '') if $format eq 'json';
 
-    $c->flash( page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?' );
+    $c->flash(page_errors => 'The username or password was incorrect. Perhaps your account has not been activated?');
   }
 
   return $c->render(status => 200, json => '') if $format eq 'json';
@@ -520,17 +520,19 @@ sub machine_sync {
   my $uuid = $c->param('uuid');
 
   # get request headers
-  my $user  = $c->req->headers->header('X-Canvas-User');
-  my $hash  = $c->req->headers->header('X-Canvas-Hash');
-  my $nonce = $c->req->headers->header('X-Canvas-Nonce');
+  my $uuid2 = $c->req->headers->header('x-canvas-uuid');
+  my $hash  = $c->req->headers->header('x-canvas-hash');
+  my $nonce = $c->req->headers->header('x-canvas-nonce');
 
   # get auth'd user
   my $cu = $c->auth_user // { id => -1 };
 
   $c->render_later;
 
-  $c->canvas->machines->find(
+  $c->canvas->machines->get_by_uuid(
     uuid    => $uuid,
+    hash    => $hash,
+    nonce   => $nonce,
     user_id => $cu->{id},
     sub {
       my ($err, $machines) = @_;
@@ -538,7 +540,7 @@ sub machine_sync {
       return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
 
       if ($machines->size != 1) {
-        $err = 'too many machine found.';
+        $err = 'machine not found.';
         return $c->render(status => 500, text => $err, json => {error => $err});
       }
 
