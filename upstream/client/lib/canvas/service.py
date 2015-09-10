@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+import codecs
 import getpass
+import hmac
 import http.cookiejar
 import json
 import urllib.request, urllib.parse, urllib.error
@@ -223,12 +225,19 @@ class Service(object):
 
     return []
 
-  def machine_sync(self, machine):
-    if not isinstance(machine, Machine):
-      TypeError('machine is not of type Machine')
+  def machine_sync(self, uuid=None, key=None, data=None):
+    # generate nonce and hmac with
+    nonce = 'foo'
+
+    m = nonce + uuid
+    h = hmac.new(codecs.decode(key, 'hex'), msg=m.encode('utf-8'), digestmod='sha512')
+
 
     try:
-      r = urllib.request.Request('{0}/api/machine/{1}/sync.json'.format(self._urlbase, machine.id))
+      r = urllib.request.Request('{0}/api/machine/{1}/sync.json'.format(self._urlbase, uuid))
+      r.add_header('x-canvas-nonce', nonce)
+      r.add_header('x-canvas-uuid', uuid)
+      r.add_header('x-canvas-hash', h.hexdigest())
       u = self._opener.open(r)
       res = json.loads(u.read().decode('utf-8'))
 
@@ -334,6 +343,7 @@ class Service(object):
       self.authenticate()
 
     query = {'user': template.user, 'name': template.name}
+
     r = urllib.request.Request('%s/api/templates.json?%s' % (self._urlbase, urllib.parse.urlencode(query)))
 
     try:

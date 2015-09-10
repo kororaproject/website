@@ -57,7 +57,15 @@ class MachineCommand(Command):
 
     # fall back to general usage
     print("General usage: {0} [--version] [--help] [--verbose] machine [<args>]\n"
-          "{0} machine list\n"
+          "{0} machine add [user:]name [--description=] [--location=] [--name=] [--template=]\n"
+          "{0} machine update [user:]name [--description=] [--location=] [--name=] [--template=]\n"
+          "{0} machine list [user] [--filter-name] [--filter-description]\n"
+          "{0} machine rm [user:]name\n"
+          "{0} machine diff [user:]name [--output=path]\n"
+          "{0} machine connect [user:]name\n"
+          "{0} machine cmd [user:]name command arg1 arg2 ... argN\n"
+          "{0} machine sync [user:]name [--pull [[user:]template]] | --push [user:]template]\n"
+          "{0} machine disconnect [user:]name\n"
           "\n".format(self.prog_name))
 
   def help_add(self):
@@ -108,6 +116,11 @@ class MachineCommand(Command):
       return 1
 
     print(res)
+
+    # update config with our newly added (registered) machine
+    self.config.set('machine', 'uuid', res['uuid'])
+    self.config.set('machine', 'key', res['key'])
+    self.config.save()
 
     print('info: machine added.')
     return 0
@@ -160,11 +173,29 @@ class MachineCommand(Command):
       print(e)
       return 1
 
+    self.config.unset('machine', 'uuid')
+    self.config.unset('machine', 'key')
+    self.config.save()
+
     print('info: machine removed.')
     return 0
 
   def run_sync(self):
-    print('MACHINE SYNC')
+    uuid = self.config.get('machine', 'uuid')
+    key = self.config.get('machine', 'key')
+
+    try:
+      res = self.cs.machine_sync(uuid, key)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    print(res)
+
+    print('info: machine synced.')
+    return 0
+
 
   def run_update(self):
     m = Machine(self.args.machine, user=self.args.username)

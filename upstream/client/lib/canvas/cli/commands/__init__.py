@@ -247,7 +247,6 @@ def buildCommandLineParser(config):
 
   # machine sync arguments
   machine_sync_parser = subparsers_machine.add_parser('sync', add_help=False, parents=[general_parser])
-  machine_sync_parser.add_argument('machine', type=str)
   machine_sync_parser_group = machine_sync_parser.add_mutually_exclusive_group()
   machine_sync_parser_group.add_argument('pull', type=str, nargs='?')
   machine_sync_parser_group.add_argument('push', type=str, nargs='?')
