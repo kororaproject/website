@@ -8,7 +8,7 @@
       </div><!--
    --><div class="col-xs-12 col-sm-6 vcenter">
         <div class="laptop">
-          <img class="img-responsive" src="/img/generic-laptop-korora-gnome-desktop.png" alt="Korora on laptop">
+          <img id="img-banner" class="img-responsive" src="/img/generic-laptop-korora-gnome-desktop.png" alt="Korora on laptop">
         </div>
       </div><!--
  --><div class="col-xs-12 col-sm-3 center vcenter">
@@ -20,4 +20,5 @@
     </div>
   </div>
 </div>
+
 <!-- END BANNER -->

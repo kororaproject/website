@@ -21,7 +21,7 @@
 <script src="/js/canvas.js"></script>
 
 <script>
-  $(document).ready( function() {
+  $(document).ready(function() {
     /* configure korobar */
     var fixed   = true;
     var korobar = $('#korobar');
@@ -32,7 +32,7 @@
     /* helper function to frob element heights for the layered effect */
     var resizeHelper = function() {
       // banner correction
-      if( $('#banner').length ) {
+      if ($('#banner').length) {
         start = $('#banner').outerHeight();
       }
 
@@ -88,6 +88,14 @@
 
     /* initialise highlight blocks */
     hljs.initHighlightingOnLoad();
+
+    /* resize also on banner load which can ... take time */
+    var banner = document.getElementById('img-banner');
+    if (banner !== null) {
+      banner.onload = function() {
+        resizeHelper();
+      };
+    };
 
     /* initial call to page resize helper */
     setTimeout(function() { resizeHelper(); }, 0);
