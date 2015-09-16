@@ -31,6 +31,7 @@ sys.path.append('./lib')
 
 import canvas.config
 from canvas.service import Service, ServiceException
+from canvas.template import Machine, Template
 
 CANVAS_HOST='https://canvas.kororaproject.org'
 CANVAS_USER = os.environ.get('SUDO_USER', os.getlogin())
@@ -48,7 +49,8 @@ class Daemon():
     self.uuid = self.config.get('machine', 'uuid')
     self.key  = self.config.get('machine', 'key')
 
-    self.template_uuid = None
+    self.machine = None
+    self.template_uuid = True
     self.template = None
 
   def loop(self):
@@ -56,20 +58,25 @@ class Daemon():
       print('Syncing ... {0}'.format(time.ctime()))
 
       try:
-        res = self.cs.machine_sync(self.uuid, self.key)
+        res = self.cs.machine_sync(self.uuid, self.key, template=self.template_uuid)
 
       except ServiceException as e:
         print(e)
         return 1
 
-      if res['template'] != 
-        self.template = self.cs.template_get(uuid=self.template_uuid)
-
       print(res)
 
-      print('info: machine synced.')
+      self.machine = Machine(res['machine'])
 
-      time.sleep(300)
+      self.template_uuid = self.machine.template
+
+      if res['template'] is not None:
+        self.template = Template(res['template'])
+
+      print('info: machine synced.')
+      print(self.machine, self.template)
+
+      time.sleep(10)
 
 
 def signal_handler(signal, frame):
