@@ -49,7 +49,7 @@ class Template(object):
     self._parse_template(template)
 
   def __str__(self):
-    return 'Template: %s (owner: %s) - R: %d, P: %d' % (self._name, self._user, len(self._repos), len(self._packages))
+    return 'Template: %s (owner: %s) - R: %d, P: %d' % (self._name, self._user, len(self.repos_all), len(self.packages_all))
 
   def _flatten(self):
     for tr in self._includes_resolved:

@@ -264,7 +264,6 @@ class Repository(object):
     return {k: v for k, v in o.items() if v != None}
 
   def to_repo(self, cache_dir=None):
-    print(cache_dir)
     if cache_dir is None:
       cli_cache = dnf.conf.CliCache('/var/tmp')
       cache_dir = cli_cache.cachedir
