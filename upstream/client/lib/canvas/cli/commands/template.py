@@ -417,7 +417,8 @@ class TemplateCommand(Command):
         for pkg in matches.installed():
           db._goal.erase(pkg, clean_deps=clean_deps)
 
-    db.resolve()
+    print('info: resolving actions ...')
+    db.resolve(allow_erasing=True)
 
     # describe process for dry runs
     if self.args.dry_run:
@@ -448,7 +449,9 @@ class TemplateCommand(Command):
       return 0
 
     # TODO: progress for download, install and removal
+    print('info: downloading ...')
     db.download_packages(list(db.transaction.install_set))
+
     return db.do_transaction()
 
   def run_push(self):

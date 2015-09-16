@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import dnf
 import json
 import logging
 import prettytable
@@ -129,7 +130,36 @@ class MachineCommand(Command):
     print('MACHINE CMD')
 
   def run_diff(self):
-    print('MACHINE DIFF')
+    uuid = self.config.get('machine', 'uuid')
+    key = self.config.get('machine', 'key')
+
+    try:
+      res = self.cs.machine_sync(uuid, key, template=True)
+
+    except ServiceException as e:
+      print(e)
+      return 1
+
+    m = Machine(res['template'])
+    t = Template(res['template'])
+
+    ts = Template('system')
+    ts.from_system()
+
+    (l_r, r_l) = t.package_diff(ts.packages_all)
+
+    print("In template not in system:")
+
+    for p in l_r:
+      print(" - {0}".format(p.name))
+
+    print()
+    print("On system not in template:")
+
+    for p in r_l:
+      print(" + {0}".format(p.name))
+
+    print()
 
   def run_list(self):
     # fetch all accessible/available templates
@@ -185,17 +215,115 @@ class MachineCommand(Command):
     key = self.config.get('machine', 'key')
 
     try:
-      res = self.cs.machine_sync(uuid, key)
+      res = self.cs.machine_sync(uuid, key, template=True)
 
     except ServiceException as e:
       print(e)
       return 1
 
-    print(res)
+    m = Machine(res['template'])
+    t = Template(res['template'])
+
+    # prepare dnf
+    print('info: analysing system ...')
+    db = dnf.Base()
+
+    # install repos from template
+    for r in t.repos_all:
+      dr = r.to_repo()
+      try:
+        dr.load()
+        db.repos.add(dr)
+
+      except dnf.exceptions.RepoError as e:
+        print(e)
+        return 1
+
+    db.read_comps()
+
+    try:
+      db.fill_sack()
+
+    except OSError as e:
+      pass
+
+    multilib_policy = db.conf.multilib_policy
+    clean_deps = db.conf.clean_requirements_on_remove
+
+    # process all packages in template
+    for p in t.packages_all:
+      if p.included():
+        #
+        # stripped from dnf.base install() in full and optimesd
+        # for canvas usage
+
+        subj = dnf.subject.Subject(p.to_pkg_spec())
+        if multilib_policy == "all" or subj.is_arch_specified(db.sack):
+          q = subj.get_best_query(db.sack)
+
+          if not q:
+            continue
+
+          already_inst, available = db._query_matches_installed(q)
+
+          for a in available:
+            db._goal.install(a, optional=False)
+
+        elif multilib_policy == "best":
+          sltrs = subj.get_best_selectors(db.sack)
+          match = reduce(lambda x, y: y.matches() or x, sltrs, [])
+
+          if match:
+            for sltr in sltrs:
+              if sltr.matches():
+                db._goal.install(select=sltr, optional=False)
+
+      else:
+        #
+        # stripped from dnf.base remove() in full and optimesd
+        # for canvas usage
+        matches = dnf.subject.Subject(p.to_pkg_spec()).get_best_query(db.sack)
+
+        for pkg in matches.installed():
+          db._goal.erase(pkg, clean_deps=clean_deps)
+
+    db.resolve()
+
+    # describe process for dry runs
+    if self.args.dry_run:
+      packages_install = list(db.transaction.install_set)
+      packages_install.sort(key=lambda x: x.name)
+
+      packages_remove = list(db.transaction.remove_set)
+      packages_remove.sort(key=lambda x: x.name)
+
+      if len(packages_install) or len(packages_remove):
+        print('The following would be installed to (+) and removed from (-) the system:')
+
+        for p in packages_install:
+          print('  + ' + str(p))
+
+        for p in packages_remove:
+          print('  - ' + str(p))
+
+        print()
+        print('Summary:')
+        print('  - Package(s): %d' % (len(packages_install)+len(packages_remove)))
+        print()
+
+      else:
+        print('No system changes required.')
+
+      print('No action peformed during this dry-run.')
+      return 0
+
+    # TODO: progress for download, install and removal
+    db.download_packages(list(db.transaction.install_set))
+    return db.do_transaction()
 
     print('info: machine synced.')
-    return 0
 
+    return 0
 
   def run_update(self):
     m = Machine(self.args.machine, user=self.args.username)

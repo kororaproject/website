@@ -214,6 +214,8 @@ def buildCommandLineParser(config):
   machine_parser = subparsers.add_parser('machine', add_help=False, parents=[general_parser], usage='')
   subparsers_machine = machine_parser.add_subparsers(dest='action', title='Machine Commands')
 
+  machine_parser.add_argument('-n', '--dry-run', action="store_true", dest='dry_run')
+
   # machine add arguments
   machine_add_parser = subparsers_machine.add_parser('add', add_help=False, parents=[general_parser])
   machine_add_parser.add_argument('machine', type=str)
@@ -242,8 +244,6 @@ def buildCommandLineParser(config):
 
   # machine diff arguments
   machine_diff_parser = subparsers_machine.add_parser('diff', add_help=False, parents=[general_parser])
-  machine_diff_parser.add_argument('machine', type=str)
-  machine_diff_parser.add_argument('--output', type=str)
 
   # machine sync arguments
   machine_sync_parser = subparsers_machine.add_parser('sync', add_help=False, parents=[general_parser])
