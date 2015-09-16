@@ -154,6 +154,9 @@ CREATE TABLE templates (
   packages      JSONB         NOT NULL  DEFAULT '[]',
   repos         JSONB         NOT NULL  DEFAULT '[]',
 
+  stores        JSONB         NOT NULL  DEFAULT '[]',
+  archives      JSONB         NOT NULL  DEFAULT '[]',
+
   meta          JSONB         NOT NULL  DEFAULT '{}',
 
   created       TIMESTAMP     NOT NULL  DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'utc'),
