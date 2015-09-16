@@ -286,11 +286,11 @@ def general_usage(prog_name='canvas'):
   print("usage: {0} [--version] [--help] [--verbose] <command> [<args>]\n"
         "\n"
         "The available canvas commands are:\n"
-        "  template  Add file contents to the index\n"
-        "  package   Find by binary search the change that introduced a bug\n"
-        "  repo      List, create, or delete branches\n"
-        "  machine   Checkout a branch or paths to the working tree\n"
-        "  config    Clone a repository into a new directory\n".format(prog_name))
+        "  template  List, create or delete templates\n"
+        "  package   Find, add and remove packages in templates\n"
+        "  repo      Find, add and remove repos in templates\n"
+        "  machine   List, create or delete machines\n"
+        "  config    Get and set configuration elements\n".format(prog_name))
 
 
 class Command(object):
