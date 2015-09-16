@@ -410,7 +410,7 @@ sub machines_get {
   my $name = $c->param('name');
 
   # get auth'd user
-  my $cu = $c->auth_user // { id => -1 };
+  my $cu = $c->auth_user // { id => undef };
 
   $c->render_later;
 
@@ -523,31 +523,51 @@ sub machine_sync {
   my $uuid2 = $c->req->headers->header('x-canvas-uuid');
   my $hash  = $c->req->headers->header('x-canvas-hash');
   my $nonce = $c->req->headers->header('x-canvas-nonce');
+  my $templ = $c->req->headers->header('x-canvas-template') // 0;
+
+  unless ($uuid eq $uuid2) {
+    my $err = 'internal server error.';
+    return $c->render(status => 500, text => $err, json => {error => $err});
+  }
 
   # get auth'd user
-  my $cu = $c->auth_user // { id => -1 };
+  my $cu = $c->auth_user // { id => undef };
 
   $c->render_later;
 
-  $c->canvas->machines->get_by_uuid(
-    uuid    => $uuid,
-    hash    => $hash,
-    nonce   => $nonce,
-    user_id => $cu->{id},
+  Mojo::IOLoop->delay(
     sub {
-      my ($err, $machines) = @_;
+      my $d = shift;
+
+      $c->canvas->machines->get(
+        uuid    => $uuid,
+        hash    => $hash,
+        nonce   => $nonce,
+        user_id => $cu->{id},
+        $d->begin(0)
+      );
+    },
+    sub {
+      my ($d, $err, $machine) = @_;
 
       return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
 
-      if ($machines->size != 1) {
-        $err = 'machine not found.';
-        return $c->render(status => 500, text => $err, json => {error => $err});
+      $d->data(machine => $machine);
+
+      if ($templ ne "1" || $templ eq $machine->{template}) {
+        return $d->pass(undef, undef);
       }
 
-      # only expect one machine
-      my $machine = $machines->first;
+      $c->canvas->templates->get($machine->{template}, $d->begin(0));
+    },
+    sub {
+      my ($d, $err, $template) = @_;
 
-      $c->render(json => $machine);
+      return $c->render(status => 500, text => $err, json => {error => $err}) if $err;
+
+      $c->resolve_includes($template) if $template;
+
+      $c->render(json => {machine => $d->data('machine'), template => $template});
     }
   );
 }

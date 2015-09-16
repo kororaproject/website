@@ -158,6 +158,41 @@ sub find {
   }
 }
 
+sub get {
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  my $self = shift;
+  my $uuid = shift;
+
+  # TODO: page
+
+  if ($cb) {
+    Mojo::IOLoop->delay(
+      sub {
+        my $d = shift;
+
+        $self->pg->db->query('
+          SELECT
+            t.uuid, t.name, t.description, t.stub, t.includes,
+            t.repos, t.packages, t.meta, u.username,
+            EXTRACT(EPOCH FROM t.created) AS created,
+            EXTRACT(EPOCH FROM t.updated) AS updated
+          FROM templates t
+          JOIN users u ON
+            (u.id=t.owner_id)
+          WHERE
+            t.uuid=$1 LIMIT 1' => ($uuid) => $d->begin);
+      },
+      sub {
+        my ($d, $err, $res) = @_;
+
+        return $cb->('internal server error', undef) if $err;
+
+        return $cb->(undef, $res->expand->hash);
+      }
+    );
+  }
+}
+
 sub remove {
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   my $self = shift;

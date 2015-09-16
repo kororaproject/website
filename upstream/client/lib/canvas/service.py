@@ -225,7 +225,7 @@ class Service(object):
 
     return []
 
-  def machine_sync(self, uuid=None, key=None, data=None):
+  def machine_sync(self, uuid=None, key=None, data=None, template=None):
     # generate nonce and hmac with
     nonce = 'foo'
 
@@ -238,6 +238,13 @@ class Service(object):
       r.add_header('x-canvas-nonce', nonce)
       r.add_header('x-canvas-uuid', uuid)
       r.add_header('x-canvas-hash', h.hexdigest())
+
+      if isinstance(template, bool) and template:
+        r.add_header('x-canvas-template', 1)
+
+      elif isinstance(template, str):
+        r.add_header('x-canvas-template', template)
+
       u = self._opener.open(r)
       res = json.loads(u.read().decode('utf-8'))
 

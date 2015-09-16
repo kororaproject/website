@@ -195,7 +195,7 @@ sub find {
   }
 }
 
-sub get_by_uuid {
+sub get {
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   my $self = shift;
 
@@ -203,7 +203,7 @@ sub get_by_uuid {
 
   # TODO: page
   if ($cb) {
-    return Mojo::IOLoop->delay(
+    Mojo::IOLoop->delay(
       sub {
         my $d = shift;
 
@@ -213,14 +213,17 @@ sub get_by_uuid {
         my ($d, $err, $res) = @_;
 
         return $cb->('internal server error', undef) if $err;
-        return $cb->('machine doesn\'t exist', undef) if $res->rows == 0;
 
-        my $key = pack('H*', $res->array->[0]);
+        unless ($args->{user_id}) {
+          return $cb->('machine doesn\'t exist', undef) if $res->rows == 0;
 
-        # calculate nonce
-        my $hmac = hmac_sha512_hex($args->{nonce}.$args->{uuid}, $key);
+          my $key = pack('H*', $res->array->[0]);
 
-        return $cb->('access denied', undef) unless $args->{hash} eq $hmac;
+          # calculate nonce
+          my $hmac = hmac_sha512_hex($args->{nonce}.$args->{uuid}, $key);
+
+          return $cb->('access denied', undef) if $args->{hash} ne $hmac;
+        }
 
         $self->pg->db->query('
           SELECT
@@ -235,14 +238,16 @@ sub get_by_uuid {
           JOIN users u ON
             (u.id=m.owner_id)
           WHERE
-            m.uuid=$1' => ($args->{uuid}) => $d->begin);
+            (u.id=$1 or $1 IS NULL) AND
+            m.uuid=$2
+          LIMIT 1' => ($args->{user_id}, $args->{uuid}) => $d->begin);
       },
       sub {
         my ($d, $err, $res) = @_;
 
         return $cb->('internal server error', undef) if $err;
 
-        return $cb->(undef, $res->expand->hashes);
+        return $cb->(undef, $res->expand->hash);
       }
     );
   }
