@@ -73,6 +73,10 @@ sub login {
   shift->render('website/login');
 }
 
+sub maintenance {
+  shift->render('maintenance');
+}
+
 sub oauth {
   my $c = shift;
 
