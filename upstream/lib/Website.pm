@@ -188,7 +188,7 @@ sub startup {
   my $r = $self->routes;
 
   # maintenance
-  if (1) {
+  if (0) {
     $r->any('/')->to('site#maintenance');
     $r->any('/*trap' => [trap => ''])->to('site#maintenance');
   }

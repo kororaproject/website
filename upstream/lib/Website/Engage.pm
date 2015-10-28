@@ -134,7 +134,7 @@ sub index {
     $db->query($raw_count_sql => $delay->begin);
 
     # get paged items with username and email associated
-    $db->query($raw_sql => $delay->begin);
+    $c->pg->db->query($raw_sql => $delay->begin);
   },
   sub {
     my ($delay, $count_err, $count_res, $err, $res) = @_;
