@@ -505,10 +505,11 @@ sub engage_reply_post {
 
   $tx->commit;
 
-  my $subject = 'Korora Project - Engage Reply: ' . $p->{title};
+  my $subject = 'Korora Project - Engage Reply Waiting: ' . $p->{title};
   my $message = join "",
     "G'day,\n\n",
-    "A new reply has been posted by " . $c->auth_user->{username} . "\n\n",
+    "(This is a courtesy email, do not reply. Please use Engage.)\n\n",
+    "A new reply is waiting for you on Engage, posted by " . $c->auth_user->{username} . "\n\n",
     "URL: https://kororaproject.org" . $c->url_for( 'supportengagetypestub', type=> $type, stub => $stub ) . '#reply-' . $reply_id . "\n",
     "Type: " . $type . "\n",
     "Status: " . $p->{status} . "\n",
