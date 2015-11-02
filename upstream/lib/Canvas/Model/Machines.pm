@@ -217,9 +217,8 @@ sub get {
         unless ($args->{user_id}) {
           return $cb->('machine doesn\'t exist', undef) if $res->rows == 0;
 
+          # calculate hmac based on nonce and key
           my $key = pack('H*', $res->array->[0]);
-
-          # calculate nonce
           my $hmac = hmac_sha512_hex($args->{nonce}.$args->{uuid}, $key);
 
           return $cb->('access denied', undef) if $args->{hash} ne $hmac;
@@ -240,7 +239,8 @@ sub get {
           WHERE
             (u.id=$1 or $1 IS NULL) AND
             m.uuid=$2
-          LIMIT 1' => ($args->{user_id}, $args->{uuid}) => $d->begin);
+          LIMIT 1' => ($args->{user_id}, $args->{uuid}) => $d->begin
+        );
       },
       sub {
         my ($d, $err, $res) = @_;
@@ -272,7 +272,8 @@ sub remove {
           WHERE
             m.uuid=$1 AND
             (u.id=$2 OR (u.meta->\'members\' @> CAST($2 AS text)::jsonb))
-          ' => ($args->{uuid}, $args->{user_id}) => $d->begin);
+          ' => ($args->{uuid}, $args->{user_id}) => $d->begin
+        );
       },
       sub {
         my ($d, $err, $res) = @_;
