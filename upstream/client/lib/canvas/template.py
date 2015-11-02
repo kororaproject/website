@@ -46,6 +46,9 @@ class Template(object):
     self._includes_packages = set() # packages from includes in template
     self._delta_packages = set()    # packages to add/remove in template
 
+    self._stores   = []             # remote stores for machine
+    self._archives = []             # archive definitions in machine
+
     self._parse_template(template)
 
   def __str__(self):
@@ -59,7 +62,6 @@ class Template(object):
       self._includes_packages.update(t.packages_all)
 
   def _parse_template(self, template):
-
     # parse the string short form
     if isinstance(template, str):
       parts = template.split(':')
@@ -82,10 +84,14 @@ class Template(object):
 
       self._includes = template.get('includes', [])
       self._includes_resolved = template.get('includes_resolved', [])
-      self._meta = template.get('meta', {})
 
       self._repos = {Repository(r) for r in template.get('repos', [])}
       self._packages = {Package(p) for p in template.get('packages', [])}
+
+      self._stores   = template.get('stores', [])
+      self._archives = template.get('archives', [])
+
+      self._meta = template.get('meta', {})
 
       # resolve includes
       self._flatten()
@@ -338,9 +344,11 @@ class Template(object):
       'title':       self._title,
       'description': self._description,
       'includes':    self._includes,
-      'meta':        self._meta,
       'packages':    [p.to_object() for p in packages],
-      'repos':       [r.to_object() for r in repos]
+      'repos':       [r.to_object() for r in repos],
+      'stores':      self._stores,
+      'archives':    self._archives,
+      'meta':        self._meta
     }
 
   def to_yaml(self):
