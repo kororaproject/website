@@ -34,12 +34,12 @@
             <p><a href="/support/engage">Engage</a> is your portal to interact with the primary developers and wider community. It allows you to submit your problems, ask questions, suggest an idea and even just say thanks.</p>
 
             <h2>Internet Relay Chat (IRC)</h2>
-            <p>The core development team plus a few lurkers can usually be found on our IRC channel, #korora on the chat.freenode.net servers.</p>
+            <p>The core development team plus a few lurkers can usually be found on <a href="https://kiwiirc.com/client/chat.freenode.net/?nick=guest|?#korora">our IRC channel</a>, #korora on the chat.freenode.net servers.</p>
 
             <h2>Social</h2>
             <p>We are also ready and waiting on <a href="https://plus.google.com/communities/110597892180797592370">Google+</a>, <a href="http://facebook.com/kororaproject">Facebook</a> and <a href="http://twitter.com/kororaproject">Twitter</a>.</p>
             <div class="callout callout-info">
-              <p>If you're after assistance specifically for Fedora, perhaps try the <a href="http://www.forums.fedoraforum.org/">community forums</a>, <a href="https://admin.fedoraproject.org/mailman/listinfo/users">official user mailing list</a>, or the #fedora IRC channel on chat.freenode.net.</p>
+              <p>If you're after assistance for something that applies to Fedora, perhaps try the <a href="http://www.forums.fedoraforum.org/">community forums</a>, <a href="https://admin.fedoraproject.org/mailman/listinfo/users">official user mailing list</a>, or the <a href="https://kiwiirc.com/client/chat.freenode.net/?nick=guest|?#fedora">#fedora IRC channel</a> on chat.freenode.net.</p>
             </div>
 
           </div>
