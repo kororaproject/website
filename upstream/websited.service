@@ -1,0 +1,19 @@
+[Unit]
+Description=Korora Project website daemon
+Requires=network.target
+After=network.target
+# put here other service requirements
+
+[Service]
+Type=simple
+RemainAfterExit=yes
+SyslogIdentifier=websited
+PIDFile=/var/run/websited.pid
+ExecStart=/usr/bin/hypnotoad /srv/kororaprojet.org/upstream/websited -f
+ExecStop=/usr/bin/hypnotoad -s /srv/kororaproject.org/upstream/websited
+ExecReload=/usr/bin/hypnotoad /srv/kororaproject.org/upstream/websited
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+Alias=websited.service
