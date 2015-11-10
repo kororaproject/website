@@ -151,9 +151,9 @@ use constant DOWNLOAD_MAP => {
               "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-mate-live.iso',
             },
             checksum => {
-              md5     => '8f8f92f43778a4e6a6936924c7bb23c7',
-              sha1    => '6f07c4ad3c332158a8e2027200ba72866e12eb3f',
-              sha256  => '456fc321cd79c7cc82f3bb21b2b8b7b5f7b3d402775380243aba2064b6c62362'
+              md5     => '7e6681816d7d01def5a49d4c422cc51e',
+              sha1    => 'bd834a8d9b06b81866b72a8520672a6f8efc429a',
+              sha256  => '0bac6786abe40a322555e4b0afdf275ef0c6bb1bb9a17bee6b16adc858de3f50',
             },
           },
         },
