@@ -8,7 +8,7 @@
 
   <div class="page-container">
 
-    %= include 'website/navigation.inc', active => 'about'
+    %= include 'navigation.inc', active => 'about'
 
     <div class="page-content">
       <!-- CONTENT -->
@@ -112,7 +112,7 @@
     </div>
   </div>
 
-  %= include 'website/footer.inc'
+  %= include 'footer.inc'
 
   <!-- MODALS -->
   %= include 'authenticate.inc'
