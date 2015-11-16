@@ -200,7 +200,7 @@ sub news_post {
 
     # update author if changed
     if ($author ne $p->{username}) {
-      my $u = $c->pg->db->query("SELECT id, username WHERE username=?", $author)->hash;
+      my $u = $c->pg->db->query("SELECT id, username FROM users WHERE username=?", $author)->hash;
 
       $p->{author_id} = $u->{id} if $u->{id};
     }
