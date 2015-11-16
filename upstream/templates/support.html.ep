@@ -6,7 +6,7 @@
 <body>
   <div class="page-container">
 
-    %= include 'website/navigation.inc', active => 'support'
+    %= include 'navigation.inc', active => 'support'
 
     <div class="page-content">
       <!-- CONTENT -->
@@ -17,7 +17,6 @@
             <ol class="breadcrumb">
               <div class="btn-group pull-right">
                 <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
-                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
                 <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
               </div>
               <li><a href="/">Home</a></li>
@@ -37,7 +36,7 @@
             <p>The core development team plus a few lurkers can usually be found on <a href="https://kiwiirc.com/client/chat.freenode.net/?nick=guest|?#korora">our IRC channel</a>, #korora on the chat.freenode.net servers.</p>
 
             <h2>Social</h2>
-            <p>We are also ready and waiting on <a href="https://plus.google.com/communities/110597892180797592370">Google+</a>, <a href="http://facebook.com/kororaproject">Facebook</a> and <a href="http://twitter.com/kororaproject">Twitter</a>.</p>
+            <p>We are also ready and waiting on <a href="https://plus.google.com/communities/110597892180797592370">Google+</a> and <a href="http://twitter.com/kororaproject">Twitter</a>.</p>
             <div class="callout callout-info">
               <p>If you're after assistance for something that applies to Fedora, perhaps try the <a href="http://www.forums.fedoraforum.org/">community forums</a>, <a href="https://admin.fedoraproject.org/mailman/listinfo/users">official user mailing list</a>, or the <a href="https://kiwiirc.com/client/chat.freenode.net/?nick=guest|?#fedora">#fedora IRC channel</a> on chat.freenode.net.</p>
             </div>
@@ -50,7 +49,7 @@
     </div>
   </div>
 
-  %= include 'website/footer.inc'
+  %= include 'footer.inc'
 
   <!-- MODALS -->
   %= include 'authenticate.inc'

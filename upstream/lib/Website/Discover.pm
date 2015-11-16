@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013-2014   Ian Firns   <firnsy@kororaproject.org>
+# Copyright (C) 2013-2015   Ian Firns   <firnsy@kororaproject.org>
 #                           Chris Smart <csmart@kororaproject.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,46 +25,32 @@ use Mojo::Base 'Mojolicious::Controller';
 #
 # PERL INCLUDES
 #
-use Data::Dumper;
-
 
 #
 # CONTROLLER HANDLERS
 #
 sub index {
-  my $self = shift;
-
-  $self->render('website/discover');
+  shift->render('discover');
 }
 
 sub gnome {
-  my $self = shift;
-
-  $self->render('website/discover-gnome');
+  shift->render('discover/gnome');
 }
 
 sub kde {
-  my $self = shift;
-
-  $self->render('website/discover-kde');
+  shift->render('discover/kde');
 }
 
 sub cinnamon {
-  my $self = shift;
-
-  $self->render('website/discover-cinnamon');
+  shift->render('discover/cinnamon');
 }
 
 sub mate {
-  my $self = shift;
-
-  $self->render('website/discover-mate');
+  shift->render('discover/mate');
 }
 
 sub xfce {
-  my $self = shift;
-
-  $self->render('website/discover-xfce');
+  shift->render('discover/xfce');
 }
 
 

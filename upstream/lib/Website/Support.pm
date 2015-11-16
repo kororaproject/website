@@ -34,15 +34,11 @@ use Time::Piece;
 # CONTROLLER HANDLERS
 #
 sub index_get {
-  my $self = shift;
-
-  $self->render('website/support');
+  shift->render('support');
 }
 
 sub documentation_get {
-  my $self = shift;
-
-  $self->render('website/support-documentation');
+  shift->render('support/documentation');
 }
 
 1;

@@ -8,7 +8,7 @@
 
   <div class="page-container">
 
-    %= include 'website/navigation.inc', active => 'about'
+    %= include 'navigation.inc', active => 'about'
 
     <div class="page-content">
       <!-- CONTENT -->
@@ -19,7 +19,6 @@
             <ol class="breadcrumb">
               <div class="btn-group pull-right">
                 <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
-                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
                 <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
               </div>
               <li><a href="/">Home</a></li>
@@ -83,7 +82,7 @@
             <p>There are a number of UI’s that sit on top of YUM to aid package installation, the latest work with GNOME Software highlights a number of new technologies that is improving the ability to search, install and modify your OS.</p>
             <p>We would like to explore a desktop-agnostic mechanism for searching, installing and modifying software on your system. It would be Canvas-aware and leverage the SDK.</p>
             <h2>Feedback Welcome!</h2>
-            <p>We encourage you to share your feedback about Korora and our road map on <a href="https://plus.google.com/communities/110597892180797592370">Google+</a>, <a href="http://facebook.com/kororaproject">Facebook</a> and <a href="http://twitter.com/kororaproject">Twitter</a> and IRC. You can also submit your bug reports, ideas and questions via <a href="/support/engage">Engage</a>!</p>
+            <p>We encourage you to share your feedback about Korora and our road map on <a href="https://plus.google.com/communities/110597892180797592370">Google+</a> and <a href="http://twitter.com/kororaproject">Twitter</a> and IRC. You can also submit your bug reports, ideas and questions via <a href="/support/engage">Engage</a>!</p>
           </div>
         </div>
       </div>
@@ -92,7 +91,7 @@
     </div>
   </div>
 
-  %= include 'website/footer.inc'
+  %= include 'footer.inc'
 
   <!-- MODALS -->
   %= include 'authenticate.inc'

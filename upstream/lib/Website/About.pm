@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013-2014   Ian Firns   <firnsy@kororaproject.org>
+# Copyright (C) 2013-2015   Ian Firns   <firnsy@kororaproject.org>
 #                           Chris Smart <csmart@kororaproject.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,43 +25,29 @@ use Mojo::Base 'Mojolicious::Controller';
 #
 # PERL INCLUDES
 #
-use Data::Dumper;
-
 
 #
 # CONTROLLER HANDLERS
 #
 sub index {
-  my $self = shift;
-
-  $self->render('website/about');
+  shift->render('about');
 }
 
 sub why_fedora {
-  my $self = shift;
-
-  $self->render('website/about-why-fedora');
+  shift->render('about/why-fedora');
 }
-
 
 sub whats_inside {
-  my $self = shift;
-
-  $self->render('website/about-whats-inside');
+  shift->render('about/whats-inside');
 }
 
-
 sub team {
-  my $self = shift;
-
-  $self->render('website/about-team');
+  shift->render('about/team');
 }
 
 
 sub roadmap {
-  my $self = shift;
-
-  $self->render('website/about-roadmap');
+  shift->render('about/roadmap');
 }
 
 1;

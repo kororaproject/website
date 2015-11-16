@@ -458,7 +458,7 @@ sub index {
 
   $c->stash(map => DOWNLOAD_MAP, static_map => encode_json(DOWNLOAD_MAP));
 
-  $c->render('website/download');
+  $c->render('download');
 }
 
 sub torrent_file {

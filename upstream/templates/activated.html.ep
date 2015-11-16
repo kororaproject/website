@@ -6,7 +6,7 @@
 <body>
   <div class="page-container">
 
-    %= include 'website/navigation.inc', active => 'support'
+    %= include 'navigation.inc', active => 'support'
 
     <div class="page-content">
       <!-- CONTENT -->
@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  %= include 'website/footer.inc'
+  %= include 'footer.inc'
 
   <!-- MODALS -->
   %= include 'authenticate.inc'

@@ -49,16 +49,16 @@ use constant POST_STATUS_MAP => (
 #
 
 sub _tree {
-  my $c    = shift;
-  my $t    = shift;
-  my $p_id = shift // 0;
+  my $c     = shift;
+  my $tree  = shift;
+  my $p_id  = shift // 0;
   my $depth = shift // 0;
 
   my $docs = $c->pg->db->query("SELECT id, menu_order, title FROM posts WHERE type='document' AND parent_id=?", $p_id)->hashes;
 
   foreach my $d (sort { $a->{menu_order} <=> $b->{menu_order} or $a->{title} cmp $b->{title} } @{$docs}) {
-    push @{$t}, { data => $d, depth => $depth };
-    _tree($c, $t, $d->{id}, $depth+1);
+    push @{$tree}, { data => $d, depth => $depth };
+    _tree($c, $tree, $d->{id}, $depth+1);
   }
 }
 
@@ -68,6 +68,8 @@ sub rebuild_index {
 
   # recursively rebuild the doc index
   _tree($c, $documents);
+
+  say Dumper $documents;
 
   # update documenation metadata
   {
@@ -127,7 +129,7 @@ sub list_status_for_post {
 sub index {
   my $c = shift;
 
-  $c->render_steps('website/document', sub {
+  $c->render_steps('document', sub {
     my $delay = shift;
 
     # get paged items with username and email associated
@@ -144,7 +146,7 @@ sub document_detail_get {
   my $c = shift;
   my $stub = $c->param('id');
 
-  $c->render_steps('website/document-detail', sub {
+  $c->render_steps('document/detail', sub {
     my $delay = shift;
 
     $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.type='document' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
@@ -171,7 +173,7 @@ sub document_add_get {
     parents  =>  $c->document->parents(0),
   );
 
-  $c->render('website/document-new');
+  $c->render('document/new');
 }
 
 sub document_edit_get {
@@ -179,7 +181,7 @@ sub document_edit_get {
 
   my $stub = $c->param('id');
 
-  $c->render_steps('website/document-edit', sub {
+  $c->render_steps('document/edit', sub {
     my $delay = shift;
 
     $c->pg->db->query("SELECT p.*, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.type='document' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
@@ -328,7 +330,7 @@ sub document_admin_get {
   my $page_size = 20;
   my $page = ($c->param('page') // 1);
 
-  $c->render_steps('website/document-admin', sub {
+  $c->render_steps('document/admin', sub {
     my $delay = shift;
 
     # get total count

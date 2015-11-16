@@ -8,7 +8,7 @@
 
   <div class="page-container">
 
-    %= include 'website/navigation.inc', active => 'support'
+    %= include 'navigation.inc', active => 'support'
 
     <div class="page-content">
       <!-- CONTENT -->
@@ -61,7 +61,7 @@
     </div>
   </div>
 
-  %= include 'website/footer.inc'
+  %= include 'footer.inc'
 
   <!-- MODALS -->
   %= include 'authenticate.inc'
@@ -74,7 +74,7 @@
           <h4 class="modal-title" id="modalEngageSyntaxLabel">Engage Markdown Syntax</h4>
         </div>
         <div class="modal-body">
-          %= include 'website/engage-syntax.inc'
+          %= include 'engage/syntax.inc'
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

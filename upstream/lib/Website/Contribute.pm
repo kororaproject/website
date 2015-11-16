@@ -41,7 +41,7 @@ use Canvas::Util::PayPal;
 sub index_get {
   my $c = shift;
 
-  $c->render('website/contribute');
+  $c->render('contribute');
 }
 
 sub donate_get {
@@ -53,7 +53,7 @@ sub donate_get {
     donor_amount => '',
   };
 
-  $c->render_steps('website/contribute-donate', sub {
+  $c->render_steps('contribute/donate', sub {
     my $delay = shift;
 
     $c->pg->db->query("SELECT name, amount, EXTRACT(EPOCH FROM created) AS created_epoch FROM contributions WHERE type='donation' ORDER BY created DESC LIMIT 100" => $delay->begin);
@@ -166,7 +166,7 @@ sub donate_confirm_get {
     email    => $self->session('donor_email'),
   );
 
-  $self->render('website/contribute-donate-confirm');
+  $self->render('contribute/donate-confirm');
 }
 
 sub donate_confirm_post {
@@ -239,7 +239,7 @@ sub sponsor_get {
     donor_amount => '',
   };
 
-  $c->render_steps('website/contribute-sponsor', sub {
+  $c->render_steps('contribute/sponsor', sub {
     my $delay = shift;
 
     $c->pg->db->query("SELECT name, amount, EXTRACT(EPOCH FROM created) AS created_epoch FROM contributions WHERE type='sponsorship' ORDER BY created DESC LIMIT 100" => $delay->begin);
@@ -358,7 +358,7 @@ sub sponsor_confirm_get {
     amount   => $self->session('sponsor_amount'),
   );
 
-  $self->render('website/contribute-sponsor-confirm');
+  $self->render('contribute/sponsor-confirm');
 }
 
 sub sponsor_confirm_post {

@@ -22,6 +22,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 #
 # PERL INCLUDES
 #
+use CommonMark;
 use Data::Dumper;
 use List::Util qw(min max);
 use List::MoreUtils qw(any);
@@ -32,7 +33,7 @@ use Time::Piece;
 #
 # LOCAL INCLUDES
 #
-use Canvas::Util::MultiMarkdown;
+#use Canvas::Util::MultiMarkdown;
 use Canvas::Store::User;
 use Canvas::Store::UserMeta;
 
@@ -360,15 +361,16 @@ sub register {
   });
 
   $app->helper(render_markdown => sub {
-    my( $self, $post ) = @_;
+    my ($self, $markdown) = @_;
 
-    my $m = Canvas::Util::MultiMarkdown->new(
-      tab_width   => 2,
-      heading_ids => 0,
-      img_ids     => 0,
-    );
-
-    return $m->markdown( $post );
+#    my $m = Canvas::Util::MultiMarkdown->new(
+#      tab_width   => 2,
+#      heading_ids => 0,
+#      img_ids     => 0,
+#    );
+    #
+#    return $m->markdown($post);
+    return CommonMark->markdown_to_html($markdown);
   });
 
   $app->helper(build_query => sub {

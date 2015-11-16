@@ -8,7 +8,7 @@
 
   <div class="page-container">
 
-    %= include 'website/navigation.inc', active => 'contribute'
+    %= include 'navigation.inc', active => 'contribute'
 
     <div class="page-content">
       <!-- CONTENT -->
@@ -19,7 +19,6 @@
             <ol class="breadcrumb">
               <div class="btn-group pull-right">
                 <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
-                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
                 <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
               </div>
               <li><a href="/">Home</a></li>
@@ -52,7 +51,7 @@
           <div class="col-sm-12">
             <h2>Support &amp; Promotion</h2>
             <h3>Spreading the word</h3>
-            <p>If you like Korora, <em>let people know</em>. Write a review and publish it on a blog. Follow and mention us on social media like <a href="https://www.facebook.com/kororaproject">Facebook</a>, <a href="https://plus.google.com/+KororaProjectOrg">Google+</a> and <a href="https://twitter.com/kororaproject">Twitter</a>. Talk about it with your friends and the people around you.</p>
+            <p>If you like Korora, <em>let people know</em>. Write a review and publish it on a blog. Follow and mention us on social media like <a href="https://plus.google.com/+KororaProjectOrg">Google+</a> and <a href="https://twitter.com/kororaproject">Twitter</a>. Talk about it with your friends and the people around you.</p>
 
             <h3>Joining the Community</h3>
             <p>Korora isn't just an operating system, it's also a dynamic community of people who enjoy and interact with a free and open project. Whether it's by helping others sort through issues, making them feel welcome, or simply meeting with and talking to other Korora users, we recommend you join the community and participate in making it better.</p >
@@ -79,7 +78,7 @@
     </div>
   </div>
 
-  %= include 'website/footer.inc'
+  %= include 'footer.inc'
 
   <!-- MODALS -->
   %= include 'authenticate.inc'

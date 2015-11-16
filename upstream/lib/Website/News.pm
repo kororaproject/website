@@ -76,7 +76,7 @@ sub index {
   my $page_size = 10;
   my $page = ($c->param('page') // 1);
 
-  $c->render_steps('website/news', sub {
+  $c->render_steps('news', sub {
     my $delay = shift;
 
     # get total count
@@ -129,7 +129,7 @@ sub news_post_get {
   my $c = shift;
   my $stub = $c->param('id');
 
-  $c->render_steps('website/news-post', sub {
+  $c->render_steps('news/post', sub {
     my $delay = shift;
 
     $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
@@ -154,7 +154,7 @@ sub news_add_get {
   $c->stash(
     statuses => list_status_for_post('news', 'draft')
   );
-  $c->render('website/news-post-new');
+  $c->render('news/post-new');
 }
 
 sub news_post_edit_get {
@@ -162,7 +162,7 @@ sub news_post_edit_get {
 
   my $stub    = $c->param('id');
 
-  $c->render_steps('website/news-post-edit', sub {
+  $c->render_steps('news/post-edit', sub {
     my $delay = shift;
 
     $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, ARRAY_AGG(t.name) AS tags, u.username, u.email FROM posts p JOIN users u ON (u.id=p.author_id) LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) WHERE p.type='news' AND p.name=? GROUP BY p.id, u.username, u.email" => ($stub) => $delay->begin);
@@ -300,7 +300,7 @@ sub news_admin_get {
   my $page_size = 20;
   my $page = ($c->param('page') // 1);
 
-  $c->render_steps('website/news-admin', sub {
+  $c->render_steps('news/admin', sub {
     my $delay = shift;
 
     # get total count

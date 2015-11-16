@@ -11,7 +11,7 @@
 
   <div class="page-container">
 
-    %= include 'website/navigation.inc', active => 'about'
+    %= include 'navigation.inc', active => 'about'
 
     <div class="page-content">
       <!-- CONTENT -->
@@ -23,7 +23,6 @@
               <div class="btn-group pull-right">
                 <a href="/about/news/rss" class="btn btn-xs btn-default btn-rss"><i class="fa fa-fw fa-rss"></i></a>
                 <a href="https://plus.google.com/+KororaProjectOrg" class="btn btn-xs btn-default btn-google-plus"><i class="fa fa-fw fa-google-plus"></i></a>
-                <a href="https://www.facebook.com/kororaproject" class="btn btn-xs btn-default btn-facebook"><i class="fa fa-fw fa-facebook"></i></a>
                 <a href="https://twitter.com/kororaproject" class="btn btn-xs btn-default btn-twitter"><i class="fa fa-fw fa-twitter"></i></a>
               </div>
               <li><a href="/">Home</a></li>
@@ -97,7 +96,7 @@
     </div>
   </div>
 
-  %= include 'website/footer.inc'
+  %= include 'footer.inc'
 
   <!-- MODALS -->
   %= include 'authenticate.inc'

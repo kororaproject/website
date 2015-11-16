@@ -98,7 +98,7 @@ sub index {
   my $tags      = $c->param('tags');
   my $type      = filter_valid_types($c->param('type')) // '';
 
-  $c->render_steps('website/engage', sub {
+  $c->render_steps('engage', sub {
     my $delay = shift;
 
     my $db = $c->pg->db;
@@ -159,7 +159,7 @@ sub index {
 sub engage_syntax_get {
   my $c = shift;
 
-  $c->render('website/engage-syntax-help');
+  $c->render('engage/syntax-help');
 }
 
 sub engage_post_prepare_add_get {
@@ -183,7 +183,7 @@ sub engage_post_prepare_add_get {
     tags    => $tags,
   );
 
-  $c->render('website/engage-new');
+  $c->render('engage/new');
 }
 
 sub engage_post_add_post {
@@ -294,7 +294,7 @@ sub engage_post_detail_get {
   # could have flashed 'content' from an attempted reply
   my $content = $c->flash('content') // '';
 
-  $c->render_steps('website/engage-detail', sub {
+  $c->render_steps('engage/detail', sub {
     my $delay = shift;
 
     $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email, ARRAY_AGG(DISTINCT t.name) AS tags FROM posts p LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) JOIN users u ON (u.id=p.author_id) WHERE p.type=? AND p.name=? GROUP BY p.id, u.username, u.email" => ($type, $stub) => $delay->begin);
@@ -316,6 +316,9 @@ sub engage_post_detail_get {
   },
   sub {
     my ($delay, $a_err, $a_res, $rc_err, $rc_res, $r_err, $r_res) = @_;
+
+    # check we found the post
+    $delay->emit(redirect => '/support/engage') if $a_err or $rc_err or $r_err;
 
     my $count = $rc_res->array->[0];
     my $post = $delay->data('post');
@@ -345,7 +348,7 @@ sub engage_post_edit_get {
   my $stub = $c->param('stub');
   my $type = $c->param('type');
 
-  $c->render_steps('website/engage-edit', sub {
+  $c->render_steps('engage/edit', sub {
     my $delay = shift;
 
     $c->pg->db->query("SELECT p.*, EXTRACT(EPOCH FROM p.created) AS created_epoch, EXTRACT(EPOCH FROM p.updated) AS updated_epoch, u.username, u.email, ARRAY_AGG(DISTINCT t.name) AS tags FROM posts p LEFT JOIN post_tag pt ON (pt.post_id=p.id) LEFT JOIN tags t ON (t.id=pt.tag_id) JOIN users u ON (u.id=p.author_id) WHERE p.type=? AND p.name=? GROUP BY p.id, u.username, u.email" => ($type, $stub) => $delay->begin);
@@ -572,7 +575,7 @@ sub engage_reply_edit_get {
   my $rt_url = $c->ub64_decode($c->flash('rt')) //
                  $c->url_for('supportengagetypestub', type => $type, stub => $stub);
 
-  $c->render_steps('website/engage-reply-edit', sub {
+  $c->render_steps('engage/reply-edit', sub {
     my $delay = shift;
 
     $c->pg->db->query("SELECT r.content, r.author_id, p.title, p.type, EXTRACT(EPOCH FROM r.created) AS created_epoch, EXTRACT(EPOCH FROM r.updated) AS updated_epoch, u.username, u.email FROM posts r JOIN posts p ON (r.parent_id=p.id) JOIN users u ON (u.id=r.author_id) WHERE r.type='reply' AND r.id=? LIMIT 1" => ($id) => $delay->begin);

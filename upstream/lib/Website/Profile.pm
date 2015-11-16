@@ -39,7 +39,7 @@ sub profile_get {
   # TODO: what aspect of the profile should be public?
 #  return $c->redirect_to('/') unless $c->is_user_authenticated;
 
-  $c->render_steps('website/profile', sub {
+  $c->render_steps('profile', sub {
     my $delay = shift;
 
     my $username = $c->param('name');
@@ -74,7 +74,7 @@ sub profile_reset_password_get {
 
   $c->stash(values => { user => $user });
 
-  $c->render('website/forgot-password');
+  $c->render('forgot-password');
 }
 
 sub profile_reset_password_post {
@@ -128,7 +128,7 @@ sub profile_admin_get {
   my $page_size = 100;
   my $page = ($c->param('page') // 1);
 
-  $c->render_steps('website/profiles-admin', sub {
+  $c->render_steps('profiles-admin', sub {
     my $delay = shift;
 
     # get total count

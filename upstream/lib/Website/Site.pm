@@ -40,7 +40,7 @@ use Time::HiRes qw(gettimeofday);
 sub index {
   my $c = shift;
 
-  $c->render_steps('website/index', sub {
+  $c->render_steps('index', sub {
     my $delay = shift;
 
     # get latest news
@@ -66,11 +66,11 @@ sub forums_get {
 }
 
 sub discover {
-  shift->render('website/discover');
+  shift->render('discover');
 }
 
 sub login {
-  shift->render('website/login');
+  shift->render('login');
 }
 
 sub maintenance {
@@ -168,7 +168,7 @@ sub activated {
 
   $c->stash(username => $username);
 
-  $c->render('website/activated');
+  $c->render('activated');
 }
 
 sub activate_get {
@@ -214,7 +214,7 @@ sub activate_get {
     provider => $provider,
   );
 
-  $c->render('website/activate');
+  $c->render('activate');
 }
 
 sub activate_post {
@@ -298,7 +298,7 @@ sub registered_get {
   my $rt_url = $rt ? $c->ub64_decode($rt) : '/';
 
   $c->stash(rt => $rt, rt_url => $rt_url);
-  $c->render('website/registered');
+  $c->render('registered');
 }
 
 sub register_get {
@@ -319,7 +319,7 @@ sub register_get {
     values => $values,
   );
 
-  $c->render('website/register');
+  $c->render('register');
 }
 
 sub register_post {
