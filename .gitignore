@@ -1,1 +1,8 @@
-*.swp
+*.pyc
+assets/
+cache/
+canvas.conf
+website.conf
+convert/
+
+.vagrant/
