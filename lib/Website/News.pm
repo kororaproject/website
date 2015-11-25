@@ -17,14 +17,12 @@
 #
 package Website::News;
 
-use warnings;
-use strict;
+use Mojo::Base 'Mojolicious::Controller';
 
 #
 # PERL INCLUDES
 #
 use Data::Dumper;
-use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Pg;
 use Mojo::Util qw(trim xml_escape);
 use POSIX qw(ceil);
@@ -114,7 +112,7 @@ sub rss_get {
     my $created = gmtime($n->{created_epoch})->strftime();
     $rss .= '<item>' .
             '<title>' . xml_escape($n->{title}) . '</title>' .
-            '<link>http://kororaproject.org/about/news/' . $n->{name} . '</link>' .
+            '<link>https://kororaproject.org/about/news/' . $n->{name} . '</link>' .
             '<description>' . xml_escape($n->{excerpt}) . '</description>' .
             '<pubDate>' . $created . '</pubDate>' .
             '</item>';

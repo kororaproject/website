@@ -17,9 +17,6 @@
 #
 package Website::About;
 
-use warnings;
-use strict;
-
 use Mojo::Base 'Mojolicious::Controller';
 
 #
