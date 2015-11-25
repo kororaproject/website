@@ -654,7 +654,14 @@ sub engage_post_delete_any {
   return $c->redirect_to('/support/engage') unless $c->engage->can_delete($p);
 
   # delete post and children
-  $c->pg->db->query("DELETE FROM posts WHERE type IN ('question', 'thank', reply') AND (id=? OR parent_id=?)", $p->{id}, $p->{id});
+  my $db = $c->pg->db;
+  my $tx = $db->begin;
+
+  $db->query('DELETE FROM post_tag WHERE post_id=$1', $p->{id});
+  $db->query('DELETE FROM postmeta WHERE post_id=$1', $p->{id});
+  $db->query('DELETE FROM posts WHERE (id=$1 OR parent_id=$1)', $p->{id});
+
+  $tx->commit;
 
   $c->redirect_to('/support/engage');
 }
