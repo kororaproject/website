@@ -31,13 +31,6 @@ use POSIX qw(floor);
 use Time::Piece;
 
 #
-# LOCAL INCLUDES
-#
-#use Canvas::Util::MultiMarkdown;
-use Canvas::Store::User;
-use Canvas::Store::UserMeta;
-
-#
 # CONSTANTS
 #
 
@@ -363,13 +356,6 @@ sub register {
   $app->helper(render_markdown => sub {
     my ($self, $markdown) = @_;
 
-#    my $m = Canvas::Util::MultiMarkdown->new(
-#      tab_width   => 2,
-#      heading_ids => 0,
-#      img_ids     => 0,
-#    );
-    #
-#    return $m->markdown($post);
     return CommonMark->markdown_to_html($markdown);
   });
 
