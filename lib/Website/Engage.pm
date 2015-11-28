@@ -380,9 +380,9 @@ sub engage_post_edit_post {
   return $c->redirect_to('/support/engage') unless defined $p;
 
   # update title, content and status
-  my $title     = $c->param('title');
-  my $content   = $c->param('content');
-  my $status    = $c->param('status');
+  my $title     = $c->param('title')    // $p->{title};
+  my $content   = $c->param('content')  // $p->{content};
+  my $status    = $c->param('status')   // $p->{status};
   my $tag_list  = trim $c->param('tags');
 
   my $now = gmtime;
