@@ -298,7 +298,7 @@ sub news_admin_get {
   my $page_size = 20;
   my $page = ($c->param('page') // 1);
 
-  $c->render_steps('news/admin', sub {
+  $c->render_steps('news-admin', sub {
     my $delay = shift;
 
     # get total count

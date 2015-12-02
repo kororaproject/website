@@ -192,6 +192,8 @@ sub document_edit_get {
     $delay->emit(redirect => 'supportdocumentation') unless $c->document->can_edit;
 
     my $d = $res->hash;
+    $d->{tags} //= [];
+
     $c->stash(
       document => $d,
       statuses => list_status_for_post($d->{status}),
@@ -330,7 +332,7 @@ sub document_admin_get {
   my $page_size = 20;
   my $page = ($c->param('page') // 1);
 
-  $c->render_steps('document/admin', sub {
+  $c->render_steps('document-admin', sub {
     my $delay = shift;
 
     # get total count
