@@ -263,7 +263,6 @@
         </div>
       </div>
 
-      <!-- END CONTENT -->
     </div>
   </div>
 
@@ -276,6 +275,28 @@
 
   <script>
     $(document).ready( function() {
+      var page    = $('.error-page-container');
+      var footer  = $('footer');
+      var start   = 0;
+
+      /* helper function to frob element heights for the layered effect */
+      var resizeHelper = function() {
+        /* frob page-content minimum height to consume immediate window */
+        $('.error-page-content').css('min-height', $(window).height() + 'px');
+
+        /* frob page-container minimum height to at least the footer top */
+        page.css({
+          'min-height': ($(window).height()-footer.outerHeight()) + 'px',
+          'margin-bottom': footer.outerHeight() + 'px'
+        });
+      }
+
+      /* bind to resize events */
+      $(window).on('resize', resizeHelper);
+
+      /* initial call to page resize helper */
+      setTimeout(function() { resizeHelper(); }, 0);
+
       /* parralax-ify */
       $('#shell img').plaxify()
       $.plax.enable()
