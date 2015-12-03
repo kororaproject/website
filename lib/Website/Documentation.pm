@@ -23,9 +23,8 @@ use strict;
 #
 # PERL INCLUDES
 #
-use Data::Dumper;
 use Mojo::Base 'Mojolicious::Controller';
-use Mojo::Util qw(trim);
+use Mojo::Util qw(dumper trim);
 use POSIX qw(ceil);
 use Time::Piece;
 
@@ -69,8 +68,6 @@ sub rebuild_index {
   # recursively rebuild the doc index
   _tree($c, $documents);
 
-  say Dumper $documents;
-
   # update documenation metadata
   {
     my $db = $c->pg->db;
@@ -85,7 +82,7 @@ sub rebuild_index {
 
       # create or update
       if ($ho) {
-        $db->query("UPDATE postmeta SET meta_value=? WHERE post_id=?", $order, $ho->{meta_id});
+        $db->query("UPDATE postmeta SET meta_value=? WHERE meta_id=?", $order, $ho->{meta_id});
       }
       else {
         $db->query("INSERT INTO postmeta (post_id, meta_key, meta_value) VALUES (?, 'hierarchy_order', ?)", $d->{data}{id}, $order);
@@ -314,7 +311,16 @@ sub document_delete_any {
   # only allow authenticated users
   return $c->redirect_to('supportdocumentation') unless $c->document->can_delete;
 
-  $c->pg->db->query("DELETE FROM posts WHERE name=? AND type='document'");
+  my $p = $c->pg->db->query("SELECT * FROM posts WHERE type='document' AND name=? LIMIT 1", $stub)->hash;
+
+  my $db = $c->pg->db;
+  my $tx = $db->begin;
+
+  $db->query('DELETE FROM post_tag WHERE post_id=$1', $p->{id});
+  $db->query('DELETE FROM postmeta WHERE post_id=$1', $p->{id});
+  $db->query('DELETE FROM posts WHERE (id=$1 OR parent_id=$1)', $p->{id});
+
+  $tx->commit;
 
   rebuild_index($c);
 
