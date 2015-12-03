@@ -1403,20 +1403,22 @@ h4.step {
 }
 
 .documentation-level-0 {
+  font-size: 28px;
 }
 
 .documentation-level-1 {
+  font-size: 20px;
   margin-top: 8px;
-  padding-left: 8px;
+  padding-left: 16px;
 }
 
 .documentation-level-2 {
   margin-top: 4px;
-  padding-left: 16px;
+  padding-left: 32px;
 }
 
 .documentation-level-3 {
-  padding-left: 24px;
+  padding-left: 48px;
 }
 
 /*
