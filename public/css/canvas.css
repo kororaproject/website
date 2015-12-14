@@ -400,6 +400,10 @@ blockquote p {
   margin: 48px 0;
 }
 
+.do-logo {
+  width: 160px;
+}
+
 .kp-logo {
   display: inline-block;
 
