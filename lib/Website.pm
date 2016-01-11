@@ -87,7 +87,7 @@ sub startup {
   #
   # AUTHENTICATION
   $self->app->log->info('Loading authentication handler.');
-  $self->plugin('authentication' => {
+  $self->plugin('Authentication' => {
     autoload_user   => 0,
     current_user_fn => 'auth_user',
     load_user => sub {
@@ -116,19 +116,19 @@ sub startup {
 
       # check user pass
       if ($user and $pass) {
-        my $u = $app->pg->db->query("SELECT username, password FROM users WHERE username=?", $user)->hash;
+        my $u = $app->pg->db->query("SELECT username, password FROM users WHERE username=? AND status='active'", $user)->hash;
 
         return $u->{username} if $app->users->validate($u, $pass);
       }
       # check github
       elsif (my $github = $extra->{github}) {
-        my $u = $app->pg->db->query("SELECT u.username FROM users u JOIN usermeta um ON (um.user_id=u.id) WHERE um.meta_key='oauth_github' AND um.meta_value=?", $github->{login})->hash;
+        my $u = $app->pg->db->query("SELECT u.username FROM users u JOIN usermeta um ON (um.user_id=u.id) WHERE um.meta_key='oauth_github' AND um.meta_value=? AND u.status='active'", $github->{login})->hash;
 
         return $u->{username} if $u;
       }
       # check activation
       elsif (my $activated = $extra->{activated}) {
-        my $u = $app->pg->db->query("SELECT username FROM users WHERE username=?", $activated->{username})->hash;
+        my $u = $app->pg->db->query("SELECT username FROM users WHERE username=? AND status='active'", $activated->{username})->hash;
 
         return $u->{username} if $u;
       }
@@ -149,6 +149,8 @@ sub startup {
     });
   }
   else {
+    #$self->app->log->info('Loading production mail (GMail) handler.');
+    #$self->plugin('gmail' => {type => 'text/plain'});
     $self->app->log->info('Loading production mail handler.');
     $self->plugin('mail' => {type => 'text/plain'});
   }
