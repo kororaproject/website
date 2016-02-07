@@ -48,138 +48,148 @@ use constant DOWNLOAD_MAP => {
       name      => 'Korora 23',
       version   => '23',
       codename  => 'Coral',
-      isStable  => 0,
+      isStable  => 1,
       isCurrent => 1,
-      released  => '8 November 2015',
+      released  => '7 February 2016',
       available => 1,
       isos => {
         cinnamon => {
           i386 => {
             url => {
-              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-cinnamon-live.iso',
-              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-cinnamon-live.iso',
-              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-cinnamon-live.iso',
+              "http"  => 'http://sourceforge.net/projects/kororaproject/files/23/korora-23-i386-cinnamon.iso/download',
+#              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-cinnamon-live.iso',
+#              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-cinnamon-live.iso',
+#              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-cinnamon-live.iso',
             },
             checksum => {
-              md5     => '7bc6f243f02606606aa68d45f37eaa92',
-              sha1    => '99ef52c1ca64dae78b3632acb46019eca00d4cdc',
-              sha256  => '77d3bd30d68f319d325cb3ce028b1cb0732cdb4d25fefe91ea0fb517c9288371',
+              md5     => '63df726f01d7789504a31d0a03916cfe',
+              sha1    => '16a9acdcf71aaccda5a5665d9e9cede7ebcc140d',
+              sha256  => '85f0650f6c91a52e889dc80f2fee6a219b3e985f1d81e87fea97386c6ebfb373',
             },
           },
           x86_64 => {
             url => {
-              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-cinnamon-live.iso',
-              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-cinnamon-live.iso',
-              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-cinnamon-live.iso',
+              "http"  => 'http://sourceforge.net/projects/kororaproject/files/23/korora-23-x86_64-cinnamon.iso/download',
+#              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-cinnamon-live.iso',
+#              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-cinnamon-live.iso',
+#              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-cinnamon-live.iso',
             },
             checksum => {
-              md5     => '01faad0c0b9cb50fc8cb94446cebadc3',
-              sha1    => '0822674b2fcda8cf8b617e78c77e47ab7cc46a93',
-              sha256  => 'aeaed35a24ee92692cfe9335696053ebf8f804b757aea5e749eaadf5437e4b1c'
+              md5     => '954e682b15ba0c0839498cb185d4acff',
+              sha1    => 'b1e7bfb0c4c4867fa805bae26f072bdd83acea31',
+              sha256  => 'f7740fd2f054d7557c2832c02f4777eaca586f6ffbe60757557b74dc27e50d6c',
             },
           },
         },
         gnome => {
           i386 => {
             url => {
-              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-gnome-live.iso',
-              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-gnome-live.iso',
-              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-gnome-live.iso',
+              "http"  => 'http://sourceforge.net/projects/kororaproject/files/23/korora-23-i386-gnome.iso/download',
+#              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-gnome-live.iso',
+#              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-gnome-live.iso',
+#              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-gnome-live.iso',
             },
             checksum => {
-              md5     => 'e1cd374e2b96130348693dac4a137acc',
-              sha1    => 'be5a41aed88045ff09bae604186b2a518613e419',
-              sha256  => 'b814cc59c36554d75538d56371d48d129d93da78da13dd4cca18fad8918ad464',
+              md5     => 'b41a6bf4b3cbdb703a346f816f4ad18b',
+              sha1    => 'e3430c65182dd18e8166696684cade6b93d1a78e',
+              sha256  => '6e7ac920ac0e9d9121661b779b39b763d1329c8eec353cd0f051d1451b7706b3',
             },
           },
           x86_64 => {
             url => {
-              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-gnome-live.iso',
-              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-gnome-live.iso',
-              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-gnome-live.iso',
+              "http"  => 'http://sourceforge.net/projects/kororaproject/files/23/korora-23-x86_64-gnome.iso/download',
+#              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-gnome-live.iso',
+#              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-gnome-live.iso',
+#              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-gnome-live.iso',
             },
             checksum => {
-              md5     => '19532ffb0c0b9e4b5943547a3bd523c7',
-              sha1    => '1996a2e445fff1d1d84dcac91740e8ca753c714b',
-              sha256  => '6b6868ea9405ebd6bd620220b5f15d9cef26611dfc14bc17d281036ca06a9cd8'
+              md5     => '5cc9db18cc88990286bf2a4322cfa847',
+              sha1    => '6c4fe80df9e869167d9bf68a173fbbc481e637b2',
+              sha256  => 'cd7b4f612d60da1dc600c77a9b521dd9051e7b265ceddf07e22d725b694be9b0'
             },
           },
         },
         kde => {
           i386 => {
             url => {
-              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-kde-live.iso',
-              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-kde-live.iso',
-              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-kde-live.iso',
+              "http"  => 'http://sourceforge.net/projects/kororaproject/files/23/korora-23-i386-kde.iso/download',
+#              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-kde-live.iso',
+#              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-kde-live.iso',
+#              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-kde-live.iso',
             },
             checksum => {
-              md5     => '96f3517d48f02bee60533ee6806fd370',
-              sha1    => '9edc60feaecb10fca84775c1d2f1f6b6f24dc618',
-              sha256  => 'a80d0b92caf6b8af39a80facb2c8e0f8191244c3b92f69bd203dfc1ebf58cd83',
+              md5     => 'dec715f1167671716d56e564523a116e',
+              sha1    => 'b9d50dca536fdc581ac9070a899e189e2a01bb0b',
+              sha256  => 'bc71cd0f10019f3d61fefdc36ad6bfbabd4746d145776de366bd57dba601a71a',
             },
           },
           x86_64 => {
             url => {
-              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-kde-live.iso',
-              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-kde-live.iso',
-              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-kde-live.iso',
+              "http"  => 'http://sourceforge.net/projects/kororaproject/files/23/korora-23-x86_64-kde.iso/download',
+#              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-kde-live.iso',
+#              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-kde-live.iso',
+#              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-kde-live.iso',
             },
             checksum => {
-              md5     => '8f8f92f43778a4e6a6936924c7bb23c7',
-              sha1    => '6f07c4ad3c332158a8e2027200ba72866e12eb3f',
-              sha256  => '456fc321cd79c7cc82f3bb21b2b8b7b5f7b3d402775380243aba2064b6c62362'
+              md5     => '9bbca3b6badca68a73662b08377c6416',
+              sha1    => '43b6a6c8076bca3d55af67b23eae59ad8152abd0',
+              sha256  => 'c19bbe290d096171d67e3bb9b73bd0b29a8aa7c6d8a0429edebb4481adfa702a'
             },
           },
         },
         mate => {
           i386 => {
             url => {
-              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-mate-live.iso',
-              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-mate-live.iso',
-              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-mate-live.iso',
+              "http"  => 'http://sourceforge.net/projects/kororaproject/files/23/korora-23-i386-mate.iso/download',
+#              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-mate-live.iso',
+#              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-mate-live.iso',
+#              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-mate-live.iso',
             },
             checksum => {
-              md5     => '2defb5f23905d5d41237ab10a194432e',
-              sha1    => 'dfb110e6c5eefe51cb41b4f3748e0b144f24b43f',
-              sha256  => '04822bb7ce9ac911b014419d1e5d33cfd999655e1a7ea45362f5e7a8b8210a97',
+              md5     => '31400451da35f5b5b9d70371df05deea',
+              sha1    => '4ca35cedaba7a18ac92c97fc55cc8b56b5db817e',
+              sha256  => '471001cf59b09456240e0462fdfab1e3bc3ba9986077de565ebabfe99d6325e5',
             },
           },
           x86_64 => {
             url => {
-              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-mate-live.iso',
-              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-mate-live.iso',
-              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-mate-live.iso',
+              "http"  => 'http://sourceforge.net/projects/kororaproject/files/23/korora-23-x86_64-mate.iso/download',
+#              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-mate-live.iso',
+#              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-mate-live.iso',
+#              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-mate-live.iso',
             },
             checksum => {
-              md5     => '7e6681816d7d01def5a49d4c422cc51e',
-              sha1    => 'bd834a8d9b06b81866b72a8520672a6f8efc429a',
-              sha256  => '0bac6786abe40a322555e4b0afdf275ef0c6bb1bb9a17bee6b16adc858de3f50',
+              md5     => 'abc8d24d47c07fabcc6c40258d8d538c',
+              sha1    => '83a5949ccef5ea1efea464064f33d358cbf674fe',
+              sha256  => '98bb94f287a5770127c7aa23f5ece0c35ff68531cb1cc36732a808882f0f0c28',
             },
           },
         },
         xfce => {
           i386 => {
             url => {
-              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-xfce-live.iso',
-              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-xfce-live.iso',
-              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-xfce-live.iso',
+              "http"  => 'http://sourceforge.net/projects/kororaproject/files/23/korora-23-i386-xfce.iso/download',
+#              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-xfce-live.iso',
+#              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-xfce-live.iso',
+#              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/i386/korora-23-beta-i386-xfce-live.iso',
             },
             checksum => {
-              md5     => '75c07e78b6658a0d8ec30b746354aa9f',
-              sha1    => '6cd1b578725e99c897fec120b8669909aa818d73',
-              sha256  => '0220881ba3b6c51e1ddf2a4150fd261e7f9370d1d574caf57d5ef3c9da2e2745'
+              md5     => '5ef9ad7ddc9f79eacd0b78b9595c8bc4',
+              sha1    => '7fca915356b7b50b6a09d8f8178abfc8189cd74e',
+              sha256  => 'ff8b10c04ae4fb2179847e8b41ce938afc984d522ee4d14043f22dd00f6b0bb2'
             },
           },
           x86_64 => {
             url => {
-              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-xfce-live.iso',
-              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-xfce-live.iso',
-              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-xfce-live.iso',
+              "http"  => 'http://sourceforge.net/projects/kororaproject/files/23/korora-23-x86_64-xfce.iso/download',
+#              "http (Asia)"  => 'http://dl.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-xfce-live.iso',
+#              "http (Europe)"  => 'http://beta.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-xfce-live.iso',
+#              "http (America)"  => 'http://gamma.kororaproject.org/pub/isos/testing/23/x86_64/korora-23-beta-x86_64-xfce-live.iso',
             },
             checksum => {
-              md5     => '78b3317a4c11f09f0a514ddaf3c7b949',
-              sha1    => '7dba559dee3392d965a7b5fb6ed20865cc7f862e',
-              sha256  => '92cb3817947ed60c829656698a17ffa9b1d29223f807b49dc9596d7ee31bd9d9',
+              md5     => '1c2f57f545de31d8ab72c7050a230853',
+              sha1    => 'df4abd79c2a3a6f01583d24d57f1c5b418e023a2',
+              sha256  => 'c0900e1f2467d06d1651369d96cd43a9ce51a1307015aa798792d38c16a193f1',
             },
           },
         },
@@ -190,7 +200,7 @@ use constant DOWNLOAD_MAP => {
       version   => '22',
       codename  => 'Selina',
       isStable  => 1,
-      isCurrent => 1,
+      isCurrent => 0,
       released  => '2 August 2015',
       available => 1,
       isos => {

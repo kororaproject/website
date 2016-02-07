@@ -15,7 +15,7 @@
       <div class="col-xs-6 col-sm-2">
         <h4><a href="/discover">Discover</a></h4>
         <ul>
-          <li><a href="/discover/gnome">Gnome</a></li>
+          <li><a href="/discover/gnome">GNOME</a></li>
           <li><a href="/discover/kde">KDE</a></li>
           <li><a href="/discover/cinnamon">Cinnamon</a></li>
           <li><a href="/discover/mate">MATE</a></li>
