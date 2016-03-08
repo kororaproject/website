@@ -34,7 +34,7 @@
             <p><a href="#opensource"></a></p>
             <h2>We're open source</h2>
             <p>Firstly, <em>all our code is open source and freely available</em> to anyone via <a href="http://github.com/kororaproject">our GitHub account</a>. We also provide a tool called <a href="https://github.com/kororaproject/kp">kp</a> which will let anyone rebuild all of our packages and an entire Korora image, or modify these to build their own variation. That's the tool we use to build all of the Korora packages and images.</p>
-            <p>We do however ship some software that is proprietary, such as Adobe Flash (in version 21 and earlier) and others are installable, such as Google Chrome. We don't have source code for these as they are not open source; however, anything <em>we</em> create, or modify <em>is</em>.</p>
+            <p>While we do not ship any proprietary software by default, some is available in the repositories (such as Google Chrome). We don't have source code for these as they are not open source; however, anything <em>we</em> create, or modify <em>is</em>.</p>
             <p><a href="#kickstarts"></a></p>
             <h2>Kickstart templates</h2>
             <p>Kickstarts are files that define how to build a system and include things like:</p>
@@ -96,7 +96,7 @@
                     </div>
                   </div>
                 <div class="col-sm-3">
-                  <p>1 package</p>
+                  <p>0 packages</p>
               </div></div>
               <div class="row">
                 <div class="col-sm-3">
@@ -138,7 +138,7 @@
                 </div>
               </div>
             </div>
-            <p>Korora is 95% upstream Fedora packages and under 2% of our own. The packages that come from RPMFusion are the regular packages any Fedora user might install and the one package from Adobe is flash-plugin.</p>
+            <p>Korora is 95% upstream Fedora packages and under 2% of our own. The packages that come from RPMFusion are the regular packages any Fedora user might install.</p>
             <p><a href="#ourpackages"></a></p>
             <h2>Our packages</h2>
             <p>So if we hardly change anything on the system in the kickstarts, where do we make the changes to the system? Regular old RPM packages. The reason we make changes in RPMs is because we want them to be persistent. If we change things in the kickstarts (like editing a configuration file) then when you get an upstream package update our settings can be lost.</p>
