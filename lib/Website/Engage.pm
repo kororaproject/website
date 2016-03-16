@@ -98,6 +98,9 @@ sub index {
   my $tags      = $c->param('tags');
   my $type      = filter_valid_types($c->param('type')) // '';
 
+  # sanitise page
+  $page = 1 unless $page =~ m/\d+/;
+
   $c->render_steps('engage', sub {
     my $delay = shift;
 
@@ -290,6 +293,9 @@ sub engage_post_detail_get {
   my $page_size = 20;
   my $stub = $c->param('stub');
   my $type = $c->param('type');
+
+  # sanitise page
+  $page = 1 unless $page =~ m/\d+/;
 
   # could have flashed 'content' from an attempted reply
   my $content = $c->flash('content') // '';
