@@ -3,12 +3,12 @@
   <div class="container">
     <div class="row">
       <div class="col-xs-12 col-sm-3 center vcenter">
-        <h1><b>Korora</b> 23</h1>
+        <h1><b itemprop="name">Korora</b> 23</h1>
         <h2>New. Improved. Solid.</h2>
       </div><!--
    --><div class="col-xs-12 col-sm-6 vcenter">
         <div class="laptop">
-          <img id="img-banner" class="img-responsive" src="/img/generic-laptop-korora-gnome-desktop.png" alt="Korora on laptop">
+          <img id="img-banner" class="img-responsive" src="/img/generic-laptop-korora-gnome-desktop.png" alt="Korora on laptop" itemprop="image">
         </div>
       </div><!--
  --><div class="col-xs-12 col-sm-3 center vcenter">
