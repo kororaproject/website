@@ -23,40 +23,6 @@
         </span>
         <meta itemprop="license" content="https://kororaproject.org/about/whats-inside">
         <meta itemprop="keywords" content="korora, linux, easy, expert, fedora, remix, innovation, community, security, choice, freedom">
-        <div class="row">
-          <div class="col-sm-12">
-            <h1 class="text-center">Latest News</h1>
-            <h2><a class="news-post-title" href="<%= url_for('aboutnewsid', id => $news->{name}) %>"><%= $news->{title} %></a></h2>
-
-            <div class="news-summary-subtitle">
-              <div class="news-detail-subtitle-metadata">
-                <%== email_gravatar($news->{email}, 32) %>
-              </div>
-              <div class="news-detail-subtitle-metadata">
-                <p>written on <%= $news->{created} %></p>
-                <p>by <%= $news->{username} %></p>
-              </div>
-            </div>
-            <div class="news-excerpt">
-              <%== render_markdown($news->{excerpt}) %>
-            </div>
-            <div class="row">
-              <div class="col-xs-8">
-% if (grep {$_} @{$news->{tags}}) {
-                <div class="post-tags">
-                  <i class="fa fa-tags"></i>
-%   foreach my $t (@{$news->{tags}}) {
-                  <span class="tag"><%= $t %></span>
-%   }
-                </div>
-% }
-              </div><!--
-           --><div class="col-xs-4 text-right">
-                <a class="btn btn-default" href="<%= url_for('aboutnewsid', id => $news->{name}) %>">Read more ... </a>
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="row row-extra-margin">
           <div class="col-sm-12">
             <h1 class="text-center">Introducing Korora</h1>
@@ -116,6 +82,40 @@
             <h2 class="text-center">Freedom</h2>
             <p class="feature-block">Korora is 100% free. Copy and distribute as you see fit. In fact, we encourage it. The full sources to all of our packages are available on <a href="https://github.com/kororaproject">GitHub</a>.</p>
             <div class="hr hr-lg"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 class="text-center">Latest News</h1>
+            <h2><a class="news-post-title" href="<%= url_for('aboutnewsid', id => $news->{name}) %>"><%= $news->{title} %></a></h2>
+
+            <div class="news-summary-subtitle">
+              <div class="news-detail-subtitle-metadata">
+                <%== email_gravatar($news->{email}, 32) %>
+              </div>
+              <div class="news-detail-subtitle-metadata">
+                <p>written on <%= $news->{created} %></p>
+                <p>by <%= $news->{username} %></p>
+              </div>
+            </div>
+            <div class="news-excerpt">
+              <%== render_markdown($news->{excerpt}) %>
+            </div>
+            <div class="row">
+              <div class="col-xs-8">
+% if (grep {$_} @{$news->{tags}}) {
+                <div class="post-tags">
+                  <i class="fa fa-tags"></i>
+%   foreach my $t (@{$news->{tags}}) {
+                  <span class="tag"><%= $t %></span>
+%   }
+                </div>
+% }
+              </div><!--
+           --><div class="col-xs-4 text-right">
+                <a class="btn btn-default" href="<%= url_for('aboutnewsid', id => $news->{name}) %>">Read more ... </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
