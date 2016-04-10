@@ -4,7 +4,7 @@
   %= include 'header.inc', title => 'Korora Project'
   <link href="/css/layerslider.css" rel="stylesheet" media="screen">
 </head>
-<body>
+<body itemscope itemtype="http://schema.org/CreativeWork">
   %= include 'noscript.inc'
 
   <div class="page-container">
@@ -16,6 +16,13 @@
       <!-- CONTENT -->
 
       <div class="container">
+        <meta itemprop="url" content="https://kororaproject.org/download">
+        <span itemprop="author" itemscope itemtype="http://schema.org/Organization">
+          <meta itemprop="name" content="Korora Project">
+          <meta itemprop="url" content="https://kororaproject.org/about/team">
+        </span>
+        <meta itemprop="license" content="https://kororaproject.org/about/whats-inside">
+        <meta itemprop="keywords" content="korora, linux, easy, expert, fedora, remix, innovation, community, security, choice, freedom">
         <div class="row">
           <div class="col-sm-12">
             <h1 class="text-center">Latest News</h1>
@@ -58,10 +65,11 @@
                 <div class="quote">
                   <p>Using a special blend of aesthetics and functionality, Korora aims to make Linux easier for new users without compromising its power and flexibility for experts.</p>
                   <p>We provide a complete and easy to use computing system that "Just&nbsp;Works" &ndash; right out of the box.</p>
+                  <meta itemprop="description" content='Using a special blend of aesthetics and functionality, Korora aims to make Linux easier for new users without compromising its power and flexibility for experts. We provide a complete and easy to use computing system that "Just&nbsp;Works" &ndash; right out of the box.' />
                 </div>
               </div><!--
            --><div class="col-sm-6 vcenter">
-                <img class="img-responsive" src="/img/generic-laptop-korora-gnome-desktop-apps.png" alt="Korora GNOME desktop running Firefox and Nautilus.">
+                <img class="img-responsive" src="/img/generic-laptop-korora-gnome-desktop-apps.png" alt="Korora GNOME desktop running Firefox and Nautilus." itemprop="image">
               </div>
             </div>
           </div>
