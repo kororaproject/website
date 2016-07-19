@@ -37,12 +37,9 @@
             <h3>Planning Phase</h3>
             <p>Currently our planning phase is ephemeral with major goals outlined early in the cycle which are then iterated over until release day. All development discussions happen in the open via Engage or on IRC.</p>
             <h2>Goals for Stable +1</h2>
-            <p>For the next release we are focusing on three main elements: User Experience (UX) and Theming, Pharlap and Canvas.</p>
-            <h3>UX and Theming</h3>
+            <p>For the next release we are focusing on two main elements: User Experience (UX) / Theming and Canvas.</p>
+            <h3>UX / Theming</h3>
             <p>With the last release, based on strong community requests, we provided five different flavours of desktop in order to provide more choice. Based on constructive community feedback, additional effort will be concentrated to optimising the KDE, Cinnamon and MATE desktops.</p>
-            <h3>Pharlap</h3>
-            <p>We introduce a tech preview of our Proprietary Driver Manager (Pharlap) which is to eventually replace Jockey. Pharlap is largely derived from Ubuntu’s Drivers Common architecture and adapted for the YUM/RPM world.</p>
-            <p>There are significant challenges as a result of different practices between DPKG and RPM packaging and their associated metadata. We plan to engage our upstream repository managers for improving this situation.</p>
             <h3>Canvas</h3>
             <p>This feature represents something completely unique for our distribution and one that at times feels all consuming and never ending. It’s a number of concepts and is best considered a spectrum of capability than a single feature in itself.</p>
             <p>The initial feature set of Canvas will include:</p>

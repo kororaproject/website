@@ -33,7 +33,6 @@
             <li class="overview"><a href="/discover">Overview</a></li>
             <li><a href="/discover/cinnamon">Cinnamon Desktop</a></li>
             <li><a href="/discover/gnome">GNOME Desktop</a></li>
-            <li><a href="/discover/kde">KDE Desktop</a></li>
             <li><a href="/discover/mate">MATE Desktop</a></li>
             <li><a href="/discover/xfce">Xfce Desktop</a></li>
           </ul>

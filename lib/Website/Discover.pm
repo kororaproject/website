@@ -37,10 +37,6 @@ sub gnome {
   shift->render('discover/gnome');
 }
 
-sub kde {
-  shift->render('discover/kde');
-}
-
 sub cinnamon {
   shift->render('discover/cinnamon');
 }
