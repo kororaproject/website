@@ -57,22 +57,26 @@
                 <p class="description">Tester and support administrator</p>
                 <p class="year">2011</p>
               </div>
+            </div>
+            <h2>Former core team</h2>
+            <p>We are so thankful for everything our former core team members have contributed to the project. You're welcome back any time, please continue to drop in and say hi!</p>
               <div class="col-sm-3 team-profile">
-                <img src="/img/avatars/darkera.jpg" class="avatar" alt="Jim Dean">
+                <img src="/img/avatars/darkera.jpg" class="avatar" alt="Maik Adamietz">
                 <h1 class="realname">Maik Adamietz</h1>
                 <h2 class="username">DarkEra</h2>
                 <p class="description">Tester and Xfce desktop support</p>
-                <p class="year">2013</p>
+                <p class="year">2013-2016</p>
               </div>
             </div>
             <h2>Active contributors</h2>
             <p>We would like to specifically recognise the following developers and community members for their contributions to the Korora Project.</p>
             <ul>
-              <li>Larry Cafiero (lcafiero) – Testing, documentation and evangelism (2014)</li>
+              <li>...</li>
             </ul>
             <h2>Former contributors</h2>
             <p>Some have stopped by only briefly but have made significant contributions and we would like to recognise them also.</p>
             <ul>
+              <li>Larry Cafiero (lcafiero) – Testing, documentation and evangelism (2014)</li>
               <li>Dan Marshal (dan408) – MATE desktop (2013)</li>
               <li>Jeremiah Summers (jmiahman) – KDE desktop (2013)</li>
             </ul>
