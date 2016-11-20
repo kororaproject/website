@@ -41,7 +41,7 @@
           <p>Simply take Korora for a test drive on a USB stick and if you like what you see, you can install Korora directly to your hard drive straight from the live desktop.</p>
           <p>The minimum installation requirements for Korora are:</p>
           <ul class="fa-ul">
-            <li><i class="fa-li fa fa-check-square-o"></i>32 bit Intel-compatible PC</li>
+            <li><i class="fa-li fa fa-check-square-o"></i>64 bit Intel-compatible PC</li>
             <li><i class="fa-li fa fa-check-square-o"></i>1GB memory (RAM)</li>
             <li><i class="fa-li fa fa-check-square-o"></i>10GB disk space / storage</li>
           </ul>
@@ -57,22 +57,20 @@
                 <img class="img-desktop-logo" src="/img/ico-logo-<%= lc $d %>.png" alt="Logo">
               </div>
               <div class="col-sm-10">
-%     foreach my $a ( keys %{ $r->{isos}{ $d } } ) {
-%       foreach my $l ( keys %{ $r->{isos}{ $d }{ $a }{url} } ) {
-<a href="<%= $r->{isos}{ $d }{ $a }{url}{ $l } %>" class="btn btn-block btn-success"><i class="fa fa-fw fa-cloud-download"></i> <%= $a %> (<%= $l %>)</a>
-%       }
+%     foreach my $l ( keys %{ $r->{isos}{$d}{url} } ) {
+<a href="<%= $r->{isos}{$d}{url}{$l} %>" class="btn btn-block btn-success"><i class="fa fa-fw fa-cloud-download"></i> (<%= $l %>)</a>
+%     }
 
                 <div class="checksums">
-%       foreach my $c ( sort keys %{ $r->{isos}{ $d }{ $a }{checksum} } ) {
+%     foreach my $c ( sort keys %{ $r->{isos}{$d}{checksum} } ) {
                   <div class="checksum">
                     <div class="hash">
                       <span class="label label-default pull-left"><%= $c %></span>
-                      <%= $r->{isos}{ $d }{ $a }{checksum}{ $c } %>
+                      <%= $r->{isos}{$d}{checksum}{$c} %>
                     </div>
                   </div>
-%       }
-                </div>
 %     }
+                </div>
               </div>
             </div>
 %   }
@@ -91,7 +89,7 @@
             <p>Simply take Korora for a test drive on a USB stick and if you like what you see, you can install Korora directly to your hard drive straight from the live desktop.</p>
             <p>The minimum installation requirements for Korora are:</p>
             <ul class="fa-ul">
-              <li><i class="fa-li fa fa-check-square-o"></i>32 bit Intel-compatible CPU</li>
+              <li><i class="fa-li fa fa-check-square-o"></i>64 bit Intel-compatible CPU</li>
               <li><i class="fa-li fa fa-check-square-o"></i>1GB memory (RAM)</li>
               <li><i class="fa-li fa fa-check-square-o"></i>10GB disk space</li>
             </ul>
@@ -111,15 +109,6 @@
                 <h4 class="step">Step&nbsp;2</h4>
               </div>
               <div class="col-sm-9">
-                <select class="form-control" ng-model="arch" ng-options="archLabel(a) for a in getArchs()"></select>
-              </div>
-            </div>
-            <div class="hr hr-sm"></div>
-            <div class="row">
-              <div class="col-sm-3">
-                <h4 class="step">Step&nbsp;3</h4>
-              </div>
-              <div class="col-sm-9">
                 <div id="desktops" class="text-center form-control form-control-generic">
                   <div class="img-well" ng-repeat="d in getDesktops()" ng-class="{'img-well-selected': isSelected(d)}" ng-click="selectDesktop(d)">
                     <img class="img-desktop-logo img-bumper" ng-src="/img/ico-logo-{{d}}.png" tooltip="{{desktopLabel(d)}}" alt="Logo">
@@ -130,7 +119,7 @@
             <div class="hr hr-sm"></div>
             <div class="row">
               <div class="col-sm-3">
-                <h4 class="step">Step&nbsp;4</h4>
+                <h4 class="step">Step&nbsp;3</h4>
               </div>
               <div class="col-sm-9">
                 <div class="links">
@@ -167,13 +156,6 @@
               <li>Korora scripts (including kickstarts) and files are <a href="https://github.com/kororaproject">available on GitHub</a>.</li>
               <li>Installed packages are available via the <a href="http://dnf-plugins-core.readthedocs.org/en/latest/download.html">dnf download</a> command.</li>
             </ul>
-          </div>
-        </div>
-        <div class="hr"></div>
-        <div class="row">
-          <div class="col-sm-12 text-center">
-            <a href="http://digitalocean.com"><img src="/img/ico-logo-digital_ocean.png" class="do-logo"></img></a>
-            <p class="text-center">Hosting and file distribution generously provided by <a href="http://digitalocean.com">Digital Ocean</a></p>
           </div>
         </div>
       </div>

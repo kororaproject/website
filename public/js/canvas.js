@@ -404,7 +404,7 @@ app.controller('DownloadController', ['$scope',
     $scope.getPreferredRelease = function(args) {
       var _release = $scope.releases[0];
 
-      // check for specified arch
+      // check for specified version
       if (args.hasOwnProperty('v') ) {
         for (var n=0, l=$scope.releases.length; n<l; n++) {
           if ($scope.releases[n].version === args.v) {
@@ -424,7 +424,7 @@ app.controller('DownloadController', ['$scope',
         }
       }
 
-      /* process for available desktops and archs */
+      /* process for available desktops */
       $scope.desktops = Object.keys(_release.isos)
 
       /* calculate preferred desktop */
@@ -437,45 +437,11 @@ app.controller('DownloadController', ['$scope',
         $scope.desktop = $scope.desktops[Math.floor(Math.random() * $scope.desktops.length)];
       }
 
-      /* re-calculate available archs */
-      console.debug(_release, $scope.desktop);
-      $scope.archs = Object.keys(_release.isos[$scope.desktop]);
-
-      /* calculate preferred arch */
-      if (args.hasOwnProperty('a') && $scope.archs.indexOf(args.a) !== -1) {
-        $scope.arch = args.a;
-      }
-      else {
-        var _nav = window.navigator;
-        var _system_arch = (_nav.userAgent.indexOf('WOW64') > -1 ||
-                            _nav.platform == 'Win64' ||
-                            _nav.userAgent.indexOf('x86_64') > -1) ? 'x86_64' : 'i686';
-
-        if($scope.archs.indexOf(_system_arch) !== -1) {
-          $scope.arch = _system_arch;
-        }
-        else {
-          $scope.arch = $scope.archs[0];
-        }
-      }
-
       return _release;
-    };
-
-    $scope.hasArchs = function() {
-      return $scope.archs.length > 0;
     };
 
     $scope.selectDesktop = function(d) {
       $scope.desktop = d;
-    };
-
-    $scope.archLabel = function(a) {
-      if( $scope.downloads.archs.hasOwnProperty(a) ) {
-        return $scope.downloads.archs[ a ];
-      }
-
-      return 'Unknown';
     };
 
     $scope.desktopLabel = function(d) {
@@ -484,10 +450,6 @@ app.controller('DownloadController', ['$scope',
       }
 
       return 'Unknown';
-    };
-
-    $scope.getArchs = function() {
-      return Object.keys($scope.release.isos[$scope.desktop]);
     };
 
     $scope.getDesktops = function() {
@@ -499,9 +461,8 @@ app.controller('DownloadController', ['$scope',
 
       var _checksums = {};
 
-      if( _isos.hasOwnProperty( $scope.desktop ) &&
-          _isos[ $scope.desktop ].hasOwnProperty( $scope.arch ) ) {
-        _checksums = _isos[ $scope.desktop ][ $scope.arch ].checksum;
+      if (_isos.hasOwnProperty($scope.desktop)) {
+        _checksums = _isos[$scope.desktop].checksum;
       }
 
       return _checksums;
@@ -512,9 +473,8 @@ app.controller('DownloadController', ['$scope',
 
       var _links = {};
 
-      if( _isos.hasOwnProperty( $scope.desktop ) &&
-          _isos[ $scope.desktop ].hasOwnProperty( $scope.arch ) ) {
-        _links = _isos[ $scope.desktop ][ $scope.arch ].url;
+      if (_isos.hasOwnProperty($scope.desktop)) {
+        _links = _isos[$scope.desktop].url;
       }
 
       return _links;
