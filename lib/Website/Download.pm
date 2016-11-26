@@ -40,57 +40,57 @@ use constant DOWNLOAD_MAP => {
     xfce      => 'Xfce',
   },
   releases => [
-    {
-      name      => 'Korora 25',
-      version   => '25',
-      codename  => 'Gurdle',
-      isStable  => 0,
-      isCurrent => 1,
-      released  => '20 November 2016',
-      available => 1,
-      isos => {
-        cinnamon => {
-          url => {
-            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-cinnamon.iso/download',
-          },
-          checksum => {
-            md5     => '',
-            sha1    => '',
-            sha256  => '',
-          },
-        },
-        gnome => {
-          url => {
-            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-gnome.iso/download',
-          },
-          checksum => {
-            md5     => '',
-            sha1    => '',
-            sha256  => ''
-          },
-        },
-        mate => {
-          url => {
-            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-mate.iso/download',
-          },
-          checksum => {
-            md5     => '',
-            sha1    => '',
-            sha256  => '',
-          },
-        },
-        xfce => {
-          url => {
-            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-xfce.iso/download',
-          },
-          checksum => {
-            md5     => '',
-            sha1    => '',
-            sha256  => '',
-          },
-        },
-      },
-    },
+#    {
+#      name      => 'Korora 25',
+#      version   => '25',
+#      codename  => 'Gurgle',
+#      isStable  => 0,
+#      isCurrent => 1,
+#      released  => '20 November 2016',
+#      available => 1,
+#      isos => {
+#        cinnamon => {
+#          url => {
+#            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-cinnamon.iso/download',
+#          },
+#          checksum => {
+#            md5     => '',
+#            sha1    => '',
+#            sha256  => '',
+#          },
+#        },
+#        gnome => {
+#          url => {
+#            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-gnome.iso/download',
+#          },
+#          checksum => {
+#            md5     => '',
+#            sha1    => '',
+#            sha256  => ''
+#          },
+#        },
+#        mate => {
+#          url => {
+#            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-mate.iso/download',
+#          },
+#          checksum => {
+#            md5     => '',
+#            sha1    => '',
+#            sha256  => '',
+#          },
+#        },
+#        xfce => {
+#          url => {
+#            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-xfce.iso/download',
+#          },
+#          checksum => {
+#            md5     => '',
+#            sha1    => '',
+#            sha256  => '',
+#          },
+#        },
+#      },
+#    },
     {
       name      => 'Korora 24',
       version   => '24',
