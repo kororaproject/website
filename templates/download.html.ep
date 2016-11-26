@@ -43,7 +43,7 @@
           <ul class="fa-ul">
             <li><i class="fa-li fa fa-check-square-o"></i>64 bit Intel-compatible PC</li>
             <li><i class="fa-li fa fa-check-square-o"></i>1GB memory (RAM)</li>
-            <li><i class="fa-li fa fa-check-square-o"></i>10GB disk space / storage</li>
+            <li><i class="fa-li fa fa-check-square-o"></i>20GB disk space / storage</li>
           </ul>
 
 % foreach my $r ( @{ $map->{releases} } ) {
@@ -91,7 +91,7 @@
             <ul class="fa-ul">
               <li><i class="fa-li fa fa-check-square-o"></i>64 bit Intel-compatible CPU</li>
               <li><i class="fa-li fa fa-check-square-o"></i>1GB memory (RAM)</li>
-              <li><i class="fa-li fa fa-check-square-o"></i>10GB disk space</li>
+              <li><i class="fa-li fa fa-check-square-o"></i>20GB disk space</li>
             </ul>
           </div>
           <div class="col-sm-6">
