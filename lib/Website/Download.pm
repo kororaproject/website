@@ -40,57 +40,62 @@ use constant DOWNLOAD_MAP => {
     xfce      => 'Xfce',
   },
   releases => [
-#    {
-#      name      => 'Korora 25',
-#      version   => '25',
-#      codename  => 'Gurgle',
-#      isStable  => 0,
-#      isCurrent => 1,
-#      released  => '20 November 2016',
-#      available => 1,
-#      isos => {
-#        cinnamon => {
-#          url => {
-#            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-cinnamon.iso/download',
-#          },
-#          checksum => {
-#            md5     => '',
-#            sha1    => '',
-#            sha256  => '',
-#          },
-#        },
-#        gnome => {
-#          url => {
-#            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-gnome.iso/download',
-#          },
-#          checksum => {
-#            md5     => '',
-#            sha1    => '',
-#            sha256  => ''
-#          },
-#        },
-#        mate => {
-#          url => {
-#            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-mate.iso/download',
-#          },
-#          checksum => {
-#            md5     => '',
-#            sha1    => '',
-#            sha256  => '',
-#          },
-#        },
-#        xfce => {
-#          url => {
-#            "http"  => 'http://sourceforge.net/projects/kororaproject/files/24/korora-24-x86_64-xfce.iso/download',
-#          },
-#          checksum => {
-#            md5     => '',
-#            sha1    => '',
-#            sha256  => '',
-#          },
-#        },
-#      },
-#    },
+    {
+      name      => 'Korora 25',
+      version   => '25',
+      codename  => 'Gurgle',
+      isStable  => 1,
+      isCurrent => 1,
+      released  => '8 December 2016',
+      available => 1,
+      isos => {
+        cinnamon => {
+          url => {
+            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-cinnamon-25-x86_64.iso/download',
+          },
+          checksum => {
+            md5     => '050cac6e9bbde974069f8ec31cea2e86',
+            sha1    => '13bd78a1900bd34ca3f4f2f23a334bc60eb0a0a8',
+          },
+        },
+        gnome => {
+          url => {
+            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-gnome-25-x86_64.iso/download',
+          },
+          checksum => {
+            md5     => '2a21e30659101b33eb1f24e34db0e611',
+            sha1    => 'b683c642062bb1037a3d854ac6b1f2c49091eb9f',
+          },
+        },
+        kde => {
+          url => {
+            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-kde-25-x86_64.iso/download',
+          },
+          checksum => {
+            md5     => 'c2f5dd171b2809262164fcfcfe3d7d72',
+            sha1    => 'c8803e613eb380bdf135265a12b5adf6e66f843b',
+          },
+        },
+        mate => {
+          url => {
+            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-mate-25-x86_64.iso/download',
+          },
+          checksum => {
+            md5     => '8e55704155b4c243e368c914b60e9e30',
+            sha1    => 'fba2509a4187e9746f668be48ae1a7e48b90c308',
+          },
+        },
+        xfce => {
+          url => {
+            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-xfce-25-x86_64.iso/download',
+          },
+          checksum => {
+            md5     => '81d32eaf6b932e09f14ff04767f25b4c',
+            sha1    => '3c351fdd6ae806a42b8da9ee32e050e7f6977ab4',
+          },
+        },
+      },
+    },
     {
       name      => 'Korora 24',
       version   => '24',
