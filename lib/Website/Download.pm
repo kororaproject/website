@@ -51,8 +51,8 @@ use constant DOWNLOAD_MAP => {
       isos => {
         cinnamon => {
           url => {
-            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-cinnamon-25-x86_64.iso/download',
             "torrent" => 'https://dl.kororaproject.org/pub/isos/releases/25/x86_64/korora-live-cinnamon-25-x86_64.iso.torrent',
+            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-cinnamon-25-x86_64.iso/download',
           },
           checksum => {
             md5     => '050cac6e9bbde974069f8ec31cea2e86',
@@ -62,8 +62,8 @@ use constant DOWNLOAD_MAP => {
         },
         gnome => {
           url => {
-            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-gnome-25-x86_64.iso/download',
             "torrent" => 'https://dl.kororaproject.org/pub/isos/releases/25/x86_64/korora-live-gnome-25-x86_64.iso.torrent',
+            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-gnome-25-x86_64.iso/download',
           },
           checksum => {
             md5     => '2a21e30659101b33eb1f24e34db0e611',
@@ -73,8 +73,8 @@ use constant DOWNLOAD_MAP => {
         },
         kde => {
           url => {
-            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-kde-25-x86_64.iso/download',
             "torrent" => 'https://dl.kororaproject.org/pub/isos/releases/25/x86_64/korora-live-kde-25-x86_64.iso.torrent',
+            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-kde-25-x86_64.iso/download',
           },
           checksum => {
             md5     => 'c2f5dd171b2809262164fcfcfe3d7d72',
@@ -84,8 +84,8 @@ use constant DOWNLOAD_MAP => {
         },
         mate => {
           url => {
-            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-mate-25-x86_64.iso/download',
             "torrent" => 'https://dl.kororaproject.org/pub/isos/releases/25/x86_64/korora-live-mate-25-x86_64.iso.torrent',
+            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-mate-25-x86_64.iso/download',
           },
           checksum => {
             md5     => '8e55704155b4c243e368c914b60e9e30',
@@ -95,8 +95,8 @@ use constant DOWNLOAD_MAP => {
         },
         xfce => {
           url => {
-            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-xfce-25-x86_64.iso/download',
             "torrent" => 'https://dl.kororaproject.org/pub/isos/releases/25/x86_64/korora-live-xfce-25-x86_64.iso.torrent',
+            "http"  => 'http://sourceforge.net/projects/kororaproject/files/25/korora-live-xfce-25-x86_64.iso/download',
           },
           checksum => {
             md5     => '81d32eaf6b932e09f14ff04767f25b4c',
