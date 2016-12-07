@@ -56,6 +56,7 @@ use constant DOWNLOAD_MAP => {
           checksum => {
             md5     => '050cac6e9bbde974069f8ec31cea2e86',
             sha1    => '13bd78a1900bd34ca3f4f2f23a334bc60eb0a0a8',
+            sha256  => 'a0e17d8c7a54f63950f89f1801e9884b5ef696bb4b8fdbb68f14195b2d778211'
           },
         },
         gnome => {
@@ -65,6 +66,7 @@ use constant DOWNLOAD_MAP => {
           checksum => {
             md5     => '2a21e30659101b33eb1f24e34db0e611',
             sha1    => 'b683c642062bb1037a3d854ac6b1f2c49091eb9f',
+            sha256  => '1be5d06feb7fedb5a364f7bcd735754f22efe3a56e1ad2310d64e965619c5468'
           },
         },
         kde => {
@@ -74,6 +76,7 @@ use constant DOWNLOAD_MAP => {
           checksum => {
             md5     => 'c2f5dd171b2809262164fcfcfe3d7d72',
             sha1    => 'c8803e613eb380bdf135265a12b5adf6e66f843b',
+            sha256  => '1af9b932ec3c03a5d27c9f81babf3f3925390bffbf47525fd9e70e0b5fccf811'
           },
         },
         mate => {
@@ -83,6 +86,7 @@ use constant DOWNLOAD_MAP => {
           checksum => {
             md5     => '8e55704155b4c243e368c914b60e9e30',
             sha1    => 'fba2509a4187e9746f668be48ae1a7e48b90c308',
+            sha256  => 'da685120fb378dd4b11200a82fe050bd11fbc470e3ddaf57887e28c0ac049f61'
           },
         },
         xfce => {
@@ -92,6 +96,7 @@ use constant DOWNLOAD_MAP => {
           checksum => {
             md5     => '81d32eaf6b932e09f14ff04767f25b4c',
             sha1    => '3c351fdd6ae806a42b8da9ee32e050e7f6977ab4',
+            sha256  => '52ff7c88dd8bc5a92b0248b6268ff2c8ce7d5d3b51270005526faa2627e91f15'
           },
         },
       },
@@ -101,7 +106,7 @@ use constant DOWNLOAD_MAP => {
       version   => '24',
       codename  => 'Sheldon',
       isStable  => 1,
-      isCurrent => 1,
+      isCurrent => 0,
       released  => '19 July 2016',
       available => 1,
       isos => {
