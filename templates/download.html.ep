@@ -33,6 +33,10 @@
           </div>
         </div>
 
+        <div class="callout callout-thank">
+          <p>Please use <b>BitTorrent</b> if you can, it will be much faster. Thanks!</p>
+        </div>
+
         <div class="hr"></div>
 
         <div ng-hide="pageLoaded">
