@@ -1010,6 +1010,7 @@ blockquote p {
 .page-container {
   min-height: 100%;
   margin-bottom: 256px; /* auto-calculated */
+  -webkit-margin-bottom-collapse: discard; /* Fixes Footer Cut of in mobile view - Dazzy */
   padding-bottom: 64px; /* match top padding of page-content */
 
   background-color: #fff;
