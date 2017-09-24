@@ -33,9 +33,9 @@
           </div>
         </div>
 
-        <div class="callout callout-thank">
-          <p>Please use <b>BitTorrent</b> if you can, it will be much faster. Thanks!</p>
-          <!--<p><b>BitTorrent</b> links will be available in a few days.</p>-->
+        <div class="callout callout-info">
+          <!--<p>Please use <b>BitTorrent</b> if you can, it will be much faster. Thanks!</p>-->
+          <p><b>BitTorrent</b> links should be available in a few days.</p>
         </div>
 
         <div class="hr"></div>

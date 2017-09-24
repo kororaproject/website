@@ -67,7 +67,7 @@
             </div>
           </div>
           <div class="col-sm-4">
-            <h3><a href="/discover/gnome">KDE</a></h3>
+            <h3><a href="/discover/kde">KDE</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-kde-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
                 <img src="/img/screenshots/korora-kde-desktop-thumb.jpg" class="img-responsive" alt="Korora KDE">
