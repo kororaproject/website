@@ -31,7 +31,7 @@
         <div class="row">
           <div class="col-sm-12">
             <p>You might be wondering, "<em>why is Korora derived from Fedora?</em>"</p>
-            <p>Perhaps you have used Fedora in the past yourself and been burnt, or perhaps you can't stand Yum, Fedora's package manager. Perhaps you even hate RPMs? Well, <em>we understand!</em></p>
+            <p>Perhaps you have used Fedora in the past yourself and been burnt, or perhaps you can't stand DNF, Fedora's package manager. Perhaps you even hate RPMs? Well, <em>we understand!</em></p>
             <p>Let us also say, that we think you should give Fedora another chance (like we did), or at least continue reading this page.<br>
             <span id="more-8"></span><br>
             All distros are different and they have different goals. However, we're drawn to Fedora for several reasons including the fact that <a href="http://fedoraproject.org/wiki/Objectives">at its heart</a>, Fedora is about building a <em>community of contributors</em>, not just consumers.</p>
@@ -46,12 +46,12 @@
             <p>That's not to say that you can't get the NVIDIA drivers, or other proprietary software for your system. Various third party repositories, such as <a href="http://rpmfusion.org/">RPMFusion</a>, exist for this very purpose (and of course, Korora configures all this for you out of the box!).<br>
             <p><a name="package" href=""></a></p>
             <h2>Package Management</h2>
-            <p>Yum (and RPM) have made leaps and bounds over the last few years and you might actually enjoy using it now (and it's quite fast!). Having said that, most package commands are run through PackageKit these days thanks to graphical package managers. As for RPMs themselves, they're just a binary package format like Debs – it's the package manager that makes the difference.</p>
-            <p>Download an RPM from the net and you can install it with Yum (or via the GUI using PackageKit), which will automatically pull in any dependencies for you. You rarely use the <em>rpm</em> command, just like in Debian and Ubuntu you rarely use <em>dpkg</em>. The days of <em>"RPM hell"</em> are long gone.</p>
+            <p>DNF (and RPM) have made leaps and bounds over the last few years and you might actually enjoy using it now (and it's quite fast!). Having said that, most package commands are run through PackageKit these days thanks to graphical package managers. As for RPMs themselves, they're just a binary package format like Debs – it's the package manager that makes the difference.</p>
+            <p>Download an RPM from the net and you can install it with DNF (or via the GUI using PackageKit), which will automatically pull in any dependencies for you. You rarely use the <em>rpm</em> command, just like in Debian and Ubuntu you rarely use <em>dpkg</em>. The days of <em>"RPM hell"</em> are long gone.</p>
             <p>Fedora also has a wonderful addition, called groups. After some educational software, office programs, or support for your language? It's easy, just install the group you need, like so:</p>
-            <pre><code class="bash">$ sudo yum groupinstall "Educational Software"</code></pre>
+            <pre><code class="bash">$ sudo dnf groupinstall "Educational Software"</code></pre>
             <p>If you're a developer, getting started with Fedora is easy. Just install the development group you need, such as GNOME, KDE, Java, Kernel, Perl, or even the Web.</p>
-            <pre><code class="bash">$ sudo yum groupinstall "Development Tools"</code></pre>
+            <pre><code class="bash">$ sudo dnf groupinstall "Development Tools"</code></pre>
             <p>There are almost 200 groups, ready to make your life easier!</p>
             <p>Fedora also has several <a href="http://repos.fedorapeople.org/">contributor repositories available</a> for end users, which is sort-of similar to Ubuntu's PPA (Personal Package Archive). However, Fedora often provides updates for major packages anyway, so you don't actually need to add a separate
             repository to get the latest version of things like KDE.</p>
@@ -71,8 +71,8 @@
             <h3>Upstream</h3>
             <p>Fedora works as <a href="http://fedoraproject.org/wiki/Staying_close_to_upstream_projects">closely to upstream as possible</a>. They don't often go off on their own tangent with disregard for upstream projects. If they want to have something changed, they work with upstream to create fixes and
             introduce new features which benefits everyone.</p>
-            <p>Take the Chromium web browser for example. It's not included in Fedora <a href="http://spot.livejournal.com/312320.html">for several reasons</a>, but Fedora people are <a href="http://code.google.com/p/chromium/issues/detail?id=28287"
-             >working with Google</a> to fix these issues, so that it <em>can</em> be included nicely. By doing this, other distros will benefit!</p>
+            <p>Take the Chromium web browser for example. It wasn't included included in Fedora <a href="http://spot.livejournal.com/312320.html">for several reasons</a>, but Fedora <a href="http://code.google.com/p/chromium/issues/detail?id=28287"
+             >worked with Google</a> to resolove these issues, and now it <em>is</em> included. By doing this, other distros will benefit!</p>
            <p>Having said that, there are Chromium builds available too. Just add <a href="http://repos.fedorapeople.org/repos/spot/chromium/">the repository</a> and away you go!</p>
            <p>Working upstream provides <a href="http://fedoraproject.org/wiki/Staying_close_to_upstream_projects#Why_push_changes_upstream.3F">many great benefits to Fedora</a> and ultimately makes it a more stable system because the fixes are shared with everyone.<br>
             <p><a name="security" href=""></a></p>

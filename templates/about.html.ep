@@ -50,7 +50,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-sm-offset-2 col-sm-4">
+          <div class="col-sm-4">
             <h3><a href="/discover/cinnamon">Cinnamon</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-cinnamon-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
@@ -63,6 +63,14 @@
             <div class="text-center">
               <a href="/img/screenshots/korora-gnome-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
                 <img src="/img/screenshots/korora-gnome-desktop-thumb.jpg" class="img-responsive" alt="Korora GNOME">
+              </a>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <h3><a href="/discover/gnome">KDE</a></h3>
+            <div class="text-center">
+              <a href="/img/screenshots/korora-kde-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
+                <img src="/img/screenshots/korora-kde-desktop-thumb.jpg" class="img-responsive" alt="Korora KDE">
               </a>
             </div>
           </div>
@@ -110,8 +118,7 @@
         <div class="row">
           <div class="col-sm-12">
             <h2>Third party driver support</h2>
-            <p>Korora includes a tool called Pharlap for simple installation of third party drivers such as those for NVIDIA graphics cards and certain wireless devices.</p>
-            <p>Korora also comes with all the development tools and kernel headers you need to easily install out of tree kernel modules, such as those required by VirtualBox. These modules are automatically built when you get a new kernel update thanks to Dynamic Kernel Module Support.</p>
+            <p>Korora comes with all the development tools and kernel headers you need to easily install out of tree kernel modules, such as those required by VirtualBox. These modules are automatically built when you get a new kernel update thanks to Dynamic Kernel Module Support.</p>
           </div>
         </div>
         <div class="row">

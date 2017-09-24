@@ -235,6 +235,7 @@ sub startup {
     $r->get('/discover')->to('discover#index');
     $r->get('/discover/gnome')->to('discover#gnome');
     $r->get('/discover/cinnamon')->to('discover#cinnamon');
+    $r->get('/discover/kde')->to('discover#kde');
     $r->get('/discover/mate')->to('discover#mate');
     $r->get('/discover/xfce')->to('discover#xfce');
 

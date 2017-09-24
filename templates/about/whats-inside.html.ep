@@ -52,7 +52,7 @@
               <li>Australia/Sydney as the default timezone</li>
               <li>SELinux to enforcing mode</li>
               <li>Opens the firewall for Samba (Windows file sharing), SSH, Multicast DNS and printing</li>
-              <li>Enables a number of services, including time, network management and yum daemon to keep repositories information fresh</li>
+              <li>Enables a number of services, including time, network management and dnf daemon to keep repositories information fresh</li>
               <li>Disables a large number of services, like bug reporting tools, enterprise services like iscsi and multipath, as well as sendmail and ssh</li>
             </ul>
             <p>The base kickstart also spells out the <strong>repositories</strong> to pull packages from. Many of these, and in particular RPMFusion, are added by most Fedora users and we can do this out of the box because we aren't restricted by Fedora's own project rules. They include:</p>
@@ -148,9 +148,8 @@
             <p>We also replace some Fedora packages so that we can make desktop specific changes, such as kde-settings (for KDE configuration) and shared-mime-info (that handles default applications). We have korora-settings packages for the desktops which deliver more custom settings including the default Firefox profile and <a
               href="https://github.com/kororaproject/kp-korora-settings-gnome/blob/master/upstream/org.korora.gschema.override">GNOME settings</a>.</p>
             <p>Next, there are several Mozilla plugins that we package up as they aren't included in Fedora but we enable them in the default Firefox profile.</p>
-            <p>Finally, we package a number of RPMs that are not available in Fedora or RPMFusion, such as Steam client (which comes from <a href="http://spot.fedorapeople.org/steam/">Spot's repository</a>), libdvdcss, scripts like unburden-home-dir and undistract-me, as well as Pharlap the proprietary driver manager and our own
-            welcome screen.</p>
-            <p>As mentioned on the Download page, you can easily download the source for any of our packages using the <a href="http://linux.die.net/man/1/yumdownloader">yumdownloader</a> command.</p>
+            <p>Finally, we package a number of RPMs that are not available in Fedora or RPMFusion.</p>
+            <p>As mentioned on the Download page, you can easily download the source for any of our packages using the <a href="http://linux.die.net/man/1/dnf">dnf download</a> command.</p>
             <p><a href="#conclusion"></a></p>
             <h2>Conclusion</h2>
             <p>Korora is an open source project and we do support open source software, even though some of the software we ship is proprietary. What we have done is to put all the pieces together and try to make a Fedora Remix that is useful for anyone out there, but there's nothing that we do that you couldn't do yourself. You're welcome to install Fedora and then grab any of our packages you want, rather than using Korora if you

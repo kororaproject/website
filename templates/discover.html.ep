@@ -33,7 +33,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-sm-3">
+          <div class="col-sm-4">
             <h3><a href="/discover/cinnamon">Cinnamon</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-cinnamon-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
@@ -41,7 +41,7 @@
               </a>
             </div>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-4">
             <h3><a href="/discover/gnome">GNOME</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-gnome-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
@@ -49,7 +49,17 @@
               </a>
             </div>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-4">
+            <h3><a href="/discover/kde">KDE</a></h3>
+            <div class="text-center">
+              <a href="/img/screenshots/korora-kde-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
+                <img src="/img/screenshots/korora-kde-desktop-thumb.jpg" class="img-responsive" alt="Korora KDE">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-offset-2 col-sm-4">
             <h3><a href="/discover/mate">MATE</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-mate-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
@@ -57,7 +67,7 @@
               </a>
             </div>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-4">
             <h3><a href="/discover/xfce">Xfce</a></h3>
             <div class="text-center">
               <a href="/img/screenshots/korora-xfce-desktop.jpg" data-toggle="lightbox" data-gallery="desktops" data-parent=".container">
@@ -77,7 +87,6 @@
               <li><i class="fa fa-li fa-check-square-o"></i>Firefox extensions included (Adblock Plus, DownThemAll, Xclear)</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Microblogging client</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Extensive multimedia support</li>
-              <li><i class="fa fa-li fa-check-square-o"></i>Pharlap device manager to handle drivers such as NVIDIA and wireless</li>
               <li><i class="fa fa-li fa-check-square-o"></i>Video editor</li>
               <li><i class="fa fa-li fa-check-square-o"></i>VLC as the default media player</li>
               <li><i class="fa fa-li fa-check-square-o"></i>SELinux enabled</li>
