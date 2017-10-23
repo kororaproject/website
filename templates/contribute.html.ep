@@ -44,7 +44,7 @@
             <h3>Artwork</h3>
             <p>If you are talented in graphic design and willing to contribute to the project, please send us your creations and artwork. Whether it's a simple wallpaper, an icon set, a splash screen, or even a new logo, we're always interested to hear from you about new artwork.</p>
             <h3>Code</h3>
-            <p>Most of our development is done in Python and Perl. We also use Git for version control and DNF/RPM for packaging. If you're comfortable with these technologies, don't hesitate to have a look at the code. If you think you can improve our applications or write new ones don't hesitate to suggest patches or to fork our git repositories.</p>
+            <p>Most of our development is done in Python and Perl. We also use Git for version control and DNF/RPM for packaging. If you're comfortable with these technologies, don't hesitate to have a look at the code. If you think you can improve our applications or write new ones don't hesitate to suggest patches or to fork our a href="https://github.com/kororaproject/">git repositories</a>.</p>
           </div>
         </div>
         <div class="row">
