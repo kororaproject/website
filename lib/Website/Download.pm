@@ -53,46 +53,51 @@ use constant DOWNLOAD_MAP => {
         cinnamon => {
           url => {
             "http"  => 'http://sourceforge.net/projects/kororaproject/files/26/korora-live-cinnamon-26-x86_64.iso/download',
+            "torrent" => 'https://dl.kororaproject.org/pub/isos/releases/26/x86_64/korora-live-cinnamon-26-x86_64.iso.torrent',
           },
           checksum => {
             md5     => 'e8956c55bd5ad1f283763c59f5dc145d',
             sha1    => '5b49b1b81c342d6ba0b9272ab9de340717c4f0a5',
-            sha266  => 'ec0d5443214554f4bdf7f0e92c1f1aaa10d46114b192a66ad527892949241ced'
+            sha256  => 'ec0d5443214554f4bdf7f0e92c1f1aaa10d46114b192a66ad527892949241ced'
           },
         },
         gnome => {
           url => {
             "http"  => 'http://sourceforge.net/projects/kororaproject/files/26/korora-live-gnome-26-x86_64.iso/download',
+            "torrent" => 'https://dl.kororaproject.org/pub/isos/releases/26/x86_64/korora-live-gnome-26-x86_64.iso.torrent',
           },
           checksum => {
             md5     => '16f60597dd6c283b99f822458afe4858',
             sha1    => '5e4896e7406a3304e10093994df505eb839cf8b3',
-            sha266  => 'd9e0cf3b69c680e7587352820e4d7cfe7c37f4f0ff354434e8f704773edfe5ee'
+            sha256  => 'd9e0cf3b69c680e7587352820e4d7cfe7c37f4f0ff354434e8f704773edfe5ee'
           },
         },
         kde => {
           url => {
             "http"  => 'http://sourceforge.net/projects/kororaproject/files/26/korora-live-kde-26-x86_64.iso/download',
+            "torrent" => 'https://dl.kororaproject.org/pub/isos/releases/26/x86_64/korora-live-kde-26-x86_64.iso.torrent',
           },
           checksum => {
             md5     => '92efe48d0b04969d9414a9fbbbaec8bd',
             sha1    => '8ba7cc75e939952ec8c966db1e095154419fe955',
-            sha266  => 'ded79e93610578d6861ababe57175f62521734e103c3704ef3be73dd93e4f25e'
+            sha256  => 'ded79e93610578d6861ababe57175f62521734e103c3704ef3be73dd93e4f25e'
           },
         },
         mate => {
           url => {
             "http"  => 'http://sourceforge.net/projects/kororaproject/files/26/korora-live-mate-26-x86_64.iso/download',
+            "torrent" => 'https://dl.kororaproject.org/pub/isos/releases/26/x86_64/korora-live-mate-26-x86_64.iso.torrent',
           },
           checksum => {
             md5     => '8af3ae6d203e0fb9c7ceb2b77770aed9',
             sha1    => 'fa96dafd99caf04bb83b71286934a0f368c864ef',
-            sha266  => '9c13132c5ac45e5a3cdc7443202ffab31510bf6b8a57691142b93a6415268129'
+            sha256  => '9c13132c5ac45e5a3cdc7443202ffab31510bf6b8a57691142b93a6415268129'
           },
         },
         xfce => {
           url => {
             "http"  => 'http://sourceforge.net/projects/kororaproject/files/26/korora-live-xfce-26-x86_64.iso/download',
+            "torrent" => 'https://dl.kororaproject.org/pub/isos/releases/26/x86_64/korora-live-xfce-26-x86_64.iso.torrent',
           },
           checksum => {
             md5     => '5edbfb1388035e20348669a09b2a8990',
