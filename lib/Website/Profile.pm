@@ -25,9 +25,7 @@ use Mojo::Base 'Mojolicious::Controller';
 #
 # PERL INCLUDES
 #
-use Data::Dumper;
 use POSIX qw(ceil);
-
 
 #
 # CONTROLLER HANDLERS
@@ -38,6 +36,7 @@ sub profile_get {
 
   # TODO: what aspect of the profile should be public?
 #  return $c->redirect_to('/') unless $c->is_user_authenticated;
+#
 
   $c->render_steps('profile', sub {
     my $delay = shift;
@@ -51,8 +50,6 @@ sub profile_get {
     my ($delay, $err, $res) = @_;
 
     my $u = $res->hash;
-
-    say Dumper $c->auth_user;
 
     $delay->emit(redirect => '/') unless defined $u;
 
@@ -97,6 +94,8 @@ sub profile_reset_password_post {
 
   if ($c->users->account->reset($user, $pass, $pass_confirm, $token)) {
     $c->flash(page_success => 'Your password has been reset.');
+  } else {
+    $c->flash(page_errors => 'Unable to reset your password.');
   }
 
   $c->redirect_to($url);

@@ -30,6 +30,7 @@
             <div class="profile-subtitle-meta">
               <p class="profile-subtitle-meta text-center">Joined on <br/><%= $user->{created} %></p>
             </div>
+
 % if ($c->profile->can_change_password($user)) {
             <div class="profile-toolbox">
               <a href="" class="btn btn-default" data-toggle="modal" data-target="#modalChangePassword"><i class="fa fa-fw fa-lock"></i> Change Password</a>
